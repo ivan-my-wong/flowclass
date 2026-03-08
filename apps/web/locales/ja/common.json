@@ -1,0 +1,122 @@
+{
+  "action": {
+    "logout": "サインアウト",
+    "back": "戻る",
+    "next": "Next",
+    "delete": "削除",
+    "finish": "完了",
+    "cancel": "キャンセル",
+    "update": "更新",
+    "create": "作成",
+    "upgrade": "計画とサブスク",
+    "modify": "修正",
+    "confirm": "確認",
+    "enquiry": "お問い合わせ",
+    "leave": "退出",
+    "join": "参加",
+    "add": "追加",
+    "share": "共有",
+    "submit": "送信",
+    "upload": "アップロード",
+    "contact": "連絡する",
+    "confirmDelete": "本当に削除しますか?",
+    "nextStep": "次の段階に",
+    "confirmLeave": "本当に退出しますか?",
+    "pay": "支払う",
+    "close": "閉じる",
+    "review": "レビュー",
+    "tryAgain": "もう一度試してください",
+    "continueToTheApplication": "続けて申し込む",
+    "viewDetails": "詳細を見る",
+    "applyHere": "ここで申し込む",
+    "addToWishlist": "ウィッシュリストに追加",
+    "viewWishlist": "ウィッシュリストを見る"
+  },
+  "section": {
+    "title": "タイトル",
+    "type": "カテゴリ",
+    "label": "レーベル",
+    "comment": "コメント",
+    "cover": "カバー",
+    "basicInfo": "基本情報"
+  },
+  "description": {
+    "no": "いいえ",
+    "info": "説明",
+    "brief": "簡単な紹介",
+    "noName": "無題",
+    "status": "状態",
+    "tag": "タグ",
+    "to": "へ",
+    "or": "または",
+    "remark": "備考",
+    "free": "無料"
+  },
+  "entity": {
+    "student": "生徒",
+    "class": "クラス",
+    "session": "セッション",
+    "user": "ユーザー",
+    "school": "学校"
+  },
+  "roles": {
+    "operations": "オペレーション",
+    "instructor": "講師",
+    "schoolAdmin": "学校管理者",
+    "siteAdmin": "サイト管理者"
+  },
+  "unit": {
+    "min": "分"
+  },
+  "fields": {
+    "locality": "地域",
+    "address": "住所",
+    "email": "メールアドレス",
+    "website": "ウェブサイト",
+    "phone": "電話番号",
+    "name": "名前",
+    "remarks": "備考",
+    "basicInfo": "基本情報",
+    "price": "価格",
+    "quota": "上限",
+    "discountedPrice": "割引価格",
+    "grade": "生徒のレベル"
+  },
+  "notFound": {
+    "back": "戻る",
+    "error": "エラー",
+    "contactTechnicalSupport": "技術支援に連絡する",
+    "pageNotFound": "このサイトはメンテナンス中です。後で確認してください！",
+    "INSTITUTION_NOT_FOUND": "機構が見つかりません",
+    "invalidDomain": "無効なドメイン",
+    "genericError": "このページはサーバーエラーががあります。ページをリフレッシュすると、ほどける可能性があります。"
+  },
+  "sectionTag": {
+    "COURSE_FEATURES": "特徴",
+    "COURSE_SYLLABUS": "シラバス",
+    "COURSE_TARGET": "対象",
+    "COURSE_INSTRUCTOR": "講師",
+    "COURSE_STUDENT_PERF": "生徒の実績",
+    "COURSE_APPLICATION": "申し込み",
+    "COURSE_ENQUIRY": "お問い合わせ",
+    "SCHOOL_ABOUT_US": "概要",
+    "SCHOOL_FACILITIES": "施設",
+    "SCHOOL_STUDENT_ACHIEVEMENT": "生徒の実績",
+    "SCHOOL_QUALIFICATION_AWARDS": "資格と受賞歴",
+    "SCHOOL_SUPPORT": "学校のサポート",
+    "SCHOOL_FAQS": "よくある質問"
+  },
+  "weekName": {
+    "Mon": "月曜日",
+    "Tue": "火曜日",
+    "Wed": "水曜日",
+    "Thu": "木曜日",
+    "Fri": "金曜日",
+    "Sat": "土曜日",
+    "Sun": "日曜日"
+  },
+  "wishlist": {
+    "title": "ウィッシュリストに追加",
+    "selectedCourses": "選択されたコース"
+  }
+}

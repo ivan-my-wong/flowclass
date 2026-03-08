@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+<url><loc>https://localhost:4000</loc><lastmod>2026-03-07T14:34:22.236Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://localhost:4000/elements/application-form</loc><lastmod>2026-03-07T14:34:22.238Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://localhost:4000/elements/calendar</loc><lastmod>2026-03-07T14:34:22.238Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://localhost:4000/elements/course-card</loc><lastmod>2026-03-07T14:34:22.238Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://localhost:4000/elements/course-list</loc><lastmod>2026-03-07T14:34:22.238Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://localhost:4000/enrol</loc><lastmod>2026-03-07T14:34:22.238Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://localhost:4000/enrol/error</loc><lastmod>2026-03-07T14:34:22.238Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://localhost:4000/enrol/success-payment</loc><lastmod>2026-03-07T14:34:22.238Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://localhost:4000/enrol/upload-receipt</loc><lastmod>2026-03-07T14:34:22.238Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://localhost:4000/profile</loc><lastmod>2026-03-07T14:34:22.238Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://localhost:4000/select</loc><lastmod>2026-03-07T14:34:22.238Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://localhost:4000/select/enrol</loc><lastmod>2026-03-07T14:34:22.238Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://localhost:4000/sitemap-sites.xml</loc><lastmod>2026-03-07T14:34:22.238Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://localhost:4000/500</loc><lastmod>2026-03-07T14:34:22.238Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://localhost:4000/zh-TW/500</loc><lastmod>2026-03-07T14:34:22.238Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://localhost:4000/404</loc><lastmod>2026-03-07T14:34:22.238Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://localhost:4000/zh-TW/404</loc><lastmod>2026-03-07T14:34:22.238Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+</urlset>

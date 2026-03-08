@@ -1,0 +1,73 @@
+{
+  "common": {
+    "actions": "Actions",
+    "activeStudents": "Active Students",
+    "averageScore": "Average Score",
+    "class": "Class",
+    "course": "Course",
+    "courseCompletion": "Course Completion",
+    "date": "Date",
+    "email": "Email",
+    "inactiveStudents": "Inactive Students",
+    "instructor": "Instructor",
+    "lesson": "Lesson",
+    "loading": "Loading...",
+    "name": "Name",
+    "noInstructorSelected": "No Instructor Selected",
+    "noLessonsFound": "No Lessons Found",
+    "phone": "Phone",
+    "selectClass": "Select Class",
+    "selectLesson": "Select Lesson",
+    "selectStatus": "Select Status",
+    "statistics": "Advanced Statistics",
+    "status": "Status",
+    "studentGrowth": "Student Growth",
+    "students": "Students",
+    "teacher": "Teacher",
+    "time": "Time",
+    "totalStudents": "Total Students"
+  },
+  "invoices": {
+    "activeStudents": "Active Students",
+    "attendanceStatus": "Attendance Status",
+    "averageInvoiceValue": "Average Invoice Value",
+    "completedLessons": "Completed Lessons",
+    "creditApplied": "Credit Applied",
+    "netPayments": "Net Payments",
+    "overdueInvoices": "Overdue Invoices",
+    "paidInvoices": "Paid Invoices",
+    "paymentStatus": "Payment Status",
+    "revenueGenerated": "Revenue Generated",
+    "searchByStudentName": "Search by student name",
+    "studentPaymentsForLessons": "Student Payments for Lessons",
+    "totalInvoices": "Total Invoices",
+    "totalLessonValue": "Total Lesson Value",
+    "totalRevenue": "Total Revenue",
+    "unpaidInvoices": "Unpaid Invoices"
+  },
+  "revenue": {
+    "noClassData": "No class data available",
+    "noCourseData": "No course data available",
+    "noInstructorData": "No instructor data available",
+    "noStudentData": "No student data available"
+  },
+  "status": {
+    "canceled": "Canceled",
+    "cancelled": "Cancelled",
+    "completed": "Completed",
+    "inProgress": "In Progress",
+    "notStarted": "Not Started",
+    "scheduled": "Scheduled"
+  },
+  "student": {
+    "activeStudents": "Active Students",
+    "dropoutRate": "Dropout Rate",
+    "dropoutStudents": "Dropout Students",
+    "dropoutThisMonth": "Dropouts This Month",
+    "lastAttendance": "Last Attendance",
+    "monthlyDropoutRates": "Monthly Dropout Rates",
+    "newStudentsThisMonth": "New Students This Month",
+    "totalDropouts": "Total Dropouts",
+    "totalStudents": "Total Students"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": false,
+    "types": ["node", "reflect-metadata"],
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "es2017",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false,
+    "resolveJsonModule": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "migrations/**/*.ts",
+    "migrations/*.ts",
+    "src/models/appointment.entity.ts",
+    "src/application/admin/courses/appointment.controller.ts",
+    // "trigger.config.ts"
+    "src/models/availability.entity.ts",
+    "src/application/admin/courses/appointment.controller.ts"
+  ],
+  "exclude": ["node_modules", "test", "**/*.ts.bak"],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"],
+    "transpileOnly": true
+  },
+  "esModuleInterop": true
+}

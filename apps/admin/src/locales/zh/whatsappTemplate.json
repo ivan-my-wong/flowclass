@@ -1,0 +1,71 @@
+{
+  "whatsappTemplate": "WhatsApp 範本",
+  "addWhatsappTemplate": "新增 WhatsApp 範本",
+  "notYetReady": "我們將推出一項功能，讓您自動向學生發送提醒 WhatsApp 訊息。您可以先創建您的訊息範本。",
+  "filter": {
+    "searchPlaceholder": "按名稱搜索範本",
+    "allStatusesPlaceholder": "所有狀態",
+    "assignedToPlaceholder": "無"
+  },
+  "form": {
+    "add": "新增 WhatsApp 範本",
+    "edit": "更新 WhatsApp 範本",
+    "name": "範本名稱",
+    "nameRequirements": "僅限小寫字母、數字和下劃線",
+    "namePlaceholder": "輸入範本名稱",
+    "content": "範本內容",
+    "contentPlaceholder": "輸入範本內容",
+    "tags": "標籤",
+    "language": "語言",
+    "languagePlaceholder": "選擇語言",
+    "category": "類別",
+    "categoryPlaceholder": "選擇類別",
+    "assignedTo": "分配給",
+    "assignedToPlaceholder": "選擇分配對象",
+    "addVariable": "新增變量",
+    "nameRequired": "範本名稱為必填項",
+    "contentRequired": "範本內容為必填項",
+    "isDefault": "設置此範本為默認範本",
+    "isDefaultDescription": "如果設為默認，所有具有相同分配功能的其他範本將被設為非默認範本",
+    "alertPendingTemplate": "待審核範本",
+    "alertPendingTemplateDescription": "此範本正在等待審核。無法用於發送訊息。",
+    "alertUnsubmittedTemplate": "未提交範本",
+    "alertUnsubmittedTemplateDescription": "此範本未提交。無法用於發送訊息。",
+    "alertRejectedTemplate": "已拒絕範本",
+    "alertRejectedTemplateDescription": "此範本已被拒絕。無法用於發送訊息。",
+    "twilioIntegration": "Twilio 整合",
+    "twilioIntegrationDescription": "配置您的 Twilio 憑證以發送 WhatsApp 訊息。"
+  },
+  "action": {
+    "checkApprovalStatus": "檢查審批請求狀態"
+  },
+  "delete": {
+    "title": "刪除範本",
+    "description": "您確定要刪除此範本嗎？"
+  },
+  "message": {
+    "createSuccess": "成功創建 WhatsApp 範本",
+    "updateSuccess": "成功更新 WhatsApp 範本",
+    "deleteSuccess": "成功刪除 WhatsApp 範本",
+    "submitApprovalSuccess": "成功提交審批",
+    "alreadyApproved": "範本：{{name}} 已經審批通過！！"
+  },
+  "category": {
+    "all": "所有類別",
+    "authentication": "身份驗證",
+    "utility": "實用工具",
+    "marketing": "營銷"
+  },
+  "language": {
+    "all": "所有語言",
+    "english": "英語",
+    "chinese": "中文"
+  },
+  "status": {
+    "all": "所有狀態",
+    "approved": "已批准",
+    "rejected": "已拒絕",
+    "pending": "待定",
+    "unsubmitted": "未提交"
+  }
+}

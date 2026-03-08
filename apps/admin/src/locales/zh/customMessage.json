@@ -1,0 +1,107 @@
+{
+  "customMessage": {
+    "title": "通知範本",
+    "description": "為您的機構創建一個範本訊息",
+    "addTemplate": "新增範本",
+    "editTemplate": "編輯範本",
+    "showMessage": "顯示訊息",
+    "updatedAt": "更新時間"
+  },
+  "email": {
+    "title": "電子郵件",
+    "description": "電子郵件是一種通訊渠道，可讓您發送和接收郵件。",
+    "connected": "電子郵件已連接到您的帳戶",
+    "notYetConnected": "尚未連接電子郵件",
+    "notYetConnectedDescription": "請點擊下方按鈕將您的電子郵件連接到系統"
+  },
+  "whatsappWeb": {
+    "showQrCode": "顯示 QR 碼",
+    "connected": "WhatsApp 已連接到您的帳戶",
+    "notConnected": "WhatsApp 未連接到您的帳戶",
+    "connectedText": "已連接",
+    "disconnectedText": "已斷開連接",
+    "createWhatsappAccount": "創建 WhatsApp 整合帳戶",
+    "refreshStatus": "重新整理狀態",
+    "connectedAlertBox": "WhatsApp 已連接到您的帳戶。如果您想斷開連接，請點擊「重新創建帳號」按鈕。",
+    "clickToRefresh": "點擊以重新整理",
+    "notCreatedWhatsappAccount": "您尚未創建 WhatsApp 整合帳戶。",
+    "notCreatedWhatsappAccountDescription": "您必須先創建 WhatsApp 整合帳戶，然後才能連結您自己的 WhatsApp 帳戶。",
+    "isInititializing": "WhatsApp 正在初始化。請等待約 10 - 30 秒。如果此頁面未顯示 QR 碼，請關閉彈出窗口並重新整理頁面。",
+    "notYetConnected": "請在您的 WhatsApp 應用程式中前往 '設定'，然後轉到 '已連接設備'，點擊 '連接到 WhatsApp Web'。然後，掃描點擊 '掃描 QR 碼' 後彈出視窗中顯示的二維碼。",
+    "clickToScan": "點擊掃描",
+    "whatsappConnectedWording": "您的 WhatsApp 整合帳戶",
+    "removeSession": "重新創建帳號",
+    "removeSessionDescription": "如果您想斷開連接，請點擊「重新創建帳號」按鈕。",
+    "cancel": "取消",
+    "remove": "移除",
+    "checkStatus": "檢查狀態",
+    "connectWhatsapp": "連接 WhatsApp",
+    "whatsappNotificationDescription": "您需要先連接 WhatsApp 才能發送訊息。",
+    "connectionError": "連接 WhatsApp 失敗。請重試。",
+    "removeSessionSuccess": "WhatsApp 會話已成功移除",
+    "connectedDescription": "如果您遇到任何連接問題，請點擊 '重新整理狀態' 以重新獲取 QR 碼。",
+    "disconnectedDescription": "請在手機上打開您的 WhatsApp 應用程式，前往 '設定' > '設備' > '連結設備' 以打開掃描器",
+    "qrCodeUpdated": "QR 碼已更新。請掃描新的 QR 碼。"
+  },
+  "modalScanQrCode": {
+    "title": "連接到 WhatsApp",
+    "connected": "WhatsApp 已連接到您的帳戶。",
+    "mayTakeLongTime": "連接 WhatsApp 可能需要很長時間。請等待約 10 - 30 秒。",
+    "retryScanIfNotWorking": "如果連接不起作用，請關閉彈出窗口並重新點擊「重新創建帳號」。",
+    "howToConnect": "請在您的 WhatsApp 應用程式中前往 '設定'，然後轉到 '已連接設備'，點擊 '連接到 WhatsApp Web'。然後，掃描彈出窗口中顯示的二維碼。",
+    "connectionError": "連接 WhatsApp 失敗。請重試。"
+  },
+  "modalCreateWhatsappAccount": {
+    "title": "請在創建 WhatsApp 帳戶前確認您的電話號碼",
+    "description": "創建整合帳戶後，您的電話號碼將無法更改，否則整合將不再有效。",
+    "phoneNumber": "電話號碼",
+    "secondDescription": "如果電話號碼不正確，請前往 <5>聯絡我們</5> 頁面更改您的電話號碼。",
+    "initializeSessionSuccess": "WhatsApp 帳戶創建成功"
+  },
+  "retryConnection": {
+    "title": "我們目前無法連接到 WhatsApp Web 伺服器。",
+    "description": "請重試以嘗試連接到 WhatsApp Web 伺服器。",
+    "clickToRetry": "點擊重試"
+  },
+  "connectingToWhatsAppWebServer": {
+    "title": "正在連接到 WhatsApp Web 伺服器。請等待約 10 - 30 秒。",
+    "loadingTooLong": "如果加載時間過長，請聯繫支援團隊。",
+    "contactSupport": "聯繫支援團隊"
+  },
+  "form": {
+    "name": "名稱",
+    "namePlaceholder": "輸入名稱",
+    "nameRequired": "名稱為必填項",
+    "content": "內容",
+    "contentPlaceholder": "輸入內容",
+    "contentRequired": "內容為必填項",
+    "type": "類型",
+    "typePlaceholder": "選擇類型",
+    "emailNotification": "電子郵件通知",
+    "whatsappNotification": "WhatsApp 通知",
+    "editMessage": "編輯訊息",
+    "typeOptions": {
+      "admin_notif_after_enrollment_submitted": "當報名提交時通知管理員",
+      "student_notif_after_enrollment_submitted": "當報名提交時通知學生",
+      "student_notif_after_payment_approved": "當付款獲批時通知學生",
+      "student_notif_after_payment_rejected": "當付款被拒時通知學生",
+      "student_notif_after_application_confirmed": "當申請確認時通知學生",
+      "teacher_notif_after_application_submitted": "當申請提交時通知教師",
+      "student_notif_after_add_new_lesson": "當新增課程時通知學生",
+      "teacher_notif_after_add_new_class": "當新增班級時通知教師",
+      "student_notif_payment_reminder": "通知學生付款提醒",
+      "student_notif_after_change_lesson_date": "當更改課程日期時通知學生",
+      "student_lesson_reminder": "學生課程提醒",
+      "create_invoice": "通知學生新發票創建"
+    },
+    "updateSuccess": "通知範本更新成功"
+  },
+  "statuses": {
+    "disconnected": "您的 WhatsApp 帳戶目前已斷開連接。",
+    "connected": "您的 WhatsApp 帳戶目前已連接。",
+    "error": "您的 WhatsApp 帳戶目前處於錯誤狀態。",
+    "initializing": "您的 WhatsApp 帳戶目前正在初始化。",
+    "qr_code": "您的 WhatsApp 帳戶目前正在等待您掃描 QR 碼。",
+    "ready": "您的 WhatsApp 帳戶目前準備發送訊息。"
+  }
+}

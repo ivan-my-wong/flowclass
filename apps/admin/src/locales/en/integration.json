@@ -1,0 +1,200 @@
+{
+  "title": "Integrations",
+  "connectionLogs": "Connection Logs",
+  "active": "Active",
+  "inactive": "Inactive",
+  "needsReconnection": "Needs Reconnection",
+  "notAvailable": "Not Available",
+  "reconnect": "Reconnect",
+  "configure": "Configure",
+  "disconnect": "Disconnect",
+  "setUp": "Set Up",
+  "logoAlt": "{{name}} logo",
+  "providers": {
+    "googleCalendar": "Google Calendar"
+  },
+  "common": {
+    "errorTitle": "Error",
+    "next": "Next",
+    "disconnectSuccess": "{{service}} disconnected successfully.",
+    "errors": {
+      "getAuthUrlFailed": "Could not get authentication URL: {{error}}",
+      "disconnectFailed": "Failed to disconnect {{service}}: {{error}}",
+      "googleCredential": "Failed to get Google credential."
+    }
+  },
+  "types": {
+    "all": "All Integrations",
+    "payment": "Payment",
+    "videoConferencing": "Video Conferencing",
+    "calendar": "Calendar",
+    "communication": "Communication",
+    "storage": "Storage",
+    "analytics": "Analytics"
+  },
+  "descriptions": {
+    "stripe": "Process online payments, subscriptions, and manage billing with Stripe's secure payment gateway.",
+    "twilioWhatsapp": "Send automated messages and notifications to students via WhatsApp.",
+    "googleCalendar": "Connect your Google Calendar to automatically detect and import available time slots.",
+    "googleMeet": "Create and manage Google Meet video conferences for online classes and meetings.",
+    "googleSheet": "Sync your Flowclass data with Google Sheets for reporting and analysis.",
+    "googleDrive": "Sync documents and class materials with Google Drive for streamlined file management."
+  },
+  "googleCalendar": {
+    "name": "Google Calendar",
+    "connectGoogleCalendar": "Connect Google Calendar",
+    "refresh": "Refresh",
+    "selectCalendar": "Select Calendar",
+    "noCalendarsFound": "No calendars found",
+    "noIntegrationCalendars": "No calendar connections found. Please connect your Google Calendar first.",
+    "primary": "Primary",
+    "selected": "Selected",
+    "saveSelection": "Save Selection",
+    "owner": "Owner",
+    "writer": "Editor",
+    "reader": "Reader"
+  },
+  "googleSheet": {
+    "name": "Google Sheet",
+    "step1": {
+      "connectTitle": "Connect to Google Drive",
+      "connectDescription": "Link your Google account to create a spreadsheet and sync your Flowclass data automatically.",
+      "googleAccountLabel": "Google Account",
+      "chooseAccountDescription": "Choose a Google account to use for creating and syncing your data:",
+      "redirectingToGoogle": "Redirecting to Google...",
+      "signInWithGoogle": "Sign in with Google",
+      "errorAuthUrl": "Could not get Google authentication URL.",
+      "errorSignInFailed": "Failed to initiate Google Sign-In. Please try again.",
+      "connectedAccountLabel": "Connected account:",
+      "disconnecting": "Disconnecting...",
+      "errorDisconnectFailed": "Failed to disconnect Google Account. Please try again."
+    },
+    "createSuccess": "Google Sheet created/updated successfully.",
+    "updateConfigSuccess": "Google Sheet configuration updated successfully.",
+    "errors": {
+      "createFailed": "Failed to create/update Google Sheet: {{error}}",
+      "updateConfigFailed": "Failed to update Google Sheet configuration: {{error}}"
+    }
+  },
+  "googleDrive": {
+    "title": "Google Drive Integration",
+    "description": "Configure your Google Drive connection for seamless file management",
+    "refresh": "Refresh",
+    "selectFolder": "Select Folder",
+    "noFoldersFound": "No folders found",
+    "noIntegrationFolders": "No folder connections found. Please connect your Google Drive first.",
+    "selected": "Selected",
+    "saveSelection": "Save Selection",
+    "folderPath": "Folder Path",
+    "createFolder": "Create Folder",
+    "newFolderName": "New Folder Name",
+    "createSuccess": "Google Drive folder created/updated successfully.",
+    "updateConfigSuccess": "Google Drive configuration updated successfully.",
+    "colorLegend": "Color Legend",
+    "permissions": {
+      "title": "Required Permissions:",
+      "createFolder": "Access to create and manage folders",
+      "upload": "Upload and organize files"
+    },
+    "errors": {
+      "createFailed": "Failed to create/update Google Drive folder: {{error}}",
+      "updateConfigFailed": "Failed to update Google Drive configuration: {{error}}"
+    },
+    "account": {
+      "title": "Google Account Authentication",
+      "description": "Connect your Google account to enable Drive integration with minimum required permissions",
+      "connectSuccess": "Successfully authenticated with Google Drive",
+      "button": "Authenticate with Google Drive",
+      "noAccount": "No Account Connected",
+      "disconnectSuccess": "Disconnect Google Drive successfully.",
+      "disconnectFailed": "Disconnect Google Drive failed: {{error}}"
+    },
+    "rootFolder": {
+      "title": "Root Folder Selection",
+      "description": "Choose the root folder where all education materials will be organized.",
+      "warning": "Once a root folder is selected, it cannot be changed. Changing the folder may result in loss of materials and links, or inaccessibility. Please choose carefully as this action is irreversible.",
+      "button": "Choose Root Folder From Google Drive",
+      "loading": "Loading folders...",
+      "error": "Failed to load folders: {{error}}",
+      "noFoldersFound": "No folders found",
+      "noIntegrationFolders": "No folder connections found. Please connect your Google Drive first.",
+      "selected": "Selected",
+      "saveSelection": "Save Selection",
+      "settingLoading": "Setting Root Folder...",
+      "settingLoadingDescription": "This may take a moment while we configure your folder structure",
+      "noFolderSelected": "No folder selected",
+      "noFolderSelectedDescription": "Please select a root folder to continue.",
+      "select": "Select",
+      "quotaUnavailable": "Quota unavailable",
+      "quotaError": "Your Google Drive quota is not enough to create the root folder. Please try again with a smaller file size or select a different folder.",
+      "used": "Used",
+      "remaining": "Remaining",
+      "total": "Total",
+      "changeFolder": "Change Folder",
+      "accessValidation": "Access Validation :",
+      "writeVerified": "Write Access Verified"
+    },
+    "suggestedFolders": {
+      "title": "Suggested Folder Structure",
+      "description": "This structure will be created within your selected root folder"
+    },
+    "callback": {
+      "processing": "Processing connection...",
+      "processingDescription": "Finalizing your Google authorization and updating configuration.",
+      "success": "Google Drive connected successfully!",
+      "successTitle": "Connection Successful",
+      "successDescription": "Your account has been connected and integration status updated.",
+      "error": "Failed to process Google Drive connection: {{error}}",
+      "errorTitle": "Connection Failed",
+      "redirecting": "You will be redirected shortly...",
+      "loading": "Loading...",
+      "preparing": "Preparing your integration..."
+    }
+  },
+  "availability": {
+    "integrationCalendared": "Google Calendar connected successfully!",
+    "eventCreated": "Calendar event created successfully.",
+    "eventUpdated": "Calendar event updated successfully.",
+    "eventDeleted": "Calendar event deleted successfully.",
+    "errors": {
+      "connectCalendar": "Failed to connect Google Calendar",
+      "fetchIntegrationCalendars": "Failed to fetch calendar connections",
+      "fetchCalendarEvents": "Failed to fetch calendar events",
+      "fetchCalendarEvent": "Failed to fetch calendar event",
+      "createEventFailed": "Failed to create calendar event: {{error}}",
+      "updateEventFailed": "Failed to update calendar event: {{error}}",
+      "deleteEventFailed": "Failed to delete calendar event: {{error}}"
+    }
+  },
+  "onlineMeeting": {
+    "name": "Google Meet",
+    "connectGoogleMeet": "Connect Google Meet",
+    "refresh": "Refresh",
+    "createMeeting": "Create Meeting",
+    "meetingTitle": "Meeting Title",
+    "meetingDescription": "Meeting Description",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "timeZone": "Time Zone",
+    "generateLink": "Generate Link",
+    "copyLink": "Copy Link",
+    "linkCopied": "Link copied to clipboard",
+    "noMeetingsFound": "No meetings found",
+    "noIntegrationMeetings": "No meeting connections found. Please connect your Google Meet first.",
+    "integrationConnected": "Google Meet connected successfully!",
+    "statusToggled": "Integration status updated successfully",
+    "meetingCreated": "Meeting created successfully",
+    "meetingUpdated": "Meeting updated successfully",
+    "meetingDeleted": "Meeting deleted successfully",
+    "errors": {
+      "connectOnlineMeeting": "Failed to connect Google Meet",
+      "fetchIntegrationOnlineMeetings": "Failed to fetch meeting connections",
+      "fetchMeetings": "Failed to fetch meetings",
+      "fetchMeeting": "Failed to fetch meeting details",
+      "createMeeting": "Failed to create meeting",
+      "updateMeeting": "Failed to update meeting",
+      "deleteMeeting": "Failed to delete meeting",
+      "toggleStatus": "Failed to update integration status"
+    }
+  }
+}

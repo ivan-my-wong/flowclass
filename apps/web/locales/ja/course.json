@@ -1,0 +1,77 @@
+{
+  "enroll": "申し込むへ",
+  "seoTitle": "オンライン申し込み",
+  "enquire": "お問い合わせ",
+  "feature": "課程の特徴",
+  "courseMaterial": "課程の教材",
+  "timeslots": "時間枠",
+  "achievement": "成果",
+  "search": "検索",
+  "searchCourse": "課程を検索",
+  "searchByCategory": "分類で検索",
+  "selectorNoOptions": "課程検索のためにカテゴリーを選択してください。",
+  "searchByKeywords": "課程検索のためにカテゴリーのキーワードを選択してください。",
+  "showSearchResult": "検索結果を表示",
+  "q&a": "問題集",
+  "noQ&A": "この課程には問題集がありません",
+  "workshop": "ワークショップ",
+  "appointment": "アポイントメント",
+  "regular": "定期課程",
+  "recurring": "繰り返す課程",
+  "courseEnquiry": "課程についてお問い合わせ",
+  "technicalSupport": "技術サポート",
+  "typeOfTeachServices": "教育サービスの種類",
+  "regularDescription1": "この教育サービスは定期課程の一種です。",
+  "regularDescription2": "複数の授業が定期的に繰り返し行われることを示します。",
+  "regularDescription3": "始まった課程の中に参加するのができません、一期間の全授業に購入する必要があります。",
+  "appointmentDescription1": "この教育サービスはアポイントメントレッスンの一種です。",
+  "appointmentDescription2": "授業時間を柔軟に選べることを示します。",
+  "appointmentDescription3": "それぞれのレッスンで、講師と時間枠を予約できます。",
+  "workshopDescription1": "この教育サービスはイベントの一種です。",
+  "workshopDescription2": "イベントのセッションのいずれかに参加できます。",
+  "workshopDescription3": "各セッションは一日中以上続く可能性があります。",
+  "showing": "表示中",
+  "results": "結果",
+
+  "courseDetailCard": {
+    "perLesson": "一レッスンあたり",
+    "forEntire": "すべてのクラス",
+    "forEntireEvent": "イベント全体",
+    "classSize": "クラスあたりの生徒数",
+    "minutesPerClass": "一レッスンあたりの時間",
+    "earliestLesson": "開始時間",
+    "freeLesson": "無料レッスンあり",
+    "more": "さらに"
+  },
+  "courseEnquiryCard": {
+    "noPhone": "電話番号が提供されていません"
+  },
+  "T&C": {
+    "termsConditions": "利用規約"
+  },
+  "courseEnrollButton": {
+    "applicationClosed": "受付終了",
+    "contact": "申し込みの手続きについてはお問い合わせください",
+    "notStarted": "まだ受付始まってていません",
+    "ended": "ウェブサイトからの申し込みは受け付けていません",
+    "noSuitableTimeslot": "ウェブサイト上に利用可能な時間枠がありません",
+    "noQuota": "空席がありません",
+    "noClasses": "利用可能なクラスがありません"
+  },
+
+  "courseDefaultSectionTitle": {
+    "COURSE_FEATURES": "特徴",
+    "COURSE_DESC": "課程説明",
+    "COURSE_REVIEW": "レビュー",
+    "COURSE_SYLLABUS": "シラバス",
+    "COURSE_ARTICULATION": "資格",
+    "COURSE_INSTRUCTOR": "講師紹介",
+    "COURSE_STUDENT_PERF": "生徒の成果",
+    "COURSE_CERTIFICATION": "受講認証",
+    "COURSE_APPLICATION": "お申込み",
+    "COURSE_TARGET": "対象者",
+    "COURSE_LOCATION": "受講場所",
+    "COURSE_ENQUIRY": "お問い合わせ",
+    "COURSE_TIMETABLE": "時刻表"
+  }
+}

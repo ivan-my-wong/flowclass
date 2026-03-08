@@ -1,0 +1,86 @@
+{
+  "lessonDateTime": "Class Schedule",
+  "lesson": "Lesson",
+  "noLesson": "Can't find this lesson",
+  "addLesson": "Add Lesson",
+  "today": "Today",
+  "filter": "Filter",
+  "reset": "Reset",
+  "viewQrCode": "View Qr Code",
+  "downloadQrCode": "Download QR Code",
+  "action": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "reset": "Reset",
+    "viewDetail": "View detail",
+    "sendWhatsapp": "Send Whatsapp",
+    "sendEmail": "Send-Email",
+    "addRemarks": "Add remarks",
+    "changeLesson": "Change Lesson",
+    "deleteLesson": "Delete lesson",
+    "deleteClass": "Delete class",
+    "changeEntireLesson": "Change entire lesson",
+    "delayAllFollowingLesson": "Delay all following lessons",
+    "changeStudentsLesson": "Change Student's Lesson"
+  },
+  "selectCourse": "Select course",
+  "selectClass": "Select class",
+  "start": "Start time",
+  "end": "End time",
+  "description": "This lesson will ONLY be assigned to student enrolled in the selected class and course under their current lesson period",
+  "createLessonSuccess": "Create Lesson Success",
+  "deleteLessonSuccess": "Delete Lesson Success",
+  "lessonDetail": "Lesson Detail",
+  "searchPlaceholder": "Search student by typing email, name or phone",
+  "edit": "Edit",
+  "studentList": "Student list",
+
+  "lessonStats": {
+    "attendance": "Marked as Attended",
+    "quota": "Quota",
+    "quota1": "(Inherited from class)"
+  },
+  "dialog": {
+    "titleDeleteDialog": "Do you want to delete lesson",
+    "descriptionDeleteLesson": "This action is irreversible.."
+  },
+  "changedFrom": "Changed from",
+  "new": "New",
+  "choosePeriod": "Choose Period",
+  "promotion": {
+    "trialLesson": "Trial Lesson"
+  },
+  "postpone": {
+    "postponed": "POSTPONED",
+    "postpone": "You have selected to postpone this lesson!",
+    "postponeWarning": " A new lesson will be added one week after the current end of the period. Once you proceed, you will not be able to change the status of this attendance record."
+  },
+  "attendanceStatus": {
+    "attended": "Attended",
+    "notAttended": "Not Attended",
+    "postpone": "Postpone",
+    "pending": "Pending"
+  },
+  "changeEntireLesson": {
+    "changeTimeLessonSuccess": "Change entire lesson successfully",
+    "changeEntireLessonTitle": "Change Entire Lesson",
+    "changeEntireLessonDescription": "All students in the current lesson will be re-assigned to the new time slot. The new time slot will belong to the same course and class.",
+    "changeStartTime": "Lesson Start Time",
+    "changeEndTime": "Lesson End Time",
+    "tooltip": "Lessons in the past cannot be changed"
+  },
+  "updateLocationRoom": {
+    "success": "Update location successfully",
+    "error": "Update location failed"
+  },
+  "updateInstructor": {
+    "success": "Update instructor successfully",
+    "error": "Update instructor failed"
+  },
+  "delayFollowingLessons": {
+    "title": "Delay All Following Lessons",
+    "description": "The current lesson will be canceled, and an extra lesson will be assigned to all students in the current lesson in next available slot.",
+    "featureForRecurring": "This feature is only applicable to recurring classes",
+    "delayFollowingLessonsSuccess": "Save data delay all following lessons successfully"
+  }
+}

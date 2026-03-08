@@ -1,0 +1,6 @@
+export const DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'
+export const DATE_TIME_AM_FORMAT = 'YYYY/MM/DD hh:mm a'
+export const DATE_LOCAL_FORMAT = 'YYYY/MM/DD'
+export const TIME_FORMAT = 'HH:mm:ss'
+export const SORT_TIME_FORMAT = 'HH:mm'
+export const TIME_AM_FORMAT = 'hh:mm a'

@@ -1,0 +1,123 @@
+{
+  "enroll": "報名",
+  "seoTitle": "網上報名",
+  "enquire": "查詢",
+  "feature": "特色",
+  "courseMaterial": "課程資料",
+  "timeslots": "上課時間",
+  "achievement": "成就",
+  "search": "搜尋",
+  "searchCourse": "搜尋課程",
+  "searchByCategory": "按分類搜尋",
+  "selectorNoOptions": "請選擇類別以搜尋課程",
+  "searchByKeywords": "請選擇分類關鍵詞以搜尋課程",
+  "showSearchResult": "顯示搜尋結果",
+  "q&a": "問答",
+  "noQ&A": "此課程暫無問答",
+  "COURSE_FEATURES": "課程特點",
+  "COURSE_DESC": "課程描述",
+  "COURSE_REVIEW": "課程評價",
+  "COURSE_SYLLABUS": "課程大綱",
+  "COURSE_ARTICULATION": "課程關聯",
+  "COURSE_INSTRUCTOR": "課程講師",
+  "COURSE_STUDENT_PERF": "學生表現",
+  "COURSE_CERTIFICATION": "課程證書",
+  "COURSE_APPLICATION": "課程申請",
+  "COURSE_TARGET": "目標人群",
+  "COURSE_LOCATION": "地點",
+  "COURSE_ENQUIRY": "課程查詢",
+  "workshop": "工作坊",
+  "appointment": "預約",
+  "regular": "定期課程",
+  "recurring": "週期課程",
+  "courseEnquiry": "課程查詢",
+  "technicalSupport": "技術支援",
+  "typeOfTeachServices": "教學服務類型",
+  "regularDescription1": "此教學服務為定期課程類型。",
+  "regularDescription2": "這表示課程將按照固定頻率安排一定數量的課時。",
+  "regularDescription3": "每次報名時，你需要報讀整個時段的所有課程，除非允許隨時加入或提供試聽課程的選擇。",
+  "appointmentDescription1": "此教學服務為預約課程類型。",
+  "appointmentDescription2": "這表示你可以彈性選擇上課時間。",
+  "appointmentDescription3": "每堂課你都可以與老師預約上課時間。",
+  "workshopDescription1": "此教學服務為工作坊活動類型。",
+  "workshopDescription2": "你可以選擇報名參加活動的其中一個場次。",
+  "workshopDescription3": "每個場次可能持續多天。",
+  "showing": "顯示",
+  "results": "結果",
+  "forEvery": "每",
+
+  "subscription": {
+    "billingCycleRepeat": "帳單週期將重複",
+    "oneTimePayment": "作為一次性付款"
+  },
+
+  "classType": {
+    "regular": "常規",
+    "appointment": "預約",
+    "recurring": "週期",
+    "workshop": "活動與工作坊",
+    "subscription": "一次性付款",
+    "regularV2": "常規"
+  },
+
+  "courseDetailCard": {
+    "perLesson": "每堂課",
+    "forEntire": "整個課程",
+    "forEntireEvent": "整個活動",
+    "classSize": "每班學生數",
+    "minutesPerClass": "分鐘一堂",
+    "earliestLesson": "最早課程開始於",
+    "freeLesson": "提供免費課堂",
+    "more": "更多"
+  },
+  "courseEnquiryCard": {
+    "noPhone": "暫未提供電話號碼"
+  },
+  "T&C": {
+    "termsConditions": "條款與條件"
+  },
+  "courseEnrollButton": {
+    "applicationClosed": "報名已截止",
+    "contact": "請聯絡導師查詢課程",
+    "notStarted": "報名尚未開始",
+    "ended": "報名已結束",
+    "noSuitableTimeslot": "沒有合適的上課時段",
+    "noQuota": "沒有剩餘名額",
+    "noClasses": "沒有可用的課程"
+  },
+
+  "courseDefaultSectionTitle": {
+    "COURSE_FEATURES": "課程特點",
+    "COURSE_DESC": "課程描述",
+    "COURSE_REVIEW": "課程評價",
+    "COURSE_SYLLABUS": "課程大綱",
+    "COURSE_ARTICULATION": "課程關聯",
+    "COURSE_INSTRUCTOR": "課程講師",
+    "COURSE_STUDENT_PERF": "學生表現",
+    "COURSE_CERTIFICATION": "課程證書",
+    "COURSE_APPLICATION": "課程申請",
+    "COURSE_TARGET": "目標人群",
+    "COURSE_LOCATION": "地點",
+    "COURSE_ENQUIRY": "課程查詢",
+    "COURSE_TIMETABLE": "課程時間表"
+  },
+  "emailVerificationModal": {
+    "title": "請輸入您的個人電郵地址以接收報名連結。",
+    "emailLabel": "個人電郵地址",
+    "emailPlaceholder": "your@email.com",
+    "submit": "發送報名連結",
+    "invalidEmail": "請輸入有效的電郵地址。",
+    "error": "發送報名連結失敗，請重試。",
+    "successTitle": "報名連結已發送",
+    "successDescription": "報名連結已發送至您的收件箱，請查閱郵件以繼續。",
+    "close": "關閉"
+  },
+
+  "dialogEnroll": {
+    "title": "此課程需要先完成報名",
+    "description": "請填寫您的資料以檢查您是否符合報名資格。",
+    "noComplete": "您尚未完成所有先決條件的報名。",
+    "complete": "您已經完成所有先決條件的報名。",
+    "continue": "您將會被重定向到報名頁面。"
+  }
+}

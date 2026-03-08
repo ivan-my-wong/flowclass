@@ -1,0 +1,52 @@
+{
+  "buttons": {
+    "import": "Import",
+    "newDocument": "New Document",
+    "edit": "Edit",
+    "delete": "Delete",
+    "preview": "Preview",
+    "saveTemplate": "Save Template",
+    "select": "Select",
+    "campaignsList": "Campaigns List",
+    "createNew": "Create New Template"
+  },
+  "usedInCampaigns": "Used in Campaigns",
+  "certificateTemplatesEditor": "Certificate Templates Editor",
+  "bulkDocumentSender": "Bulk Document Sender",
+  "empty": {
+    "noTemplatesFound": "No certificate templates found. Create your first template to get started!"
+  },
+  "success": {
+    "createTemplate": "Template created successfully.",
+    "updateTemplate": "Template updated successfully.",
+    "deleteTemplate": "Template deleted successfully.",
+    "createBulkSendDocument": "Documents sent successfully.",
+    "updateBulkSendDocument": "Documents updated successfully.",
+    "deleteBulkSendDocument": "Documents deleted successfully.",
+    "resendDocumentCampaign": "Document resent successfully."
+  },
+  "errors": {
+    "createTemplate": "Failed to create template.",
+    "updateTemplate": "Failed to update template.",
+    "deleteTemplate": "Failed to delete template.",
+    "imageIsEmpty": "Please add an image template first!",
+    "mandatoryFieldMissing": "Please fill in all mandatory fields!",
+    "createBulkSendDocument": "Failed to send documents.",
+    "updateBulkSendDocument": "Failed to update documents.",
+    "deleteBulkSendDocument": "Failed to delete documents.",
+    "resendDocumentCampaign": "Failed to resend document."
+  },
+  "dialog": {
+    "titleDeleteDialog": "Delete Template",
+    "descriptionDeleteTemplate": "Are you sure you want to delete this template?",
+    "selectedRecords": "Selected Records"
+  },
+  "recipientsList": {
+    "viewRecipients": "View Recipients",
+    "campaignRecipients": "Campaign Recipients",
+    "template": "Template:",
+    "noRecipientsAvailable": "No recipients available.",
+    "resending": "Resending...",
+    "resend": "Resend"
+  }
+}

@@ -1,0 +1,659 @@
+{
+  "stepNames": {
+    "Students": "學生",
+    "Schools": "學校",
+    "Admin Staff": "管理人員",
+    "Tutors": "導師",
+    "Class Type": "課程類型",
+    "Notification": "通知",
+    "Promotions": "推廣",
+    "Setup": "設置",
+    "Add-ons": "附加功能",
+    "Overview": "概覽"
+  },
+  "subscription": "訂閱",
+  "heading": "管理您的訂閱",
+  "upgradeRequired": "需要升級",
+  "currentSubscription": "當前訂閱",
+  "monthlyPrice": "月費",
+  "free": "免費",
+  "expiryDate": "到期日期",
+  "status": "狀態",
+  "active": "啟用",
+  "expired": "已過期",
+  "upgradeToUnlock": "升級以解鎖：",
+  "upgradeNow": "立即升級",
+  "benefits": {
+    "moreFeatures": "前往更多高級功能",
+    "higherLimits": "更高的使用限制和配額",
+    "prioritySupport": "優先客戶支持"
+  },
+  "alertBox": {
+    "heading": "立即升級您的計劃，體驗更多自動營銷課程的功能",
+    "button": "管理您的訂閱",
+    "currently": "您目前訂閱的計劃：",
+    "currentPlan": "您目前使用的是 Flowclass 成長計劃",
+    "daysLeft": "免費試用剩餘天數",
+    "upgrade": "延長您的計劃"
+  },
+  "title": {
+    "FREE_TIER": "免費",
+    "STARTER_TIER": "入門",
+    "GROWTH_TIER": "成長",
+    "PRO_TIER": "專業"
+  },
+  "visitDashboard": {
+    "title": "前往付款主頁",
+    "description": "您可以通過 Stripe 主頁查看付款記錄並管理您的計劃。"
+  },
+  "bill": "帳單",
+  "mySubscription": "我的活躍訂閱",
+  "checkOutWithLink": "您的升級連結已創建。完成付款後，您的帳戶將自動升級",
+  "currentlySubscribed": "查看其他可以促進您教學業務增長的計劃：",
+  "paymentRecord": "付款記錄",
+  "nextBillDay": "下次計費日",
+  "billSetting": "帳單設置",
+  "allFeatures": "所有功能",
+  "upgrade": "升級",
+  "detail": "詳情",
+  "install": "安裝",
+  "currentPlan": "當前計劃",
+  "activeSubscription": "活躍訂閱",
+  "yourCurrentPlan": "您目前的方案",
+  "customPlanLabel": "您正在使用自訂方案",
+  "manageAllSubscription": "管理全部",
+  "approachingLimits": "接近限制",
+  "approachingLimitsLabel": "您正在使用 100% 的用戶和學校限制。考慮升級以避免服務中斷。",
+  "perMonth": "每月",
+  "perYear": "每年",
+  "monthly": "月付",
+  "yearly": "年付",
+  "per": "每",
+  "month": "月",
+  "year": "年",
+  "price": "價格",
+  "totalPrice": "總價格",
+  "subscribed": "已訂閱",
+  "cancelled": "已取消",
+  "schoolLowerCase": "學校",
+  "btnModify": "修改",
+  "usage": "使用量",
+  "manage": "管理",
+  "availablePlans": "可用計劃",
+  "switchPlans": "切換計劃",
+  "planCurrentlyActiveLabel": "此計劃目前在您的訂閱中處於活躍狀態",
+  "cancelNextBilling": "此計劃將在下一個計費期間取消",
+  "reviewChanges": "審查您的更改",
+  "noActiveSubscription": {
+    "description": "您沒有此服務的活躍訂閱",
+    "message": "您可以創建新訂閱或升級現有計劃以享受高級功能。",
+    "manageButton": "管理訂閱",
+    "upgradeTitle": "需要升級"
+  },
+  "updateSubscriptionSuccess": "成功更新訂閱，請刷新頁面查看更改",
+  "createSubscriptionPlanSuccess": "您的訂閱計劃已成功創建，您將被重定向到付款頁面",
+  "headerBtnViewSubscription": "查看訂閱",
+  "subscriptionDetail": {
+    "fetchError": "您尚未擁有訂閱。",
+    "startSubscription": "您從 {{date}} 開始訂閱",
+    "cancelSubscription": "您從 {{date}} 取消了訂閱",
+    "cancelSubscriptionTips": "您仍然可以前往高級功能，直到您當前的訂閱期結束於 {{date}}",
+    "nextBilling": "您的下一個計費日期是 {{date}}",
+    "resubscribe": "重新訂閱",
+    "currentPlan": "當前計劃",
+    "upgrade": "升級",
+    "downgrade": "降級"
+  },
+  "subscriptionPopup": {
+    "title": "更新訂閱",
+    "cancel": "取消",
+    "confirm": "確認",
+    "description": "您即將將訂閱更改為 {{plan}} {{period}} 計劃。\n您的下一筆訂閱費用將為每{{interval}} {{price}}。\n請確認您的操作。",
+    "annual": "年度",
+    "monthly": "月度"
+  },
+  "plan": {
+    "flowclassPlan": "Flowclass 計劃",
+    "seoPlan": "SEO 計劃",
+    "addOns": "附加功能"
+  },
+  "flowclass": {
+    "free": "免費",
+    "plus": "進階",
+    "premium": "高級"
+  },
+  "seo": {
+    "basic": "基礎",
+    "advance": "進階",
+    "supreme": "最高級"
+  },
+  "limit": {
+    "maxOfActiveStudents": "最大活躍學生數",
+    "maxOfNotificationReminders": "每月發送的最大通知數"
+  },
+  "channel": {
+    "whatsapp": "WhatsApp 提醒",
+    "assistedWhatsappOnboarding": "WhatsApp 輔助入職"
+  },
+  "user": {
+    "additional": "額外用戶",
+    "limit": "用戶（按機構）"
+  },
+  "branding": {
+    "premiumDomain": "高級域名",
+    "personalBranding": "在電子郵件通訊中使用個人電子郵件和名稱",
+    "noPlatformBranding": "付款頁面上沒有 Flowclass 品牌標識"
+  },
+  "promotion": {
+    "coupon": "優惠券代碼",
+    "additionalFee": "額外費用"
+  },
+  "noSubscriptionLabel": "您沒有任何活躍訂閱。請創建新訂閱以享受高級功能",
+  "createSubscriptionBtnLabel": "創建新訂閱",
+  "payment": {
+    "integratedWithStripe": "與 Stripe 集成",
+    "customFields": "自定義欄位",
+    "successTitle": "付款完成",
+    "successDesc": "您的付款成功。點擊下方按鈕返回訂閱管理頁面",
+    "redirectBtnLabel": "前往訂閱管理",
+    "upgradeSuccessTitle": "🎉 升級成功！",
+    "upgradeSuccessDesc": "恭喜！您的平台已成功升級。所有新功能即將準備就緒。",
+    "featuresReadySoon": "您的高級功能正在激活中，很快就會可用。",
+    "goToDashboard": "前往主頁",
+    "featureHighlights": {
+      "advancedFeatures": "高級功能",
+      "higherLimits": "更高限制",
+      "prioritySupport": "優先支援",
+      "enhancedTools": "增強工具"
+    }
+  },
+  "unused": {
+    "maxOfTotalStudents": "最大總學生數",
+    "maxOfTotalClasses": "最大班級數"
+  },
+  "addOns": {
+    "classroomManagement": "教室管理",
+    "teacherManagement": "教師管理"
+  },
+  "features": {
+    "seeAll": "比較所有功能",
+    "essential": "基本功能",
+    "advanced": "進階功能",
+    "premium": "高級功能"
+  },
+  "customerSupport": "全面客戶支持",
+  "emailAutomation": "電子郵件自動化",
+  "checkout": {
+    "failCheckout": "創建結賬會話失敗。請稍後再試",
+    "noPermission": "您沒有升級計劃的權限。請聯繫網站管理員。",
+    "subscriptionFailCheckout": "創建結賬會話失敗。請稍後再試，或前往您的 Stripe 主頁，查看是否存在任何未結算的付款。"
+  },
+  "comingSoon": "即將推出",
+  "paymentMethod": "付款方式",
+  "subscriptionDialog": {
+    "dialogTitle": "您已超出計劃限制",
+    "upgradePlan": "您可以升級現有計劃，創建更多課程頁面，並享受高級招生系統構建器功能。",
+    "upgradePlan2": "請升級您的計劃以解鎖此功能。",
+    "upgradePlan3": "您可以升級現有計劃，邀請更多用戶，並享受高級招生系統構建器功能。",
+    "upgradePlan4": "您可以升級現有計劃，連接 Stripe，並享受高級招生系統構建器功能。",
+    "upgrade": "計劃和訂閱價格",
+    "upgradeCreate": "您必須升級計劃才能創建更多課程項目。",
+    "contactSales": "聯繫我們的銷售團隊",
+    "messages": {
+      "starterPlanCourse": "升級到入門計劃，創建 3 個課程頁面並設置自定義路徑",
+      "premiumPlanCourse": "升級到高級計劃，創建 10 個課程頁面",
+      "discountCode": "升級到入門計劃，創建折扣碼"
+    }
+  },
+  "subscriptionSuccessPage": "感謝您支持我們並訂閱！\n您的訂閱已成功。我們感謝您的支持，並很高興您加入我們！",
+  "redirecting": "即將重定向到下一頁",
+  "importantNote": {
+    "title": "重要注意事項",
+    "updatedImmediately": "您的訂閱將在付款後立即更新",
+    "proratedAmountCover": "按比例計算的金額涵蓋到您下一個計費週期的剩餘天數",
+    "futureRenewal": "所有未來續費將按新計劃費率計算",
+    "downGradeAnytime": "您可以隨時降級，在下一個計費週期生效",
+    "downGradeEffectiveOn": "此操作將於 {{nextBillingDate}} 生效",
+    "cancelDownGrade": "您可以在生效日期前隨時取消此降級",
+    "upgradeBack": "您可以隨時升級回您當前的計劃",
+    "noRefund": "您當前的計費週期不會提供退款",
+    "remainUntilNextBil": "您的訂閱將保持活躍直到 {{nextBillingDate}}",
+    "loseAllFeatures": "計費週期結束後，您將失去所有功能的前往權限",
+    "resubscribe": "您可以隨時重新訂閱",
+    "noPaymentRequired": "無需付款。您的訂閱和功能將立即更新",
+    "switchBack": "您可以隨時切換回來或再次升級",
+    "renewalReamins": "您的下一次續費仍為 {{nextBillingDate}}"
+  },
+  "cancelLabelConfirm": "我理解我將在當前計費週期結束後失去此服務的前往權限",
+  "cancelLabelBackup": "我已從此服務導出任何重要數據",
+  "actions": {
+    "proceedReview": "檢視計劃",
+    "proceedPayment": "繼續付款",
+    "backToPlans": "返回計劃",
+    "upgrade": "立即升級",
+    "substitute": "確認更改",
+    "downgrade": "確認降級",
+    "cancelSubscriptions": "取消訂閱",
+    "keepSubscription": "保持訂閱",
+    "cancelConfirm": "確認取消"
+  },
+  "alert": {
+    "subscriptionUpdated": "訂閱成功更新"
+  },
+  "actionType": {
+    "upgrade": "升級至",
+    "downgrade": "降級至",
+    "substitute": "切換至"
+  },
+  "subscriptionManagement": {
+    "pageTitle": "訂閱",
+    "btnNewPlan": "訂閱新計劃",
+    "createSubscription": "創建訂閱",
+    "tabSubscription": "訂閱",
+    "tabOverview": "概覽",
+    "tabBilling": "帳單歷史",
+    "customPlanTitle": "需要自訂方案？",
+    "customPlanDescription": "建立自己的訂閱。"
+  },
+  "manageSubscription": {
+    "title": "訂閱管理",
+    "currentPlanSummary": "當前訂閱計劃記錄",
+    "noActivePlan": "未找到活躍的訂閱計劃",
+    "planDetails": {
+      "title": "當前計劃詳情",
+      "noData": "無計劃數據可用"
+    }
+  },
+  "billingHistory": {
+    "column": {
+      "date": "日期",
+      "amount": "金額",
+      "status": "狀態",
+      "actions": "操作"
+    },
+    "tableActions": {
+      "detailInvoice": "查看發票和收據",
+      "downloadInvoice": "下載"
+    }
+  },
+  "prorateAmountLabel": "剩餘 {{days}} 天的按比例計算金額",
+  "nextRenewalDate": "下次續費 {{date}}",
+  "overviewCards": {
+    "activeSvc": {
+      "title": "活躍服務",
+      "subtitle": "所有服務正常運行",
+      "subtitle2": "系統健康"
+    },
+    "annualFee": {
+      "title": "年度訂閱費",
+      "subtitle": "已付款 - {{summary?.paymentDate}}",
+      "subtitle2": "包含 {{setupFeeAmount}} 設置費"
+    },
+    "nextBilling": {
+      "title": "下次計費日期",
+      "subtitle": "所有活躍服務的年度續費",
+      "subtitle2": ""
+    },
+    "isTrial": {
+      "title": "您目前正在免費試用",
+      "subtitle": "您的試用期將於 {{date}} 結束",
+      "subtitle2": "您可以隨時升級到付費計劃"
+    }
+  },
+  "addPlan": {
+    "dialogTitle": "訂閱新計劃",
+    "dialogDes": "選擇您想要添加的計劃類別",
+    "selectCatLabel": "選擇類別",
+    "btnBackToCat": "返回類別",
+    "btnBackToPlan": "返回計劃選擇",
+    "reviewPlanSelections": "審查您的選擇",
+    "billDetail": "帳單詳情",
+    "creditBalance": "可用積分",
+    "amountDueToday": "今日應付金額",
+    "newPlanCost": "新計劃費用",
+    "currentPlanCost": "當前計劃費用",
+    "totalCost": "總費用"
+  },
+  "modifyPlan": {},
+  "trialUpgrade": {
+    "title": "試用計劃限制",
+    "description": "由於您正在使用試用計劃，您無法單獨升級每個計劃。要單獨修改每個計劃，請創建一個活躍的訂閱。",
+    "cancel": "取消",
+    "createYearlySubscription": "創建年度訂閱"
+  },
+  "planType": {
+    "counterPlanDesc": "調整此功能的數量。更改將反映在您的下一個計費週期中",
+    "BASE_USER": {
+      "title": "用戶",
+      "desc": "用戶"
+    },
+    "MULTIPLE_SCHOOL": {
+      "title": "學校",
+      "desc": "學校"
+    },
+    "MULTIPLE_ADMIN": {
+      "title": "管理員"
+    },
+    "MULTIPLE_TUTOR": {
+      "title": "導師"
+    },
+    "CLASS_TYPE": {
+      "title": "課程類型",
+      "desc": "啟用不同類型的課程",
+      "desc2": "啟用正確的課程類型可確保您的排程、註冊和付款工作流程與您組織實際運營課程的方式相匹配"
+    },
+    "FEATURE_ENABLE": {
+      "title": "高級功能",
+      "desc": "增強您的平台功能"
+    },
+    "NOTIFICATION_CHANNEL": {
+      "title": "通知",
+      "desc": "管理您的客戶溝通"
+    },
+    "PROMOTION_FEES": {
+      "title": "促銷和費用",
+      "desc": "營銷和定價工具"
+    },
+    "INTEGRATION": {
+      "title": "集成",
+      "desc": "集成工具"
+    },
+    "CUSTOMER_SUPPORT": {
+      "title": "客戶支持",
+      "desc": "客戶支持"
+    }
+  },
+  "stripeProduct": {
+    "CLASS_TYPE_REGULAR": "常規",
+    "CLASS_TYPE_RECURRING": "循環",
+    "CLASS_TYPE_APPOINTMENT": "預約",
+    "FEATURE_ENABLE_OWN_BRANDING": "品牌",
+    "NOTIFICATION_CHANNEL_EMAIL_ONLY": "電子郵件",
+    "NOTIFICATION_CHANNEL_EMAIL_WHATSAPP_OFFICIAL": "官方 WhatsApp",
+    "NOTIFICATION_CHANNEL_EMAIL_WHATSAPP_UNOFFICIAL": "非官方 WhatsApp",
+    "PROMOTION_FEES_BASIC": "優惠券",
+    "PROMOTION_FEES_ADVANCED": "進階推廣功能",
+    "FEATURE_ENABLE_STUDENT_PORTAL": "學生平台",
+    "FEATURE_ENABLE_TUTOR_CENTRAL": "導師中心",
+    "FEATURE_ENABLE_QRCODE_ATTENDANCE": "QR 碼考勤",
+    "FEATURE_ENABLE_RESCHEDULE_REQUEST": "在學生平台要求調堂",
+    "FEATURE_ENABLE_APPLY_MULTIPLE_COURSES": "多課程",
+    "FEATURE_ENABLE_CREDIT_SYSTEM": "學生積分結餘",
+    "BASE_USER_100": "基礎用戶 100",
+    "BASE_USER_500": "基礎用戶 500",
+    "BASE_USER_1500": "基礎用戶 1500",
+    "BASE_USER_3000": "基礎用戶 3000",
+    "BASE_USER_5000": "基礎用戶 5000",
+    "BASE_USER_UNLIMITED": "基礎用戶無限制",
+    "BASE_USERS": "用戶",
+    "MULTIPLE_SCHOOL": "學校",
+    "MULTIPLE_ADMIN": "管理員",
+    "MULTIPLE_TUTOR": "導師",
+    "INTEGRATION_GOOGLE_DRIVE": "Google 雲端硬碟"
+  },
+  "stripeProductDescription": {
+    "CLASS_TYPE_REGULAR": "固定期限課程，設有明確的開課及結束日期。非常適合班制教學或學期制課程。",
+    "CLASS_TYPE_RECURRING": "持續進行的課堂，學生可隨時加入，沒有結束日期。非常適合一次性付款或長期課程。",
+    "CLASS_TYPE_APPOINTMENT": "靈活預約類型，學生可自由選擇時段進行一對一或小組課堂。",
+    "FEATURE_ENABLE_OWN_BRANDING": "移除 Flowclass 品牌標誌，所有系統電郵及訊息均可用您自己的學校名稱和發件人地址，提升品牌形象。",
+    "NOTIFICATION_CHANNEL_EMAIL_ONLY": "所有通知及提醒僅經電郵發送。（所有方案均已包含）",
+    "NOTIFICATION_CHANNEL_EMAIL_WHATSAPP_OFFICIAL": "透過官方 WhatsApp Business（Twilio 連接）及電郵發送通知，提升學員回應率。",
+    "NOTIFICATION_CHANNEL_EMAIL_WHATSAPP_UNOFFICIAL": "透過我們的非官方 WhatsApp 方案及電郵發送通知，毋須自設 WhatsApp Business 帳號。",
+    "PROMOTION_FEES_BASIC": "基本推廣功能：可使用優惠券，提升招生或設立特價方案。",
+    "PROMOTION_FEES_ADVANCED": "進階推廣功能：除優惠券外，還可讓新生於網上預約試堂。",
+    "FEATURE_ENABLE_STUDENT_PORTAL": "讓學生可登入專屬平台，自行預約、申請改期及查閱發票與收據。",
+    "FEATURE_ENABLE_TUTOR_CENTRAL": "啟用導師管理後台：導師可登入查閱課表、管理課堂、點名及查看薪酬。",
+    "FEATURE_ENABLE_QRCODE_ATTENDANCE": "以二維碼點名，學生掃描即可完成出席登記，適用於線上及實體課堂。",
+    "FEATURE_ENABLE_RESCHEDULE_REQUEST": "學生可於平台直接申請改期，減省行政工作，提升彈性。",
+    "FEATURE_ENABLE_APPLY_MULTIPLE_COURSES": "允許學生於同一帳號報讀多個課程或班型，適合家庭或重複報讀學生。",
+    "FEATURE_ENABLE_CREDIT_SYSTEM": "啟用積分或儲值系統，學生可預先購買積分並靈活預約課堂。",
+    "BASE_USER_100": "最多 100 名學生的基本方案，適合個人導師或小型班。",
+    "BASE_USER_500": "最多 500 名學生的基本方案，適合正成長的教育中心。",
+    "BASE_USER_1500": "最多 1,500 名學生的方案，適合中型學校或多分校經營。",
+    "BASE_USER_3000": "最多 3,000 名學生的方案，適合大型機構或多元課程運營。",
+    "BASE_USER_5000": "最多 5,000 名學生的方案，適合大型成熟教育機構。",
+    "BASE_USER_UNLIMITED": "學生人數無上限，全面支援業務擴展。",
+    "BASE_USERS": "您方案內包含的學生人數上限，決定可註冊的最大學生人數。",
+    "MULTIPLE_SCHOOL": "可於一個帳戶內管理多間學校或分校，按實際校數收費。",
+    "MULTIPLE_ADMIN": "增加額外管理員，用於處理預約、收費及校務管理。",
+    "MULTIPLE_TUTOR": "增加額外導師帳號，供導師查閱課表及進行課堂管理及點名。",
+    "INTEGRATION_GOOGLE_DRIVE": "連接 Google Drive，方便管理教材和文件。",
+    "SETUP_FEE_SCHOOL_1": "首間學校或中心的一次性設定及數據遷移費用，由專業團隊協助導入資料及設置帳戶。",
+    "SETUP_FEE_INSTITUTION_2": "第二間學校或分校的一次性設定及數據遷移費用，包含資料匯入及系統配置。",
+    "SETUP_FEE_INSTITUTION_3": "第三間學校或分校的一次性設定及數據遷移費用，包含資料匯入及系統配置。",
+    "SETUP_FEE_PER_INSTITUTION_AFTER_4": "每間第四間及以後的學校/分校的一次性設定及數據遷移費用，包含資料匯入及系統配置。",
+    "MULTIPLE_INSTITUTION_4": "每間第四間及以後的學校/分校的年度費用。包含持續支援及管理服務。專業服務確保營運順暢。",
+    "MULTIPLE_INSTITUTION_10": "每間第十間及以後的學校/分校的年度費用。包含持續支援及管理服務。大型多校區營運的高效管理。",
+    "MULTIPLE_INSTITUTION_20": "每間第二十間及以後的學校/分校的年度費用。包含持續支援及管理服務。廣泛地理覆蓋機構的簡化管理。",
+    "MULTIPLE_INSTITUTION_50": "每間第五十間及以後的學校/分校的年度費用。包含持續支援及管理服務。主要教育機構的企業級服務。",
+    "MULTIPLE_INSTITUTION_UNLIMITED": "每間無限間及以後的學校/分校的年度費用。包含持續支援及管理服務。無限擴展的全面支援。",
+    "MULTIPLE_INSTITUTION_1": "每間第一間及以後的學校/分校的年度費用。包含持續支援及管理服務。成長中機構的專業服務。",
+    "MULTIPLE_ADMIN_4": "第 4 位及之後每位管理員的年費。包含持續存取與管理服務。擴展行政團隊的高效管理。",
+    "MULTIPLE_ADMIN_10": "第 10 位及之後每位管理員的年費。包含持續存取與管理服務。大型行政營運的簡化管理。",
+    "MULTIPLE_ADMIN_20": "第 20 位及之後每位管理員的年費。包含持續存取與管理服務。企業級營運的專業管理。",
+    "MULTIPLE_ADMIN_30": "第 30 位及之後每位管理員的年費。包含持續存取與管理服務。主要教育機構的高效管理。",
+    "MULTIPLE_ADMIN_50": "第 50 位及之後每位管理員的年費。包含持續存取與管理服務。大型營運的簡化管理。",
+    "MULTIPLE_ADMIN_UNLIMITED": "無上限方案：每位管理員的年費。包含持續存取與管理服務。無限行政擴展的全面管理。",
+    "MULTIPLE_ADMIN_1": "第 1 位及之後每位管理員的年費。包含持續存取與管理服務。成長中行政團隊的專業管理。",
+
+    "MULTIPLE_TUTOR_2": "第 2 位及之後每位導師的年費。包含持續存取與管理服務。擴展教學團隊的高效管理。",
+    "MULTIPLE_TUTOR_4": "第 4 位及之後每位導師的年費。包含持續存取與管理服務。成長中教育營運的簡化管理。",
+    "MULTIPLE_TUTOR_10": "第 10 位及之後每位導師的年費。包含持續存取與管理服務。中型教學營運的專業管理。",
+    "MULTIPLE_TUTOR_20": "第 20 位及之後每位導師的年費。包含持續存取與管理服務。大型教學團隊的高效管理。",
+    "MULTIPLE_TUTOR_50": "第 50 位及之後每位導師的年費。包含持續存取與管理服務。主要教育機構的簡化管理。",
+    "MULTIPLE_TUTOR_UNLIMITED": "無上限方案：每位導師的年費。包含持續存取與管理服務。無限教學擴展的全面管理。",
+    "MULTIPLE_TUTOR_1": "第 1 位及之後每位導師的年費。包含持續存取與管理服務。成長中教學營運的專業管理。",
+
+    "CUSTOMER_SUPPORT_ADVANCED": "進階客戶支援，享有更快回應速度及專屬帳戶經理。包括優先處理支援票、延長服務時間，以及針對複雜實施需求的個人化協助。",
+    "CUSTOMER_SUPPORT_BASIC": "基本客戶支援，提供標準回應時間。包含於辦公時間內的電郵及即時聊天支援、完整教學文件及自助社群資源。",
+    "CUSTOMER_SUPPORT_EXPERT": "專家級客戶支援，享有即時回應及專屬帳戶經理。包括 24/7 優先支援、自訂培訓課程，以及為企業級實施提供策略諮詢。"
+  },
+  "client": {
+    "noDataAvailable": "沒有可用的訂閱計劃",
+    "buildYourPackage": "構建您的套餐",
+    "customizeSolution": "自定義您的完美解決方案",
+    "subscriptionPlanRecordsTable": {
+      "allClientSubscriptions": "所有客戶訂閱",
+      "mySubscriptions": "我的訂閱",
+      "addClient": "添加客戶",
+      "searchAllClients": "搜索所有客戶...",
+      "searchSubscriptions": "搜索訂閱...",
+      "nextBilling": "下次計費",
+      "noClientsFound": "未找到客戶",
+      "noSubscriptionsFound": "未找到訂閱",
+      "totalRecords": "總記錄數",
+      "active": "啟用",
+      "trial": "試用"
+    },
+    "section": {
+      "student": {
+        "question": "您將有多少學生？",
+        "description": "選擇您預計在未來一年中擁有的學生總數。"
+      },
+      "school": {
+        "question": "您將管理多少所學校或中心？",
+        "description": "選擇您希望管理的學校或中心數量。",
+        "inputLabel": "學校數量",
+        "schoolLabel": "所學校"
+      },
+      "setup": {
+        "question": "您希望我們的團隊幫助設置您的課程並遷移數據嗎？",
+        "description": "我們提供專業的設置和遷移服務。我們的團隊將幫助您從 Excel 或其他系統導入您的課程、學生和時間表，讓您能夠更快地開始，減少麻煩。",
+        "yesLabel": "是的，我希望在設置和數據遷移方面獲得協助",
+        "noLabel": "不，我將自己設置所有內容"
+      },
+      "adminStaff": {
+        "question": "有多少管理人員將使用該系統？",
+        "description": "選擇需要系統前往權限的管理人員總數（不包括導師）。管理人員是指幫助管理平台的用戶，例如：",
+        "schoolManagers": "學校經理",
+        "receptionists": "接待員",
+        "financeAdmin": "財務/管理人員",
+        "coordinators": "協調員",
+        "inputLabel": "管理員數量"
+      },
+      "tutor": {
+        "question": "有多少導師將使用該系統？",
+        "description": "選擇需要系統前往權限的導師數量。導師是指任何教授課程或直接與學生進行教育目的互動的員工。每個導師可以：",
+        "viewScheduleLabel": "查看自己的教學時間表",
+        "attendanceLabel": "進行考勤",
+        "manageClassLabel": "管理自己的課程和學生",
+        "viewRateLabel": "查看自己的時薪和預期工資",
+        "inputLabel": "導師數量"
+      },
+      "classType": {
+        "question": "您需要哪些課程類型？",
+        "description": "啟用正確的課程類型可確保您的排程、註冊和付款工作流程與您組織實際運營課程的方式相匹配。",
+        "schedule": {
+          "question": "您的課程通常如何安排？",
+          "optionFixedSchedule": "固定時間表，時間段由您設定（例如每週一 4-6 點）",
+          "optionFlexibleSchedule": "靈活，學生可以在我們有可用時間段時隨時預訂"
+        },
+        "entering": {
+          "question": "學生可以隨時加入，還是只能在新的階段開始時加入（例如，新的月份或學期）？",
+          "optionRegularLabel": "每個學生都在完全相同的課程結束，無論他們何時加入（例如課程總是在每月最後一個週六下午 3:00 結束）",
+          "optionRecurringLabel": "學生根據開始加入的時間在不同的課程結束（例如課程總是在第 8 課結束）"
+        },
+        "optionOther": "其他/不確定",
+        "finalStep": "最後一步：結果",
+        "event": "活動",
+        "eventDescription": "適用於一次性工作坊、研討會或試聽課。",
+        "membership": "一次性付款",
+        "membershipDescription": "適用於持續前往和會員費福利。",
+        "includedByDefault": "活動和一次性付款課程類型始終包含在內，無需額外費用。",
+        "suggestion": {
+          "label": "根據您的運營情況，以下是我們建議的課程類型：",
+          "regular": "常規",
+          "regularDescription": "適用於有固定時間表和開始/結束日期的固定期限課程",
+          "recurring": "循環",
+          "recurringDescription": "適用於學生可以隨時加入且沒有結束日期的持續課程。",
+          "appointment": "預約",
+          "appointmentDescription": "適用於靈活、可預訂的時間段和私人課程。",
+          "noSuggestion": "目前的課程類型應該足夠滿足您的需求。"
+        }
+      },
+      "addons": {
+        "question": "您需要以下任何高級功能嗎？",
+        "description": "您可以通過啟用以下可選功能來增強您的體驗。每個附加功能都是單獨定價的，可以隨時添加或移除。",
+        "steps": {
+          "featureBranding": {
+            "question": "您想在電子郵件中使用自己的品牌嗎？",
+            "desc": "您是否希望移除 Flowclass 品牌並在系統電子郵件中使用自己的姓名或電子郵件作為發件人？",
+            "resultLabel": "品牌",
+            "yesLabel": "是的，啟用自定義電子郵件發件人和品牌移除",
+            "noLabel": "不，我對 Flowclass 品牌沒問題"
+          },
+          "featurePortal": {
+            "question": "您想讓學生前往自助服務門戶嗎？",
+            "desc": "您希望您的學生擁有自己的門戶來管理他們的課程、提出在學生平台要求調堂、提交問題和查看發票嗎？",
+            "resultLabel": "學生平台",
+            "yesLabel": "是的，啟用學生平台",
+            "noLabel": "不，我不需要這個功能"
+          },
+          "featureTutorCentral": {
+            "question": "您希望每個導師都能登錄系統嗎？",
+            "desc": "您想使用導師中心嗎？它包括導師數據庫、自動工資計算、導師可用性管理和考勤選項。",
+            "resultLabel": "導師中心",
+            "yesLabel": "是的，啟用導師中心",
+            "noLabel": "不，我不需要這個功能"
+          },
+          "featureQrCode": {
+            "question": "您想使用 QR 碼追蹤考勤嗎？",
+            "desc": "您想啟用 QR 碼考勤，讓學生可以通過掃描代碼進行簽到嗎？這簡化了線上和線下課程的考勤追蹤。",
+            "resultLabel": "QR 碼考勤",
+            "yesLabel": "是的，啟用 QR 碼考勤",
+            "noLabel": "不，我不需要這個功能"
+          },
+          "optionNoLabel": "不，我不需要此功能",
+          "creditSystem": {
+            "question": "你想啟用學生積分功能嗎？",
+            "desc": "你是否希望能夠即時以積分方式處理退款、手動發放折扣，並透過積分鼓勵學生多次報讀課程？學生可隨時將積分用於任何課程付款，提升續班率及學生滿意度！",
+            "resultLabel": "學生積分",
+            "yesLabel": "是的，啟用學生積分",
+            "noLabel": "不，我不需要這個功能"
+          }
+        }
+      },
+      "notification": {
+        "question": "您想使用 WhatsApp 通知學生嗎？",
+        "description": "選擇您希望如何向學生傳達重要更新和提醒。默認情況下，包含電子郵件通知。啟用 WhatsApp 以更直接和方便地聯繫學生。",
+        "steps": {
+          "wa": {
+            "question": "您想通過 WhatsApp 向學生發送通知嗎？",
+            "yesLabel": "是的，我想使用 WhatsApp 通知",
+            "noLabel": "不，電子郵件通知就足夠了"
+          },
+          "official": {
+            "question": "您是否創建了自己的 Meta (Facebook) 官方 WhatsApp Business 帳戶？",
+            "yesLabel": "是的，我有官方 WhatsApp Business 帳戶",
+            "yesDesc": "我們將通過 Twilio 連接",
+            "noLabel": "不，我沒有官方帳戶",
+            "noDesc": "您可以使用我們的非官方 WhatsApp 集成"
+          }
+        },
+        "resultLabel": {
+          "email": "電子郵件",
+          "waOfficial": "WhatsApp（通過 Twilio 官方）",
+          "waUnofficial": "WhatsApp（非官方）"
+        }
+      },
+      "promotion": {
+        "question": "您希望在平台上啟用哪一種促銷等級？",
+        "description": "啟用高級促銷功能以：",
+        "descriptionList": {
+          "trial": "讓學生可以在線預約試聽課，並在報名前體驗課堂。",
+          "bundle": "提供套票優惠，學生購買多堂課時可享有特別折扣。"
+        },
+        "yes": "是的",
+        "no": "不",
+        "coupon": "基本（僅優惠券）",
+        "couponTrialLabel": "高級（優惠券 + 試聽課 + 套票優惠）"
+      }
+    },
+    "overview": {
+      "reviewPackage": "審查您的套餐",
+      "reviewSelection": "確認您的選擇並繼續付款"
+    },
+    "subtotal": "小計",
+    "total": "總計",
+    "totalAnnual": "年度總計",
+    "subTotal": "小計",
+    "setupFee": "設置費",
+    "setupFeeReq": "需要設置費",
+    "setupFeeFirstInvoice": "一次性費用將添加到第一張發票",
+    "setupFeeOneTime": "設置費（一次性）",
+    "firstYearSetup": "第一年總計（包括設置費）",
+    "proceedPayment": "繼續付款",
+    "priceSummary": "價格摘要",
+    "stripeProduct": {
+      "CLASS_TYPE_REGULAR": "常規",
+      "CLASS_TYPE_RECURRING": "循環",
+      "CLASS_TYPE_APPOINTMENT": "預約"
+    }
+  },
+  "presetPlanNames": {
+    "subscribePresetPlan": "訂閱預設計劃",
+    "mostPopular": "最受歡迎",
+    "startUsing": "開始使用",
+    "INDIVIDUAL_TRAINERS_TUTORS": "個人導師和培訓師",
+    "STARTUP_EDUCATION_CENTRES": "初創教育中心",
+    "GROWING_EDUCATION_CENTRES": "成長教育中心",
+    "MULTI_BRANCH_EDUCATION_CENTRES": "多分校教育中心",
+    "SMALL_SCALE_EDUCATION_CENTRES": "小型教育中心",
+    "MEDIUM_SIZE_EDUCATION_CENTRES": "中型教育中心",
+    "baseUserQuantity": "{{count}} 名學生",
+    "schoolQuantity": "{{count}} 所學校",
+    "classTypeEnable": "{{count}} 種課程類型",
+    "notificationQuantity": "{{count}} 個通知",
+    "adminQuantity": "{{count}} 名管理員",
+    "tutorQuantity": "{{count}} 名導師",
+    "OWN_BRANDING": "自有品牌",
+    "CREDIT_SYSTEM": "積分系統",
+    "TUTOR_CENTRAL": "導師中心",
+    "STUDENT_PORTAL": "學生門戶",
+    "APPLY_MULTIPLE_COURSES": "申請多個課程",
+    "EMAIL": "電子郵件",
+    "TWILIO_WHATSAPP": "官方 WhatsApp",
+    "UNOFFICIAL_WHATSAPP": "非官方 WhatsApp",
+    "promotionTier": "推廣等級"
+  }
+}

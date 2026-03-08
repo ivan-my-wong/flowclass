@@ -1,0 +1,124 @@
+{
+  "enroll": "Apply Here",
+  "seoTitle": "Online Application",
+  "enquire": "Enquire",
+  "feature": "Features",
+  "courseMaterial": "Course materials",
+  "timeslots": "Timeslots",
+  "achievement": "Achievement",
+  "search": "Search",
+  "searchCourse": "Search Course",
+  "searchByCategory": "Search by category",
+  "selectorNoOptions": "Please select the category for course search.",
+  "searchByKeywords": "Please select category keywords for course search.",
+  "showSearchResult": "Showing Search Result",
+  "q&a": "Q&A",
+  "noQ&A": "This course does not have Q&A",
+  "COURSE_FEATURES": "Features",
+  "COURSE_DESC": "Course Description",
+  "COURSE_REVIEW": "Review",
+  "COURSE_SYLLABUS": "Syllabus",
+  "COURSE_ARTICULATION": "Course Articulation",
+  "COURSE_INSTRUCTOR": "Instructors",
+  "COURSE_STUDENT_PERF": "Student Performance",
+  "COURSE_CERTIFICATION": "Certification",
+  "COURSE_APPLICATION": "Application",
+  "COURSE_TARGET": "Target Audience",
+  "COURSE_LOCATION": "Location",
+  "COURSE_ENQUIRY": "Course Enquiry",
+
+  "courseEnquiry": "Course Enquiry",
+  "technicalSupport": "Technical Support",
+  "typeOfTeachServices": "Types of teaching services",
+  "regularDescription1": "This teaching service is a type of regular course.",
+  "regularDescription2": "It means that a number of lessons would be arrange repeatedly on a regular basis.",
+  "regularDescription3": "Every time you have to enrol in all the time slots of a period unless drop-in is allowed or there is an option of trial lesson",
+  "appointmentDescription1": "This teaching service is a type of appointment lesson.",
+  "appointmentDescription2": "It means that you can choose your lesson time flexibly.",
+  "appointmentDescription3": "Each lesson you can book a time slot with the teacher.",
+  "workshopDescription1": "This teaching service is a type of event.",
+  "workshopDescription2": "You can choose to enroll in one of the sessions of the event.",
+  "workshopDescription3": "Each session might last for more than 1 days",
+  "showing": "Showing",
+  "results": "results",
+  "forEvery": "for every",
+
+  "subscription": {
+    "billingCycleRepeat": "Billing cycle will repeat",
+    "oneTimePayment": "as a one-time payment"
+  },
+
+  "dialogEnroll": {
+    "title": "This requires a previously approved application",
+    "description": "Please fill in your information to check if you are eligible for the application.",
+    "noComplete": "You have not completed all the prerequisite applications.",
+    "complete": "You have completed all the prerequisite applications.",
+    "continue": "You will be redirected to the application page in a moment."
+  },
+
+  "classType": {
+    "workshop": "Event",
+    "appointment": "Appointment",
+    "regular": "Regular",
+    "recurring": "Recurring",
+    "subscription": "Subscription",
+    "regularV2": "Regular"
+  },
+
+  "courseDetailCard": {
+    "perLesson": "per time slot",
+    "forEntire": "for entire class",
+    "forEntireEvent": "for entire event",
+    "classSize": "students per class",
+    "minutesPerClass": "minutes per class",
+    "earliestLesson": "Start at",
+    "freeLesson": "Offers free lesson",
+    "more": "more"
+  },
+  "courseEnquiryCard": {
+    "noPhone": "The phone number is not provided"
+  },
+  "T&C": {
+    "termsConditions": "Terms & Conditions"
+  },
+  "courseEnrollButton": {
+    "applicationClosed": "Application closed",
+    "contact": "Please contact for application",
+    "notStarted": "Application has not started yet",
+    "ended": "Application is unavailable through website",
+    "noSuitableTimeslot": "No available timeslot on website",
+    "noQuota": "No quota available",
+    "noClasses": "No classes available"
+  },
+
+  "courseDefaultSectionTitle": {
+    "COURSE_FEATURES": "Features",
+    "COURSE_DESC": "Course Description",
+    "COURSE_REVIEW": "Review",
+    "COURSE_SYLLABUS": "Syllabus",
+    "COURSE_ARTICULATION": "Course Articulation",
+    "COURSE_INSTRUCTOR": "Instructors",
+    "COURSE_STUDENT_PERF": "Student Performance",
+    "COURSE_CERTIFICATION": "Certification",
+    "COURSE_APPLICATION": "Application",
+    "COURSE_TARGET": "Target Audience",
+    "COURSE_LOCATION": "Location",
+    "COURSE_ENQUIRY": "Course Enquiry",
+    "COURSE_TIMETABLE": "Timetable"
+  },
+  "wishlist": {
+    "findTechnicalSupport": "Find Technical Support",
+    "selectedCourses": "Selected Courses"
+  },
+  "emailVerificationModal": {
+    "title": "Please enter your personal email address to receive the application link.",
+    "emailLabel": "Personal Email Address",
+    "emailPlaceholder": "your@email.com",
+    "submit": "Send Application Link",
+    "invalidEmail": "Please enter a valid email address.",
+    "error": "Failed to send application link. Please try again.",
+    "successTitle": "Application Link Sent",
+    "successDescription": "An application link has been sent to your inbox. Please check your email to continue.",
+    "close": "Close"
+  }
+}

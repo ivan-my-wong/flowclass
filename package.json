@@ -1,0 +1,50 @@
+{
+  "name": "flowclass-open-source",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Flowclass open-source monorepo.",
+  "packageManager": "pnpm@10.28.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flowclass/flowclass-open-source.git"
+  },
+  "keywords": [
+    "flowclass",
+    "edtech",
+    "nextjs",
+    "nestjs",
+    "pnpm-workspaces"
+  ],
+  "engines": {
+    "node": ">=24.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "scripts": {
+    "start": "bash scripts/start.sh",
+    "dev:web": "pnpm --filter @flowclass/web dev",
+    "dev:api": "pnpm --filter @flowclass/api dev",
+    "dev:admin": "pnpm --filter @flowclass/admin dev",
+    "dev:all": "concurrently -n web,api,admin -c blue,green,magenta \"pnpm dev:web\" \"pnpm dev:api\" \"pnpm dev:admin\"",
+    "dev": "pnpm run dev:all",
+    "build": "pnpm --recursive build",
+    "lint": "pnpm --recursive lint",
+    "test": "pnpm --recursive test",
+    "type-check": "pnpm --recursive type-check",
+    "clean": "pnpm -r exec rimraf dist build .turbo .next",
+    "evaluate:functionality": "bash scripts/functional-parity-evaluation.sh",
+    "security:check-secrets": "bash scripts/check-no-secrets.sh",
+    "prepublishOnly": "pnpm security:check-secrets"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.9.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "18.2.0",
+      "@types/react-dom": "18.2.0"
+    }
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "tiers": {
+    "trialTier": "Trial Tier",
+    "freeTier": "Free Tier",
+    "starterTier": "Starter Tier",
+    "growthTier": "Growth Tier",
+    "proTier": "Pro Tier",
+    "enterpriseTier": "Enterprise Tier"
+  },
+  "quotas": {
+    "currentActiveStudents": "Current number of active students",
+    "currentSentReminder": "Number of notifications sent"
+  },
+  "target": {
+    "freeTier": "Everyone",
+    "starterTier": "Individual Trainers & Tutors",
+    "growthTier": "Small-scale education centres",
+    "proTier": "Medium-size education centres",
+    "enterpriseTier": "Medium-size education centres"
+  },
+  "pricing": {
+    "starterTier": "(Only one site)",
+    "growthTier": "$29.9 / Month / Site",
+    "proTier": "$199.9 / Month / Site",
+    "enterpriseTier": ""
+  },
+  "features": {
+    "target": {
+      "": "Target",
+      "everyone": "Everyone",
+      "starterPlan": "Individual Trainers & Tutors",
+      "growthPlan": "Small-scale education centres",
+      "proPlan": "University & Schools & Learning Centre Chains"
+    },
+    "userManagement": {
+      "": "Staff Management",
+      "noOfUsers": "No. of Users"
+    },
+    "landingPageBuilder": {
+      "": "Landing Page Builder",
+      "usersBySite": "Users (By site)",
+      "mobileOptimized": "Mobile-optimized site builder for educators",
+      "confirmation": "Course registration with timeslot selection and email notifications",
+      "regularCoursePagesAppointmentPages": "Regular Course Pages / Appointment Pages / Events & Workshop Pages (Total)",
+      "eventsWorkshopPagesTotal": "Events & Workshop Pages (Total)",
+      "removeFlowclassBranding": "Remove Flowclass Branding",
+      "customDomainPlugin": "Premium .course.site Domain",
+      "gpt3WriterNoOfWords": "AI Writer (No. of attempts)"
+    },
+    "promotion": {
+      "": "Promotion",
+      "directDiscounts": "Direct Discounts",
+      "trialLessons": "Trial Lessons",
+      "recurringBundleDiscounts": "Recurring / Bundle Discounts",
+      "couponCode": "Coupon Code"
+    },
+    "postSales": {
+      "": "Post Sales",
+      "searchEngineVisibility": "Search Engine Visibility",
+      "commentEmailsForStudents": "Comment Emails for Students",
+      "referralEmailsForStudents": "Referral Emails for Students"
+    },
+    "payment": {
+      "": "Payment",
+      "connectWithDigitalPayments": "Connect with Digital Payments",
+      "customFields": "Custom Fields"
+    },
+    "integration": {
+      "connectWithSchoolManagementSystem": "Connect with School Management System",
+      "connectWithCalendars": "Connect with Calendars"
+    },
+    "support": {
+      "": "Support",
+      "marketingConsultancy": "Marketing Consultancy"
+    }
+  },
+  "freePlan": {
+    "mobileSiteBuilder": "Mobile-optimized site builder for educators",
+    "optimizedProfileSite": "Fully search engine optimized and indexed profile site",
+    "publishedCoursePage": "1 published course page of any type (Regular course, Event & Workshop)",
+    "embedPageToWebsite": "Embed page to an existing website",
+    "aiProfileCreatorAttempts": "10 Attempts of AI Educator Profile Creator",
+    "courseRegistration": "Course registration with timeslot selection and email notifications",
+    "ownDomain": "Your own .flowclass.site domain"
+  },
+  "starterPlan": {
+    "allFeatures": "All Features in Starter Plan and:",
+    "publishedCoursePages": "5 published course pages of any type (Regular course, Event & Workshop)",
+    "aiProfileCreatorAttempts": "100 Attempts of AI Educator Profile Creator",
+    "stripeIntegration": "Automatically confirm online payments with Stripe Integration",
+    "coupons": "Create discount coupons for your courses"
+  },
+  "growthPlan": {
+    "allFeatures": "All Features in Growth Plan and:",
+    "publishedCoursePages": "20 published course pages of any type (Regular course, Event & Workshop)",
+    "aiProfileCreatorAttempts": "500 Attempts of AI Educator Profile Creator",
+    "ownDomain": "Your own premium .course.site domain"
+  },
+  "proPlan": {
+    "allFeatures": "All Features in Pro Plan and:",
+    "publishedCoursePages": "100 published course pages of any type (Regular course, Event & Workshop)",
+    "coursePlatform": "Course platform with filter & search function",
+    "integrationAvailable": "Integration available with school management system, CRM, and calendars",
+    "customEnrollmentForm": "Customize student enrollment form with custom data field",
+    "promotion": "Promotion with direct discounts, trial lessons, recurring/bundle discounts, and coupon code"
+  },
+  "confirmDialog": {
+    "title": "Confirm Subscription Assignment",
+    "clientInformation": {
+      "title": "Client Information",
+      "name": "Name:",
+      "email": "Email:",
+      "phone": "Phone:",
+      "clientId": "Client ID:"
+    },
+    "billingSummary": {
+      "title": "Billing Summary",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "plans": "Plans",
+      "subtotal": "Subtotal:",
+      "setupFeeProportional": "Setup Fee (Proportional):",
+      "setupFeeOneTime": "Setup Fee (One-time):",
+      "recordTotal": "Record Total:",
+      "grandTotal": "Grand Total:",
+      "totalFirstYear": "Total First Year:"
+    },
+    "billingPeriod": {
+      "title": "Billing Period",
+      "start": "Start:",
+      "expires": "Expires:",
+      "currency": "Currency:"
+    },
+    "note": {
+      "label": "Note:",
+      "multipleIntervals": "This will create {{count}} separate subscription records (one for each billing interval: {{intervals}}). Each will be billed according to its respective interval.",
+      "singleInterval": "This will create a subscription plan record for the selected client. The billing will be processed according to the plan's interval."
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "creating": "Creating...",
+      "confirmCreate": "Confirm & Create"
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "firstName": "名字",
+  "lastName": "姓氏",
+  "name": "名字 (用於通訊)",
+  "email": "電子郵件",
+  "phone": "電話",
+  "company": "公司",
+  "account": "帳號",
+  "position": "職位",
+  "profile": "個人檔案",
+  "editInformation": "編輯資訊",
+  "updateProfile": "更新您的個人檔案",
+  "changePassword": "修改密碼",
+  "changePasswordExplanation": "如果您使用社交媒體帳號登入，您可以使用相同的電子郵件註冊一個帳號以修改您的密碼。所有您的資料將會連結起來。",
+
+  "support": "支援",
+  "documentation": "文件",
+
+  "introductionFlowclass": "Flowclass 由總部位於香港的 Flowsophic Limited 開發❤️",
+
+  "currentPassword": "目前密碼",
+  "newPassword": "新密碼",
+  "confirmPassword": "確認新密碼",
+  "saveChanges": "儲存變更",
+  "haveUnSavedChanges": "有未儲存的變更",
+  "pageTitle": "帳號設定",
+
+  "profileView": {
+    "edit": "編輯個人檔案",
+    "change-password": "修改密碼",
+    "delete": "刪除帳號",
+    "profile": "個人檔案"
+  },
+
+  "deleteAccount": {
+    "deleteAccount": "刪除帳號",
+    "successDelete": "您的帳號已成功刪除。隨時歡迎您再次使用 Flowclass。",
+    "successDeleteAccount": "您的帳號已成功刪除。",
+    "title": "您確定要這麼做嗎？",
+    "textInput": "請輸入 'delete' 以確認刪除您的帳號。",
+    "description": "此動作無法撤消。這將永久刪除您的帳號並從我們的伺服器上刪除您的資料。",
+    "cancel": "取消",
+    "confirm": "是的，刪除帳號",
+    "goToConfirm": "開始確認",
+    "willNotDelete": "這將不會立即刪除您的帳號。",
+    "notice1": "請注意，如果您選擇刪除您的使用者帳號，您的個人資訊和相關資料將永久從我們的系統中刪除。但是，我們想要通知您，網站的資料將保持完整，包括您所建立的所有課程和內容。",
+    "notice2": "如果您希望刪除您所建立的任何網站或課程，請在刪除您的使用者帳號之前進行。如果與某個網站相關聯的沒有其他使用者，一旦您刪除帳號，整個網站將被刪除。",
+    "notice3": "我們重視您的隱私並希望確保您在 Flowclass 中擁有無縫的體驗。如果您有任何問題或疑慮，請隨時與我們的支援團隊聯繫。"
+  },
+  "errMessage": {
+    "newPasswordNotMatch": "新密碼和確認密碼不相符。請重試。",
+    "updateProfile": "抱歉，無法更新您的帳號資訊。請稍後再試。",
+    "updatePassword": "更新密碼時發生錯誤。",
+    "emptyCurrentPassword": "請輸入目前的密碼",
+    "emptyNewPassword": "請輸入新密碼",
+    "notStrongPassword": "請建立符合以下要求的新密碼：",
+    "incorrectPassword": "密碼不正確。",
+    "emptyConfirmPassword": "請確認您的密碼"
+  },
+  "successMessage": {
+    "updateProfile": "您的帳號資訊已成功更新。",
+    "updatePassword": "您的帳號密碼已成功更新。"
+  },
+  "strongPassword": {
+    "requirement0": "至少8個字元",
+    "requirement1": "包含至少一個特殊字元（例如 @、#、$）",
+    "requirement2": "包含至少一個數字（0-9）",
+    "requirement3": "包含至少一個大寫字母（A-Z）",
+    "requirement4": "包含至少一個小寫字母（a-z）"
+  }
+}

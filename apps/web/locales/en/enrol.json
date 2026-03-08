@@ -1,0 +1,386 @@
+{
+  "enrol": "Application",
+  "siteTitle": "Online Application",
+  "step": "Step",
+  "lessons": "Lessons",
+  "stepTitles": {
+    "selectOption": {
+      "normal": "Please select your class for this course",
+      "event": "Please select the option which you are applying for"
+    },
+    "pickedClass": "Class selected",
+    "pickedPeriod": "Period selected",
+    "pickedPhase": "Period selected",
+    "pickedLesson": "Lesson time",
+    "pickedPrice": "Course Price",
+    "stepIndicator": {
+      "selectOption": "Select Option",
+      "selectPeriod": "Select Time Slot",
+      "selectTuition": "Select Price",
+      "customField": "Application Form",
+      "confirmDetail": "Confirm",
+      "selectRecurPeriod": "Select Week Day",
+      "selectRecurStartLesson": "Select First Lesson",
+      "selectPriceOption": "Select Price Option"
+    }
+  },
+  "pickPeriodStep": {
+    "seatsLeft": "Seats left",
+    "selectTimeSlot": {
+      "normal": "Select the first lesson for the class you are going to apply for",
+      "event": "Select the time slot of the event which you are applying for",
+      "recurring": "Select the time slot when you want to start your class",
+      "fixedSchedule": "Choose the same time slot(s) every week",
+      "lessonsChosen": "Time Slots Selected",
+      "individual": "Individual Dates",
+      "showNextPeriod": "Show Next Period",
+      "noMorePeriods": "No More Periods",
+      "removeFromList": "Remove from list",
+      "noTimeSlots": "Please select a date in the calendar to show available time slots",
+      "remainingQuota": "Remaining quota: {remaining} out of {total}",
+      "thisDateHasNoTimeSlots": "This date has no available time slots",
+      "selectAllTimeslots": "Select all time slots"
+    },
+
+    "classesRemaining": "classes remaining",
+    "subscriptionPaymentDescription": "for one time payment",
+    "time": "Time Zone: ",
+    "timeExplain": ", displayed in 12 hour am / pm format",
+    "available": "Available Periods",
+    "noClasses": "The educator has not set up any classes for recruitment yet.",
+    "noSessions": "The educator has not set up any sessions for recruitment yet.",
+    "noPhases": "The educator has not set up any class timeslots for recruitment yet.",
+    "noCurrentPhases": "Sorry, all the time slots of the option has started. Please contact the educator for more information.",
+    "noCurrentSessions": "Sorry, all the sessions of the event has started. Please contact the educator for more information.",
+    "timeslotsAvailable": "time slots available",
+    "perLesson": "per time slot",
+    "perClass": "for all lessons in class",
+    "lessonsInClass": "lesson(s) in class",
+    "forApplication": "per event",
+    "forTotal": "for",
+    "forBuying": "for buying",
+    "lessons": "lessons",
+    "instructor": "Instructor:",
+    "location": "Location:",
+    "periodRemind": "By applying for this event, you will have access to all the time slots included",
+    "startedLesson": "Started Lesson",
+    "startedClass": "Started Class",
+    "statedSession": "Started Session",
+    "noAvailableTimeSlot": "No available time slots",
+    "openingsAvailable": "Available",
+    "limitedOpenings": "Limited Availability",
+    "onlyAFewOpeningsLeft": "Only a few openings left",
+    "seatLeft": "Openings left:",
+    "noSeatLeft": "No openings left"
+  },
+  "pickTimeslotStep": {
+    "searchingForTime": "Searching for available timeslots",
+    "pickDate": "Pick date and time for your first lesson",
+    "time": "Time: ",
+    "timeExplain": ", displayed in 12 hour am/pm format",
+    "sessionRemind": "By purchasing this session, you will have access to all the timeslot included"
+  },
+  "pickSubscriptionPlanStep": {
+    "buyPlanRemind": "When you purchase our subscription product, you will be billed",
+    "billCycleRepeat": "This billing cycle will repeat",
+    "billingCycleStartDate": "Billing cycle start date",
+    "billingCycleNextDate": "Billing cycle next date",
+    "billingCycleEndDate": "Billing cycle end date"
+  },
+  "pickPriceOptionStep": {
+    "title": "Price Options",
+    "description": "Please select the price option you want to apply for",
+    "numOfLesson": "{{count}} lessons",
+    "insufficientLessonsWithinPeriod": "Not enough lessons within the application period. Please pick another package."
+  },
+  "repeatType": {
+    "every": "Every",
+    "times": "times",
+    "per": "per"
+  },
+  "customFieldStep": {
+    "fillDetail": "Please fill in the following information to complete the application",
+    "specialStudy": "Special study (please indicate if we could offer you extra help)",
+    "selectCountry": "Select country or region",
+    "title": {
+      "normal": "You will review the information, payment details, and the time slots on the next step",
+      "event": "You will review the information, payment details, and the time slots on the next step"
+    },
+    "applicantOfNumber": "Applicant {step} of {total}",
+    "stepOfNumber": "Step {step} of {total}",
+    "commonFields": "Additional Information",
+    "createAnAccount": "Send application information to this applicant through email?",
+    "previousApplicant": "Previous applicant",
+    "previousStep": "Previous step",
+    "nextApplicant": "Next applicant",
+    "pleaseValidateForm": "Form submission failed. Please fill in all required fields.",
+    "nextStep": "Next step"
+  },
+  "confirmDetailStep": {
+    "confirmDetail": "Confirm and proceed to payment",
+    "confirmYourDetail": "Confirm your detail",
+    "tuitionFee": "Payment Amount",
+    "totalTuitionFee": "Total payment amount",
+    "specificT&C": "Please read the terms and conditions before confirming your application",
+    "viewDetail": "View detail",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "pickTuitionStep": {
+    "numOfLesson": "number of lesson",
+    "pricePerLesson": "Price per lesson",
+    "pricePerClass": "Price for entire class",
+    "applicant": "applicant",
+    "numberOfApplicant": "Number of applicant",
+    "pickOption": "Pick a tuition option",
+    "confirmDetail": "You can confirm the detail of each lesson on next step",
+    "autoFill": "Auto fill",
+    "recurTuitionReminder": "The educator may have set some dates as unavailable. Therefore, some of the lessons may be delayed until the next week."
+  },
+  "pickWorkshopFeeStep": {
+    "pickOption": "Pick a session fee option",
+    "confirmDetail": "You can confirm the detail of each session on next step"
+  },
+  "pickClassStep": {
+    "multipleClass": "Select multiple classes",
+    "selectedClass": "Selected classes",
+    "noClassesSelected": "No classes selected"
+  },
+  "confirmDetail": "Please confirm your application information",
+  "allLessons": "All time slots",
+  "payment": {
+    "title": "Payment",
+    "name": "Your full name (for validating your application)",
+    "bank": "Supported Payment Methods",
+    "phone": "Phone number (for the educator to contact you)",
+    "email": "Email (for sending the confirmation email)",
+    "creditCard": "Credit Card or Digital Payments",
+    "enrolForm": "Enrolment form",
+    "success": "Your application is successful. An email will be sent to you soon.",
+    "waitingPayment": "You have submitted the application form. Please complete the payment to confirm your application.",
+    "failure": "Your application failed. Please contact the educator directly.",
+    "incomplete": "You have not completed all the steps. Please go back and select your class, date and time, and tuition option.",
+    "proceed": "Proceed",
+    "proceedWith": "Proceed with",
+    "proceedToPayment": "Register and proceed to payment",
+    "completeRegistration": "Complete application",
+    "notChanged": "You will not be charged yet. Please enter your payment details in the new window after proceeding.",
+    "newStudentFee": "New Student Registration Fee",
+    "totalPayment": "Total Amount"
+  },
+  "autoFillForm": {
+    "title": "Auto-fill application form",
+    "resetAllFields": "Reset all fields",
+    "description": "Please verify your information used in the previous application. We will retrieve your information securely.",
+    "email": "Email",
+    "name": "Full name",
+    "bookingId": "Your previous booking ID",
+    "phone": "Phone number",
+    "autoFill": "Retrieve previous application",
+    "bookingFound": "Previous application found. We will fill the appropriate fields with your previous information.",
+    "tryAgain": "Try again",
+    "noRecordFound": "No previous application found. Please fill in the form manually.",
+    "previousApplicationRetrieved": "Previous application retrieved.",
+    "loginFailed": "Login failed",
+    "pleaseCheckCredentials": "Please check your credentials and try again.",
+    "loading": "Loading..."
+  },
+  "paymentDetail": {
+    "onlinePayment": "Online payment",
+    "title": "Payment Detail",
+    "pickPayment": "Choose How To Pay",
+    "paymentMethodType": "Select Payment Method Type",
+    "description": "Description",
+    "enrollToSeeDetail": "Payment details will be shown after registration.",
+    "error": "Error in getting payment detail, please try again later.",
+    "accountName": "Account Name",
+    "accountNumber": "Account Number",
+    "bankName": "Bank Name",
+    "bankBranch": "Bank Branch",
+    "payoutDetails": "Payout Details",
+    "payoutImg": "Payment Image",
+    "payoutUrl": "Payment link",
+    "paymentGuide": "Details of the payment method will be shown after you click 'Proceed'. Here are the instructions:",
+    "scanPaymentImage": "Check the payment instructions and account number on the next page.",
+    "enterPaymentLink": "Pay according to the instructions. Save any receipt or payment proof.",
+    "transferMoney": "Upload the relevant payment proof. Our staff will verify the payment and confirm your application.",
+    "choosePaymentMethod": "Please select a payment method from the options below",
+    "uploadReceipt": "Upload payment receipt",
+    "receiptRequired": "Receipt is required",
+    "payWithExternalLink": "Pay with external link"
+  },
+  "successPayment": {
+    "confirmCode": "Confirm Code",
+    "enrolmentComplete": "Enrolment complete!",
+    "confirmEmail": "An confirmation E-mail and receipt has been sent to your email",
+    "followInstruction": "Follow the instruction in the E-mail and enjoy your lesson!",
+    "done": "Done",
+    "enrollmentDetail": "Application Detail",
+    "courseName": "Course name",
+    "class": "Class",
+    "period": "Period",
+    "firstLesson": "First Lesson",
+    "allLesson": "All time slots",
+    "feePerLesson": "Lesson fee",
+    "selectedLessons": "Selected Lessons",
+    "session": "Session",
+    "sessionTime": "Timeslots Booked",
+    "lessons": "Time Slot(s)",
+    "items": "Item(s)",
+    "qrCode": {
+      "showAtCounter": "Please show this QR code at the counter",
+      "tapQrCode": "Tap the QR code to enlarge it",
+      "save": "Save QR Code"
+    }
+  },
+  "uploadReceipt": {
+    "paymentReceipt": "Please upload the payment receipt image to complete your application",
+    "uploadHint": "Please complete the payment to secure the seat.",
+    "applicationApproved": "Your application and payment has been approved",
+    "enrollId": "Application ID",
+    "invoiceId": "Invoice ID",
+    "done": "Submit",
+    "uploadSuccess": "Your payment proof has been uploaded successfully.",
+    "uploadSuccessToast": "Your payment proof has been uploaded successfully.",
+    "waitConfirm": "Please wait for the institution to confirm your payment.",
+    "tokenNotMatch": "Token not match",
+    "unauthorized": "Link expired",
+    "tokenExpired": "The payment page has expired. Please apply again to obtain a new payment page.",
+    "uploadFailed": "Upload failed",
+    "onlyImage": "Only images (.jpg/.jpeg/.png) is allowed",
+    "browseMoreCourses": "Browse more courses",
+    "totalPayment": "Payment Amount",
+    "classInfo": "Class Information",
+    "total": "Total",
+    "selectedPayLaterMethod": "Your selected payment method",
+    "discountIncluded": "Discount Included",
+    "instructor": "Instructor",
+    "location": "Location",
+    "receiptStatus": {
+      "waiting": "Please select whether to pay by online payment or offline payment to complete the registration.",
+      "disapproved": "The receipt you uploaded earlier is disapproved by the educator. Please pay again.",
+      "approved": "The application has been approved. The payment has been completed.",
+      "applied": "You have submitted the proof. Please wait for the institution to confirm your application.",
+      "resubmit": "The application has been approved. The payment has been completed. You can still submit additional payment proof if needed.",
+      "noInvoices": "No invoices found for your application"
+    },
+    "additionalFee": {
+      "title": "Additional Fee",
+      "newStudentFee": "New Student Registration Fee"
+    },
+    "approvalTime": "Approval time",
+    "applicationInfo": "Application Information"
+  },
+
+  "reviewItems": "Review Your Items",
+  "viewPaymentBtn": "View Payment",
+  "itemPrice": "Item Price",
+
+  "paymentStatus": {
+    "title": "Payment Status",
+    "ApplicationTitle": "Application Status",
+    "createdAt": "Created At",
+    "updatedAt": "Updated At",
+    "PAID": "Paid",
+    "UNPAID": "Unpaid",
+    "PENDING": "Pending",
+    "SUBMITTED": "Submitted",
+    "REFUNDED": "Refunded",
+    "UNKNOWN": "Unknown"
+  },
+
+  "paymentSummary": {
+    "title": "Payment Summary",
+    "titleApplication": "Application Summary",
+    "viewTimeSlotBtn": "View Time Slots",
+    "courses": "Courses",
+    "lessonCount": "({{ count }} sessions)",
+    "subtotal": "Subtotal",
+    "discountsApplied": "Discounts Applied",
+    "totalAmount": "Total Amount",
+    "couponApplied": "Coupon Discount",
+    "creditsUsed": "Credits Used",
+    "creditsApplied": "Credits Applied"
+  },
+
+  "paymentSuccessSummary": {
+    "paymentAmount": "Payment Amount",
+    "paymentMethod": "Payment Method",
+    "onlinePayment": "Online Payment",
+    "payLater": "Pay Later",
+    "paymentDate": "Payment Date",
+    "approvalDate": "Approval Date"
+  },
+  "workshop": {
+    "pickSession": "Pick your session for this event",
+    "pickedSession": "Session selected",
+    "pickedPeriod": "Timeslot selected",
+    "pickedLesson": "Starting Lesson",
+    "pickedPrice": "Workshop Price"
+  },
+  "fieldData": {
+    "Name": "Name",
+    "Email": "Email",
+    "Phone": "Phone Number",
+    "specialStudy": "Special Study"
+  },
+  "requiredFields": {
+    "name": "Full Name",
+    "email": "Email",
+    "phone": "Phone Number (Support contact via WhatsApp)",
+    "isOptional": "(Optional)"
+  },
+  "contactInformation": "Contact Information",
+  "enrollmentInformation": "Application Information",
+  "coupon": {
+    "redeem": "Promo Code",
+    "expired": "The coupon is invalid or expired",
+    "applied": "The coupon is successfully applied",
+    "couponUsed": "Coupon Discount",
+    "canUse": "The price is not final yet. You can use coupons and discounts in the next stage.",
+    "discount": "discount offer",
+    "discountCode": "Discount code",
+    "validDate": "This coupon is valid until",
+    "quota": "Quota",
+    "availableCoupon": "Available coupons",
+    "selectCoupon": "Please select your coupon",
+    "availableCoupons": "Choose from your available coupons"
+  },
+
+  "enrollSseStep": {
+    "started": "Process started",
+    "validating_course": "Validating course",
+    "checking_seat_availability": "Checking seat availability",
+    "checking_schedule_availability": "Checking schedule availability",
+    "creating_student": "Creating applicant profile",
+    "creating_multiple_class_information": "Creating multiple class information",
+    "creating_application_form": "Creating application form",
+    "enrolling_course": "Enrolling in course",
+    "preparing_payment": "Preparing payment",
+    "creating_invoice": "Creating invoice",
+    "creating_student_schedule": "Creating applicant schedule",
+    "sending_reminder": "Sending reminder",
+    "done": "Enrollment completed",
+    "failed": "Enrollment failed"
+  },
+  "trialLesson": {
+    "title": "Trial Lesson",
+    "alreadyEnrolled": "The applicant is already enrolled in this class lesson!",
+    "usedTitleAlert": "You have already registered in this class before.",
+    "usedDescriptionAlert": "You are not eligible for this trial class option."
+  },
+  "wishlist": {
+    "success": "Application Successful!",
+    "failed": "Some applications have failed. Please try again.",
+    "redirecting": "Redirecting to courses in",
+    "seconds": "seconds",
+    "applicationSuccessful": "All your course applications have been successfully submitted.",
+    "confirmationEmail": "You will receive a confirmation email shortly with further details.",
+    "redirectingToCourses": "Redirecting to courses in",
+    "secondsToRedirect": "seconds..."
+  },
+  "refillConfirm": {
+    "title": "You want to refill the form?",
+    "description": "You have already filled in the form. Do you want to refill the form?"
+  }
+}

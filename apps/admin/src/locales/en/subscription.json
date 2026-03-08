@@ -1,0 +1,690 @@
+{
+  "perInterval": "per {{interval}}",
+  "stepNames": {
+    "Students": "Students",
+    "Schools": "Schools",
+    "Admin Staff": "Admin Staff",
+    "Tutors": "Tutors",
+    "Class Type": "Class Type",
+    "Notification": "Notification",
+    "Promotions": "Promotions",
+    "Setup": "Setup",
+    "Add-ons": "Add-ons",
+    "Overview": "Overview"
+  },
+  "subscription": "Subscription",
+  "heading": "Manage your subscription",
+  "upgradeRequired": "Upgrade Required",
+  "currentSubscription": "Current Subscription",
+  "monthlyPrice": "Monthly Price",
+  "free": "Free",
+  "expiryDate": "Expiry Date",
+  "status": "Status",
+  "active": "Active",
+  "expired": "Expired",
+  "upgradeToUnlock": "Upgrade to unlock:",
+  "upgradeNow": "Upgrade Now",
+  "benefits": {
+    "moreFeatures": "Access to more advanced features",
+    "higherLimits": "Higher usage limits and quotas",
+    "prioritySupport": "Priority customer support"
+  },
+  "alertBox": {
+    "heading": "Upgrade your plan now and experience more features for marketing your courses automatically",
+    "button": "Manage your subscription",
+    "currently": "You are currently subscribed to the following plan:",
+    "currentPlan": "You are currently on Flowclass Growth Plan",
+    "daysLeft": "days left in your free trial",
+    "upgrade": "Extend your plan"
+  },
+  "title": {
+    "FREE_TIER": "Free",
+    "STARTER_TIER": "Starter",
+    "GROWTH_TIER": "Growth",
+    "PRO_TIER": "Pro"
+  },
+  "visitDashboard": {
+    "title": "Visit payment dashboard",
+    "description": "You can view your payment history and manage your plans through the Stripe dashboard."
+  },
+  "bill": "Billing",
+  "mySubscription": "My Active Subscription",
+  "checkOutWithLink": "Your upgrade link is created. After you finish the payment, your account will be automatically upgraded",
+  "currentlySubscribed": "View other plans that can boost your teaching business growth:",
+  "paymentRecord": "Payment Record",
+  "nextBillDay": "Next billing day",
+  "billSetting": "Bill Setting",
+  "allFeatures": "All Features",
+  "upgrade": "Upgrade",
+  "detail": "Detail",
+  "install": "Install",
+  "currentPlan": "Current Plan",
+  "activeSubscription": "Active Subscription",
+  "yourCurrentPlan": "Your current plan",
+  "customPlanLabel": "You are on a custom plan",
+  "manageAllSubscription": "Manage All",
+  "approachingLimits": "Approaching Limits",
+  "approachingLimitsLabel": "You are using 100% of your user and school limits. Consider upgrading to avoid service interruptions.",
+  "perMonth": "per month",
+  "perYear": "per year",
+  "monthly": "Monthly",
+  "yearly": "Yearly",
+  "per": "per",
+  "month": "month",
+  "year": "year",
+  "price": "Price",
+  "totalPrice": "Total Price",
+  "subscribed": "Subscribed",
+  "cancelled": "Cancelled",
+  "schoolLowerCase": "school",
+  "btnModify": "Modify",
+  "usage": "Usage",
+  "manage": "Manage",
+  "availablePlans": "Available Plans",
+  "switchPlans": "Switch Plans",
+  "planCurrentlyActiveLabel": "This plan is currently active in your subscriptions",
+  "cancelNextBilling": "This plan will be cancelled in the next billing period",
+  "reviewChanges": "Review Your Changes",
+  "noActiveSubscription": {
+    "description": "You don't have any active subscriptions for this service",
+    "message": "You can create a new subscription or upgrade the existing plan to enjoy advanced features.",
+    "manageButton": "Manage Subscriptions",
+    "upgradeTitle": "Upgrade Required"
+  },
+  "updateSubscriptionSuccess": "Update subscription successfully, Please refresh the page to see the changes",
+  "createSubscriptionPlanSuccess": "Your subscription plan was successfully created, and you'll be redirected to the payment page",
+  "headerBtnViewSubscription": "View Subscription",
+  "subscriptionDetail": {
+    "fetchError": "You do not have a subscription yet.",
+    "startSubscription": "You started your subscription since {{date}}",
+    "cancelSubscription": "You cancelled your subscription since {{date}}",
+    "cancelSubscriptionTips": "You will still have access to the premium features until the end of your current subscription period on {{date}}",
+    "nextBilling": "Your next billing date is {{date}}",
+    "resubscribe": "Resubscribe",
+    "currentPlan": "Current Plan",
+    "upgrade": "Upgrade",
+    "downgrade": "Downgrade"
+  },
+  "subscriptionPopup": {
+    "title": "Update subscription",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "description": "You are about to change your subscription to {{plan}} {{period}} plan.\nYour next subscription fee will be {{price}} per {{interval}}.\nPlease confirm your action.",
+    "annual": "annual",
+    "monthly": "monthly"
+  },
+  "plan": {
+    "flowclassPlan": "Flowclass plan",
+    "seoPlan": "SEO plan",
+    "addOns": "Add-ons"
+  },
+  "flowclass": {
+    "free": "Free",
+    "plus": "Plus",
+    "premium": "Premium"
+  },
+  "seo": {
+    "basic": "Basic",
+    "advance": "Advanced",
+    "supreme": "Supreme"
+  },
+  "limit": {
+    "maxOfActiveStudents": "Max No. of Active Students",
+    "maxOfNotificationReminders": "Max No. of Notifications Sent Each Month"
+  },
+  "channel": {
+    "whatsapp": "Reminders on WhatsApp",
+    "assistedWhatsappOnboarding": "Assisted WhatsApp Onboarding"
+  },
+  "user": {
+    "additional": "Additional Users",
+    "limit": "Users (By institution)"
+  },
+  "branding": {
+    "premiumDomain": "Premium Domain",
+    "personalBranding": "Use personal email & name in email communications",
+    "noPlatformBranding": "No Flowclass branding on payment page"
+  },
+  "promotion": {
+    "coupon": "Coupon Code",
+    "additionalFee": "Additional Fee"
+  },
+  "noSubscriptionLabel": "You don't have any active subscriptions. Please create a new one to enjoy advanced features",
+  "createSubscriptionBtnLabel": "Create New Subscription",
+  "payment": {
+    "integratedWithStripe": "Integrated with Stripe",
+    "customFields": "Custom Fields",
+    "successTitle": "Payment Completed",
+    "successDesc": "Your payment was successful. Click the button below to return to the Subscription Management page",
+    "redirectBtnLabel": "Go To Subscription Management",
+    "upgradeSuccessTitle": "🎉 Upgrade Successful!",
+    "upgradeSuccessDesc": "Congratulations! Your platform has been upgraded successfully. All your new features will be ready soon.",
+    "featuresReadySoon": "Your enhanced features are being activated and will be available shortly.",
+    "goToDashboard": "Go to Dashboard",
+    "featureHighlights": {
+      "advancedFeatures": "Advanced Features",
+      "higherLimits": "Higher Limits",
+      "prioritySupport": "Priority Support",
+      "enhancedTools": "Enhanced Tools"
+    }
+  },
+  "unused": {
+    "maxOfTotalStudents": "Max No. of Total Students",
+    "maxOfTotalClasses": "Max No. of Classes"
+  },
+  "addOns": {
+    "classroomManagement": "Classroom management",
+    "teacherManagement": "Teacher management"
+  },
+  "features": {
+    "seeAll": "Compare all features",
+    "essential": "Essential features",
+    "advanced": "Advanced features",
+    "premium": "Premium features"
+  },
+  "customerSupport": "Full Customer support",
+  "emailAutomation": "Email automation",
+  "checkout": {
+    "failCheckout": "Failed to create checkout session. Please try again later",
+    "noPermission": "You do not have the permission to upgrade the plan. Please contact the admin of the site.",
+    "subscriptionFailCheckout": "Failed to create checkout session. Please try again later or visit your stripe dashboard to see if any unsettled payment exists."
+  },
+  "comingSoon": "Coming Soon",
+  "paymentMethod": "Payment Method",
+  "subscriptionDialog": {
+    "dialogTitle": "You have exceeded your plan limit",
+    "upgradePlan": "You can upgrade your existing plan to create more course pages and enjoy advanced recruitment system builder features.",
+    "upgradePlan2": "Please upgrade your plan to unlock this function.",
+    "upgradePlan3": "You can upgrade your existing plan to invite more users and enjoy advanced recruitment system builder features.",
+    "upgradePlan4": "You can upgrade your existing plan to connect Stripe and enjoy advanced recruitment system builder features.",
+    "upgrade": "Plan and Subscription Pricing",
+    "upgradeCreate": "You must upgrade your plan to create more course items.",
+    "contactSales": "contact our sales team",
+    "messages": {
+      "starterPlanCourse": "Upgrade to starter plan to create 3 course pages and set custom path",
+      "premiumPlanCourse": "Upgrade to premium plan to create 10 course pages",
+      "discountCode": "Upgrade to starter plan to create discount codes"
+    }
+  },
+  "subscriptionSuccessPage": "Thanks for supporting us and subscribing!\nYour subscription was successful. We appreciate your support and are excited to have you on board!",
+  "redirecting": "Redirecting you to the next page shortly",
+  "importantNote": {
+    "title": "Important Notes",
+    "updatedImmediately": "Your subscription will be updated immediately upon payment",
+    "proratedAmountCover": "The prorated amount covers the remaining days until your next billing cycle",
+    "futureRenewal": "All future renewals will be at the new plan rate",
+    "downGradeAnytime": "You can downgrade at any time, effective at the next billing cycle",
+    "downGradeEffectiveOn": "This action will take effect on {{nextBillingDate}}",
+    "cancelDownGrade": "You can cancel this downgrade anytime before the effective date",
+    "upgradeBack": "You can upgrade back to your current plan anytime",
+    "noRefund": "No refund will be provided for your current billing period",
+    "remainUntilNextBil": "Your subscription will remain active until {{nextBillingDate}}",
+    "loseAllFeatures": "You'll lose access to all features after the billing period ends",
+    "resubscribe": "You can resubscribe at any time",
+    "noPaymentRequired": "No payment is required. Your subscription and features will update immediately",
+    "switchBack": "You can switch back or upgrade again at any time",
+    "renewalReamins": "Your next renewal remains on {{nextBillingDate}}"
+  },
+  "cancelLabelConfirm": "I understand that I will lose access to this service after the current billing period ends",
+  "cancelLabelBackup": "I have exported any important data from this service",
+  "actions": {
+    "proceedReview": "Proceed to Review",
+    "proceedPayment": "Proceed to Payment",
+    "backToPlans": "Back to Plans",
+    "upgrade": "Upgrade Now",
+    "substitute": "Confirm Changes",
+    "downgrade": "Confirm Downgrade",
+    "cancelSubscriptions": "Cancel Subscription",
+    "keepSubscription": "Keep Subscription",
+    "cancelConfirm": "Confirm Cancel"
+  },
+  "alert": {
+    "subscriptionUpdated": "Subscription successfully updated"
+  },
+  "actionType": {
+    "upgrade": "Upgrade to",
+    "downgrade": "Downgrade to",
+    "substitute": "Switch to"
+  },
+  "subscriptionManagement": {
+    "pageTitle": "Subscriptions",
+    "btnNewPlan": "Subscribe to New Plan",
+    "createSubscription": "Create Subscription",
+    "tabSubscription": "Subscription",
+    "tabOverview": "Overview",
+    "tabBilling": "Billing History",
+    "customPlanTitle": "Need a customized plan?",
+    "customPlanDescription": "Create your own subscription."
+  },
+  "manageSubscription": {
+    "title": "Manage Subscription",
+    "currentPlanSummary": "Current Subscription Plan Summary",
+    "noActivePlan": "No active subscription plan found",
+    "planDetails": {
+      "title": "Current Plan Details",
+      "noData": "No plan data available"
+    }
+  },
+  "billingHistory": {
+    "column": {
+      "date": "Date",
+      "amount": "Amount",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "tableActions": {
+      "detailInvoice": "View Invoice & Receipt",
+      "downloadInvoice": "Download"
+    }
+  },
+  "prorateAmountLabel": "Prorated amount for remaining {{days}} days",
+  "nextRenewalDate": "Next renewal {{date}}",
+  "overviewCards": {
+    "activeSvc": {
+      "title": "Active Services",
+      "subtitle": "All services running normally",
+      "subtitle2": "System healthy"
+    },
+    "annualFee": {
+      "title": "Annual Subscription Fee",
+      "subtitle": "Paid - {{summary?.paymentDate}}",
+      "subtitle2": "{{setupFeeAmount}} setup fee included"
+    },
+    "nextBilling": {
+      "title": "Next Billing Date",
+      "subtitle": "Annual renewal for all active services",
+      "subtitle2": ""
+    },
+    "isTrial": {
+      "title": "You are currently on a free trial",
+      "subtitle": "Your trial period will end on {{date}}",
+      "subtitle2": "You can upgrade to a paid plan at any time"
+    }
+  },
+  "addPlan": {
+    "dialogTitle": "Subscribe to New Plan",
+    "dialogDes": "Choose the plan category you want to add",
+    "selectCatLabel": "Select Category",
+    "btnBackToCat": "Back to Categories",
+    "btnBackToPlan": "Back to Plan Selection",
+    "reviewPlanSelections": "Review your Selections",
+    "billDetail": "Billing details",
+    "creditBalance": "Available credits",
+    "amountDueToday": "Amount due today",
+    "newPlanCost": "New Plan Cost",
+    "currentPlanCost": "Current Plan Cost",
+    "totalCost": "Total Cost"
+  },
+  "modifyPlan": {},
+  "trialUpgrade": {
+    "title": "Trial Plan Limitation",
+    "description": "Because you are on a trial plan, you cannot upgrade each plan individually. To modify each plan individually, please create an active subscription.",
+    "cancel": "Cancel",
+    "createYearlySubscription": "Create Yearly Subscription"
+  },
+  "planType": {
+    "counterPlanDesc": "Adjust quantity for this feature. Changes will be reflected in your next billing cycle",
+    "BASE_USER": {
+      "title": "Users",
+      "desc": "Users"
+    },
+    "MULTIPLE_SCHOOL": {
+      "title": "Schools",
+      "desc": "Schools"
+    },
+    "MULTIPLE_ADMIN": {
+      "title": "Admins"
+    },
+    "MULTIPLE_TUTOR": {
+      "title": "Tutors"
+    },
+    "CLASS_TYPE": {
+      "title": "Class Type",
+      "desc": "Enable different types of classes",
+      "desc2": "Enabling the right class types to match how your organization actually runs its classes"
+    },
+    "FEATURE_ENABLE": {
+      "title": "Advanced Features",
+      "desc": "Enhance your platform capabilities"
+    },
+    "NOTIFICATION_CHANNEL": {
+      "title": "Notifications",
+      "desc": "Manage your customer communication"
+    },
+    "PROMOTION_FEES": {
+      "title": "Promotions & Fees",
+      "desc": "Marketing and Pricing Tools"
+    },
+    "SETUP_FEE": {
+      "title": "Setup Fee",
+      "desc": "Setup Fee"
+    },
+    "INTEGRATION": {
+      "title": "Integrations",
+      "desc": "Integration Tools"
+    },
+    "CUSTOMER_SUPPORT": {
+      "title": "Customer Support",
+      "desc": "Customer Support"
+    }
+  },
+  "stripeProduct": {
+    "CLASS_TYPE_REGULAR": "Regular",
+    "CLASS_TYPE_RECURRING": "Recurring",
+    "CLASS_TYPE_APPOINTMENT": "Appointment",
+    "FEATURE_ENABLE_OWN_BRANDING": "Branding",
+    "NOTIFICATION_CHANNEL_EMAIL_ONLY": "Email",
+    "NOTIFICATION_CHANNEL_EMAIL_WHATSAPP_OFFICIAL": "Whatsapp Official",
+    "NOTIFICATION_CHANNEL_EMAIL_WHATSAPP_UNOFFICIAL": "Whatsapp Unofficial",
+    "PROMOTION_FEES_BASIC": "Coupon",
+    "PROMOTION_FEES_ADVANCED": "Multiple Promotion Tools",
+    "FEATURE_ENABLE_STUDENT_PORTAL": "Student Portal",
+    "FEATURE_ENABLE_TUTOR_CENTRAL": "Tutor Central",
+    "FEATURE_ENABLE_QRCODE_ATTENDANCE": "QR Code Attendance",
+    "FEATURE_ENABLE_RESCHEDULE_REQUEST": "Reschedule Request",
+    "FEATURE_ENABLE_APPLY_MULTIPLE_COURSES": "Multiple Courses",
+    "FEATURE_ENABLE_CREDIT_SYSTEM": "Credit System",
+    "BASE_USER_100": "Base User 100",
+    "BASE_USER_500": "Base User 500",
+    "BASE_USER_1500": "Base User 1500",
+    "BASE_USER_3000": "Base User 3000",
+    "BASE_USER_5000": "Base User 5000",
+    "BASE_USER_UNLIMITED": "Base User Unlimited",
+    "BASE_USERS": "Users",
+    "MULTIPLE_SCHOOL": "Schools",
+    "MULTIPLE_ADMIN": "Admins",
+    "MULTIPLE_TUTOR": "Tutors",
+    "INTEGRATION_GOOGLE_DRIVE": "Google drive",
+    "SETUP_FEE_SCHOOL_1": "Setup Fee (School 1)",
+    "SETUP_FEE_INSTITUTION_2": "Setup Fee (Institution 2)",
+    "SET_UP_FEE_INSTITUTION_3": "Setup Fee (Institution 3)",
+    "SETUP_FEE_PER_INSTITUTION_AFTER_4": "Setup Fee (Institution 4+)",
+    "MULTIPLE_INSTITUTION_4": "Multiple Institutions (4+)",
+    "MULTIPLE_INSTITUTION_10": "Multiple Institutions (10+)",
+    "MULTIPLE_INSTITUTION_20": "Multiple Institutions (20+)",
+    "MULTIPLE_INSTITUTION_50": "Multiple Institutions (50+)",
+    "MULTIPLE_INSTITUTION_UNLIMITED": "Multiple Institutions (Unlimited)",
+    "MULTIPLE_INSTITUTION_1": "Multiple Institutions (1)",
+    "MULTIPLE_ADMIN_4": "Additional Admin (After 4)",
+    "MULTIPLE_ADMIN_10": "Additional Admin (After 10)",
+    "MULTIPLE_ADMIN_20": "Additional Admin (After 20)",
+    "MULTIPLE_ADMIN_30": "Additional Admin (After 30)",
+    "MULTIPLE_ADMIN_50": "Additional Admin (After 50)",
+    "MULTIPLE_ADMIN_UNLIMITED": "Additional Admin (Unlimited)",
+    "MULTIPLE_ADMIN_1": "Additional Admin (1)",
+    "MULTIPLE_TUTOR_2": "Additional Tutor (After 2)",
+    "MULTIPLE_TUTOR_4": "Additional Tutor (After 4)",
+    "MULTIPLE_TUTOR_10": "Additional Tutor (After 10)",
+    "MULTIPLE_TUTOR_20": "Additional Tutor (After 20)",
+    "MULTIPLE_TUTOR_50": "Additional Tutor (After 50)",
+    "MULTIPLE_TUTOR_UNLIMITED": "Additional Tutor (Unlimited)",
+    "MULTIPLE_TUTOR_1": "First Tutor (Free)",
+    "CUSTOMER_SUPPORT_ADVANCED": "Customer Support (Advanced)",
+    "CUSTOMER_SUPPORT_BASIC": "Customer Support (Basic)",
+    "CUSTOMER_SUPPORT_EXPERT": "Customer Support (Expert)"
+  },
+
+  "stripeProductDescription": {
+    "CLASS_TYPE_REGULAR": "Fixed-term courses with a set schedule and start/end date. Ideal for cohorts or semester-based classes where all students begin and end together. Perfect for traditional academic programs, certification courses, and structured learning paths.",
+    "CLASS_TYPE_RECURRING": "Ongoing classes where students can join at any time, continuing indefinitely without a set end date. Perfect for memberships, continuous enrollment programs, and drop-in style classes where students progress at their own pace.",
+    "CLASS_TYPE_APPOINTMENT": "Flexible, private session booking—students can select available time slots for 1-on-1 or small group classes. Ideal for tutoring services, consultation sessions, and personalized learning experiences.",
+    "FEATURE_ENABLE_OWN_BRANDING": "Remove Flowclass branding from system emails and communications. Use your own school name and sender address for a fully branded experience. Make every communication look like it comes directly from your institution.",
+    "NOTIFICATION_CHANNEL_EMAIL_ONLY": "Send notifications and reminders to students and staff via email only. (Included in all plans) Reliable communication that works across all devices and platforms.",
+    "NOTIFICATION_CHANNEL_EMAIL_WHATSAPP_OFFICIAL": "Send notifications via official WhatsApp Business (using Twilio), in addition to email. Reach students on their preferred platform with professional, reliable messaging that maintains your brand reputation.",
+    "NOTIFICATION_CHANNEL_EMAIL_WHATSAPP_UNOFFICIAL": "Send notifications via our unofficial WhatsApp channel, in addition to email. No need for your own WhatsApp Business account. Perfect for schools that want WhatsApp communication without the setup complexity.",
+    "PROMOTION_FEES_BASIC": "Basic promotion tools: Apply discount coupons to boost enrollment or offer special rates. Increase student retention and attract new enrollments with flexible pricing strategies.",
+    "PROMOTION_FEES_ADVANCED": "Advanced promotions: Enable discount coupons plus let new students book trial lessons online. Convert prospects into paying students with risk-free trial experiences and automated enrollment workflows.",
+    "FEATURE_ENABLE_STUDENT_PORTAL": "Give students access to a self-service portal for managing bookings, making reschedule requests, and viewing invoices and receipts. Reduce administrative workload and improve student satisfaction with 24/7 self-service access.",
+    "FEATURE_ENABLE_TUTOR_CENTRAL": "Enable Tutor Central: Tutors can log in to view their schedule, manage classes, take attendance, and track their salary. Streamline tutor management and provide transparency in scheduling and compensation.",
+    "FEATURE_ENABLE_QRCODE_ATTENDANCE": "Simplify attendance tracking with QR code check-in—students scan to mark attendance for both online and in-person lessons. Reduce administrative overhead and improve accuracy in attendance records.",
+    "FEATURE_ENABLE_RESCHEDULE_REQUEST": "Let students request to reschedule classes directly through the platform, saving admin time and improving flexibility. Automated workflow for handling schedule changes while maintaining class capacity limits.",
+    "FEATURE_ENABLE_APPLY_MULTIPLE_COURSES": "Allow students to register for multiple courses or class types in a single profile. Streamline enrollment for families or returning students with unified account management.",
+    "FEATURE_ENABLE_CREDIT_SYSTEM": "Enable a credit or prepaid system so students can purchase credits in advance and use them to book classes flexibly. Improve cash flow and offer flexible payment options for your students.",
+    "BASE_USER_100": "Base plan for up to 100 students. Suited for small groups or solo tutors. Perfect for individual instructors, small learning centers, or schools just starting their digital transformation journey.",
+    "BASE_USER_500": "Base plan for up to 500 students. Ideal for growing education centres. Supports expanding institutions that need to scale their operations while maintaining quality service delivery.",
+    "BASE_USER_1500": "Base plan for up to 1,500 students. For medium-sized schools or multi-branch operations. Handles the complexity of multiple programs and locations with robust user management.",
+    "BASE_USER_3000": "Base plan for up to 3,000 students. For larger institutions with multiple programs. Designed for established education businesses that need enterprise-level scalability.",
+    "BASE_USER_5000": "Base plan for up to 5,000 students. For large, established education businesses. Supports complex organizational structures and high-volume operations.",
+    "BASE_USER_UNLIMITED": "No limit on student numbers. Scale as much as you want. Perfect for rapidly growing institutions or those with ambitious expansion plans. No more worrying about hitting user limits.",
+    "BASE_USERS": "The number of student accounts included in your plan. Determines your maximum enrollment. Each student gets their own profile with access to classes, payments, and communication features.",
+    "MULTIPLE_SCHOOL": "Manage multiple schools or centres under one account. Pay only for the number of locations you need. Centralized administration with location-specific customization and reporting.",
+    "MULTIPLE_ADMIN": "Add extra admin staff who can manage bookings, payments, and school operations. Distribute administrative responsibilities across your team while maintaining security and access control.",
+    "MULTIPLE_TUTOR": "Add extra tutors who can access their schedules, manage classes, and take attendance. Empower your teaching staff with the tools they need to deliver excellent student experiences.",
+    "INTEGRATION_GOOGLE_DRIVE": "Sync documents and class materials with Google Drive for streamlined file management. Keep all your educational resources organized and accessible across your team.",
+    "SETUP_FEE_SCHOOL_1": "One-time setup and data migration fee for your first school or centre. Our team will import your data and configure your system for a smooth start. Includes data migration from Excel or other systems.",
+    "SETUP_FEE_INSTITUTION_2": "One-time setup fee for your second school or institution. Includes data migration and configuration. Our experts ensure seamless integration with your existing operations.",
+    "SET_UP_FEE_INSTITUTION_3": "One-time setup fee for your third school or institution. Includes data migration and configuration. Streamlined setup process for expanding multi-location operations.",
+    "SETUP_FEE_PER_INSTITUTION_AFTER_4": "One-time setup fee for each additional school (fourth and onwards). Includes data migration and configuration. Volume pricing for institutions with extensive multi-location needs.",
+    "MULTIPLE_INSTITUTION_4": "Per year per additional school (fourth and onwards). Includes ongoing support and management for each additional location. Professional services to ensure smooth operations.",
+    "MULTIPLE_INSTITUTION_10": "Per year per additional school (tenth and onwards). Includes ongoing support and management for each additional location. Efficient management for large-scale multi-location operations.",
+    "MULTIPLE_INSTITUTION_20": "Per year per additional school (twentieth and onwards). Includes ongoing support and management for each additional location. Streamlined management for institutions with extensive geographic reach.",
+    "MULTIPLE_INSTITUTION_50": "Per year per additional school (fiftieth and onwards). Includes ongoing support and management for each additional location. Enterprise-level services for major educational organizations.",
+    "MULTIPLE_INSTITUTION_UNLIMITED": "Per year per additional school (unlimited and onwards). Includes ongoing support and management for each additional location. Comprehensive support for unlimited expansion.",
+    "MULTIPLE_INSTITUTION_1": "Per year per additional school (first and onwards). Includes ongoing support and management for each additional location. Professional services for growing institutions.",
+    "MULTIPLE_ADMIN_4": "Per year per additional admin (fourth and onwards). Includes ongoing access and management for each additional admin. Efficient admin management for expanding administrative teams.",
+    "MULTIPLE_ADMIN_10": "Per year per additional admin (tenth and onwards). Includes ongoing access and management for each additional admin. Streamlined admin management for large administrative operations.",
+    "MULTIPLE_ADMIN_20": "Per year per additional admin (twentieth and onwards). Includes ongoing access and management for each additional admin. Professional admin management for enterprise-level operations.",
+    "MULTIPLE_ADMIN_30": "Per year per additional admin (thirtieth and onwards). Includes ongoing access and management for each additional admin. Efficient admin management for major educational institutions.",
+    "MULTIPLE_ADMIN_50": "Per year per additional admin (fiftieth and onwards). Includes ongoing access and management for each additional admin. Streamlined admin management for large-scale operations.",
+    "MULTIPLE_ADMIN_UNLIMITED": "Per year per additional admin (unlimited and onwards). Includes ongoing access and management for each additional admin. Comprehensive admin management for unlimited administrative expansion.",
+    "MULTIPLE_ADMIN_1": "Per year per additional admin (first and onwards). Includes ongoing access and management for each additional admin. Professional admin management for growing administrative teams.",
+    "MULTIPLE_TUTOR_2": "Per year per additional tutor (second and onwards). Includes ongoing access and management for each additional tutor. Efficient tutor management for expanding teaching teams.",
+    "MULTIPLE_TUTOR_4": "Per year per additional tutor (fourth and onwards). Includes ongoing access and management for each additional tutor. Streamlined tutor management for growing educational operations.",
+    "MULTIPLE_TUTOR_10": "Per year per additional tutor (tenth and onwards). Includes ongoing access and management for each additional tutor. Professional tutor management for medium-sized teaching operations.",
+    "MULTIPLE_TUTOR_20": "Per year per additional tutor (twentieth and onwards). Includes ongoing access and management for each additional tutor. Efficient tutor management for large teaching teams.",
+    "MULTIPLE_TUTOR_50": "Per year per additional tutor (fiftieth and onwards). Includes ongoing access and management for each additional tutor. Streamlined tutor management for major educational institutions.",
+    "MULTIPLE_TUTOR_UNLIMITED": "Per year per additional tutor (unlimited and onwards). Includes ongoing access and management for each additional tutor. Comprehensive tutor management for unlimited teaching expansion.",
+    "MULTIPLE_TUTOR_1": "Per year per additional tutor (first and onwards). Includes ongoing access and management for each additional tutor. Professional tutor management for growing teaching operations.",
+    "CUSTOMER_SUPPORT_ADVANCED": "Advanced customer support with faster response times and dedicated account management. Includes priority ticket handling, extended support hours, and personalized assistance for complex implementation needs.",
+    "CUSTOMER_SUPPORT_BASIC": "Basic customer support with standard response times. Includes email and chat support during business hours, comprehensive documentation, and community resources for self-service assistance.",
+    "CUSTOMER_SUPPORT_EXPERT": "Expert-level customer support with immediate response times and dedicated account manager. Includes 24/7 priority support, custom training sessions, and strategic consultation for enterprise-level implementations."
+  },
+  "client": {
+    "noDataAvailable": " No subscription plans available",
+    "buildYourPackage": "Build Your Package",
+    "customizeSolution": "Customize your perfect solution",
+    "subscriptionPlanRecordsTable": {
+      "allClientSubscriptions": "All Client Subscriptions",
+      "mySubscriptions": "My Subscriptions",
+      "addClient": "Add Client",
+      "searchAllClients": "Search all clients...",
+      "searchSubscriptions": "Search subscriptions...",
+      "nextBilling": "Next billing",
+      "noClientsFound": "No clients found",
+      "noSubscriptionsFound": "No subscriptions found",
+      "totalRecords": "Total Records",
+      "active": "Active",
+      "trial": "Trial"
+    },
+    "section": {
+      "student": {
+        "question": "How many students will you have?",
+        "description": "Select the total number of students you expect to have in the coming year."
+      },
+      "school": {
+        "question": "How many schools or centers will you manage?",
+        "description": "Select the number of schools or centers you wish to manage.",
+        "inputLabel": "Number of schools",
+        "schoolLabel": "schools"
+      },
+      "setup": {
+        "question": "Would you like our team to help set up your classes and migrate data?",
+        "description": "We offer a professional setup and migration service. Our team will help you import your classes, students, and schedules from Excel or other systems, so you can get started faster and with less hassle.",
+        "yesLabel": "Yes, I would like assistance with setup and data migration",
+        "noLabel": "No, I will set up everything myself"
+      },
+      "adminStaff": {
+        "question": "How many admin staff will be using the system?",
+        "description": "Choose the total number of admin staff (excluding tutors) who need system access. Admin staff refers to users who help manage the platform, for example:",
+        "schoolManagers": "School managers",
+        "receptionists": "Receptionists",
+        "financeAdmin": "Finance/admin personnel",
+        "coordinators": "Coordinators",
+        "inputLabel": "Number of admins"
+      },
+      "tutor": {
+        "question": "How many tutors will be using the system?",
+        "description": "Choose the number of tutors who need system access. Tutor refers to any staff member who teaches classes or interacts directly with students for educational purposes. Each tutor can:",
+        "viewScheduleLabel": "View their own teaching schedule",
+        "attendanceLabel": "Take attendance",
+        "manageClassLabel": "Manage their classes and students",
+        "viewRateLabel": "View their hourly rate and expected salary",
+        "inputLabel": "Number of tutors"
+      },
+      "classType": {
+        "question": "What class types do you need?",
+        "description": "Enabling the right class types ensures your scheduling, enrollment, and payment workflows match how your organization actually runs its classes.",
+        "schedule": {
+          "question": "How are your classes typically scheduled?",
+          "optionFixedSchedule": "Fixed schedule, the time slot is set by you (e.g. every Monday 4–6 PM)",
+          "optionFlexibleSchedule": "Flexible, students can book time slots whenever we have an available time slot"
+        },
+        "entering": {
+          "question": "Can students join at any time, or only at the start of a new phase (e.g., a new month or term)?",
+          "optionRegularLabel": "Every student ends the class at the exact same lesson, regardless of when the joined the class (e.g. the class always end on the last Saturday 3:00 p.m. of the month)",
+          "optionRecurringLabel": "Student ends their classes at different lessons, according to when they started joining the class (e.g. the class always end at the 8th lesson)"
+        },
+        "optionOther": "Other / Not sure",
+        "finalStep": "Final Step: Result",
+        "event": "Event",
+        "eventDescription": "For one-off workshops, seminars, or trial lessons.",
+        "membership": "Membership",
+        "membershipDescription": "For ongoing access and benefits with a membership fee.",
+        "includedByDefault": "Both Event and Membership class types are always included at no extra cost.",
+        "suggestion": {
+          "label": "Here’s our suggested class types according to your operations:",
+          "regular": "Regular",
+          "regularDescription": "For fixed-term courses with a set schedule and start/end dates",
+          "recurring": "Recurring",
+          "recurringDescription": "For ongoing classes students can join anytime, with no end date.",
+          "appointment": "Appointment",
+          "appointmentDescription": "For flexible, bookable time slots and private sessions.",
+          "noSuggestion": "The current class types should be enough for your needs."
+        }
+      },
+      "addons": {
+        "question": "Do you need any of the following premium features?",
+        "description": "You can enhance your experience by enabling the following optional features. Each add-on is priced separately and can be added or removed at any time.",
+        "steps": {
+          "featureBranding": {
+            "question": "Do you want to use your own branding in emails?",
+            "desc": "Would you like to remove Flowclass branding and use your own name or email as the sender for system emails?",
+            "resultLabel": "Branding",
+            "yesLabel": "Yes, enable custom email sender and branding removal",
+            "noLabel": "No, I’m fine with Flowclass branding"
+          },
+          "featurePortal": {
+            "question": "Would you like to give students access to a self-service portal?",
+            "desc": "Do you want your students to have their own portal for managing their classes, making reschedule requests, submitting questions, and viewing invoices?",
+            "resultLabel": "Student Portal",
+            "yesLabel": "Yes, enable the Student Portal",
+            "noLabel": "No, I don’t need this feature"
+          },
+          "featureTutorCentral": {
+            "question": "Do you want each tutor to be able to log into the system?",
+            "desc": "Would you like to use Tutor Central, which includes a tutor database, automated salary calculations, tutor availability management, and attendance options?",
+            "resultLabel": "Tutor Central",
+            "yesLabel": "Yes, enable Tutor Central",
+            "noLabel": "No, I don’t need this feature"
+          },
+          "featureQrCode": {
+            "question": "Do you want to track attendance using QR codes?",
+            "desc": "Would you like to enable QR code attendance so students can check in by scanning a code? This streamlines attendance tracking for both in-person and online lessons.",
+            "resultLabel": "QR Code Attendance",
+            "yesLabel": "Yes, enable QR Code Attendance",
+            "noLabel": "No, I don’t need this feature"
+          },
+          "optionNoLabel": "No, I don’t need this feature",
+          "creditSystem": {
+            "question": "Do you want to enable a Credit Wallet for every student account?",
+            "desc": "Would you like to handle refunds instantly as credits, give manual discounts, and encourage repeat enrolments by rewarding parents and students with credits they can use anytime for any course?",
+            "resultLabel": "Credit System",
+            "yesLabel": "Yes, enable the Credit System",
+            "noLabel": "No, I don’t need this feature"
+          }
+        }
+      },
+      "notification": {
+        "question": "Do you want to notify students using WhatsApp?",
+        "description": "Choose how you’d like to communicate important updates and reminders to your students. By default, email notifications are included. Enable WhatsApp to reach students more directly and conveniently.",
+        "steps": {
+          "wa": {
+            "question": "Do you want to send notifications to students via WhatsApp?",
+            "yesLabel": "Yes, I want to use WhatsApp notifications",
+            "noLabel": "No, email notifications are enough"
+          },
+          "official": {
+            "question": "Have you created your own Meta (Facebook) official WhatsApp Business account?",
+            "yesLabel": "Yes, I have an official WhatsApp Business account",
+            "yesDesc": "We will connect via Twilio",
+            "noLabel": "No, I don’t have an official account",
+            "noDesc": "You can use our unofficial WhatsApp integration"
+          }
+        },
+        "resultLabel": {
+          "email": "Email",
+          "waOfficial": "WhatsApp (Official via Twilio)",
+          "waUnofficial": "WhatsApp (Unofficial)"
+        }
+      },
+      "promotion": {
+        "question": "Which promotion tier would you like to enable on the platform?",
+        "description": "Enable advanced promotion features to:",
+        "descriptionList": {
+          "trial": "Let students easily book trial lessons online and experience a class before enrolling.",
+          "bundle": "Offer bundle discounts, giving students special rates when they purchase multiple classes together."
+        },
+        "yes": "Yes",
+        "no": "No",
+        "coupon": "Basic (Coupon Only)",
+        "couponTrialLabel": "Advanced (Coupon + Trial Lesson + Bundle Discounts)"
+      }
+    },
+    "overview": {
+      "reviewPackage": "Review Your Package",
+      "reviewSelection": "Confirm your selection and proceed to payment"
+    },
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "totalAnnual": "Total Annual",
+    "subTotal": "Subtotal",
+    "setupFee": "Setup Fee",
+    "setupFeeReq": "Setup Fee Required",
+    "setupFeeFirstInvoice": "One-time fee will be added to first invoice",
+    "setupFeeOneTime": "Setup Fee (One-time)",
+    "firstYearSetup": "First year total including setup",
+    "proceedPayment": "Proceed to payment",
+    "priceSummary": "Price Summary",
+    "stripeProduct": {
+      "CLASS_TYPE_REGULAR": "Regular",
+      "CLASS_TYPE_RECURRING": "Recurring",
+      "CLASS_TYPE_APPOINTMENT": "Appointment"
+    }
+  },
+  "presetPlanNames": {
+    "subscribePresetPlan": "Subscribe Preset Plan",
+    "mostPopular": "Most Popular",
+    "startUsing": "Start Using",
+    "INDIVIDUAL_TRAINERS_TUTORS": "Individual Trainers and Tutors",
+    "STARTUP_EDUCATION_CENTRES": "Startup Education Centers",
+    "GROWING_EDUCATION_CENTRES": "Growing Education Centers",
+    "MULTI_BRANCH_EDUCATION_CENTRES": "Multi-Branch Education Centers",
+    "SMALL_SCALE_EDUCATION_CENTRES": "Small-scale Education Centers",
+    "MEDIUM_SIZE_EDUCATION_CENTRES": "Medium-sized Education Centers",
+    "baseUserQuantity": "{{count}} students",
+    "schoolQuantity": "{{count}} schools",
+    "classTypeEnable": "{{count}} class types",
+    "notificationQuantity": "{{count}} notifications",
+    "adminQuantity": "{{count}} admins",
+    "tutorQuantity": "{{count}} tutors",
+    "OWN_BRANDING": "Own Branding",
+    "CREDIT_SYSTEM": "Credit System",
+    "TUTOR_CENTRAL": "Tutor Central",
+    "STUDENT_PORTAL": "Student Portal",
+    "APPLY_MULTIPLE_COURSES": "Apply Multiple Courses",
+    "EMAIL": "Email",
+    "TWILIO_WHATSAPP": "Official WhatsApp",
+    "UNOFFICIAL_WHATSAPP": "Unofficial WhatsApp",
+    "promotionTier": "Promotion"
+  }
+}

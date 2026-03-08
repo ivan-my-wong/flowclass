@@ -1,0 +1,48 @@
+{
+  "pickedClass": "活動類型選擇",
+  "pickedPrice": "活動價格",
+  "uploadReceipt": {
+    "waitConfirm": "請等待付款確認"
+  },
+  "stepTitles": {
+    "selectOption": {
+      "normal": "請選擇你的活動類型"
+    },
+    "pickedClass": "活動類型選擇",
+    "pickedLesson": "活動時間",
+    "pickedPhase": "活動時段",
+    "pickedPrice": "活動價格",
+    "stepIndicator": {
+      "selectRecurStartLesson": "選擇第一個活動"
+    }
+  },
+  "pickPeriodStep": {
+    "selectTimeSlot": {
+      "normal": "選擇第一個活動",
+      "event": "選擇活動時間",
+      "recurring": "選擇活動時間",
+      "lessonsChosen": "已選擇活動"
+    },
+    "lessonsInClass": "活動節數"
+  },
+  "confirmDetailStep": {
+    "tuitionFee": "費用",
+    "specificT&C": "請於報名此活動前，確認您已閱讀並同意條款和細則。"
+  },
+  "pickTuitionStep": {
+    "recurTuitionReminder": "舉辦者可能設置了一些日期為不可用。因此，一些活動可能會推遲到下周。"
+  },
+  "successPayment": {
+    "allLesson": "活動",
+    "feePerLesson": "活動費用",
+    "selectedLessons": "已選擇活動",
+    "lessons": "活動時段"
+  },
+  "payment": {
+    "success": "您已成功報名，我們稍後會透過電郵寄出確認信",
+    "failure": "您的活動報名失敗。請直接聯繫舉辦方。",
+    "incomplete": "您尚未完成所有步驟。請返回並選擇活動類型、時間和費用選項。",
+    "waitingPayment": "您已提交表格，請完成付款確認報名。",
+    "completeRegistration": "完成報名"
+  }
+}

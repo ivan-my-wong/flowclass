@@ -1,0 +1,139 @@
+{
+  "userName": "使用者名稱",
+  "emailOrUserName": "電子郵件或使用者名稱",
+  "email": "電子郵件",
+  "password": "密碼",
+  "login": "登入",
+  "forgetPassword": "忘記密碼？",
+  "welcomeBack": "歡迎回來",
+  "noAccountYet": "還沒有帳號嗎？",
+
+  "areaCode": "國家代碼",
+  "phoneNumber": "電話號碼",
+
+  "resetPassword": "重設密碼",
+  "back": "返回",
+  "forgetPasswordHint": "請輸入您用於 Flowclass 帳戶的電子郵件",
+  "sendSuccess": "請求已成功發送。請檢查您的電子郵件。",
+  "resetSuccess": "密碼已重設。請使用新密碼登入。",
+  "required": "必填",
+
+  "goToRegister": "前往 Flowclass",
+
+  "submit": "提交",
+  "submitting": "正在提交...",
+
+  "errors": {
+    "loginError": "登入失敗。請檢查您的電郵或密碼。",
+    "failedToCreateUser": "創建用戶失敗。請再試一次。",
+    "userNotFoundError": "該電子郵件未與 Flowclass 帳戶關聯。",
+    "noAccountWithThisSocialMedia": "您尚未使用此登入方法註冊。請前往 app.flowclass.io/register 以註冊此登入方法。",
+    "forgetPasswordRequestAlreadyExists": "您已有一個忘記密碼的請求。請檢查您的電子郵件。",
+    "userNotExist": "您的帳戶不存在。請前往 app.flowclass.io/register 以連結您的登入方法帳戶。",
+    "passwordTooShort": "密碼太短。請輸入至少 8 個字符。",
+    "passwordNotSame": "密碼不相同。請輸入相同的密碼。",
+    "required": "請填寫此字段。",
+    "emailAlreadyExists": "已經有一個使用該電子郵件地址的使用者，請直接登入。",
+    "phoneAlreadyExists": "已經有一個使用該電話號碼的使用者，請使用另一個電話號碼。",
+    "tryLogin": "使用者已存在。如果這是您的帳戶，請直接在 https://app.flowclass.io/login 登入。",
+    "invalidEmail": "請填寫正確的電子郵件",
+    "tryAnotherEmail": "無法註冊該電子郵件。請嘗試其他電子郵件地址。",
+    "strongPassword": "您的密碼必須包含至少一個小寫字母、一個大寫字母和一個數字。",
+    "notAllowReset": "您的忘記密碼代碼不正確",
+    "checkEmail": "請檢查您的電子郵件是否正確。",
+    "accountExists": "您先前使用其他社交媒體登入過。請再次使用該社交媒體同一電郵的帳戶登入。"
+  },
+
+  "register": {
+    "here": "註冊",
+    "goToCMS": "立即登入",
+    "orRegisterWith": "或",
+    "start": "建立方便您和學生的課程報名網站",
+    "continue": "繼續",
+    "alreadyHaveAccount": "已經有帳號？",
+    "registerWithGoogle": "使用 Google 帳戶註冊",
+    "registerWithFacebook": "使用 Facebook 帳戶註冊",
+    "consent": "點擊「註冊」即表示您同意我們的",
+    "createAccount": "建立帳戶",
+    "chooseSignupMethod": "選擇您想要的註冊方式",
+    "continueWithGoogle": "使用 Google 繼續",
+    "or": "或",
+    "continueWithEmail": "使用電子郵件繼續",
+    "almostDone": "快完成了！",
+    "enterPhoneForGoogle": "請輸入您的電話號碼以完成註冊",
+    "whatsYourEmail": "您的電子郵件地址是什麼？",
+    "enterEmailToContinue": "輸入您的電子郵件以繼續",
+    "whatsYourPhone": "您的電話號碼是什麼？",
+    "enterPhoneToContinue": "輸入您的電話號碼以繼續",
+    "whatsYourName": "您的姓名是什麼？",
+    "enterNameToContinue": "輸入您的姓名以繼續",
+    "createPassword": "建立您的密碼",
+    "enterPasswordToComplete": "輸入您的密碼以完成註冊",
+    "chooseMethod": "選擇方式",
+    "email": "電子郵件",
+    "phone": "電話",
+    "name": "姓名",
+    "password": "密碼",
+    "progress": "註冊進度",
+
+    "success": "帳戶創建成功！請檢查您的郵箱以驗證您的電子郵件。",
+    "inviteSuccess": "您已接受邀請。請使用您剛設置的電子郵件和密碼登入。",
+
+    "terms": "服務條款",
+    "privacy": "隱私政策",
+    "passwordAgain": "確認密碼",
+    "verifyEmail": "帳戶創建成功！請檢查您的郵箱以驗證您的電子郵件。",
+    "socialMediaLinked": "您的社交媒體帳戶已連結到 Flowclass 帳戶。",
+    "socialMediaLinkedError": "我們無法連結您的社交媒體帳戶。我們已使用您註冊時使用的社交媒體帳戶為您登入。",
+    "termsAgreement": "建立帳戶即表示您同意我們的",
+    "alreadyHaveAccountSignIn": "已經有帳號？"
+  },
+
+  "eBook": {
+    "title": "立即註冊，直接以電郵收到我們的獨家電子書",
+    "description": "第一集：建立和擴張您的教育企業"
+  },
+
+  "guides": "使用者指南",
+
+  "loginModal": {
+    "smsLogin": "短信登入",
+    "passwordLogin": "使用密碼登入",
+    "linkWithSocial": "連接社交媒體",
+    "registerNow": "還沒有帳號？點擊這裡註冊",
+    "loginFailed": "登入失敗",
+    "popupClosed": "彈出窗口已關閉。",
+    "loginSucceeded": "登入成功",
+    "welcomeTitle": "歡迎回來！",
+    "email": "電子郵件",
+    "password": "密碼",
+    "login": "登入",
+
+    "title": {
+      "sms": "登入",
+      "password": "登入",
+      "forgetPassword": "忘記密碼",
+      "linkWithSocial": "連結社交媒體帳戶"
+    },
+    "alreadyHaveAccount": "已經有帳號？"
+  },
+
+  "socialLogin": {
+    "loginWithGoogle": "使用 Google 帳戶繼續",
+    "loginWithFacebook": "使用 Facebook 帳戶繼續",
+    "error": "社交媒體登入失敗。請重試。"
+  },
+
+  "updateShowcase": {
+    "v2_2_0": {
+      "title": "v2.2.0 - 完整的發票管理",
+      "description": "對發票管理系統進行了巨大的升級。現在，您可以管理發票並將其分配給您的學生。"
+    },
+    "updateNotesButton": "查看更新說明",
+    "documentationButton": "使用教學"
+  },
+
+  "lastUpdate": {
+    "dateText": "最後更新：{{date}}"
+  }
+}

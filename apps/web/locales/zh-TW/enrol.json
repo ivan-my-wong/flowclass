@@ -1,0 +1,398 @@
+{
+  "enrol": "報名",
+  "siteTitle": "網上報名",
+  "step": "步驟",
+  "lessons": "課程",
+  "stepTitles": {
+    "selectOption": {
+      "normal": "請選擇這個課程的班別",
+      "event": "選擇您想報名的選項"
+    },
+    "pickClass": "選擇這個課程的班別",
+    "pickedClass": "已選擇班別",
+    "pickedPeriod": "已選擇時段",
+    "pickedPhase": "已選擇期數",
+    "pickedLesson": "上課時間",
+    "pickedPrice": "課程價格",
+    "stepIndicator": {
+      "selectOption": "選擇選項",
+      "selectPeriod": "選擇時段",
+      "selectTuition": "選擇價格",
+      "customField": "申請表格",
+      "confirmDetail": "確認",
+      "selectPriceOption": "選擇價格選項",
+      "selectRecurPeriod": "選擇時段",
+      "selectRecurStartLesson": "選擇第一堂課"
+    }
+  },
+  "pickPeriodStep": {
+    "seatsLeft": "餘下名額",
+    "selectTimeSlot": {
+      "normal": "請選擇這個課程的班別",
+      "event": "選擇您想報名的選項",
+      "recurring": "選擇您想開始上課的時間",
+      "fixedSchedule": "一次過選擇每週的同一時段",
+      "lessonsChosen": "已選擇時段",
+      "individual": "個別日期",
+      "showNextPeriod": "顯示下一個時段",
+      "noMorePeriods": "沒有更多時段",
+      "removeFromList": "從列表中移除",
+      "noTimeSlots": "請在日曆中選擇日期以顯示可用的時段",
+      "remainingQuota": "剩餘名額：{remaining} / {total}",
+      "thisDateHasNoTimeSlots": "此日期沒有可用的時段",
+      "selectAllTimeslots": "選擇所有時段"
+    },
+    "classesRemaining": "尚有班別",
+    "subscriptionPaymentDescription": "一次付款",
+    "pickDate": "選擇您想報名的每週時段",
+    "pickRecurStart": "選擇第一堂課的日期。之後的課程時間將會被自動生成。",
+    "pickDateSession": "選擇第一次時段的日期和時間",
+    "time": "時區：",
+    "timeExplain": "，以12小時制（AM / PM）顯示",
+    "available": "可用時段",
+    "noClasses": "尚未有教育者建立任何班別供招募。",
+    "noSessions": "該教育工作者尚未設立任何時段。",
+    "noPhases": "尚未有教育者建立班別的上課時段供招募。",
+    "noCurrentPhases": "抱歉，該班別的所有課程已開始。請聯繫教育者獲取更多資訊。",
+    "noCurrentSessions": "抱歉，該活動的所有時段已開始。請聯繫教育者獲取更多資訊。",
+    "timeslotsAvailable": "個可用時段",
+    "perLesson": "每節課",
+    "perClass": "整個班別",
+    "lessonsInClass": "堂課",
+    "forApplication": "報名費用",
+    "forTotal": "總共包含",
+    "forBuying": "總共購買",
+    "lessons": "堂課",
+    "instructor": "導師：",
+    "location": "地點：",
+    "periodRemind": "購買此時段後，您可以出席所有包含的課程。",
+    "startedLesson": "已開始的課堂",
+    "startedClass": "已開始的班別",
+    "statedSession": "已開始的時段",
+    "noAvailableTimeSlot": "沒有可用時段",
+    "openingsAvailable": "尚有名額",
+    "limitedOpenings": "尚有部分名額",
+    "onlyAFewOpeningsLeft": "尚有少量名額",
+    "seatLeft": "尚餘名額:",
+    "noSeatLeft": "名額已滿"
+  },
+  "pickTimeslotStep": {
+    "searchingForTime": "正在搜索有學位的時段",
+    "pickDate": "選擇第一堂課的日期和時間",
+    "time": "時間：",
+    "timeExplain": "，以24小時制顯示",
+    "sessionRemind": "購買此時段後，您可以出席所有包含的時間段。"
+  },
+  "pickSubscriptionPlanStep": {
+    "buyPlanRemind": "當您購買訂閱商品時，您將被計費",
+    "billCycleRepeat": "此計費週期將重複",
+    "billingCycleStartDate": "帳單週期開始日期",
+    "billingCycleNextDate": "帳單週期下次日期",
+    "billingCycleEndDate": "帳單週期結束日期"
+  },
+  "pickPriceOptionStep": {
+    "title": "價格選項",
+    "description": "請選擇您想報名的價格選項",
+    "numOfLesson": "{{count}} 堂課",
+    "insufficientLessonsWithinPeriod": "課程時段不足。請選擇其他課程組合。"
+  },
+  "repeatType": {
+    "every": "每",
+    "times": "次",
+    "per": "每"
+  },
+  "customFieldStep": {
+    "fillDetail": "請填寫以下資料",
+    "specialStudy": "特殊幫助 (如需要特殊幫助，請告知我們)",
+    "selectCountry": "選擇國家或地區",
+    "title": {
+      "normal": "您將在下一步核對資料、報名費用和班級時段",
+      "event": "您將在下一步核對資料、報名費用和活動時段"
+    },
+    "applicantOfNumber": "共 {total} 位申請人的第 {step} 位",
+    "stepOfNumber": "{total} 的第 {step} 步",
+    "commonFields": "其他資料",
+    "createAnAccount": "將報名資料發送給此申請人嗎？",
+    "previousApplicant": "上一位申請人",
+    "previousStep": "上一步",
+    "nextApplicant": "下一位申請人",
+    "pleaseValidateForm": "表單提交失敗，請填寫所有必填欄位。",
+    "nextStep": "下一步"
+  },
+  "confirmDetailStep": {
+    "confirmDetail": "確認並前往付款",
+    "confirmYourDetail": "確認您的詳細資料",
+    "tuitionFee": "學費",
+    "totalTuitionFee": "總計",
+    "specificT&C": "請於報名此課程前，確認您已閱讀並同意條款和細則。",
+    "viewDetail": "查看詳情",
+    "yes": "是",
+    "no": "否"
+  },
+  "pickTuitionStep": {
+    "numOfLesson": "數量",
+    "applicant": "人",
+    "pricePerClass": "整個班別",
+    "pricePerLesson": "每節課",
+    "numberOfApplicant": "報名人數",
+    "pickOption": "選擇學費選項",
+    "confirmDetail": "您可以在下一步確認每節課的詳細信息",
+    "autoFill": "填寫過往報名資料",
+    "recurTuitionReminder": "教育者可能設定了某些日期沒有班別。因此，部分班別可能會延後到下一週。"
+  },
+  "pickWorkshopFeeStep": {
+    "pickOption": "選擇學費選項",
+    "confirmDetail": "您可以在下一步確認每節時段的詳細信息"
+  },
+  "pickClassStep": {
+    "multipleClass": "選擇多個班別",
+    "selectedClass": "已選擇的班別",
+    "noClassesSelected": "您尚未選擇任何班別"
+  },
+  "confirmDetail": "請確認您的報名信息",
+  "payment": {
+    "title": "付款",
+    "name": "您的全名（用於驗證報名）",
+    "bank": "銀行轉帳或現金",
+    "phone": "電話號碼（供教育者與您聯繫）",
+    "email": "電子郵件（用於發送確認郵件）",
+    "creditCard": "信用卡或數字支付",
+    "enrolForm": "報名表",
+    "success": "您的課程報名成功。一封郵件將很快發送給您。",
+    "failure": "您的課程報名失敗。請直接聯繫教育者。",
+    "incomplete": "您尚未完成所有步驟。請返回並選擇班別、日期和時間以及學費選項。",
+    "waitingPayment": "您已提交報名表，請完成付款確認報名。",
+    "proceed": "確認",
+    "proceedWith": "繼續進行",
+    "proceedToPayment": "報名並前往付款",
+    "completeRegistration": "完成報名",
+    "notChanged": "我們還不會向您收費。請在繼續操作後在新視窗中輸入您的付款詳細信息。",
+    "newStudentFee": "新生報名費用",
+    "totalPayment": "總付款"
+  },
+  "autoFillForm": {
+    "title": "自動填寫申請表",
+    "resetAllFields": "重置所有欄位",
+    "description": "請驗證您在之前申請中使用的信息。我們將安全地找回您的信息。",
+    "email": "電郵",
+    "name": "全名",
+    "bookingId": "您之前的預訂編號",
+    "phone": "電話號碼",
+    "autoFill": "檢索以前的申請",
+    "bookingFound": "找到先前的申請記錄。我們將使用您先前的資訊填寫相應的欄位。",
+    "tryAgain": "重試",
+    "noRecordFound": "沒有找到先前的申請記錄。請手動填寫表單。",
+    "previousApplicationRetrieved": "已檢索先前申請",
+    "loginFailed": "登入失敗",
+    "pleaseCheckCredentials": "請檢查您的登入資料並重試。",
+    "loading": "載入中..."
+  },
+  "paymentDetail": {
+    "onlinePayment": "線上付款",
+    "enrollToSeeDetail": "請報名以查看付款詳情",
+    "pickPayment": "選擇並完成付款",
+    "paymentMethodType": "選擇付款方式",
+    "title": "付款詳情",
+    "description": "描述",
+    "error": "獲取付款詳情時出錯，請稍後再試。",
+    "accountName": "帳戶名稱",
+    "accountNumber": "帳戶號碼",
+    "bankName": "銀行名稱",
+    "bankBranch": "銀行分行",
+    "payoutDetails": "支付詳情",
+    "payoutImg": "支付圖片",
+    "payoutUrl": "支付網址",
+    "paymentGuide": "點擊「繼續」後將顯示付款方式的詳細資料：",
+    "scanPaymentImage": "在下一頁上檢查付款步驟和帳戶號碼。",
+    "enterPaymentLink": "按照指示進行付款，並保存任何收據或付款證明。",
+    "transferMoney": "上傳相關的付款證明。我們將核實付款並確認您的報名。",
+    "choosePaymentMethod": "請從以下選項中選擇一種付款方式",
+    "uploadReceipt": "上傳付款證明",
+    "payWithExternalLink": "使用外部連結付款"
+  },
+  "successPayment": {
+    "confirmCode": "確認碼",
+    "enrolmentComplete": "報名完成！",
+    "confirmEmail": "確認郵件和收據已發送至您的郵箱",
+    "followInstruction": "請按照郵件中的指示享受您的課程！",
+    "done": "完成",
+    "enrollmentDetail": "報名詳情",
+    "courseName": "課程名稱",
+    "class": "班別",
+    "period": "期間",
+    "firstLesson": "第一堂課",
+    "allLesson": "全部課堂",
+    "feePerLesson": "課程費用",
+    "selectedLessons": "已選擇課堂",
+    "session": "時段",
+    "sessionTime": "時間",
+    "lessons": "課堂",
+    "items": "項目",
+    "qrCode": {
+      "showAtCounter": "請向職員出示此二維碼",
+      "tapQrCode": "點擊二維碼放大",
+      "save": "儲存二維碼"
+    }
+  },
+  "uploadReceipt": {
+    "paymentReceipt": "請上傳付款收據圖片以完成您的報名",
+    "uploadHint": "請完成付款以確保名額。",
+    "enrollId": "報名編號",
+    "invoiceId": "收據編號",
+    "done": "送出",
+    "uploadSuccess": "您的付款證明已經成功上傳。",
+    "uploadSuccessToast": "上傳成功",
+    "waitConfirm": "請等待機構確認您的付款。",
+    "tokenNotMatch": "Token不符合",
+    "unauthorized": "連結已過期",
+    "tokenExpired": "此付款頁面已經過時。請再次申請，以前往新的付款連結。",
+    "uploadFailed": "上傳失敗",
+    "onlyImage": "只能上傳圖片 (.jpg/.jpeg/.png)",
+    "browseMoreCourses": "瀏覽更多課程",
+    "totalPayment": "總付款",
+    "classInfo": "班別資訊",
+    "total": "總計",
+    "selectedPayLaterMethod": "您選擇的付款方式",
+    "instructor": "導師",
+    "location": "地點",
+    "discountIncluded": "已包含折扣",
+    "receiptStatus": {
+      "waiting": "您的報名已經提交給教育者。請完成付款和上傳收據以確認報名。",
+      "disapproved": "很抱歉，您之前上傳的收據未被課程提供者批准。請重新支付費用。",
+      "approved": "付款已完成，報名已經被批准。",
+      "applied": "您已提交付款收據。請等待課程提供者確認您的付款。",
+      "resubmit": "申請已經被批准。付款已經完成。如有需要，您仍可以提交額外的付款證明。"
+    },
+    "additionalFee": {
+      "title": "附加費",
+      "newStudentFee": "新生註冊費"
+    },
+    "approvalTime": "審核時間",
+    "applicationInfo": "應用程式資訊"
+  },
+
+  "reviewItems": "檢視您的項目",
+  "viewPaymentBtn": "檢視付款",
+  "itemPrice": "項目價格",
+
+  "paymentStatus": {
+    "title": "付款狀態",
+    "ApplicationTitle": "報名狀態",
+    "createdAt": "建立時間",
+    "updatedAt": "更新時間",
+    "PAID": "已付款",
+    "UNPAID": "未付款",
+    "PENDING": "待處理",
+    "SUBMITTED": "已提交",
+    "REFUNDED": "已退款",
+    "UNKNOWN": "未知"
+  },
+
+  "paymentSummary": {
+    "title": "付款摘要",
+    "titleApplication": "報名摘要",
+    "viewTimeSlotBtn": "檢視時段",
+    "courses": "課程",
+    "lessonCount": "({{ count }} 堂課)",
+    "subtotal": "小計",
+    "discountsApplied": "已應用折扣",
+    "totalAmount": "總金額",
+    "couponApplied": "優惠券折扣",
+    "creditsUsed": "已使用積分",
+    "creditsApplied": "已應用積分"
+  },
+
+  "paymentSuccessSummary": {
+    "paymentAmount": "付款金額",
+    "paymentMethod": "付款方式",
+    "onlinePayment": "線上付款",
+    "payLater": "延遲付款",
+    "paymentDate": "報名日期",
+    "approvalDate": "核准日期"
+  },
+
+  "workshop": {
+    "pickSession": "選擇這個活動的時段",
+    "pickedSession": "已選擇時段",
+    "pickedPeriod": "已選擇時段",
+    "pickedPhase": "已選擇時段",
+    "pickedLesson": "開始課程",
+    "pickedPrice": "活動價格",
+    "stepIndicator": {
+      "selectOption": "選擇選項",
+      "selectPeriod": "選擇時段",
+      "selectTuition": "選擇價格",
+      "customField": "申請表格",
+      "confirmDetail": "確認",
+      "selectRecurPeriod": "選擇時段",
+      "selectRecurStartLesson": "選擇第一堂課"
+    }
+  },
+
+  "fieldData": {
+    "Name": "姓名",
+    "Email": "電郵",
+    "Phone": "聯絡電話",
+    "specialStudy": "特殊學習"
+  },
+  "requiredFields": {
+    "name": "全名",
+    "email": "電郵",
+    "phone": "電話 (支援WhatsApp聯繫)",
+    "isOptional": "(可選填)"
+  },
+  "contactInformation": "聯絡資訊",
+  "enrollmentInformation": "報名資訊",
+  "coupon": {
+    "redeem": "兌換優惠券",
+    "expired": "優惠券代碼錯誤或已過期",
+    "applied": "優惠券已成功應用",
+    "couponUsed": "優惠券折扣",
+    "canUse": "這並不是最終價格，您還可以在下頁使用優惠券和折扣。",
+    "discount": "折扣優惠",
+    "discountCode": "優惠碼",
+    "validDate": "有效期至",
+    "quota": "可使用次數",
+    "availableCoupon": "可用優惠券",
+    "selectCoupon": "請選擇您的優惠卷",
+    "availableCoupons": "選擇您擁有的優惠券"
+  },
+
+  "enrollSseStep": {
+    "started": "報名程序已開始",
+    "validating_course": "正在驗證課程",
+    "checking_seat_availability": "正在檢查課程是否有剩餘名額",
+    "checking_schedule_availability": "正在檢查課程時間表",
+    "creating_student": "正在創建學生資料",
+    "creating_multiple_class_information": "正在創建多個班級信息",
+    "creating_application_form": "正在遞交申請表",
+    "enrolling_course": "正在確認報名",
+    "preparing_payment": "正在準備付款",
+    "creating_invoice": "正在創建付款記錄",
+    "creating_student_schedule": "正在創建您的上課時間表",
+    "sending_reminder": "正在發送提醒",
+    "done": "報名已完成",
+    "failed": "報名失敗"
+  },
+  "trialLesson": {
+    "title": "試堂",
+    "alreadyEnrolled": "報名人已經報名這堂課",
+    "usedTitleAlert": "您已經報名這堂課",
+    "usedDescriptionAlert": "試堂課程不能被重複報名"
+  },
+  "wishlist": {
+    "==============": "============== Generated by AI, improve this translation ===============",
+    "success": "申請成功!",
+    "failed": "申請失敗。請再試一次。",
+    "redirecting": "正在重定向到課程",
+    "seconds": "秒",
+    "applicationSuccessful": "所有課程申請已成功提交。",
+    "confirmationEmail": "您將收到一封確認郵件，詳細如下。",
+    "redirectingToCourses": "正在重定向到課程",
+    "secondsToRedirect": "秒..."
+  },
+  "refillConfirm": {
+    "title": "您要重新填寫表單嗎？",
+    "description": "您已經填寫過表單了。您要重新填寫表單嗎？"
+  }
+}

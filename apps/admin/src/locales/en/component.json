@@ -1,0 +1,368 @@
+{
+  "delete": "Delete",
+  "editor": {
+    "typeHere": "Type here to start...",
+    "enableToEdit": "Enable to edit"
+  },
+  "classCard": {
+    "moreInfo": "More",
+    "name": "Name",
+    "locality": "Location",
+    "venue": "Place",
+    "time": "Time",
+    "teachingLanguage": "Teaching Language",
+    "teachLevels": "Target Student Level",
+    "teachStyles": "Teaching Style",
+    "schedules": "Class RegularPeriods",
+    "to": "to",
+    "quota": "Application Quota",
+    "applied": "Registered",
+    "enrollmentOffset": "Adjust number of enrolled student",
+    "price": "Tuition fee",
+    "classDescription": "Introduction",
+    "discountedPrice": "Discounted tuition fee",
+    "applyNow": "Register now",
+    "notOpen": "Not open for registration",
+    "stillHaveQuota": "There are still places",
+    "limitedQuota": "Limited spots",
+    "full": "Quota is full!",
+    "expand": "Expand",
+    "collapse": "Fold",
+    "edit": "Revise",
+    "notSet": "Not set"
+  },
+  "dataCard": {
+    "pending": "Processing"
+  },
+  "statsChip": {
+    "pending": "Processing"
+  },
+  "createCentre": {
+    "field": {
+      "name": "Page name",
+      "email": "Contact email",
+      "teachSubjects": "Teaching subjects or skills",
+      "teachLevels": "Target student level",
+      "phone": "Contact number",
+      "areaCode": "Area code"
+    },
+    "helperText": {
+      "name": "This will be used as your page name, displayed on the header and Google search results. ",
+      "teachLevels": "Choose the level of students you will be teaching. ",
+      "teachSubjects": "Pick the subjects or skills you will be teaching. ",
+      "email": "The email which students can contact you, either company email or personal email. ",
+      "phone": "It is recommended to enter the phone number with Whatsapp, so that students can respond instantly."
+    },
+    "validate": {
+      "name": "You must enter a page name",
+      "email": "Please make sure the email format is correct",
+      "phone": "Phone format input error, please check again",
+      "existingTc": "This page name is already in use, please try another name. ",
+      "unknownError": "An unknown error occurred, please try to reload or contact us via Whatsapp.",
+      "forbidden": "You do not have the access to create a page. This may be because your Flowclass account is relatively old, please contact us via Whatsapp to upgrade your account.",
+      "alreadyHaveTcAdmin": "Successfully added creator permissions."
+    },
+    "welcomeTitle": "Just one step away from getting your course page online 👋",
+    "welcomeSubtitle": "The following information is only for setting up. Anything can be changed later.",
+    "create": "Create page"
+  },
+  "defaultPage": {
+    "choosePage": "Please choose your page in the dropdown menu."
+  },
+  "courseEditDialog": {
+    "uploadImage": {
+      "pleaseUpload": "Error. Please make sure you have uploaded the image.",
+      "wrongFormat": "Incompatible image format. Please try again with another image.",
+      "finishCrop": "Please complete cropping the course banner",
+      "upload": "Upload Course Banner",
+      "crop": "Cropping the Course Banner",
+      "finish": "Complete cropping",
+      "noImage": "No course banner",
+      "dragAndDrop": "Drag & drop your file here, or click to select"
+    },
+    "description": "Course Description",
+    "name": "Course Title",
+    "success": "Course is successfully created or updated!",
+    "category": "Course category",
+    "addCategory": "Add category",
+    "newCourse": "New course",
+    "newClass": "New Class/Timetable",
+    "unsaved": "Unsaved changes",
+    "unnamedClass": "Unnamed class",
+    "pleaseFinishInfo": "Please complete the basic information",
+    "pleaseFinishClass": "Please complete the class description",
+    "class": {
+      "name": "Class name",
+      "classId": "Class ID:",
+      "locality": "Class Location",
+      "area": "Class Area",
+      "country": "Country or Region",
+      "address": "Class address",
+      "onlineLink": "Link to online meeting:",
+      "brief": "Class information",
+      "timetable": "Class timetable",
+      "memo": "Memo to students",
+      "startTime": "Starting time",
+      "endTime": "End Time",
+      "deleteClass": "After deleting a class, it cannot be restored by any means",
+      "addReminder": "Use classes to allow students to choose different timeslots, different levels or different location when applying.",
+      "freeReminder": "Reminder: You can set the price of a class to be $0 as a trial lesson for students to apply without payment details."
+    },
+    "application": {
+      "start": "Registration start time",
+      "end": "Deadline for registration",
+      "people": "Adjustment of the number of applicants"
+    },
+    "header": {
+      "class": "Basic Information",
+      "time": "Schedules",
+      "priceAndQuota": "Price & Quota"
+    },
+    "helper": {
+      "noEmpty": "This field cannot be blank",
+      "video": "Video (Youtube link only)",
+      "onlyYoutube": "Youtube link only",
+      "keyword": "Separate each keyword with a comma ',', e.g. 'Interactive, SEN'",
+      "removeDate": "*To stop enrollment. Please delete the date",
+      "noNegative": "This field cannot be negative",
+      "adjustment": "Adjust the number of students who enroll, transfer, or withdraw from other sources",
+      "online": "If it is an online course, please fill in 'Online'",
+      "wrongLink": "Malformed link",
+      "meetingUrl": "If it is an online course, please fill in the Meeting URL, this link will be sent by email to the students after they successfully enroll",
+      "memo": "This reminder will only be sent to the student's email after they have successfully enrolled",
+      "brief": "You can enter the class timetable, target students, or brief introduction of the class.",
+      "noSchedule": "(No class RegularPeriods)",
+      "plsAddSchedule": "Please add timetable information for each class"
+    }
+  },
+  "subscriptionDialog": {
+    "dialogTitle": "You have exceeded your plan limit",
+    "upgradePlan": "You can upgrade your existing plan to create more course pages and enjoy advanced recruitment system builder features.",
+    "upgrade": "Plan and Subscription Pricing",
+    "contactSales": "contact our sales team",
+    "messages": {
+      "starterPlanCourse": "Upgrade to starter plan to create 3 course pages and set custom path",
+      "premiumPlanCourse": "Upgrade to premium plan to create 10 course pages",
+      "discountCode": "Upgrade to starter plan to create discount codes"
+    }
+  },
+  "errorPage": {
+    "notFound": "This page is not found",
+    "forbidden": "You do not have access to this page"
+  },
+
+  "table": {
+    "exportToCsv": "Export to CSV",
+    "selectSortBy": "Sort by"
+  },
+  "menubar": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "homepage": "Brand & Links",
+    "student": "Application Record",
+    "rescheduleApproval": "Reschedule Approval",
+    "lessonMatrix": "Attendance Sheet",
+    "payment": "Payment Methods",
+    "chargeClients": "Manage Clients",
+    "teachingService": "Courses & Events",
+    "promotion": "Promotion & Fees",
+    "settings": "Educator Settings",
+    "subscription": "Subscription",
+    "account": "Account",
+    "notificationLog": "Notification Log",
+    "onboarding": "Onboarding",
+    "logout": "Logout",
+    "site": "Site",
+    "embed": "Add to Website",
+    "info": "Customize Site",
+    "schoolList": "School List",
+    "contact": "Contacts",
+    "educator": "Educator Information",
+    "photo": "Photo album",
+    "userManagement": "Staff Management",
+    "siteSettings": "Settings",
+    "integrations": "Integrations",
+    "backToSchool": "Visit School Settings",
+    "admin": "Admin",
+    "profile": "Profile",
+    "preferences": "Preferences",
+    "notifications": "Notifications",
+    "updates": "Updates",
+    "studentRecord": "Student Central",
+    "paymentCampaign": "Invoice Campaign",
+    "classSchedule": "Class Schedule",
+    "mySchools": "My schools",
+    "locations": "Locations",
+    "customDataField": "Custom Data Fields",
+    "applicationForm": "Application Form",
+    "blockTime": "Closing Time",
+    "visitSubscription": "Visit Subscription",
+    "classMaterials": "Class Materials",
+    "classMaterialsSubMenu": "Class Materials",
+    "featureEnable": "Enable Features",
+
+    "whatsappTemplate": "WhatsApp Template",
+    "automationFlow": "Automation Flow",
+    "support": "Contact Support",
+    "availability": "Availability",
+
+    "certificateTemplates": "Certificate Templates",
+    "receiptTemplates": "Receipt Campaign",
+    "bulkSendDocuments": "Bulk Send Documents",
+    "studentSubmission": "Student Submissions",
+
+    "headings": {
+      "setup": "Website",
+      "applications": "Management",
+      "courses": "Courses",
+      "revenue": "Application & Revenue",
+      "schedule": "Schedule",
+      "messages": "Messages",
+      "settings": "Settings",
+      "students": "Students",
+      "templateManagement": "Template Management",
+      "staffAndLocation": "Staff & Location"
+    },
+
+    "aiTools": {
+      "descriptionGenerator": "Description Generator",
+      "getMoreCredits": "Get more credits"
+    }
+  },
+  "select": {
+    "placeholder": "Please select",
+    "selectSite": "Select site",
+    "selectSchool": "Select school",
+    "addSite": "Add new site",
+    "addSchool": "Add new school",
+    "section": "Section",
+    "selectCourse": "Select course",
+    "proPlanOnly": "Available in Pro Plan",
+    "createSchool": "Create new school",
+    "createSchoolSuccess": "Create new school succesfully",
+    "expand": "Expand",
+    "selectSocialMedia": "Select social media",
+    "deselectAllClasses": "Deselect all classes",
+    "selectAllClasses": "Select all classes",
+    "deselectAll": "Deselect All",
+    "selectAll": "Select All"
+  },
+  "ImageUpload": {
+    "title": "Select an image to upload",
+    "updateTitle": "Update image detail",
+    "uploadImage": "Upload Image",
+    "cropImage": "Crop Image",
+    "finishCrop": "Finish Crop",
+    "pleaseUpload": "Please upload an image",
+    "wrongFormat": "Wrong image format",
+    "error": "Error, please reupload image",
+    "noImage": "No image",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "update": "Update",
+    "uploadSuccess": "Image uploaded successfully",
+    "updateSuccess": "Image information successfully",
+    "cropImageTips": "You can drag and drop the box to reposition it, or resize it to adjust the size of the image",
+    "tags": "Tags",
+    "caption": "Caption",
+    "loader": "Loader..."
+  },
+  "SectionTag": {
+    "DEFAULT": "Default Sections",
+    "COURSE_FEATURES": "Highlights",
+    "COURSE_DESC": "Course Description",
+    "COURSE_REVIEW": "Review",
+    "COURSE_SYLLABUS": "Syllabus",
+    "COURSE_ARTICULATION": "Course Articulation",
+    "COURSE_INSTRUCTOR": "Instructors",
+    "COURSE_STUDENT_PERF": "Student Performance",
+    "COURSE_CERTIFICATION": "Certification",
+    "COURSE_APPLICATION": "Application",
+    "COURSE_TARGET": "Target Audience",
+    "COURSE_TIMETABLE": "Timetable",
+    "COURSE_LOCATION": "Location",
+    "COURSE_ENQUIRY": "Course Enquiry",
+    "SCHOOL_ABOUT_US": "About Us",
+    "SCHOOL_FACILITIES": "Facilities",
+    "SCHOOL_STUDENT_ACHIEVEMENT": "Student Achievement",
+    "SCHOOL_QUALIFICATION": "Qualification",
+    "SCHOOL_STUDENT_LIFE": "Student Life",
+    "SCHOOL_AWARDS": "Awards",
+    "SCHOOL_SUCCESS_STORIES": "Success Stories",
+    "SCHOOL_QUALIFICATION_AWARDS": "Qualification & Awards",
+    "SCHOOL_SUPPORT": "School Support",
+    "SCHOOL_FAQS": "FAQs"
+  },
+  "colorPicker": {
+    "error": "The color code is invalid. Please enter a valid hex code."
+  },
+  "dateSelector": {
+    "title": "Select Date",
+    "confirm": "Confirm"
+  },
+  "darkModeToggle": {
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode",
+    "on": "On",
+    "off": "Off"
+  },
+  "tourGuide": {
+    "tips": "Take a guided tour!"
+  },
+  "calendar": {
+    "today": "Today",
+    "month": "Month",
+    "list": "List",
+    "noEventsToDisplay": "No events"
+  },
+  "chartDate": {
+    "today": "Today",
+    "thisWeek": "This week",
+    "lastWeek": "Last week",
+    "thisMonth": "This month",
+    "lastMonth": "Last month",
+    "last3Months": "Last 3 months",
+    "thisYear": "This year",
+    "lastYear": "Last year",
+    "latest7Days": "Latest 7 days",
+    "latest30Days": "Latest 30 days",
+    "latest90Days": "Latest 90 days",
+    "latest365Days": "Latest 365 days",
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "confirm": "Confirm"
+  },
+  "googleAnalytics": {
+    "retrievingData": "We are retrieving analytics data for your site",
+    "channelGroupFirstAcquiredTheUser": "Channel Group First Acquired the User",
+    "coursePurchaseRevenue": "Course Purchase Revenue",
+    "pageView": "Page View",
+    "schoolTotalPurchaseRevenue": "School Total Purchase Revenue",
+    "dailyWebsiteVisitorCount": "Daily Website Visitor Count",
+    "visitorCountByCountry": "Visitor Count by Country",
+    "today": "Today",
+    "thisWeek": "This week",
+    "lastWeek": "Last week",
+    "thisMonth": "This month",
+    "lastMonth": "Last month",
+    "last3Months": "Last 3 months",
+    "thisYear": "This year",
+    "lastYear": "Last year",
+    "latest7Days": "Latest 7 days",
+    "latest30Days": "Latest 30 days",
+    "latest90Days": "Latest 90 days",
+    "latest365Days": "Latest 365 days",
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "confirm": "Confirm",
+    "revenue": "Revenue",
+    "display": "Displaying data from",
+    "tryAgainLater": "The analytics of your site will be ready soon. Come back tomorrow!"
+  },
+  "footer": {
+    "copyright": "All rights reserved."
+  },
+  "progress": {
+    "tasksComplete": "{{completedCount}} of {{total}} tasks complete"
+  }
+}

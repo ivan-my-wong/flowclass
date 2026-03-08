@@ -1,0 +1,50 @@
+{
+  "select": {
+    "section": "時刻を選択",
+    "placeholder": "選択肢を選んでください"
+  },
+  "footer": {
+    "email": "メールアドレス",
+    "address": "住所",
+    "socialMedia": "ソーシャルメディア",
+    "contactUs": "お問い合わせ",
+    "phone": "電話番号",
+    "copyright": "著作権を持っています ©",
+    "slogan": "教育会社を、オンラインで作りましょう © Flowsophic Limited",
+    "currency": "特に指定のない限り、このサイトの価格はすべて",
+    "timeZone": "で計算されており、表示されている日時のタイムゾーンはすべて"
+  },
+  "colorPicker": {
+    "error": "選択した色は無効です"
+  },
+  "ImageUpload": {
+    "title": "アップロードする画像を選択",
+    "uploadImage": "画像をアップロード",
+    "cropImage": "画像を切り抜き",
+    "finishCrop": "切り抜き完了",
+    "pleaseUpload": "画像をアップロードしてください",
+    "wrongFormat": "画像形式が間違っています",
+    "error": "エラー、画像を再アップロードしてください",
+    "noImage": "画像なし",
+    "confirm": "確認",
+    "cancel": "キャンセル",
+    "uploadSuccess": "画像がアップロード済み",
+    "cropImageTips": "ボックスをドラッグして、画像のサイズと位置を調整できます"
+  },
+  "template": {
+    "details": "詳細",
+    "allCourses": "すべての課程",
+    "allEvents": "すべてのイベント"
+  },
+  "filterTagSidebar": {
+    "filter": "絞り込み",
+    "reset": "リセット",
+    "apply": "検索"
+  },
+  "calendar": {
+    "noEvents": "最近はイベントがありません",
+    "today": "今日",
+    "viewByWeek": "週ごとに表示",
+    "viewByList": "リストで表示"
+  }
+}

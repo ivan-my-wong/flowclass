@@ -1,0 +1,282 @@
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+
+import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
+
+import SelectDefault from '@/components/Selector/Select'
+import LinkToGoogleCalendar from '@/components/SocialLogin/LinkToGoogleCalendar'
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
+import Text from '@/components/ui/Text'
+import useAvailability from '@/hooks/useAvailability'
+import ContentLayout from '@/layouts/ContentLayout'
+import GoogleCalendarAvailabilities from '@/pages/Integrations/GoogleCalendar'
+import { CalendarItem, WorkingHours } from '@/types/availability.type'
+import { StaffUserType } from '@/types/user'
+
+// Add type declaration for the WeekdayList component
+declare module '@/pages/TeachingService/EditCourse/Recurring/WeekdayList' {
+  export interface WeekdayListProps {
+    workingHours: WorkingHours
+    onChange: (newWorkingHours: WorkingHours) => void
+    showHeader?: boolean
+  }
+}
+
+interface CalendarSelectionProps {
+  calendars: CalendarItem[]
+  selectedCalendars: string[]
+  onToggleCalendar: (id: string) => void
+}
+
+const CalendarSelection = ({
+  calendars,
+  selectedCalendars,
+  onToggleCalendar,
+}: CalendarSelectionProps): JSX.Element => {
+  return (
+    <div className="space-y-2">
+      {calendars.map(calendar => (
+        <div
+          key={calendar.id}
+          className="flex items-center justify-between p-3 border rounded-md"
+        >
+          <div>
+            <Text className="font-medium">{calendar.name}</Text>
+            <Text className="text-sm text-gray-600">{calendar.email}</Text>
+          </div>
+          <div>
+            <input
+              type="checkbox"
+              checked={selectedCalendars.includes(calendar.id)}
+              onChange={() => onToggleCalendar(calendar.id)}
+              className="h-5 w-5 text-blue-600"
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+const AvailabilityPage = (): JSX.Element => {
+  const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
+  const { t } = useTranslation()
+
+  const [activeSection, setActiveSection] = useState('working-hours')
+  const [users, setUsers] = useState<StaffUserType[]>([])
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false)
+
+  const {
+    integrationCalendars,
+    fetchIntegrationCalendars,
+    fetchCurrentAvailability,
+    saveAvailabilitySettings,
+    useUpdateAssignedUser,
+  } = useAvailability()
+
+  const handleSaveSettings = async () => {
+    try {
+      await saveAvailabilitySettings()
+      toast.success(t('availability:settingsSaved'))
+    } catch (error) {
+      toast.error(t('availability:errorSavingSettings'))
+    }
+  }
+
+  const handleCancel = () => {
+    navigate('/availability')
+  }
+
+  const updateAssignedUser = useUpdateAssignedUser()
+
+  // Handle user assignment
+  const handleAssignUser = async (userId: number) => {
+    if (!id) return
+
+    setSelectedUserId(userId)
+    try {
+      await updateAssignedUser.mutateAsync({
+        availabilityId: Number(id),
+        userId,
+      })
+    } catch (error) {
+      toast.error(t('availability:errorAssigningUser'))
+    }
+  }
+
+  useEffect(() => {
+    if (id) {
+      // fetchCurrentAvailability.mutate(Number(id))
+      // fetchIntegrationCalendars.refetch()
+    }
+  }, [id, fetchIntegrationCalendars, fetchCurrentAvailability])
+
+  return (
+    <ContentLayout>
+      <div className="max-w-4xl mx-auto">
+        <Card>
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold">
+                {t('availability:settings')}
+              </h2>
+              <div className="space-x-2">
+                <Button variant="outline" onClick={handleCancel}>
+                  {t('common:cancel')}
+                </Button>
+                <Button onClick={handleSaveSettings}>{t('common:save')}</Button>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <div className="flex border-b mb-6 sticky top-0 bg-white z-10">
+                <a
+                  href="#working-hours"
+                  className={`px-4 py-2 font-medium ${
+                    activeSection === 'working-hours' || activeSection === ''
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-600'
+                  }`}
+                  onClick={e => {
+                    e.preventDefault()
+                    setActiveSection('working-hours')
+                    document
+                      .getElementById('working-hours')
+                      ?.scrollIntoView({ behavior: 'smooth' })
+                  }}
+                >
+                  {t('availability:workingHours')}
+                </a>
+                <a
+                  href="#calendar-integration"
+                  className={`px-4 py-2 font-medium ${
+                    activeSection === 'calendar-integration'
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-600'
+                  }`}
+                  onClick={e => {
+                    e.preventDefault()
+                    setActiveSection('calendar-integration')
+                    document
+                      .getElementById('calendar-integration')
+                      ?.scrollIntoView({ behavior: 'smooth' })
+                  }}
+                >
+                  {t('availability:calendarIntegration')}
+                </a>
+                <a
+                  href="#preview"
+                  className={`px-4 py-2 font-medium ${
+                    activeSection === 'preview'
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-600'
+                  }`}
+                  onClick={e => {
+                    e.preventDefault()
+                    setActiveSection('preview')
+                    document
+                      .getElementById('preview')
+                      ?.scrollIntoView({ behavior: 'smooth' })
+                  }}
+                >
+                  {t('availability:preview')}
+                </a>
+              </div>
+
+              <div id="working-hours" className="space-y-6 mb-12 scroll-mt-16">
+                <h3 className="text-lg font-medium mb-2">
+                  {t('availability:workingHours')}
+                </h3>
+                {/* Use the WeekdayList component from TeachingService module */}
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                {/* <WeekdayList
+                  workingHours={workingHours}
+                  onChange={(newWorkingHours: WorkingHours) => {
+                    updateWorkingHours(newWorkingHours)
+                  }}
+                  showHeader
+                /> */}
+              </div>
+
+              <div id="calendar-integration" className="mb-12 scroll-mt-16">
+                <h3 className="text-lg font-medium mb-2">
+                  {t('availability:connectCalendar')}
+                </h3>
+                <Text className="text-sm text-gray-600 mb-4">
+                  {t('availability:calendarDescription')}
+                </Text>
+
+                <div className="p-4 border border-dashed rounded-md mb-6">
+                  <div className="flex flex-col items-center justify-center py-4">
+                    <Text className="mb-4 text-center">
+                      {t('availability:connectGoogleCalendarPrompt')}
+                    </Text>
+                    <LinkToGoogleCalendar />
+                  </div>
+                </div>
+
+                {/* User Assignment Dropdown */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-medium mb-2">
+                    {t('availability:assignUser')}
+                  </h3>
+                  <Text className="text-sm text-gray-600 mb-4">
+                    {t('availability:assignUserDescription')}
+                  </Text>
+                  <SelectDefault
+                    placeholder={t('availability:selectUser')}
+                    selectItems={[
+                      {
+                        itemValues: users.map(user => ({
+                          value: user.id,
+                          label: `${user.firstName} ${user.lastName} (${user.email})`,
+                        })),
+                      },
+                    ]}
+                    currentSelect={selectedUserId || ''}
+                    onValueChange={value => {
+                      handleAssignUser(Number(value))
+                    }}
+                    fullWidth
+                    disabled={isLoadingUsers}
+                  />
+                </div>
+
+                {/* Google Calendar Events */}
+                {integrationCalendars.length > 0 && (
+                  <div className="mt-8">
+                    <GoogleCalendarAvailabilities />
+                  </div>
+                )}
+              </div>
+
+              <div id="preview" className="mb-6 scroll-mt-16">
+                <h3 className="text-lg font-medium mb-2">
+                  {t('availability:previewAvailability')}
+                </h3>
+                <Text className="text-sm text-gray-600 mb-4">
+                  {t('availability:previewDescription')}
+                </Text>
+
+                <div className="p-4 border rounded-md">
+                  {/* Calendar preview would go here */}
+                  <div className="h-64 flex items-center justify-center bg-gray-50">
+                    <Text className="text-gray-500">
+                      {t('availability:calendarPreviewPlaceholder')}
+                    </Text>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </ContentLayout>
+  )
+}
+
+export default AvailabilityPage

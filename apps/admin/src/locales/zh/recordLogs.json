@@ -1,0 +1,74 @@
+{
+  "notificationLogs": {
+    "title": "通知日誌",
+    "description": "此頁面顯示發送給用戶的所有通知的日誌。",
+    "tableHeaders": {
+      "action": "操作",
+      "notificationType": "通知類型",
+      "automationFlow": "自動化流程",
+      "whatsappTemplate": "WhatsApp模板",
+      "associatedClass": "相關班級",
+      "notificationMessage": "通知訊息",
+      "recipientUserEmail": "接收者電子郵件",
+      "recipientUserPhone": "接收者電話號碼",
+      "messageSent": "已發送訊息",
+      "status": "狀態",
+      "sentAt": "發送於"
+    },
+    "notificationTypes": {
+      "CONFIRM_PAYMENT": "付款確認通知",
+      "REJECT_PAYMENT": "付款拒絕通知",
+      "REMINDER": "給申請人：即將到來的事件或待辦事項提醒",
+      "APPLICATION": "申請狀態更新通知",
+      "FORGET_PASSWORD": "忘記密碼重設指示",
+      "INVITATION": "課程、活動或平台邀請",
+      "LESSON_POSTPONE": "課程延期通知",
+      "ASSIGN_COURSE": "給申請人：分配到新課程的通知",
+      "OTHERS": "其他雜項通知",
+      "WAITING_FOR_PAYMENT": "給申請人：等待付款",
+      "ENROLLED_IN_COURSE": "給申請人：已報名課程",
+      "RECEIVED_COUPON": "給申請人：已收到優惠券",
+      "UPDATE_ON_COURSE_STATUS": "給申請人：課程狀態更新",
+      "APPLIED_FOR_COURSE": "給申請人：已申請課程",
+      "STUDENT_REGISTERED": "給管理員：學生已註冊",
+      "STUDENT_PAID": "給管理員：學生已付款",
+      "STUDENT_QUESTION": "給管理員：學生提問",
+      "STUDENT_ANSWER": "給管理員：學生回答",
+      "REQUEST_TIME_CHANGE_PENDING": "給管理員：時間變更請求待處理",
+      "REQUEST_TIME_CHANGE_APPROVED": "給管理員：時間變更請求已批准",
+      "REQUEST_TIME_CHANGE_REJECTED": "給管理員：時間變更請求已拒絕"
+    },
+    "bannerCards": {
+      "sentOnEmail": "郵件發送次數",
+      "sentOnWhatsApp": "WhatsApp 發送次數",
+      "timeSaved": "預估節省時間",
+      "SinceLastMonth": "對比上一時期"
+    },
+    "notificationChannels": {
+      "EMAIL": "電子郵件",
+      "WHATSAPP": "WhatsApp"
+    },
+    "notificationStatuses": {
+      "null": "",
+      "SENT": "成功",
+      "SUCCESS": "成功",
+      "QUEUED": "排隊中",
+      "FAILED": "失敗"
+    },
+    "selectLabels": {
+      "selectStudent": "所有學生",
+      "selectNotificationChannel": "所有通道",
+      "selectNotificationType": "所有通知類型",
+      "selectNotificationStatus": "所有狀態",
+      "selectWhatsappTemplateOptions": "所有WhatsApp模板",
+      "selectAutomationFlowOptions": "所有自動化流程",
+      "reset": "重置"
+    },
+    "growthRate": {
+      "NA": "不適用"
+    },
+    "cell": {
+      "view": "查看"
+    }
+  }
+}

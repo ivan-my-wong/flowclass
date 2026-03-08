@@ -1,0 +1,331 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Theme color variables for API-driven styles (react-select, AG-Grid, etc.) */
+    --color-primary: #467ef7;
+    --color-primary-highlight: #4459cf;
+    --color-text: rgba(0, 0, 0, 0.92);
+    --color-background: white;
+    --color-background-layer-2: #f7f7f7;
+    --color-background-layer-3: #e6e6e6;
+    --color-background-disabled: #999999;
+    --color-border: rgba(0, 0, 0, 0.48);
+    --color-text-subtle: #666666;
+    --color-warn: #e53e3e;
+    --color-success: #38a169;
+    --color-secondary: #f7bf46;
+    --color-tertiary: #f99191;
+    --color-primary-highlight-subtle: #bedcff;
+
+    --background: 0 0% 100%;
+    --backgroundLayer2: 0 0% 98%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --text-foreground: 0 0% 9%;
+  }
+
+  .dark {
+    /* Theme color variables for dark mode */
+    --color-primary: #dd6b20;
+    --color-primary-highlight: #ed8936;
+    --color-text: white;
+    --color-background: #1a1a1a;
+    --color-background-layer-2: #333333;
+    --color-background-layer-3: #4d4d4d;
+    --color-background-disabled: #666666;
+    --color-border: #b3b3b3;
+    --color-text-subtle: #feef82;
+    --color-warn: #fc8181;
+    --color-success: #68d391;
+    --color-secondary: #319795;
+    --color-tertiary: #805ad5;
+    --color-primary-highlight-subtle: #fed7a8;
+
+    --background: 0 0% 3.9%;
+    --backgroundLayer2: 0 0% 14.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --text-foreground: 0 0% 98%;
+  }
+
+  .text-foreground {
+    color: var(--text-foreground);
+  }
+
+  .font-lato {
+    font-family: 'Lato', sans-serif;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body {
+    @apply relative z-0 p-0 m-0 text-base leading-none h-full min-h-dvh;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /**/
+  /*  */
+  div {
+    @apply relative;
+  }
+
+  .text-link {
+    @apply hover:text-blue-500 hover:underline;
+  }
+
+  /**/
+  /*  */
+  div {
+    @apply relative;
+  }
+
+  p {
+    @apply leading-6;
+  }
+
+  .page-header {
+    @apply w-full flex flex-col lg:flex-row justify-between flex-shrink-0 border-b border-gray-300 p-4 px-6;
+  }
+
+  .page-header__title {
+    @apply text-2xl font-bold mb-2 sm:mb-0;
+  }
+
+  /* Dialog */
+  .dialog-content {
+    @apply fixed z-modal max-h-[95vh] overflow-y-auto left-[50%] top-[50%] max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 border box-border overflow-visible bg-background dark:bg-dark-background shadow-lg duration-200 rounded sm:rounded-lg;
+  }
+
+  .dialog-body {
+    @apply px-6;
+  }
+
+  .dialog-btn__close {
+    @apply absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none;
+  }
+
+  .dialog-header {
+    @apply flex space-y-1.5 text-center sm:text-left !py-4 bg-white dark:bg-dark-background h-14 items-center border-b border-gray-300 px-4;
+  }
+
+  .dialog-content--scrollable .dialog-body {
+    @apply max-h-[80vh] overflow-y-auto shadow-sm pb-2;
+  }
+
+  .dialog-footer {
+    @apply flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 px-4 pb-4 pt-2;
+  }
+
+  /* Css classes for react-flow */
+  div.react-node-item {
+    @apply px-4 py-2 rounded-md min-w-80 max-w-80 shadow-2xl;
+  }
+
+  div.react-node-item.parent-node {
+    @apply bg-dark-tertiary text-white;
+  }
+
+  div.react-node-item.interval-node {
+    @apply bg-gray-300;
+  }
+
+  div.react-node-item.step-node {
+    @apply bg-gray-300 text-black text-center;
+  }
+
+  .react-flow__edge-path {
+    @apply !stroke-black;
+  }
+
+  div.react-node-item .react-flow__handle {
+    @apply !bg-transparent !shadow-sm !border-none;
+  }
+
+  div.step-node__action {
+    @apply top-0 -left-full right-0 -translate-x-1/2 bottom-0 absolute bg-white/60 dark:bg-slate-700/60 dark:text-white flex items-center justify-center transition-all duration-500;
+  }
+
+  div.react-node-item:hover > div.step-node__action {
+    @apply left-0 right-0 translate-x-0;
+  }
+
+  /* CSS classes to replace boxes */
+  .box-row {
+    @apply flex w-full flex-row items-center justify-center gap-2 p-2;
+  }
+
+  .box-row-full {
+    @apply flex w-full flex-row items-center justify-center gap-2 p-0;
+  }
+
+  .box-col {
+    @apply flex w-full flex-col items-center justify-center gap-2 p-2;
+  }
+
+  .box-col-full {
+    @apply flex w-full flex-col items-center justify-center gap-2 p-0;
+  }
+
+  .box-responsive {
+    @apply flex w-full flex-col items-center justify-center gap-2 p-2 lg:flex-row;
+  }
+
+  .box-responsive-full {
+    @apply flex w-full flex-col items-center justify-center gap-2 p-0 lg:flex-row;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  span,
+  label {
+    @apply font-lato;
+  }
+
+  #root {
+    @apply min-h-full h-full p-0 m-0;
+  }
+
+  * {
+    @apply box-border;
+  }
+
+  .shadow-box {
+    @apply box-col-full bg-background-layer-2 p-4 rounded-lg;
+  }
+
+  .add-button {
+    @apply text-primary cursor-pointer self-center;
+
+    &:hover {
+      @apply text-[#4459cf] underline;
+    }
+  }
+
+  /* Used for disabled button states across the application */
+  /* Apply this class alongside component-specific button classes */
+  .btn-disabled {
+    @apply opacity-50 cursor-not-allowed pointer-events-none;
+  }
+
+  .rdp-day-button {
+    @apply text-sm;
+  }
+
+  .calendar-sidebar .rdp-root {
+    --rdp-day-height: 32px;
+    --rdp-day-width: 32px;
+    --rdp-day_button-width: 32px;
+    --rdp-day_button-height: 32px;
+    /* --rdp-day_button-border: 1px solid #000; */
+    --rdp-day_button-border-radius: 100%;
+    --rdp-outside-opacity: 0.2;
+    --rdp-accent-color: var(--colors-primary);
+    --rdp-accent-background-color: var(--colors-primary);
+    --rdp-today-color: var(--colors-primary);
+  }
+
+  .calendar-sidebar .rdp-root .rdp-day_button {
+    @apply !text-xs;
+  }
+
+  .calendar-sidebar .rdp-root .rdp-today .rdp-day_button {
+    @apply !font-bold !bg-sky-100;
+  }
+
+  .calendar-sidebar .rdp-root .rdp-nav {
+    @apply z-10;
+  }
+
+  .calendar-sidebar .rdp-root .rdp-selected .rdp-day_button {
+    @apply !text-xs !text-white !bg-primary;
+  }
+
+  .react-tel-input .flag-dropdown {
+    @apply rounded-l-md border-gray-500/70;
+  }
+
+  /* Custom layout for react-colorful picker*/
+  .custom-layout .react-colorful {
+    @apply bg-background w-full;
+  }
+
+  .custom-layout .react-colorful__saturation-pointer {
+    @apply w-5 h-5;
+  }
+
+  .custom-layout .react-colorful__saturation {
+    @apply rounded-none;
+  }
+
+  .custom-layout .react-colorful__hue,
+  .custom-layout .react-colorful__alpha {
+    @apply w-[80%] h-5 rounded-lg self-center;
+  }
+
+  .custom-layout .react-colorful__hue-pointer,
+  .custom-layout .react-colorful__alpha-pointer {
+    @apply w-5 h-5;
+  }
+}

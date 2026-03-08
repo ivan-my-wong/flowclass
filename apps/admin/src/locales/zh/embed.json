@@ -1,0 +1,46 @@
+{
+  "websiteIntegration": {
+    "title": "網站整合",
+    "choosePlatform": "請選擇您使用的網站建置平台：",
+    "wordpress": "WordPress",
+    "elementor": "Elementor",
+    "shopify": "Shopify",
+    "wix": "Wix",
+    "squarespace": "Squarespace",
+    "customDevelopment": "自訂開發",
+    "others": "其他"
+  },
+
+  "configuration": {
+    "title": "設定",
+    "setWidthHeightCourse": "請設定顯示的寬度、高度和課程：",
+    "width": "寬度：",
+    "height": "高度：",
+    "course": "課程：",
+    "apply": "應用",
+    "negative": "請輸入正數。",
+    "entireSchool": "整個學校",
+    "element": "元素"
+  },
+  "code": {
+    "install": "安裝",
+    "installationSuccessful": "安裝成功！",
+    "successfullyInstalled": "您已成功安裝小工具。",
+    "howToUse": "複製以下程式碼並將其貼上到您希望顯示小部件的網站的 HTML 程式碼中。",
+    "copy": "複製",
+    "copied": "已複製！",
+    "linkCopied": "已複製連結！",
+    "preview": "預覽",
+    "previewHeader": "您現在正在預覽小工具",
+    "copyFailed": "複製失敗"
+  },
+  "install": {
+    "guide": "安裝指南"
+  },
+  "elements": {
+    "courseList": "課程列表",
+    "courseCard": "卡片",
+    "calendar": "日曆",
+    "applicationForm": "申請表單"
+  }
+}

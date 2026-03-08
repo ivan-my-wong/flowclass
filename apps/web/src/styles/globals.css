@@ -1,0 +1,83 @@
+@tailwind base;
+/* Preflight will be injected here */
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .box-row {
+    @apply flex w-full flex-row items-center justify-center gap-2 p-2;
+  }
+
+  .box-row-full {
+    @apply flex w-full flex-row items-center justify-center gap-2 p-0;
+  }
+
+  .box-col {
+    @apply flex w-full flex-col items-center justify-center gap-2 p-2;
+  }
+
+  .box-col-full {
+    @apply flex w-full flex-col items-center justify-center gap-2 p-0;
+  }
+
+  .box-responsive {
+    @apply flex w-full flex-col items-center justify-center gap-2 p-2 lg:flex-row;
+  }
+
+  .box-responsive-full {
+    @apply flex w-full flex-col items-center justify-center gap-2 p-0 lg:flex-row;
+  }
+
+  .input-label {
+    @apply text-text mb-2 bg-transparent px-2;
+  }
+
+  .raw-input {
+    @apply bg-background border-borderColor text-text hover:border-borderColor focus:border-borderColor focus:outline-primary placeholder:text-textSubtle disabled:bg-backgroundDisabled w-full rounded-sm border-[1px] py-2 pl-2 outline-none;
+  }
+
+  .raw-input-line {
+    @apply border-borderColor text-text hover:border-borderColor focus:border-borderColor focus:outline-primary placeholder:text-textSubtle disabled:bg-backgroundDisabled w-full border-b-[1px] py-2 pl-2 outline-none;
+  }
+
+  .raw-input-error {
+    @apply border-secondary text-text hover:border-secondary placeholder:text-textSubtle disabled:bg-backgroundDisabled w-full border-[1px] py-2 pl-2 outline-none;
+  }
+
+  .prose-preset {
+    @apply prose prose-stone prose-a:text-primary prose-a:underline visited:prose-a:text-textHighlight prose-headings:font-bold prose-p:my-3 prose-h1:text-[2em] prose-h1:my-[0.67em] prose-h2:text-[1.5em] prose-h2:my-[0.83em] prose-h3:text-[1.17em] prose-h3:my-[1em] prose-h4:my-[1.33em] prose-h5:text-[0.83em] prose-h5:my-[1.67em] prose-h6:text-[0.67em] prose-h6:my-[2.33em] pointer-events-auto max-w-[100%];
+  }
+
+  .border-default {
+    @apply border-background-disabled w-full border-t border-solid;
+  }
+
+  /*  payment amount classes*/
+  .row-classes {
+    @apply box-col-full lg:box-row-full mt-4 flex-nowrap items-start gap-2 md:p-4;
+  }
+
+  .multiple-row-classes {
+    @apply break-words text-right;
+  }
+
+  .question-classes {
+    @apply break-words text-left font-bold md:w-2/5;
+  }
+
+  .available-days > button {
+    @apply !cursor-pointer !select-auto text-[#000];
+  }
+
+  .available-days[data-selected='true'] > button {
+    @apply !cursor-pointer !select-auto text-[#fff];
+  }
+
+  .selected-time-slots > button {
+    @apply !cursor-pointer !select-auto text-[#fff];
+  }
+}
+
+.btn-profile [data-state='open'] {
+  min-height: fit-content;
+}

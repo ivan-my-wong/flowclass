@@ -1,0 +1,111 @@
+{
+  "title": "可用時間表",
+  "createNew": "創建新時間表",
+  "yourSchedules": "您的可用時間表",
+  "manageSchedules": "管理您的課程和預約的可用時間表",
+  "loading": "正在加載可用時間表...",
+  "noSchedules": "未找到可用時間表",
+  "createFirstSchedule": "創建您的第一個可用時間表，以管理您可以上課和預約的時間",
+  "scheduleName": "時間表名稱",
+  "schedulePlaceholder": "輸入時間表名稱",
+  "createAndContinue": "創建並繼續",
+  "settings": "可用性設置",
+  "workingHours": "工作時間",
+  "calendarIntegration": "日曆集成",
+  "preview": "預覽",
+  "connectCalendar": "連接日曆",
+  "calendarDescription": "連接您的日曆，以自動阻止您已有約會的時間。",
+  "connectGoogleCalendarPrompt": "連接您的Google日曆以同步您的可用性。",
+  "integrationCalendared": "日曆連接成功",
+  "googleCalendar": "Google日曆",
+  "googleCalendarDescription": "您的Google日曆已連接。選擇要用於可用性的日曆。",
+  "googleCalendarSync": "同步您的Google日曆，以自動偵測和導入可用的時間段",
+  "notConnected": "未連接",
+  "connected": "已連接",
+  "selectCalendars": "選擇日曆",
+  "previewAvailability": "預覽可用性",
+  "previewDescription": "這是您的可用性將如何顯示給他人。",
+  "calendarPreviewPlaceholder": "日曆預覽將顯示在此處",
+
+  "tabBar": {
+    "dateOverride": "日期覆蓋",
+    "workingHours": "工作時間",
+    "calendarIntegration": "日曆整合",
+    "listClass": "課程列表"
+  },
+
+  "errors": {
+    "fetchAvailabilities": "獲取可用時間表失敗",
+    "fetchCurrentAvailability": "獲取當前可用時間表失敗",
+    "errorSavingSettings": "保存可用性設置時出錯"
+  },
+
+  "dateRange": {
+    "title": "日期範圍",
+    "alwaysAvailable": "始終可用（重複）",
+    "noStartDate": "無開始日期",
+    "noEndDate": "無結束日期"
+  },
+  "status": {
+    "title": "狀態",
+    "active": "活躍",
+    "inactive": "不活躍"
+  },
+  "calendar": {
+    "title": "日曆",
+    "connected": "已連接",
+    "notConnected": "未連接"
+  },
+  "actions": {
+    "title": "動作",
+    "edit": "編輯",
+    "delete": "刪除"
+  },
+  "delete": {
+    "title": "刪除可用時間表",
+    "confirmation": "您確定要刪除此可用時間表嗎？"
+  },
+
+  "messages": {
+    "createSuccess": "可用性創建成功",
+    "createError": "創建可用時間表失敗",
+    "deleteSuccess": "可用性刪除成功",
+    "deleteError": "刪除可用性失敗",
+    "schoolDataError": "學校數據不可用",
+    "settingsSaved": "可用性設置保存成功"
+  },
+  "googleCalendarEvents": "Google 日曆事件",
+  "refresh": "刷新",
+  "selectCalendar": "選擇日曆",
+  "noIntegrationCalendars": "找不到日曆連接。請先連接您的 Google 日曆。",
+  "selectDateRange": "選擇日期範圍",
+  "events": "事件",
+  "noEventsFound": "在選定的日期範圍內找不到事件。",
+  "assignUser": "分配用戶",
+  "assignUserDescription": "分配一個用戶負責此可用性。",
+  "selectUser": "選擇用戶",
+  "errorFetchingUsers": "獲取用戶時出錯。請再試一次。",
+  "errorAssigningUser": "分配用戶時出錯。請再試一次。",
+  "errorStartTimeOverlap": "開始時間必須在結束時間之前。",
+  "errorEndTimeOverlap": "結束時間必須在開始時間之後。",
+  "dateOverride": "日期覆蓋",
+  "connectGoogleCalendar": "連接 Google 日曆",
+  "addDateOverride": {
+    "title": "添加特定日期時間",
+    "explanation": "調整特定日期的時間",
+    "description": "選擇您要分配特定小時的日期",
+    "availableHours": "您有什麼時間可用？",
+    "availableDate": "此日期有可用時間",
+    "notAvailableDate": "此日期將被全日禁用"
+  },
+  "applyToClass": {
+    "title": "應用於課程",
+    "description": "您想立即將此可用性應用於課程嗎？",
+    "selectClass": "選擇課程",
+    "assignedClasses": "已分配課程",
+    "addMore": "添加更多課程"
+  },
+  "listClass": "課程列表",
+  "listClassDescription": "這是將受到此可用性影響的課程列表",
+  "filterPlaceholder": "根據課程名稱或班級名稱搜尋"
+}

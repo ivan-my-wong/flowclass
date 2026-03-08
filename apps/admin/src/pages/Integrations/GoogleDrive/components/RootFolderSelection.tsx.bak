@@ -1,0 +1,374 @@
+import { useState, useEffect } from 'react'
+import {
+  FaFolder,
+  FaFolderOpen,
+  FaPlus,
+  FaTimes,
+  FaChevronRight,
+  FaHome,
+  FaCheck,
+} from 'react-icons/fa'
+import { Button } from '@/components/ui/Button'
+import Text from '@/components/ui/Text'
+import { Input } from '@/components/ui/Inputs/Input'
+import { UseQueryResult } from 'react-query'
+import { useTranslation } from 'react-i18next'
+import {
+  DriveCreateFolderPayload,
+  DriveCreateFolderResponse,
+  GoogleDriveFolder,
+} from '@/types/external/googleIntegration.type'
+
+interface FolderSelectionModalProps {
+  isOpen: boolean
+  onClose: () => void
+  onFolderSelect: (folder: { id: string; name: string; path: string }) => void
+  onCreateFolder: (
+    payload: DriveCreateFolderPayload
+  ) => Promise<DriveCreateFolderResponse>
+  useDriveFolders: (
+    parentFolderId?: string
+  ) => UseQueryResult<GoogleDriveFolder[], Error>
+  isCreatingFolder: boolean
+  isSettingRoot: boolean
+}
+
+interface BreadcrumbItem {
+  id: string
+  name: string
+}
+
+export const FolderSelectionModal: React.FC<FolderSelectionModalProps> = ({
+  isOpen,
+  onClose,
+  onFolderSelect,
+  onCreateFolder,
+  useDriveFolders,
+  isCreatingFolder,
+  isSettingRoot,
+}) => {
+  const { t } = useTranslation('integration')
+  const [currentFolderId, setCurrentFolderId] = useState<string>('root')
+  const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([
+    { id: 'root', name: 'My Drive' },
+  ])
+  const [showCreateForm, setShowCreateForm] = useState(false)
+  const [newFolderName, setNewFolderName] = useState('')
+
+  // Get folders for current directory
+  const foldersQuery = useDriveFolders(currentFolderId)
+  const folders = foldersQuery.data || []
+
+  useEffect(() => {
+    if (!isOpen) {
+      setCurrentFolderId('root')
+      setBreadcrumbs([{ id: 'root', name: 'My Drive' }])
+      setShowCreateForm(false)
+      setNewFolderName('')
+    }
+  }, [isOpen])
+
+  const handleFolderClick = (folder: GoogleDriveFolder) => {
+    setCurrentFolderId(folder.id)
+    setBreadcrumbs(prev => [...prev, { id: folder.id, name: folder.name }])
+  }
+
+  const handleBreadcrumbClick = (index: number) => {
+    const newBreadcrumbs = breadcrumbs.slice(0, index + 1)
+    setBreadcrumbs(newBreadcrumbs)
+    setCurrentFolderId(newBreadcrumbs[newBreadcrumbs.length - 1].id)
+  }
+
+  const handleCreateFolder = async () => {
+    if (!newFolderName.trim()) return
+
+    try {
+      const payload: DriveCreateFolderPayload = {
+        folderName: newFolderName.trim(),
+        parentFolderId:
+          currentFolderId === 'root' ? undefined : currentFolderId,
+      }
+
+      await onCreateFolder(payload)
+      setNewFolderName('')
+      setShowCreateForm(false)
+      // Refetch current folder contents
+      foldersQuery.refetch()
+    } catch (error) {
+      console.error('Failed to create folder:', error)
+    }
+  }
+
+  const handleSelectFolder = (folder: GoogleDriveFolder) => {
+    const path = breadcrumbs.map(b => b.name).join(' / ') + ` / ${folder.name}`
+    onFolderSelect({
+      id: folder.id,
+      name: folder.name,
+      path,
+    })
+  }
+
+  const handleSelectCurrentFolder = () => {
+    const currentFolder = breadcrumbs[breadcrumbs.length - 1]
+    const path = breadcrumbs.map(b => b.name).join(' / ')
+    onFolderSelect({
+      id: currentFolder.id,
+      name: currentFolder.name,
+      path,
+    })
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Select Root Folder
+            </h2>
+            <Text className="text-gray-600 mt-1">
+              Choose a folder from your Google Drive
+            </Text>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="p-2"
+            disabled={isSettingRoot}
+          >
+            <FaTimes className="text-gray-400" />
+          </Button>
+        </div>
+
+        {/* Breadcrumbs */}
+        <div className="px-6 py-3 border-b border-gray-100 bg-gray-50">
+          <div className="flex items-center space-x-2 text-sm">
+            <FaHome className="text-gray-400" />
+            {breadcrumbs.map((crumb, index) => (
+              <div key={crumb.id} className="flex items-center space-x-2">
+                {index > 0 && (
+                  <FaChevronRight className="text-gray-400 text-xs" />
+                )}
+                <button
+                  onClick={() => handleBreadcrumbClick(index)}
+                  className={`hover:text-blue-600 transition-colors ${
+                    index === breadcrumbs.length - 1
+                      ? 'text-gray-900 font-medium'
+                      : 'text-gray-600'
+                  }`}
+                  disabled={isSettingRoot}
+                >
+                  {crumb.name}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Current Folder Selection */}
+        <div className="px-6 py-3 border-b border-gray-100 bg-blue-50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <FaFolderOpen className="text-blue-600" />
+              <div>
+                <Text className="font-medium text-blue-900">
+                  Current: {breadcrumbs[breadcrumbs.length - 1].name}
+                </Text>
+                <Text className="text-sm text-blue-600">
+                  Select this folder as root
+                </Text>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSelectCurrentFolder}
+              disabled={isSettingRoot}
+              className="border-blue-300 text-blue-700 hover:bg-blue-100"
+            >
+              <FaCheck className="mr-2" />
+              {isSettingRoot ? 'Setting...' : 'Select This Folder'}
+            </Button>
+          </div>
+        </div>
+
+        {/* Folder List */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {/* Create New Folder Section */}
+          <div className="mb-4">
+            {!showCreateForm ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowCreateForm(true)}
+                disabled={isCreatingFolder || isSettingRoot}
+                className="w-full border-dashed border-gray-300 text-gray-600 hover:border-blue-300 hover:text-blue-600"
+              >
+                <FaPlus className="mr-2" />
+                Create New Folder
+              </Button>
+            ) : (
+              <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                <Text className="font-medium mb-2">Create New Folder</Text>
+                <div className="flex space-x-2">
+                  <Input
+                    value={newFolderName}
+                    onChange={e => setNewFolderName(e.target.value)}
+                    placeholder="Enter folder name"
+                    className="flex-1"
+                    disabled={isCreatingFolder || isSettingRoot}
+                    onKeyPress={e => {
+                      if (
+                        e.key === 'Enter' &&
+                        !isCreatingFolder &&
+                        !isSettingRoot
+                      ) {
+                        handleCreateFolder()
+                      }
+                    }}
+                  />
+                  <Button
+                    onClick={handleCreateFolder}
+                    disabled={
+                      !newFolderName.trim() || isCreatingFolder || isSettingRoot
+                    }
+                    size="sm"
+                  >
+                    {isCreatingFolder ? 'Creating...' : 'Create'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowCreateForm(false)
+                      setNewFolderName('')
+                    }}
+                    size="sm"
+                    disabled={isCreatingFolder || isSettingRoot}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Loading State */}
+          {foldersQuery.isLoading && (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+              <Text className="text-gray-500">Loading folders...</Text>
+            </div>
+          )}
+
+          {/* Error State */}
+          {foldersQuery.error && (
+            <div className="text-center py-8">
+              <Text className="text-red-600 mb-2">
+                Failed to load folders. Please try again.
+              </Text>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => foldersQuery.refetch()}
+                disabled={foldersQuery.isRefetching}
+              >
+                {foldersQuery.isRefetching ? 'Retrying...' : 'Retry'}
+              </Button>
+            </div>
+          )}
+
+          {/* Folders List */}
+          {!foldersQuery.isLoading && !foldersQuery.error && (
+            <div className="space-y-2">
+              {folders.length === 0 ? (
+                <div className="text-center py-8">
+                  <FaFolder className="text-gray-300 text-4xl mx-auto mb-2" />
+                  <Text className="text-gray-500">No folders found</Text>
+                  <Text className="text-sm text-gray-400 mt-1">
+                    Create a new folder to get started
+                  </Text>
+                </div>
+              ) : (
+                folders.map(folder => (
+                  <div
+                    key={folder.id}
+                    className={`flex items-center justify-between p-3 border border-gray-200 rounded-lg transition-colors ${
+                      isSettingRoot
+                        ? 'opacity-50 cursor-not-allowed'
+                        : 'hover:bg-gray-50 cursor-pointer'
+                    }`}
+                  >
+                    <div
+                      className="flex items-center space-x-3 flex-1"
+                      onClick={() =>
+                        !isSettingRoot && handleFolderClick(folder)
+                      }
+                    >
+                      <FaFolder className="text-blue-500" />
+                      <div className="flex-1">
+                        <Text className="font-medium">{folder.name}</Text>
+                        <Text className="text-sm text-gray-500">
+                          {isSettingRoot
+                            ? 'Please wait...'
+                            : 'Click to open folder'}
+                        </Text>
+                      </div>
+                      {!isSettingRoot && (
+                        <FaChevronRight className="text-gray-400" />
+                      )}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleSelectFolder(folder)}
+                      disabled={isSettingRoot}
+                      className="ml-3"
+                    >
+                      <FaCheck className="mr-1" />
+                      {isSettingRoot ? 'Setting...' : 'Select'}
+                    </Button>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
+          <Text className="text-sm text-gray-500">
+            Selected folder will be used as the root for all education materials
+          </Text>
+          <div className="flex space-x-3">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              disabled={isSettingRoot}
+            >
+              {isSettingRoot ? 'Setting Root...' : 'Cancel'}
+            </Button>
+          </div>
+        </div>
+
+        {/* Setting Root Overlay */}
+        {isSettingRoot && (
+          <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded-lg">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <Text className="text-gray-700 font-medium">
+                Setting Root Folder...
+              </Text>
+              <Text className="text-sm text-gray-500 mt-1">
+                This may take a moment while we configure your folder structure
+              </Text>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}

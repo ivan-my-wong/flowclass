@@ -1,0 +1,46 @@
+{
+  "websiteIntegration": {
+    "title": "Website Integration",
+    "choosePlatform": "Choose the website building platform you are using:",
+    "wordpress": "WordPress",
+    "elementor": "Elementor",
+    "shopify": "Shopify",
+    "wix": "Wix",
+    "squarespace": "Squarespace",
+    "custom": "Code",
+    "others": "Others"
+  },
+
+  "configuration": {
+    "title": "Configuration",
+    "setWidthHeightCourse": "Please select the course you want to link to, and then set the width and height of the widget:",
+    "width": "Width:",
+    "height": "Height:",
+    "course": "Course:",
+    "apply": "Apply",
+    "negative": "Please enter a positive number.",
+    "entireSchool": "Entire School",
+    "element": "Element"
+  },
+  "code": {
+    "install": "Your widget code",
+    "installationSuccessful": "Installation Successful!",
+    "successfullyInstalled": "You have successfully installed the widget.",
+    "howToUse": "Copy the following code and paste it into the HTML code of your website where you want the widget to appear.",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "linkCopied": "Link copied to clipboard",
+    "preview": "Preview",
+    "copyFailed": "Copy failed",
+    "previewHeader": "You are now previewing widget"
+  },
+  "install": {
+    "guide": "Installation Guide"
+  },
+  "elements": {
+    "courseList": "Course List",
+    "courseCard": "Card",
+    "calendar": "Calendar",
+    "applicationForm": "Application Form"
+  }
+}

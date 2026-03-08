@@ -1,0 +1,37 @@
+import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Column, Entity, Repository } from 'typeorm'
+
+import { BaseAbstractRepository } from '@/modules/base/base.abstract.repository'
+import { BaseEntity } from '@/modules/base/base.entity'
+
+@Entity('stripe_products')
+export class StripeProductsEntity extends BaseEntity {
+  @Column({ name: 'stripe_product_id' })
+  stripeProductId: string
+
+  @Column({ name: 'name' })
+  name: string
+
+  @Column({ name: 'description', nullable: true })
+  description: string
+
+  @Column({ name: 'metadata', type: 'jsonb' })
+  metadata: Record<string, string>
+
+  @Column({ name: 'active', default: false })
+  active: boolean
+}
+
+@Injectable()
+export class StripeProductsRepository extends BaseAbstractRepository<StripeProductsEntity> {
+  private _repository: Repository<StripeProductsEntity>
+
+  constructor(
+    @InjectRepository(StripeProductsEntity)
+    repository: Repository<StripeProductsEntity>
+  ) {
+    super(repository)
+    this._repository = repository
+  }
+}

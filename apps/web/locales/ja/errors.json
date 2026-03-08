@@ -1,0 +1,42 @@
+{
+  "NETWORK": "ネットワークエラー。サーバーが応答停止しています。インターネット接続が不安定の可能性があります。",
+  "UNKNOWN_ERROR": "不明なエラーが発生しました",
+  "INVAID_VERIFICATION_CODE": "キャプチャコードが間違っています",
+  "TOO_MANY_REQUEST": "リクエストが多すぎます。後ほどお試しください",
+  "NO_CLASS_CHOSEN": "お申し込みたいな課程を選択してください",
+  "MISSING_CLASS_DATA": "課程情報が見つかりません。再度選択してください",
+  "SERVER_ERROR": "アカウントを認証できません。ページを再読み込みするか、再度ログインしてください。",
+  "NAME_LENGTH_ERROR": "名前が長すぎます",
+  "WRONG_DOMAIN": "このドメインは存在しません。入力したリンクを再度確認してください",
+  "AUTHENTICATE": {
+    "PLEASE_AUTHENTICATE": "ログインしていません。ページを再読み込みするか、再度ログインしてください。",
+    "ACCOUNT_NOT_FOUND": "ログイン失敗です。メールアドレスまたはパスワードを確認してください。",
+    "AUTHENTICATION_FAIL": "ログイン情報が正しくありません"
+  },
+  "VALIDATE": {
+    "FIELD_REQUIRED": "この項目は必要です。入力してください。",
+    "VALIDATION_ERROR": "入力した情報が正しくありません",
+    "INVALID_PHONE_NUMBER": "電話番号が無効です",
+    "INVALID_EMAIL": "メールアドレスが無効です"
+  },
+  "SITE": {
+    "NOT_FOUND": "サイトが見つかりません。"
+  },
+  "ENROL": {
+    "PLEASE_PICK_CLASS": "先にクラスを選んでください。",
+    "PLEASE_PICK__STARTING_LESSON": "先に初めのレッスンを選んでください。",
+    "PLEASE_PICK_COURSE": "もう一度お申し込むお願いします。",
+    "COURSE_NOT_OPEN": "この課程は現在受講できません。講師に直接問い合わせてください",
+    "WORKSHOP_NOT_OPEN": "このワークショップは現在お申し込みを受けてい付けません。講師に直接お問い合わせてください",
+    "COURSE_RECRUITMENT_NOT_STARTED": "この課程はまだ生徒を募集していません。講師に直接問い合わせてください",
+    "DATE_PICKED_IS_IN_PAST": "選択した開始日が過去の日付です。別の日付を選んでください",
+    "INCORRECT_DATA_FORMAT": "入力したデータが正しくありません。入力を確認するか、技術サポートにお問い合わせください。",
+    "RECORDNOTFOUND": "要求した予約が見つかりません",
+    "LESSON_DATE_TIME_BLOCKED": "選択した日時は予約できません。別の日時を選んでください。",
+    "PAYMENT_AMOUNT_TOO_LOW": "講師が設定した金額が無効です。下のボタンから講師に直接お問い合わせてください。",
+    "DUPLICATE_ENROLLMENT": "この課程にはすでに登録済みです。講師に直接お問い合わせてください。",
+    "URL_NOT_FOUND": "入力したリンクは無効です。リンクを再度確認してください。",
+    "REGISTRATION_ERROR": "申し訳ありませんが、申し込む際にエラーが発生しました。エラーメッセージは:",
+    "CONTACT_SUPPORT": "受講登録は仕上がられません。サポートにお知らせいただければ、手続きのサポートを早くいたします。"
+  }
+}

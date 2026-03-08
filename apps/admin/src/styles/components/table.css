@@ -1,0 +1,41 @@
+.ag-theme-alpine {
+  --ag-cell-horizontal-border: var(--ag-row-border-width)
+    var(--ag-row-border-style) var(--ag-row-border-color); /* Add left and right borders to each cell and use row border's properties  */
+  --ag-header-column-separator-display: block;
+}
+.ag-row .ag-cell {
+  /* display: flex;
+  justify-content: start;
+  align-items: center;
+  text-overflow: ellipsis; */
+  /* padding-top: 10px; */
+}
+.ag-header-cell,
+.ag-header-group-cell {
+  background-color: #e6e6e6;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background-color: #d9d9d9;
+  border-radius: 25px;
+}
+::-webkit-scrollbar-thumb {
+  background: #bfbfbf;
+  border-radius: 25px;
+}
+.ag-theme-alpine {
+  /* --ag-font-family: 'Segoe UI, Helvetica Neue, Helvetica, Arial, sans-serif'; */
+}
+
+/* .ag-center-cols-viewport{
+  height: fit-content !important;
+}
+.ag-root-wrapper{
+  border: none;
+}
+.ag-center-cols-container{
+  border: 1px solid red;
+} */

@@ -1,0 +1,164 @@
+[
+  {
+    "id": "evt_1SWufaR2VXHcE5PxRpYScOJ6",
+    "object": "event",
+    "account": "acct_1Rj9dJR2VXHcE5Px",
+    "api_version": "2023-10-16",
+    "context": "acct_1Rj9dJR2VXHcE5Px",
+    "created": 1763971126,
+    "data": {
+      "object": {
+        "id": "cs_live_a1bropLSh4tqYbBZ4i69N6S56FySPXyapNZ16vWCYeL543iLXF7fz3Lq1v",
+        "object": "checkout.session",
+        "adaptive_pricing": {
+          "enabled": true
+        },
+        "after_expiration": null,
+        "allow_promotion_codes": null,
+        "amount_subtotal": 40000,
+        "amount_total": 40000,
+        "automatic_tax": {
+          "enabled": false,
+          "liability": null,
+          "provider": null,
+          "status": null
+        },
+        "billing_address_collection": null,
+        "branding_settings": {
+          "background_color": "#ffffff",
+          "border_style": "rounded",
+          "button_color": "#0074d4",
+          "display_name": "Example Organization",
+          "font_family": "default",
+          "icon": null,
+          "logo": null
+        },
+        "cancel_url": null,
+        "client_reference_id": null,
+        "client_secret": null,
+        "collected_information": {
+          "business_name": null,
+          "individual_name": null,
+          "shipping_details": null
+        },
+        "consent": null,
+        "consent_collection": null,
+        "created": 1763971106,
+        "currency": "hkd",
+        "currency_conversion": null,
+        "custom_fields": [],
+        "custom_text": {
+          "after_submit": null,
+          "shipping_address": null,
+          "submit": null,
+          "terms_of_service_acceptance": null
+        },
+        "customer": null,
+        "customer_creation": "if_required",
+        "customer_details": {
+          "address": {
+            "city": null,
+            "country": "HK",
+            "line1": null,
+            "line2": null,
+            "postal_code": null,
+            "state": null
+          },
+          "business_name": null,
+          "email": "customer@example.com",
+          "individual_name": null,
+          "name": "John Doe",
+          "phone": null,
+          "tax_exempt": "none",
+          "tax_ids": []
+        },
+        "customer_email": "customer@example.com",
+        "discounts": [],
+        "expires_at": 1764057506,
+        "invoice": null,
+        "invoice_creation": {
+          "enabled": false,
+          "invoice_data": {
+            "account_tax_ids": null,
+            "custom_fields": null,
+            "description": null,
+            "footer": null,
+            "issuer": null,
+            "metadata": {},
+            "rendering_options": null
+          }
+        },
+        "livemode": true,
+        "locale": null,
+        "metadata": {
+          "type": "ENROLL_COURSE",
+          "enrollInto": "機構會員員工"
+        },
+        "mode": "payment",
+        "origin_context": null,
+        "payment_intent": "pi_3SWufXR2VXHcE5Px2wsjvHqh",
+        "payment_link": null,
+        "payment_method_collection": "if_required",
+        "payment_method_configuration_details": {
+          "id": "pmc_1Rj9dpR2VXHcE5Px7NFRca3y",
+          "parent": "pmc_1OcUgYJCG0XrAvOkoU8BUFhE"
+        },
+        "payment_method_options": {
+          "card": {
+            "request_three_d_secure": "automatic"
+          }
+        },
+        "payment_method_types": ["card", "link"],
+        "payment_status": "paid",
+        "permissions": null,
+        "phone_number_collection": {
+          "enabled": false
+        },
+        "recovered_from": null,
+        "redirect_on_completion": "always",
+        "return_url": "https://example.com/enrol/success-payment?school=&course=2025AC_org_mem&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImN1c3RvbWVyQGV4YW1wbGUuY29tIiwiaWF0IjoxNjAwMDAwMDAwLCJleHAiOjE5MDAwMDAwMDB9.example-signature&session_id={CHECKOUT_SESSION_ID}",
+        "saved_payment_method_options": null,
+        "setup_intent": null,
+        "shipping_address_collection": null,
+        "shipping_cost": null,
+        "shipping_options": [],
+        "status": "complete",
+        "submit_type": null,
+        "subscription": null,
+        "success_url": null,
+        "total_details": {
+          "amount_discount": 0,
+          "amount_shipping": 0,
+          "amount_tax": 0
+        },
+        "ui_mode": "embedded",
+        "url": null,
+        "wallet_options": null,
+        "shipping_details": null
+      }
+    },
+    "livemode": true,
+    "pending_webhooks": 1,
+    "request": {
+      "id": null,
+      "idempotency_key": null
+    },
+    "type": "checkout.session.completed"
+  },
+  {
+    "customer_email": "judith@garycheng.com",
+    "line_items": {
+      "0": {
+        "price": "price_1SQpu9QzZ9cuOY1NCUrINqXs",
+        "quantity": "1"
+      }
+    },
+    "metadata": {
+      "enrollInto": "2025-11\nRepertory Orchestra -A(ROA)",
+      "type": "ENROLL_COURSE"
+    },
+    "mode": "payment",
+    "return_url": "https://example.com/enrol/success-payment?school=&course=Repertory-Orchestra-Nov-2025&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImN1c3RvbWVyQGV4YW1wbGUuY29tIiwiaWF0IjoxNjAwMDAwMDAwLCJleHAiOjE5MDAwMDAwMDB9.example-signature&session_id={CHECKOUT_SESSION_ID}",
+    "ui_mode": "embedded"
+  }
+]

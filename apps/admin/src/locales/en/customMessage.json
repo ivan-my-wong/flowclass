@@ -1,0 +1,110 @@
+{
+  "customMessage": {
+    "title": "Notification Template",
+    "description": "Create a template message to be used in your institution",
+    "addTemplate": "Add Template",
+    "editTemplate": "Edit Template",
+    "showMessage": "Show message",
+    "updatedAt": "Updated At"
+  },
+  "email": {
+    "title": "Email",
+    "description": "Email is a communication channel that allows you to send and receive emails.",
+    "connected": "Email is connected to your account",
+    "notYetConnected": "Email Not Connected",
+    "notYetConnectedDescription": "Please connect your email to the system by clicking the button below"
+  },
+  "whatsappWeb": {
+    "showQrCode": "Show QR Code",
+    "connected": "WhatsApp is connected to your account",
+    "notConnected": "WhatsApp is not connected to your account",
+    "connectedText": "connected",
+    "disconnectedText": "disconnected",
+    "createWhatsappAccount": "Create WhatsApp Integration Account",
+    "refreshStatus": "Refresh Status",
+    "connectedAlertBox": "WhatsApp is connected to your account. If you want to disconnect, please click the 'Remove Session' button.",
+    "clickToRefresh": "Click to refresh",
+    "notCreatedWhatsappAccount": "You have not created a whatsApp integration account.",
+    "notCreatedWhatsappAccountDescription": "You must first create a WhatsApp integration account before linking your own WhatsApp account.",
+    "isInititializing": "WhatsApp is initializing. Please wait for around 10 - 30 seconds. If this page does not show the QR code, please close the pop up and refresh the page.",
+    "notYetConnected": "Please visit 'Settings' in your WhatsApp App, go to 'Linked Devices' and click 'Connect to WhatsApp Web'. Then, scan the QR code shown in the pop up after clicking 'Scan QR Code'.",
+    "clickToScan": "Click to scan",
+    "whatsappConnectedWording": "Your Whatsapp integration account is",
+    "removeSession": "Remove Session",
+    "removeSessionDescription": "If you want to disconnect, please click the 'Remove Session' button.",
+    "cancel": "Cancel",
+    "remove": "Remove",
+    "checkStatus": "Check Status",
+
+    "connectWhatsapp": "Connect WhatsApp",
+    "whatsappNotificationDescription": "You need to connect WhatsApp before you can send message.",
+
+    "connectionError": "Failed to connect WhatsApp. Please try again.",
+    "removeSessionSuccess": "WhatsApp Session Removed Successfully",
+    "connectedDescription": "If you encounter any connection issue, please click on 'Refresh status' to retrieve the QrCode again.",
+    "disconnectedDescription": "Please open your WhatApp app on Mobile, visit 'Settings' > 'Devices' > 'Link a Device' to open the scanner",
+    "qrCodeUpdated": "QR Code has been updated. Please scan the new QR code."
+  },
+
+  "modalScanQrCode": {
+    "title": "Connect To WhatsApp",
+    "connected": "WhatsApp is connected to your account.",
+    "mayTakeLongTime": "It may take a long time to connect WhatsApp. Please wait for around 10 - 30 seconds.",
+    "retryScanIfNotWorking": "If the connection is not working, please try to close the pop up to refresh and scan the QR code again.",
+    "howToConnect": "Please visit 'Settings' in your WhatsApp App, go to 'Linked Devices' and click 'Connect to WhatsApp Web'. Then, scan the QR code shown in the pop up after clicking 'Scan QR Code'.",
+    "connectionError": "Failed to connect WhatsApp. Please try again."
+  },
+  "modalCreateWhatsappAccount": {
+    "title": "Please confirm your phone before creating WhatsApp account",
+    "description": "Your phone number cannot be changed after creating the integration account, or the integration will no longer work.",
+    "phoneNumber": "Phone Number",
+    "secondDescription": "If the phone number is incorrect, please visit <5>Contact</5> page to change your phone number.",
+    "initializeSessionSuccess": "WhatsApp account created successfully"
+  },
+  "retryConnection": {
+    "title": "We cannot connect to WhatsApp Web Server currently.",
+    "description": "Please try again to try to connect to WhatsApp Web Server.",
+    "clickToRetry": "Click to retry"
+  },
+  "connectingToWhatsAppWebServer": {
+    "title": "Connecting to WhatsApp Web Server. Please wait for around 10 - 30 seconds.",
+    "loadingTooLong": "If the loading takes too long, please contact support.",
+    "contactSupport": "Contact Support"
+  },
+  "form": {
+    "name": "Name",
+    "namePlaceholder": "Enter name",
+    "nameRequired": "Name is required",
+    "content": "Content",
+    "contentPlaceholder": "Enter content",
+    "contentRequired": "Content is required",
+    "type": "Type",
+    "typePlaceholder": "Select type",
+    "emailNotification": "Email Notification",
+    "whatsappNotification": "Whatsapp Notification",
+    "editMessage": "Edit Message",
+    "typeOptions": {
+      "admin_notif_after_enrollment_submitted": "Notify Admin After Enrollment Submitted",
+      "student_notif_after_enrollment_submitted": "Notify Student After Enrollment Submitted",
+      "student_notif_after_payment_approved": "Notify Student After Payment Approved",
+      "student_notif_after_payment_rejected": "Notify Student After Payment Rejected",
+      "student_notif_after_application_confirmed": "Notify Student After Application Confirmed",
+      "teacher_notif_after_application_submitted": "Notify Teacher After Application Submitted",
+      "student_notif_after_add_new_lesson": "Notify Student After Add New Lesson",
+      "teacher_notif_after_add_new_class": "Notify Teacher After Add New Class",
+      "student_notif_payment_reminder": "Notify Student Payment Reminder",
+      "student_notif_after_change_lesson_date": "Notify Student After Change Lesson Date",
+      "student_lesson_reminder": "Student Lesson Reminder",
+      "create_invoice": "Notify Student New Invoice Created"
+    },
+    "updateSuccess": "Notification template updated successfully"
+  },
+  "statuses": {
+    "disconnected": "Your WhatsApp account is currently disconnected.",
+    "connected": "Your WhatsApp account is currently connected.",
+    "error": "Your WhatsApp account is currently in error.",
+    "initializing": "Your WhatsApp account is currently initializing.",
+    "qr_code": "Your WhatsApp account is currently waiting for you to scan the QR code.",
+    "ready": "Your WhatsApp account is currently ready to send messages."
+  }
+}

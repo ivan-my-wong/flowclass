@@ -1,0 +1,12 @@
+/**/node_modules/*
+node_modules/
+node_modules/**/*
+# Ignore artifacts:
+build/
+doc/
+coverage/
+storybook-static/
+
+vite-env.d.ts
+vite.config.ts
+tailwind.config.ts

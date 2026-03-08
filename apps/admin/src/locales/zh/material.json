@@ -1,0 +1,95 @@
+{
+  "actions": {
+    "addNewMaterialBtn": "上載新文件"
+  },
+  "deleteMaterial": {
+    "confirmDescription": "該檔案將從 Google Drive 中刪除，所有學生將無法再訪問該檔案。",
+    "confirmTitle": "您確定要刪除 {{fileName}} 嗎？",
+    "title": "刪除資料",
+    "warning": "此操作無法撤消。該資料將被永久刪除。"
+  },
+  "deleteMediaMaterialSuccess": "刪除媒體資料成功",
+  "editExpiry": {
+    "currentExpiry": "當前到期時間",
+    "expiryDate": "到期日期",
+    "expiryTime": "到期時間",
+    "materialName": "資料",
+    "removeExpiry": "移除到期時間",
+    "selectDate": "選擇到期日期",
+    "student": {
+      "studentName": "學生",
+      "title": "編輯學生資料到期時間"
+    },
+    "studentName": "學生",
+    "title": "編輯到期時間"
+  },
+
+  "items": "項",
+  "materialListHeading": "資料",
+  "noMaterials": "未添加資料",
+
+  "updateExpirySuccess": "到期時間更新成功",
+  "uploadedLinks": "{{count}} 連結",
+  "uploadedPercentage": "{{percentage}}% 上傳中",
+  "uploadMaterials": {
+    "addLinks": "添加連結",
+    "chooseFiles": "選擇檔案",
+    "dialogTitle": "上傳教材",
+    "form": {
+      "classLabel": "班級",
+      "lessonLabel": "單一課堂",
+      "lessonPlaceholder": "選擇單一課堂",
+      "expiryLabel": "到期日期（可選）",
+      "expiryPlaceholder": "添加到期日期",
+      "linkUrlLabel": "連結地址",
+      "materialDescLabel": "資料描述",
+      "materialDescPlaceholder": "輸入資料描述（顯示給學生）",
+      "materialNameLabel": "資料名稱",
+      "materialNamePlaceholder": "輸入資料名稱（顯示給學生）",
+      "materialNameRequired": "資料名稱是必填項",
+      "linkUrlRequired": "連結地址是必填項",
+      "invalidUrl": "請輸入有效的URL",
+      "pleaseSelectLesson": "請選擇單一課堂",
+      "pleaseAddAtLeastOneMaterial": "請添加至少一個資料"
+    },
+    "materialLimitExceeded": "超過資料上傳限制",
+    "materialLimitLabel": "最多可上傳 10 個檔案，總大小不超過 500 MB",
+    "materialsToUpload": "待上傳的資料",
+    "message": {
+      "preparingUploadMaterial": "準備上傳資料",
+      "uploadError": "上傳錯誤",
+      "uploadingCompleted": "上傳完成",
+      "uploadingFailed": "上傳失敗",
+      "uploadingMaterials": "上傳資料",
+      "uploadingPending": "上傳中",
+      "uploadingToGoogleDrive": "上傳到谷歌雲端硬碟",
+      "uploadMaterialsSuccess": "上傳資料成功"
+    }
+  },
+  "notifyStudents": {
+    "title": "發送課程資料提醒",
+    "emailNotification": "郵件通知",
+    "whatsappNotification": "WhatsApp 通知",
+    "student": "學生",
+    "email": "郵箱",
+    "phone": "電話",
+    "cancel": "取消",
+    "send": "發送"
+  },
+  "filter": {
+    "selectLessons": "選擇課程",
+    "searchByName": "按名稱搜尋",
+    "sortBy": "排序方式"
+  },
+  "materialItem": {
+    "notifyStudentsBtn": "通知學生",
+    "uploadMaterialsBtn": "上傳資料",
+    "materials": "資料",
+    "students": "學生（{{count}}）",
+    "expiresAt": "到期時間 {{date}}",
+    "uploadedAt": "上傳時間 {{date}}"
+  },
+  "notifyStudentSuccess": "成功通知學生",
+  "deleteMaterialSuccess": "刪除資料成功",
+  "downloadMaterialSuccess": "下載資料成功"
+}

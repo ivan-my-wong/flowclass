@@ -1,0 +1,72 @@
+{
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "name": "Name",
+  "email": "Email",
+  "phone": "Phone",
+  "company": "Company",
+  "account": "Account",
+  "position": "Position",
+  "role": "Role",
+  "profile": "Profile",
+  "editInformation": "Edit Information",
+  "updateProfile": "Update Your Profile",
+  "changePassword": "Change Password",
+  "changePasswordExplanation": "If you use social media to log in, you can register an account with the same email to change your password. All your data will be linked.",
+
+  "support": "Support",
+  "documentation": "Documentation",
+
+  "introductionFlowclass": "Flowclass is developed by Flowsophic Limited, headquartered in Hong Kong❤️",
+
+  "currentPassword": "Current Password",
+  "newPassword": "New Password",
+  "confirmPassword": "Confirm New Password",
+  "saveChanges": "Save Changes",
+  "haveUnSavedChanges": "haveUnSavedChanges",
+  "pageTitle": "Account Settings",
+
+  "profileView": {
+    "edit": "Edit Profile",
+    "change-password": "Change Password",
+    "delete": "Delete Account",
+    "profile": "Profile"
+  },
+
+  "deleteAccount": {
+    "deleteAccount": "Delete Account",
+    "successDelete": "Your account has been deleted successfully. We welcome you to use Flowclass again at any time",
+    "successDeleteAccount": "The account has been deleted successfully.",
+    "title": "Are you absolutely sure?",
+    "textInput": "Please enter 'delete' to confirm delete your account.",
+    "description": "This action cannot be undone. This will permanently delete your account and remove your data from our servers.",
+    "cancel": "Cancel",
+    "confirm": "Yes, delete account",
+    "goToConfirm": "Start confirmation",
+    "willNotDelete": "This will not delete your account yet.",
+    "notice1": "Please note that if you choose to delete your user account, you have withdrawn your consent and your personal information and associated data will be permanently removed from our system. However, we would like to inform you that the site data will remain intact, including all courses and content you have created.",
+    "notice2": "If you wish to remove any site or courses that you have created, please do so before deleting your user account. If there are no other users associated with a site, the entire site will be deleted once you delete your account.",
+    "notice3": "We value your privacy and want to ensure that you have a seamless experience with Flowclass. If you have any questions or concerns, please do not hesitate to reach out to our support team."
+  },
+  "errMessage": {
+    "newPasswordNotMatch": "New password and confirmation password do not match. Please try again.",
+    "updateProfile": "Sorry, we couldn't update your account information. Please try again later.",
+    "updatePassword": "There was an error updating your password.",
+    "emptyCurrentPassword": "Please enter the current password",
+    "emptyNewPassword": "Please enter the new password",
+    "notStrongPassword": "Please create a new password that meets the following requirements: ",
+    "incorrectPassword": "Password is not correct.",
+    "emptyConfirmPassword": "Please confirm your password"
+  },
+  "successMessage": {
+    "updateProfile": "Your account information has been updated successfully.",
+    "updatePassword": "Your account password has been updated successfully."
+  },
+  "strongPassword": {
+    "requirement0": "At least 8 characters long",
+    "requirement1": "Contains at least one special character (such as @, #, $)",
+    "requirement2": "Contains at least one number (0-9)",
+    "requirement3": "Contains at least one uppercase letter (A-Z)",
+    "requirement4": "Contains at least one lowercase letter (a-z)"
+  }
+}

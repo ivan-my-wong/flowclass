@@ -1,0 +1,92 @@
+{
+  "manage": "Manage",
+  "save": "Save",
+  "bankName": "Name of Bank",
+  "accountName": "Payment Account Holder Name",
+  "bankAccountName": "Bank Account Holder Name",
+  "accountNumber": "Account Number",
+  "iban": "IBAN",
+  "paymentCode": "QR Code for Payment",
+  "accountId": "Account Number",
+  "paymentDetailsHint": "Account Number / Phone number",
+  "paymentMethodNameHint": "For bank transfer, please enter name of the bank for the payment method name",
+  "paymentUrl": "Link to Payment Page",
+  "description": "Remarks for Payment",
+  "receiptRequired": "User must provide receipt when paying?",
+  "delete": "Delete",
+  "create": "Register new payment method",
+  "add": "Add payment method",
+  "enable": "Enable",
+  "paymentMethodName": "Payment Method Name",
+  "instruction": "Instruction",
+  "customSuccessMessage": "Success Message",
+  "customSuccessMessagePlaceholder": "Write custom message when student payment process successfully",
+  "paymentLinkUrlLabel": "Payment link Url",
+  "paymentLinkUrlDesc": "If each course has different payment links, please add the link in the course setting page. For courses  without individual payment link, they will show this general link.",
+  "instructionPlaceholder": "Please make the payment to the following account:\nBank name: First National Bank\nAccount number: 12345677\nAccount name: Flowclass Center",
+  "paymentMethodSettingDescription": "For students to pay you besides using bank transfer or digital payment methods. The information of your payment methods will be displayed on the student's payment page, and the student will pay directly. You will need to confirm the payments yourself.",
+  "bankBranch": "Bank Branch",
+  "paymentMethod": {
+    "offlinePayment": "Offline Payment",
+    "": "Payment Method",
+    "bankTransfer": "Bank Transfer",
+    "external": "External",
+    "payme": "Payme",
+    "swift": "Swift",
+    "stripe": "Stripe",
+    "other": "Other"
+  },
+  "tooltip": {
+    "accountName": "The name of the account holder. Usually a person or a company.",
+    "accountDetails": "The username or phone number which the students enters to identify you and pay you.",
+    "accountUrl": "(Optional) A payment link of your account which the student can scan to pay you.",
+    "accountCode": "(Optional) A QR code the student can scan to pay you."
+  },
+  "deletePayment": {
+    "title": "Delete Payment Method",
+    "description": "Are you sure you want to delete this payment method?"
+  },
+  "confirmManage": {
+    "title": "Are you absolutely sure?",
+    "description": "This action cannot be undone. This will permanently delete your account and remove your data from our servers."
+  },
+  "managePaymentMethod": "Other Payment Methods",
+  "noPaymentMethodFound": "There is no payment method. Please create a new one.",
+  "createSuccess": "You have successfully created a payment method!",
+  "updateSuccess": "You have successfully updated a payment method!",
+  "deleteSuccess": "You have successfully deleted a payment method!",
+  "required": "This field is required",
+  "updateFailed": "Failed to update payout payment information. Please check your information and try again",
+  "payoutToggle": {
+    "disableTitle": "Disable payment method",
+    "disableDescription": "Are you sure you want to disable this payment method? If you do, students will not be able to view this payment option when enrolling in the course.",
+    "enableTitle": "Enable payment method",
+    "haveNotConnected": "You have not connected your Stripe account yet. Please connect your Stripe account to enable this payment method.",
+    "enableDescription": "Are you sure you want to enable this payment method? If you do, students will be able to view this payment option when enrolling in the course."
+  },
+  "stripe": {
+    "accountCreated": "Your Stripe Express account has been created successfully!",
+    "connectToStripe": "Connect to Stripe",
+    "connectTo": "Connect to",
+    "customerAccountCreated": "Your Stripe customer account has been created successfully!",
+    "onlinePayment": "Online Payment - Stripe",
+    "description": "Accept credit cards, Apple Pay, Google Pay, and more with Stripe. A processing fee of 3.4% + HK$2.5 per transaction applies.\nIt may take 10 more minutes to set up, please prepare necessary company documents"
+  },
+  "paymentInfo": {
+    "title": "Seamless and Secure Payments with Stripe",
+    "alertMessage": "If you have a Stripe account, please log in with the same email and password to skip the onboarding process.",
+    "description": "We are thrilled to offer our clients the convenience of accepting online payments through Stripe, one of the most trusted and secure payment platforms available. By integrating with Stripe, we ensure that your transactions are not only fast but also protected by cutting-edge security measures.",
+    "benefitDesc": "When your customers pay you through our software, they'll benefit from:",
+    "benefitList": {
+      "speed": "Speed: Quick processing times mean you get paid faster.",
+      "security": "Security: Industry-leading security features safeguard every transaction.",
+      "reliable": "Reliability: A trusted platform that handles millions of transactions daily."
+    },
+    "notes": "Please note that a handling fee, applied by Stripe, will be deducted from each transaction. This fee helps cover the costs associated with providing a seamless and secure payment experience",
+    "setupButton": "Start to set up"
+  },
+  "setup": "Setup",
+  "helperStripeDashboard": "To know more about the payout schedule and amount, please visit your Stripe dashboard",
+  "goToStripe": "Go to Stripe",
+  "goTo": "Go to"
+}

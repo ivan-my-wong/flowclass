@@ -1,0 +1,53 @@
+{
+  "select": {
+    "section": "Select Section",
+    "placeholder": "Select an option"
+  },
+  "footer": {
+    "email": "Email",
+    "address": "Address",
+    "socialMedia": "Social Media",
+    "contactUs": "Contact Us",
+    "phone": "Phone",
+    "copyright": " All rights reserved. ©",
+    "slogan": "Automate payments & communications for educators © Flowclass",
+    "currency": "Unless specified, all prices on this sites are calculated in ",
+    "timeZone": "and all dates and time displayed on this sites is in the timezone of"
+  },
+  "colorPicker": {
+    "error": "The color you selected is invalid"
+  },
+  "ImageUpload": {
+    "title": "Select an image to upload",
+    "uploadImage": "Upload Image",
+    "cropImage": "Crop Image",
+    "finishCrop": "Finish Crop",
+    "pleaseUpload": "Please upload an image",
+    "wrongFormat": "Wrong image format",
+    "error": "Error, please reupload image",
+    "noImage": "No image",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "uploadSuccess": "Image uploaded successfully",
+    "cropImageTips": "You can drag and drop the box to reposition it, or resize it to adjust the size of the image"
+  },
+  "template": {
+    "details": "Details",
+    "allCourses": "All courses",
+    "allEvents": "All events"
+  },
+  "filterTagSidebar": {
+    "filter": "Filter",
+    "reset": "Reset",
+    "apply": "Apply"
+  },
+  "calendar": {
+    "noEvents": "No events to display",
+    "today": "Today",
+    "viewByWeek": "View By Week",
+    "viewByList": "View By List"
+  },
+  "inAppBrowser": {
+    "navigatingToAnotherDomain": "You are navigating to another domain"
+  }
+}

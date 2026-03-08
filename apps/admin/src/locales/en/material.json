@@ -1,0 +1,95 @@
+{
+  "actions": {
+    "addNewMaterialBtn": "Add New Materials"
+  },
+  "deleteMaterial": {
+    "confirmDescription": "The file will be removed from Google Drive, and all students will no longer be able to access the file.",
+    "confirmTitle": "Are you sure you want to delete {{fileName}}?",
+    "title": "Delete Material",
+    "warning": "This action cannot be undone. The material will be permanently deleted."
+  },
+  "deleteMaterialSuccess": "Delete material successfully",
+  "deleteMediaMaterialSuccess": "Delete media material successfully",
+  "downloadMaterialSuccess": "Download material successfully",
+  "editExpiry": {
+    "currentExpiry": "Current expiry",
+    "expiryDate": "Expiry Date",
+    "expiryTime": "Expiry Time",
+    "studentName": "Student",
+    "materialName": "Material",
+    "removeExpiry": "Remove Expiry",
+    "selectDate": "Select expiry date",
+    "title": "Edit Expiry Date",
+    "student": {
+      "studentName": "Student",
+      "title": "Edit Student Expiry Date"
+    }
+  },
+  "filter": {
+    "searchByName": "Search by name",
+    "selectLessons": "Select Lessons",
+    "sortBy": "Sort by"
+  },
+  "items": "items",
+  "materialItem": {
+    "deleteMaterial": "Delete material",
+    "editExpiry": "Edit expiry date",
+    "expiresAt": "Expires at {{date}}",
+    "materials": "Materials",
+    "notifyStudentsBtn": "Notify Students",
+    "students": "Students ({{count}})",
+    "uploadedAt": "Uploaded at {{date}}"
+  },
+  "materialListHeading": "Materials",
+  "notifyStudents": {
+    "cancel": "Cancel",
+    "email": "Email",
+    "emailNotification": "Email Notification",
+    "phone": "Phone",
+    "send": "Send",
+    "student": "Student",
+    "title": "Send Reminder for Lesson Materials",
+    "whatsappNotification": "WhatsApp Notification"
+  },
+  "notifyStudentSuccess": "Notify student successfully",
+  "updateExpirySuccess": "Expiry date updated successfully",
+  "uploadMaterials": {
+    "addLinks": "Add Links",
+    "chooseFiles": "Choose Files",
+    "dialogTitle": "Upload Materials",
+    "form": {
+      "classLabel": "Class",
+      "expiryLabel": "Expiry Date (Optional)",
+      "expiryPlaceholder": "Add expiry date",
+      "invalidUrl": "Please enter a valid URL",
+      "lessonLabel": "Lesson",
+      "lessonPlaceholder": "Select Lesson",
+      "linkUrlLabel": "Link URL",
+      "linkUrlRequired": "Link URL is required",
+      "materialDescLabel": "Material Description",
+      "materialDescPlaceholder": "Enter material description (shows to students)",
+      "materialNameLabel": "Material Name",
+      "materialNamePlaceholder": "Enter material name (shows to students)",
+      "materialNameRequired": "Material name is required",
+      "pleaseAddAtLeastOneMaterial": "Please add at least one material",
+      "pleaseSelectLesson": "Please select a lesson"
+    },
+    "materialLimitExceeded": "Material Limit Exceeded",
+    "materialLimitLabel": "You can upload a maximum of 10 files, with a total size limit of 500 MB",
+    "materialsToUpload": "Materials to Upload",
+    "message": {
+      "preparingUploadMaterial": "Preparing upload materials",
+      "uploadError": "Upload error",
+      "uploadingCompleted": "Uploading completed",
+      "uploadingFailed": "Uploading failed",
+      "uploadingMaterials": "Uploading materials",
+      "uploadingPending": "Uploading pending",
+      "uploadingToGoogleDrive": "Uploading to google drive",
+      "uploadMaterialsSuccess": "Upload materials successfully"
+    },
+    "noMaterials": "No materials added",
+    "uploadedLinks": "{{count}} Links",
+    "uploadedPercentage": "{{percentage}}% uploaded",
+    "uploadMaterials": "Upload Materials"
+  }
+}

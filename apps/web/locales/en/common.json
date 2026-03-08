@@ -1,0 +1,138 @@
+{
+  "action": {
+    "logout": "Sign out",
+    "back": "Back",
+    "next": "Next",
+    "delete": "Delete",
+    "finish": "Finish",
+    "cancel": "Cancel",
+    "update": "Update",
+    "create": "Create",
+    "upgrade": "Plans & Subscriptions",
+    "modify": "Modify",
+    "confirm": "Confirm",
+    "enquiry": "Enquiry",
+    "leave": "Leave",
+    "join": "Join",
+    "add": "Add",
+    "share": "Share",
+    "submit": "Submit",
+    "upload": "Upload",
+    "contact": "Contact",
+    "confirmDelete": "Confirm deletion?",
+    "nextStep": "Next Step",
+    "confirmLeave": "Confirm leaving?",
+    "pay": "Pay",
+    "close": "Close",
+    "review": "Review",
+    "tryAgain": "Try again",
+    "continueToTheApplication": "Continue to the application",
+    "viewDetails": "View details",
+    "applyHere": "Apply here",
+    "addToWishlist": "Add to Wishlist",
+    "viewWishlist": "View Wishlist",
+    "reject": "Reject",
+    "yesSend": "Yes, Send"
+  },
+  "navigation": {
+    "goToHome": "Go to home",
+    "backToPreviousPage": "Back to previous page"
+  },
+  "section": {
+    "title": "Title",
+    "type": "Category",
+    "label": "Label",
+    "comment": "Comment",
+    "cover": "Cover",
+    "basicInfo": "Basic Info"
+  },
+  "price": {
+    "free": "Free"
+  },
+  "description": {
+    "no": "No",
+    "info": "Description",
+    "brief": "Brief Introduction",
+    "noName": "Unnamed",
+    "status": "Status",
+    "tag": "Tag",
+    "to": "to",
+    "or": "or",
+    "remark": "Remarks",
+    "free": "Free"
+  },
+  "entity": {
+    "student": "Student",
+    "class": "Class",
+    "session": "Session",
+    "user": "User",
+    "school": "School"
+  },
+  "roles": {
+    "operations": "Operations",
+    "instructor": "Course Instructor",
+    "schoolAdmin": "School Manager",
+    "siteAdmin": "Site Manager"
+  },
+  "unit": {
+    "min": "min",
+    "day": "day",
+    "hour": "hour",
+    "minute": "minute"
+  },
+  "fields": {
+    "locality": "Area",
+    "address": "Address",
+    "email": "Email",
+    "website": "Website",
+    "phone": "Phone",
+    "name": "Name",
+    "remarks": "Remarks",
+    "basicInfo": "Basic Information",
+    "price": "Price",
+    "quota": "Quota",
+    "discountedPrice": "Discounted Price",
+    "grade": "Student Level"
+  },
+  "notFound": {
+    "back": "Back",
+    "error": "error",
+    "technicalSupport": "I want technical support on",
+    "contactTechnicalSupport": "Contact Technical Support on WhatsApp",
+    "pageNotFound": "This site is under maintenance. Please check again later!",
+    "INSTITUTION_NOT_FOUND": "The institution is not found",
+    "courseNotFound": "The course is not found",
+    "invoiceNotFound": "The invoice is not found",
+    "invalidDomain": "Invalid domain",
+    "dataNotFound": "Data not found, Please go back to the homepage and try again.",
+    "genericError": "This page does not exist, or there's a problem on our side. Please refresh the page or go back."
+  },
+  "sectionTag": {
+    "COURSE_FEATURES": "Features",
+    "COURSE_SYLLABUS": "Syllabus",
+    "COURSE_TARGET": "Target Audience",
+    "COURSE_INSTRUCTOR": "Instructors",
+    "COURSE_STUDENT_PERF": "Student Performance",
+    "COURSE_APPLICATION": "Application",
+    "COURSE_ENQUIRY": "Event Enquiry",
+    "SCHOOL_ABOUT_US": "About Us",
+    "SCHOOL_FACILITIES": "Facilities",
+    "SCHOOL_STUDENT_ACHIEVEMENT": "Student Achievement",
+    "SCHOOL_QUALIFICATION_AWARDS": "Qualification & Awards",
+    "SCHOOL_SUPPORT": "School Support",
+    "SCHOOL_FAQS": "FAQs"
+  },
+  "weekName": {
+    "Mon": "Monday",
+    "Tue": "Tuesday",
+    "Wed": "Wednesday",
+    "Thu": "Thursday",
+    "Fri": "Friday",
+    "Sat": "Saturday",
+    "Sun": "Sunday"
+  },
+  "wishlist": {
+    "title": "Add to Wishlist",
+    "selectedCourses": "Selected Courses"
+  }
+}

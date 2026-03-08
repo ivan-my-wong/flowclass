@@ -1,0 +1,57 @@
+{
+  "NETWORK": "網路錯誤。可能是我們的伺服器故障或您的網路連線不穩定。",
+  "UNKNOWN_ERROR": "發生未知錯誤",
+  "INVAID_VERIFICATION_CODE": "驗證碼錯誤",
+  "TOO_MANY_REQUEST": "請求過多，請稍後再試",
+  "NO_CLASS_CHOSEN": "請選擇您要報名的課程",
+  "MISSING_CLASS_DATA": "課程資訊遺失，請重新選擇",
+  "SERVER_ERROR": "無法驗證您的帳號。請重新整理頁面或重新登錄。",
+  "NAME_LENGTH_ERROR": "名稱輸入過長",
+  "WRONG_DOMAIN": "此網域不存在。請檢查您輸入的連結",
+  "AUTHENTICATE": {
+    "PLEASE_AUTHENTICATE": "您尚未登錄。請重新整理頁面或嘗試登錄。",
+    "ACCOUNT_NOT_FOUND": "登錄失敗。請檢查您的電子郵件或密碼。",
+    "AUTHENTICATION_FAIL": "登錄資格認證失敗"
+  },
+  "VALIDATE": {
+    "FIELD_REQUIRED": "您必須填寫此欄位",
+    "AT_LEAST_ONE_OPTION": "請選擇至少一個選項",
+    "MUST_SELECT_YES": "您必須選擇「是」",
+    "VALIDATION_ERROR": "輸入錯誤",
+    "INVALID_PHONE_NUMBER": "無效的電話號碼",
+    "INVALID_EMAIL": "無效的電子郵件"
+  },
+  "SITE": {
+    "NOT_FOUND": "找不到網站。"
+  },
+  "PAYMENT": {
+    "paymentFailed": "付款失敗",
+    "failed": "無法進行下一步。您應該已報名的課程。請直接聯繫教育者。",
+    "back": "返回",
+    "message": "無法處理您的付款。請稍後再試。",
+    "invalidPhone": "*電話號碼無效。請輸入有效的電話號碼。",
+    "creditCardNotActivated": "教育者尚未啟動此付款方式。請嘗試“通過現金或銀行付款”方式。"
+  },
+  "COUPON": {
+    "EXPIRED": "優惠券已過期",
+    "USED_UP": "優惠券已被用完"
+  },
+  "ENROL": {
+    "PLEASE_PICK_CLASS": "請先選擇您的班別。",
+    "CLASS_QUOTA_IS_FULL": "此課程已額滿。請選擇其他課程。",
+    "PLEASE_PICK_STARTING_LESSON": "請先選擇您的課程",
+    "PLEASE_PICK_COURSE": "請再試著報名。",
+    "COURSE_NOT_OPEN": "此課程尚未開放報名。請直接聯繫教育者。",
+    "WORKSHOP_NOT_OPEN": "此工作坊不開放報名。請直接聯繫教育者。",
+    "COURSE_RECRUITMENT_NOT_STARTED": "該課程尚未開始招生。請直接聯繫教育者。",
+    "DATE_PICKED_IS_IN_PAST": "您選擇的開始日期已過去。請選擇其他日期。",
+    "INCORRECT_DATA_FORMAT": "您輸入的資料不正確。請檢查您的輸入或聯繫技術支援。",
+    "RECORDNOTFOUND": "找不到您的報名資料。請聯繫教育者。",
+    "PAYMENT_AMOUNT_TOO_LOW": "教育者設定的付款金額無效。請直接透過下方的按鈕聯繫教育者。",
+    "LESSON_DATE_TIME_BLOCKED": "您選擇的日期無法被預約。請選擇其他日期。",
+    "DUPLICATE_ENROLLMENT": "您已經報名過此課程。請勿重複報名。",
+    "URL_NOT_FOUND": "您輸入的連結無效。請檢查連結後再試一次。",
+    "REGISTRATION_ERROR": "很抱歉，我們在您的註冊過程中遇到了一些錯誤。以下是錯誤訊息：",
+    "CONTACT_SUPPORT": "請注意，您的課程註冊尚未完成。請點擊下方的按鈕聯繫我們的客服告知此狀況，我們將竭盡所能協助您完成註冊程序。"
+  }
+}

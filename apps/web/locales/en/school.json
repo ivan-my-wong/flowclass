@@ -1,0 +1,155 @@
+{
+  "detailPageTitle": "Online Application & Payment Platform",
+  "callToAction": "View all courses",
+
+  "applyNow": "Apply Now",
+  "introduction": "Introduction",
+  "classList": "Classes",
+  "commentList": "Comments",
+  "addComment": "Leave your comment",
+  "noClass": "There is no course yet",
+  "noGallery": "There is no gallery yet",
+  "noComment": "There is no comment yet",
+  "contactCentre": "Contact the Centre",
+  "scanQrCode": "Scan the QR code and contact the centre through Flowclass app",
+  "online": "Online",
+  "loginPrompt": "Please log in before you comment",
+  "commentPrompt": "Only students enrolled in the courses can leave comments. For any enquiries, please contact Flowclass Admin",
+  "recommendedCentres": "Suggested tutorial centres",
+
+  "courseCard": {
+    "nPeopleEnrolledAlready": "Enrolled by {{count}}",
+    "perCourse": "Course   or above",
+    "details": "Browse all details",
+    "ratingNumber": "comments",
+    "canUse75Coupon": "Coupon available",
+    "discount": "Discount"
+  },
+
+  "helperText": {
+    "commentNumber": "comment(s)"
+  },
+
+  "heading": {
+    "basicInfo": "Introduction",
+    "searchTitle": "Relevant tutorial centres",
+    "searchTitleAll": "All tutorial centres on Flowclass",
+    "searchSubtitle": "No. of Results",
+    "providedCourse": "Courses Provided",
+    "gallery": "Gallery",
+    "description": "Introduction",
+    "comments": "Comments",
+    "courses": "Courses",
+    "contact": "Contact Us",
+    "allCourses": "All courses",
+    "allImages": "All images",
+    "": "Home",
+    "home": "Home",
+    "calendar": "Calendar"
+  },
+
+  "gallery": {
+    "all": "All",
+    "environment": "Environment",
+    "student": "Student",
+    "course": "Course Details",
+    "qualification": "Qualifications",
+    "exit": "Exit"
+  },
+  "description": {
+    "SCHOOL_ABOUT_US": "About Us",
+    "SCHOOL_FACILITIES": "Facilities",
+    "SCHOOL_STUDENT_ACHIEVEMENT": "Student Achievement",
+    "SCHOOL_QUALIFICATION": "Qualification",
+    "SCHOOL_STUDENT_LIFE": "Student Life",
+    "SCHOOL_AWARDS": "Awards",
+    "SCHOOL_SUCCESS_STORIES": "Success Stories"
+  },
+  "imageTag": {
+    "all": "All",
+    "environment": "Environment",
+    "student": "Student",
+    "courseReview": "Course Review",
+    "teacherQualification": "Teacher Qualification"
+  },
+  "contact": {
+    "description": "Contact us using any of the following methods. We will get back to you as soon as possible.",
+    "noContactInfo": "This educator has not provided contact information"
+  },
+  "noContent": "No Content",
+  "profile": {
+    "login": "Log In",
+    "logout": "Logout",
+    "save": "Save",
+    "modalTitle": "Access your student profile at {{institutionName}}",
+    "findMyProfile": "Find My Profile",
+    "visitMyProfile": "Visit My Profile",
+    "viewProfile": "View Profile",
+    "continueTheApplication": "Continue the Application",
+    "tryAgain": "Try again",
+    "profileNotEnabled": "Your login session has expired. Please log in again.",
+    "profileFound": "You have successfully logged into your student profile. \n\nYour future applications will be automatically filled with your existing information. You can also access your profile to view all applications, payments, and notifications.",
+    "profileNotFound": "Your password is incorrect or you entered the wrong phone number.\n\nIf needed, please contact the institution to reset your password through {{contactInfo}}.",
+    "phoneNumber": "Phone Number",
+    "email": "Email",
+    "menu": {
+      "upcoming": "Upcoming Lessons",
+      "past": "Past Lessons",
+      "payment": "Payment Records",
+      "notification": "Notification Preferences",
+      "profile": "My Profile",
+      "creditBalance": "Credit Balance",
+      "pendingPayments": "Pending Payments",
+      "paymentHistory": "Payment History",
+      "lessons": "Lessons"
+    },
+    "notification": {
+      "admin_notif_after_enrollment_submitted": "Notify Admin After Enrollment Submitted",
+      "student_notif_after_enrollment_submitted": "Notify Student After Enrollment Submitted",
+      "student_notif_after_payment_approved": "Notify Student After Payment Approved",
+      "student_notif_after_payment_rejected": "Notify Student After Payment Rejected",
+      "student_notif_after_application_confirmed": "Notify Student After Application Confirmed",
+      "teacher_notif_after_application_submitted": "Notify Teacher After Application Submitted",
+      "student_notif_after_add_new_lesson": "Notify Student After Add New Lesson",
+      "teacher_notif_after_add_new_class": "Notify Teacher After Add New Class",
+      "student_notif_payment_reminder": "Notify Student Payment Reminder",
+      "student_notif_after_change_lesson_date": "Notify Student After Change Lesson Date",
+      "student_lesson_reminder": "Student Lesson Reminder",
+      "admin_notif_after_add_new_class": "Notify Admin After Add New Class",
+      "create_invoice": "Notify Student New Invoice Created",
+      "email": "E-mail",
+      "whatsapp": "WhatsApp"
+    },
+    "updateProfile": "Profile updated successfully",
+    "updateNotification": "Notification updated successfully",
+    "paid": "Paid",
+    "unpaid": "Unpaid",
+    "resendPaymentRecord": "Re-send Payment Record",
+    "viewUploadedPaymentProof": "View Uploaded Payment Proof",
+    "successResend": "Payment record has been re-sent",
+    "lesson": "Lesson",
+    "invoiceStatus": {
+      "PENDING": "Pending",
+      "PAID": "Paid",
+      "UNPAID": "Unpaid"
+    },
+    "attendanceStatus": {
+      "ATTENDED": "Attended",
+      "UNATTENDED": "Unattended",
+      "CANCELLED": "Cancelled",
+      "PENDING": "Pending"
+    }
+  },
+  "credit": {
+    "currentBalance": "Current Balance",
+    "creditDescription": "Your available credit and recent activity",
+    "availableCredits": "Available Credits",
+    "creditHistory": "Usage & Change History",
+    "creditHistoryDescription": "Track your credit usage and tops-ups",
+    "date": "Date",
+    "description": "Description",
+    "change": "Change",
+    "balance": "Balance",
+    "loadMore": "Load More"
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "manage": "管理",
+  "save": "儲存",
+  "bankName": "銀行名稱",
+  "accountName": "付款帳戶持有人名稱",
+  "bankAccountName": "銀行帳戶持有人名稱",
+  "accountNumber": "帳號",
+  "iban": "國際銀行帳戶號碼 (IBAN)",
+  "paymentCode": "付款QR碼",
+  "accountId": "帳戶號碼",
+  "paymentDetailsHint": "帳戶號碼 / 手機號碼",
+  "paymentMethodNameHint": "若為銀行轉帳，請輸入支付方式的銀行名稱",
+  "paymentUrl": "付款頁面連結",
+  "description": "付款備註",
+  "receiptRequired": "用戶必須在付款時提供收據?",
+  "delete": "刪除",
+  "create": "註冊新支付方式",
+  "add": "新增支付方式",
+  "enable": "啟用",
+  "paymentMethodName": "支付方式名稱",
+  "instruction": "指示",
+  "customSuccessMessage": "成功訊息",
+  "customSuccessMessagePlaceholder": "寫下學生付款成功時的客製化訊息",
+  "paymentLinkUrlLabel": "付款連結網址",
+  "paymentLinkUrlDesc": "如果每門課程有不同的付款連結，請在課程設定頁面中添加連結。對於沒有個別付款連結的課程，它們將顯示此通用連結。",
+  "instructionPlaceholder": "請將款項支付到以下帳戶：\n銀行名稱：第一國家銀行\n帳戶號碼：12345677\n帳戶名稱：Flowclass 中心",
+  "paymentMethodSettingDescription": "供學生除使用銀行轉帳或數位支付方式外的付款方式。您的支付方式資訊將顯示在學生的支付頁面上，學生將直接支付給您。您需要自行確認收款。",
+  "bankBranch": "銀行分行",
+  "paymentMethod": {
+    "offlinePayment": "離線支付",
+    "": "支付方式",
+    "bankTransfer": "銀行轉帳",
+    "external": "外部",
+    "payme": "Payme",
+    "swift": "Swift",
+    "stripe": "Stripe",
+    "other": "其他"
+  },
+  "tooltip": {
+    "accountName": "帳戶持有人的名稱，通常是個人或公司名稱。",
+    "accountDetails": "學生輸入以識別您並支付給您的用戶名或手機號碼。",
+    "accountUrl": "（可選）您的帳戶支付連結，學生可以掃描該連結來支付給您。",
+    "accountCode": "（可選）學生可以掃描的QR碼以支付給您。"
+  },
+  "deletePayment": {
+    "title": "刪除支付方式",
+    "description": "您確定要刪除此支付方式嗎？"
+  },
+  "confirmManage": {
+    "title": "您確定嗎？",
+    "description": "此操作無法撤銷。這將永久刪除您的帳戶並從我們的伺服器中移除您的資料。"
+  },
+  "managePaymentMethod": "其他支付方式",
+  "noPaymentMethodFound": "無支付方式。請新增一個。",
+  "createSuccess": "您已成功建立支付方式！",
+  "updateSuccess": "您已成功更新支付方式！",
+  "deleteSuccess": "您已成功刪除支付方式！",
+  "required": "此欄位為必填",
+  "updateFailed": "更新支付結算資訊失敗。請檢查您的資訊並重試。",
+  "payoutToggle": {
+    "disableTitle": "停用支付方式",
+    "disableDescription": "您確定要停用此支付方式嗎？停用後，學生在報名課程時將無法看到此付款選項。",
+    "enableTitle": "啟用支付方式",
+    "haveNotConnected": "您尚未連接您的Stripe帳戶。請連接您的Stripe帳戶以啟用此支付方式。",
+    "enableDescription": "您確定要啟用此支付方式嗎？啟用後，學生在報名課程時將能夠看到此付款選項。"
+  },
+  "stripe": {
+    "accountCreated": "您的Stripe Express帳戶已成功建立！",
+    "connectToStripe": "連接到Stripe",
+    "customerAccountCreated": "您的Stripe客戶帳戶已成功建立！",
+    "connectTo": "連接",
+    "onlinePayment": "在線支付 - Stripe"
+  },
+  "paymentInfo": {
+    "title": "使用Stripe進行無縫且安全的付款",
+    "alertMessage": "如果您有Stripe帳戶，請使用相同的電子郵件和密碼登入以跳過啟動流程。",
+    "description": "我們很高興為我們的客戶提供通過Stripe在線支付的便利，Stripe是可用於在線支付的最受信任和安全的支付平台之一。通過與Stripe集成，我們確保您的交易不僅快速，而且受到尖端安全措施的保護。",
+    "benefitDesc": "當您的客戶通過我們的軟體支付給您時，他們將受益於：",
+    "benefitList": {
+      "speed": "速度：快速處理時間意味著您可以更快地收到款項。",
+      "security": "安全性：行業領先的安全功能保護每一筆交易。",
+      "reliable": "可靠性：一個每天處理數百萬筆交易的受信任平台。"
+    },
+    "notes": "請注意，Stripe會從每筆交易中扣除處理費。這些費用涵蓋了提供無縫且安全的支付體驗的相關成本",
+    "setupButton": "開始設置"
+  },
+  "setup": "設置",
+  "helperStripeDashboard": "如需了解有關支付計劃和金額的更多信息，請前往您的Stripe主頁",
+  "goToStripe": "前往Stripe",
+  "goTo": "前往"
+}

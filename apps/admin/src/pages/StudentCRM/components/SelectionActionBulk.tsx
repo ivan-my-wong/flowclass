@@ -1,0 +1,199 @@
+import { useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
+
+import { IRowNode } from 'ag-grid-community'
+import { AnimatePresence } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
+import { FaCheckCircle } from 'react-icons/fa'
+import { IoBook } from 'react-icons/io5'
+import { MdDelete } from 'react-icons/md'
+import { useMutation, useQueryClient } from 'react-query'
+import { useRecoilState } from 'recoil'
+import { toast } from 'sonner'
+
+import ApiError, { handleApiError } from '@/api/errors/apiError'
+import { deleteStudent } from '@/api/student'
+import LoadingButton from '@/components/Buttons/LoadingButton'
+import SelectedActions from '@/components/Cards/SelectedActions'
+import { FEATURE_FLAG } from '@/constants/featureFlags'
+import { QUERY_KEY } from '@/constants/queryKey'
+import useGlobalConfirm from '@/hooks/useGlobalConfirm'
+import { AlertTypes } from '@/reducers/confirm.reducers'
+import { schoolState } from '@/stores/schoolData'
+import { siteState } from '@/stores/siteData'
+import { AddTeachingServiceMode, StudentState } from '@/stores/studentData'
+import {
+  StudentEnrolmentRecord,
+  TypeDeleteStudentParams,
+} from '@/types/student'
+import { BulkAssignCourseType } from '@/types/studentAddTeachingService'
+
+type IProps = {
+  selectedRows: IRowNode<StudentEnrolmentRecord>[]
+  studentData: StudentState
+  setStudentData: (prev: StudentState) => void
+  handleClearSelection: () => void
+}
+
+const SelectionActionBulk = (params: IProps): JSX.Element => {
+  const navigate = useNavigate()
+  const { selectedRows, studentData, setStudentData, handleClearSelection } =
+    params
+
+  const { t } = useTranslation()
+
+  const queryClient = useQueryClient()
+
+  const [schoolData] = useRecoilState(schoolState)
+  const [siteData] = useRecoilState(siteState)
+
+  const currentSchoolId = schoolData.currentSchool?.id || 0
+  const currentSiteId = siteData.currentSite?.id || 0
+
+  const { mutateAsync: handleDelete, isLoading } = useMutation({
+    mutationFn: (params: Partial<TypeDeleteStudentParams>) =>
+      deleteStudent(params),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries([
+        QUERY_KEY.student.studentListNewKey,
+        currentSchoolId,
+      ]) // call API get list
+      await queryClient.invalidateQueries(QUERY_KEY.student.studentListBinKey)
+      toast.success(t('student:detail.deleteStudentSuccess'))
+      setLoading(false)
+      closeConfirm()
+      handleClearSelection()
+    },
+    onError: (error: ApiError) => {
+      handleApiError({ error, t })
+      setLoading(false)
+      closeConfirm()
+    },
+  })
+
+  const isBulkAssignCourseDisabled = useMemo(() => {
+    const MAX_BULK_ASSIGN_LIMIT = 50
+    if (selectedRows.length <= MAX_BULK_ASSIGN_LIMIT) return false
+    if (FEATURE_FLAG.CAN_ASSIGN_MORE_THAN_FIVE_COURSES) return false
+    return true
+  }, [selectedRows])
+
+  const { confirmState, openConfirm, closeConfirm, setLoading } =
+    useGlobalConfirm(isLoading)
+
+  return (
+    <AnimatePresence>
+      {selectedRows.length > 0 && (
+        <div className="box-row-full gap-2 px-4 mt-4">
+          <SelectedActions
+            countText={t('student:paymentProof.selectedRecords')}
+            onClearSelection={handleClearSelection}
+            selectedCount={selectedRows.length}
+            rightComponent={
+              <div className="box-responsive-full w-fit justify-end">
+                <LoadingButton
+                  variant="destructive"
+                  iconBefore={<MdDelete size={20} />}
+                  dataTestId="delete-student-bulk"
+                  onClick={() => {
+                    confirmState.content = {
+                      title: t('student:modalDeleteStudent:title') || '',
+                      description:
+                        t('student:modalDeleteStudent:description') || '',
+                      confirmText: t('common:action:confirm') || '',
+                      onConfirm: () => {
+                        confirmState.content.loading = true
+                        handleDelete({
+                          institutionId: Number(currentSchoolId),
+                          siteId: currentSiteId,
+                          userAliasIds: selectedRows.map(
+                            row => row.data?.id ?? 0
+                          ),
+                        })
+                      },
+                      cancelText: t('common:action.cancel') || '',
+                      alertType: AlertTypes.WARN,
+                    }
+                    openConfirm()
+                  }}
+                  disabled={isLoading}
+                  isLoading={isLoading}
+                  color="warn"
+                >
+                  {t('common:action.delete')}
+                </LoadingButton>
+                <LoadingButton
+                  iconBefore={<FaCheckCircle size={18} />}
+                  variant="primary-outline"
+                  onClick={() => {
+                    setStudentData({
+                      ...studentData,
+                      currentEnrolId: null,
+                      tableDrawers: {
+                        ...studentData.tableDrawers,
+                        isOpenAssignCourse: true,
+                        bulkAssignCourse: selectedRows
+                          .map(row => {
+                            if (!row.data) return null
+                            const { id, email, userId, user, name } = row.data
+
+                            return {
+                              userId,
+                              userAliasId: id,
+                              email,
+                              phone: user?.phone,
+                              name,
+                            } as BulkAssignCourseType
+                          })
+                          .filter(
+                            item => item !== null
+                          ) as BulkAssignCourseType[],
+                        assignCourseMode:
+                          AddTeachingServiceMode.addCourseDirectly,
+                      },
+                    })
+                  }}
+                  disabled={isBulkAssignCourseDisabled}
+                  isLoading={false}
+                >
+                  {t('student:button.assignCourse')}
+                </LoadingButton>
+                <LoadingButton
+                  iconBefore={<IoBook />}
+                  isLoading={false}
+                  onClick={() => {
+                    const studentIds = selectedRows
+                      .map(row => {
+                        if (!row.data) return null
+                        return row.data.id
+                      })
+                      .filter(item => item !== null)
+                      .sort((a, b) => {
+                        if (!!a && !!b) return a - b
+                        return 0
+                      })
+                    navigate(
+                      `/invoice-templates/editor?studentIds=${studentIds.join(
+                        ','
+                      )}`
+                    )
+                  }}
+                >
+                  {t('student:button.assignInvoice')}
+                </LoadingButton>
+
+                {isBulkAssignCourseDisabled && (
+                  <p className="text-sm max-w-64">
+                    {t('student:button.cannotAssignMoreThanFiveCourses')}
+                  </p>
+                )}
+              </div>
+            }
+          />
+        </div>
+      )}
+    </AnimatePresence>
+  )
+}
+
+export default SelectionActionBulk

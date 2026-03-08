@@ -1,0 +1,14 @@
+{
+  "searchCourse": "Search Event",
+  "selectorNoOptions": "Please select the category for event search.",
+  "searchByKeywords": "Please select category keywords for event search.",
+  "courseDetailCard": {
+    "perLesson": "per time slot",
+    "forEntire": "for entire event",
+    "classSize": "participants per event",
+    "minutesPerClass": "minutes per event",
+    "earliestLesson": "Start at",
+    "freeLesson": "Offers free event",
+    "more": "more"
+  }
+}

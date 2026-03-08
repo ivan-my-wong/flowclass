@@ -1,0 +1,102 @@
+{
+  "events": {
+    "eventsForDay": "事件列表"
+  },
+  "sidebar": {
+    "showOnlyClassesWithApplications": "只顯示有申請的課程",
+    "filterByCourseAndClass": "按課程和班級過濾",
+    "searchByStudent": "按學生搜索",
+    "filterByDate": "按日期過濾",
+    "filterByLocation": "按位置過濾",
+    "filterByTeacher": "按教師過濾"
+  },
+  "label": {
+    "day": "天",
+    "nDays": "N天",
+    "week": "週",
+    "month": "月",
+    "year": "年",
+    "schedule": "日程"
+  },
+  "days": {
+    "Today": "今天",
+    "Sunday": "星期日",
+    "Monday": "星期一",
+    "Tuesday": "星期二",
+    "Wednesday": "星期三",
+    "Thursday": "星期四",
+    "Friday": "星期五",
+    "Saturday": "星期六",
+    "Sun": "日",
+    "Mon": "一",
+    "Tue": "二",
+    "Wed": "三",
+    "Thu": "四",
+    "Fri": "五",
+    "Sat": "六"
+  },
+  "time": {
+    "AM": "上午",
+    "PM": "下午"
+  },
+  "months": {
+    "January": "一月",
+    "February": "二月",
+    "March": "三月",
+    "April": "四月",
+    "May": "五月",
+    "June": "六月",
+    "July": "七月",
+    "August": "八月",
+    "September": "九月",
+    "October": "十月",
+    "November": "十一月",
+    "December": "十二月",
+    "Jan": "一月",
+    "Feb": "二月",
+    "Mar": "三月",
+    "Apr": "四月",
+    "Jun": "六月",
+    "Jul": "七月",
+    "Aug": "八月",
+    "Sep": "九月",
+    "Oct": "十月",
+    "Nov": "十一月",
+    "Dec": "十二月"
+  },
+  "errors": {
+    "exceedDayLimit": "最多允許31天",
+    "onlyPositiveNumber": "請輸入正數"
+  },
+  "checkConflict": {
+    "title": "檢查衝突"
+  },
+  "showUnpaid": "顯示未付款",
+  "legend": {
+    "available": "可用",
+    "limited": "有限",
+    "full": "已滿",
+    "leftDot": "左點: 課程",
+    "rightDot": "右點: 地點"
+  },
+  "attendance": {
+    "loading": "載入中…",
+    "quota": "學生限額:",
+    "recorded": "已記錄出席:"
+  },
+  "indicator": {
+    "title": "線條顏色說明:",
+    "gray": {
+      "title": "灰色",
+      "description": "所有學生都處於「待處理」狀態（尚未點名) "
+    },
+    "yellow": {
+      "title": "黃色",
+      "description": "至少有一位學生的狀態不是「待處理」（部分已點名) "
+    },
+    "green": {
+      "title": "綠色",
+      "description": "所有學生的狀態都不是「待處理」（已全部點名完成) "
+    }
+  }
+}

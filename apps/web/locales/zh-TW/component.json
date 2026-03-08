@@ -1,0 +1,53 @@
+{
+  "select": {
+    "section": "選擇部分",
+    "placeholder": "請選擇"
+  },
+  "footer": {
+    "email": "電子郵件",
+    "address": "地址",
+    "socialMedia": "社交媒體",
+    "contactUs": "聯絡我們",
+    "phone": "電話",
+    "copyright": " 版權所有 ©",
+    "slogan": "一起擴大教育版圖 © Flowsophic Limited",
+    "currency": "除非特別指明，本網站上所有價格均結算為",
+    "timeZone": "本網站顯示的所有日期和時間均使用時區為"
+  },
+  "colorPicker": {
+    "error": "您選擇的顏色無效"
+  },
+  "ImageUpload": {
+    "title": "選擇要上傳的圖片",
+    "uploadImage": "上傳圖片",
+    "cropImage": "裁剪圖片",
+    "finishCrop": "完成裁剪",
+    "pleaseUpload": "請上傳一張圖片",
+    "wrongFormat": "圖片格式錯誤",
+    "error": "錯誤，請重新上傳圖片",
+    "noImage": "沒有圖片",
+    "confirm": "確認",
+    "cancel": "取消",
+    "uploadSuccess": "圖片上傳成功",
+    "cropImageTips": "你可以拖放方框來重新定位，或調整大小以調整圖片的尺寸"
+  },
+  "template": {
+    "details": "詳細",
+    "allCourses": "所有課程",
+    "allEvents": "所有活動"
+  },
+  "filterTagSidebar": {
+    "filter": "搜尋篩選",
+    "reset": "重設",
+    "apply": "應用"
+  },
+  "calendar": {
+    "noEvents": "沒有活動",
+    "today": "今天",
+    "viewByWeek": "按週查看",
+    "viewByList": "按列表查看"
+  },
+  "inAppBrowser": {
+    "navigatingToAnotherDomain": "您正在前往另一個網域"
+  }
+}

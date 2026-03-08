@@ -1,0 +1,74 @@
+{
+  "notificationLogs": {
+    "title": "Notification Logs",
+    "description": "This page shows the logs of all the notifications sent to the users.",
+    "tableHeaders": {
+      "action": "Action",
+      "notificationType": "Notification Type",
+      "automationFlow": "Automation Flow",
+      "whatsappTemplate": "Whatsapp Template",
+      "associatedClass": "Associated Class",
+      "notificationMessage": "Notification Message",
+      "recipientUserEmail": "Recipient User Email",
+      "recipientUserPhone": "Recipient User Phone",
+      "messageSent": "Message Sent",
+      "status": "Status",
+      "sentAt": "Sent At"
+    },
+    "notificationTypes": {
+      "CONFIRM_PAYMENT": "Confirmation of payment received",
+      "REJECT_PAYMENT": "Notification of payment rejection",
+      "REMINDER": "To applicant: Reminder for an upcoming event or due action",
+      "APPLICATION": "Update on your application status",
+      "FORGET_PASSWORD": "Instructions for resetting your forgotten password",
+      "INVITATION": "Invitation to join a course, event, or platform",
+      "LESSON_POSTPONE": "Notification of a postponed lesson",
+      "ASSIGN_COURSE": "To applicant: Notification of being assigned to a new course",
+      "OTHERS": "Other miscellaneous notifications",
+      "WAITING_FOR_PAYMENT": "To applicant: Waiting for payment",
+      "ENROLLED_IN_COURSE": "To applicant: Enrolled in course",
+      "RECEIVED_COUPON": "To applicant: Received coupon",
+      "UPDATE_ON_COURSE_STATUS": "To applicant: Update on course status",
+      "APPLIED_FOR_COURSE": "To applicant: Applied for course",
+      "STUDENT_REGISTERED": "To admin: Student registered",
+      "STUDENT_PAID": "To admin: Student paid",
+      "STUDENT_QUESTION": "To admin: Student question",
+      "STUDENT_ANSWER": "To admin: Student answer",
+      "REQUEST_TIME_CHANGE_PENDING": "To admin: Request time change pending",
+      "REQUEST_TIME_CHANGE_APPROVED": "To admin: Request time change approved",
+      "REQUEST_TIME_CHANGE_REJECTED": "To admin: Request time change rejected"
+    },
+    "bannerCards": {
+      "sentOnEmail": "Messages Sent on Email",
+      "sentOnWhatsApp": "Messages Sent on WhatsApp",
+      "timeSaved": "Estimated Time Saved",
+      "SinceLastMonth": "Since Previous Period"
+    },
+    "notificationChannels": {
+      "EMAIL": "Email",
+      "WHATSAPP": "WhatsApp"
+    },
+    "notificationStatuses": {
+      "null": "",
+      "SENT": "Success",
+      "SUCCESS": "Success",
+      "QUEUED": "In Queue",
+      "FAILED": "Failed"
+    },
+    "selectLabels": {
+      "selectStudent": "All Student",
+      "selectNotificationChannel": "All channel",
+      "selectNotificationType": "All Notification Type",
+      "selectNotificationStatus": "All status",
+      "selectWhatsappTemplateOptions": "All Whatsapp Templates",
+      "selectAutomationFlowOptions": "All Automation Flows",
+      "reset": "Reset"
+    },
+    "growthRate": {
+      "NA": "N/A"
+    },
+    "cell": {
+      "view": "View"
+    }
+  }
+}

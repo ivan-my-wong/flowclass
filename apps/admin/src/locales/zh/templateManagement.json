@@ -1,0 +1,52 @@
+{
+  "buttons": {
+    "import": "匯入",
+    "newDocument": "新建文件",
+    "edit": "編輯",
+    "delete": "刪除",
+    "preview": "預覽",
+    "saveTemplate": "儲存範本",
+    "select": "選擇",
+    "campaignsList": "活動列表",
+    "createNew": "建立新範本"
+  },
+  "usedInCampaigns": "已用於活動",
+  "certificateTemplatesEditor": "證書範本編輯器",
+  "bulkDocumentSender": "批量發送文件",
+  "empty": {
+    "noTemplatesFound": "未找到證書範本。建立您的第一個範本以開始使用！"
+  },
+  "success": {
+    "createTemplate": "範本建立成功。",
+    "updateTemplate": "範本更新成功。",
+    "deleteTemplate": "範本刪除成功。",
+    "createBulkSendDocument": "文件發送成功。",
+    "updateBulkSendDocument": "文件更新成功。",
+    "deleteBulkSendDocument": "文件刪除成功。",
+    "resendDocumentCampaign": "文件重新發送成功。"
+  },
+  "errors": {
+    "createTemplate": "範本建立失敗。",
+    "updateTemplate": "範本更新失敗。",
+    "deleteTemplate": "範本刪除失敗。",
+    "imageIsEmpty": "請先新增圖片範本！",
+    "mandatoryFieldMissing": "請填寫所有必填欄位！",
+    "createBulkSendDocument": "文件發送失敗。",
+    "updateBulkSendDocument": "文件更新失敗。",
+    "deleteBulkSendDocument": "文件刪除失敗。",
+    "resendDocumentCampaign": "文件重新發送失敗。"
+  },
+  "dialog": {
+    "titleDeleteDialog": "刪除範本",
+    "descriptionDeleteTemplate": "確定要刪除此範本嗎？",
+    "selectedRecords": "已選記錄"
+  },
+  "recipientsList": {
+    "viewRecipients": "查看學生",
+    "campaignRecipients": "發票學生",
+    "template": "範本：",
+    "noRecipientsAvailable": "沒有可用的學生。",
+    "resending": "重新發送中...",
+    "resend": "重新發送"
+  }
+}

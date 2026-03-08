@@ -1,0 +1,19 @@
+{
+  "selectCourseAndClassFirst": "請先選擇課程和班級以查看出席表。",
+  "totalStudents": "學生總數",
+  "avgAttendance": "平均出席率",
+  "attendanceGrid": "出席格",
+  "descriptionAttendanceGrid": "點擊任意格查看詳細資訊",
+  "students": "學生",
+  "calculatedAttended": "{{attended}}/{{total}} 已記錄",
+  "changeTo": "更改為",
+  "status": {
+    "present": "出席",
+    "absent": "缺席",
+    "pending": "待定",
+    "postponed": "延期",
+    "cancelled": "取消"
+  },
+  "tooltipUnpaid": "付款狀態為 {{paymentState}}",
+  "noLessonsInThisClass": "此班級尚無排定課堂。"
+}

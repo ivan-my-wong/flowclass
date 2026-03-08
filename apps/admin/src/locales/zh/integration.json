@@ -1,0 +1,202 @@
+{
+  "title": "集成",
+  "connectionLogs": "連接日誌",
+  "active": "已激活",
+  "inactive": "未激活",
+  "needsReconnection": "需要重新連接",
+  "notAvailable": "不可用",
+  "reconnect": "重新連接",
+  "configure": "配置",
+  "disconnect": "斷開連接",
+  "setUp": "設置",
+  "logoAlt": "{{name}} 圖標",
+  "providers": {
+    "googleCalendar": "Google Calendar"
+  },
+  "common": {
+    "errorTitle": "錯誤",
+    "next": "下一步",
+    "disconnectSuccess": "{{service}} 已成功斷開連接。",
+    "errors": {
+      "getAuthUrlFailed": "無法獲取驗證 URL：{{error}}",
+      "disconnectFailed": "斷開 {{service}} 失敗：{{error}}",
+      "googleCredential": "無法獲取 Google 憑證。"
+    }
+  },
+  "types": {
+    "all": "所有集成",
+    "payment": "支付",
+    "videoConferencing": "視頻會議",
+    "calendar": "日歷",
+    "communication": "通信",
+    "storage": "存儲",
+    "analytics": "分析"
+  },
+  "descriptions": {
+    "stripe": "使用Stripe安全支付網關處理在線支付、訂閱和管理賬單。",
+    "twilioWhatsapp": "通過WhatsApp向學生發送自動消息和通知。",
+    "googleCalendar": "連接您的Google日曆，自動檢測並導入可用時間段。",
+    "googleMeet": "為線上課程和會議創建和管理Google Meet視訊會議。",
+    "googleSheet": "將您的 Flowclass 數據與 Google 表格同步，以便進行報告和分析。",
+    "googleDrive": "將文檔和課程材料與 Google 雲端硬碟同步，以實現流暢的文件管理。"
+  },
+  "googleCalendar": {
+    "name": "Google 日曆",
+    "connectGoogleCalendar": "連接 Google 日曆",
+    "refresh": "刷新",
+    "selectCalendar": "選擇日曆",
+    "noCalendarsFound": "未找到日曆",
+    "noIntegrationCalendars": "未找到日曆連接。請先連接您的 Google 日曆。",
+    "primary": "主要",
+    "selected": "已選擇",
+    "saveSelection": "保存選擇",
+    "owner": "擁有者",
+    "writer": "編輯者",
+    "reader": "閱讀者"
+  },
+  "googleSheet": {
+    "name": "Google 表格",
+    "step1": {
+      "connectTitle": "連接到 Google 雲端硬碟",
+      "connectDescription": "关联您的 Google 帐户以创建电子表格并自动同步您的 Flowclass 数据。",
+      "googleAccountLabel": "Google 帳戶",
+      "chooseAccountDescription": "選擇一個 Google 帳戶用於創建和同步您的數據：",
+      "redirectingToGoogle": "正在重定向到 Google...",
+      "signInWithGoogle": "使用 Google 登錄",
+      "errorAuthUrl": "無法獲取 Google 身份驗證 URL。",
+      "errorSignInFailed": "啟動 Google 登錄失敗。請重試。",
+      "connectedAccountLabel": "已連接帳戶：",
+      "disconnecting": "正在斷開連接...",
+      "errorDisconnectFailed": "斷開 Google 帳戶失敗。請重試。"
+    },
+    "createSuccess": "Google 表格已成功創建/更新。",
+    "updateConfigSuccess": "Google 表格配置已成功更新。",
+    "errors": {
+      "createFailed": "創建/更新 Google 表格失敗：{{error}}",
+      "updateConfigFailed": "更新 Google 表格配置失敗：{{error}}"
+    }
+  },
+  "googleDrive": {
+    "title": "Google 雲端硬碟連接",
+    "description": "配置您的 Google 雲端硬碟連接以實現流暢的文件管理",
+    "name": "Google 雲端硬碟",
+    "connectGoogleDrive": "連接 Google 雲端硬碟",
+    "refresh": "刷新",
+    "selectFolder": "選擇資料夾",
+    "noFoldersFound": "未找到資料夾",
+    "noIntegrationFolders": "未找到資料夾連接。請先連接您的 Google 雲端硬碟。",
+    "selected": "已選擇",
+    "saveSelection": "保存選擇",
+    "folderPath": "資料夾路徑",
+    "createFolder": "創建資料夾",
+    "newFolderName": "新資料夾名稱",
+    "createSuccess": "Google 雲端硬碟資料夾已成功創建/更新。",
+    "updateConfigSuccess": "Google 雲端硬碟配置已成功更新。",
+    "colorLegend": "顏色說明",
+    "permissions": {
+      "title": "Required Permissions:",
+      "createFolder": "創建和管理資料夾",
+      "upload": "上傳和組織檔案"
+    },
+    "errors": {
+      "createFailed": "創建/更新 Google 雲端硬碟資料夾失敗：{{error}}",
+      "updateConfigFailed": "更新 Google 雲端硬碟配置失敗：{{error}}"
+    },
+    "account": {
+      "title": "Google 帳戶身份驗證",
+      "description": "連接您的 Google 帳戶以啟用雲端硬碟集成，並獲得最低所需的權限",
+      "connectSuccess": "成功驗證 Google 帳戶。",
+      "button": "使用 Google 帳戶驗證",
+      "noAccount": "未連接 Google 帳戶",
+      "disconnectSuccess": "成功斷開 Google 雲端硬碟連接。",
+      "disconnectFailed": "斷開 Google 雲端硬碟連接失敗：{{error}}"
+    },
+    "rootFolder": {
+      "title": "根資料夾選擇",
+      "description": "選擇根資料夾，所有教育材料將存儲在該資料夾中。請注意，一旦選擇，根資料夾將無法更改。",
+      "warning": "一旦選擇了根資料夾，它將無法更改。更改資料夾可能導致資料和連結的損失或無法存取。請謹慎選擇，這是一個不可逆的操作。",
+      "button": "從 Google 雲端硬碟選擇根資料夾",
+      "loading": "載入資料夾...",
+      "error": "載入資料夾失敗：{{error}}",
+      "noFoldersFound": "未找到資料夾",
+      "noIntegrationFolders": "未找到資料夾連接。請先連接您的 Google 雲端硬碟。",
+      "selected": "已選擇",
+      "saveSelection": "保存選擇",
+      "settingLoading": "設定根資料夾...",
+      "settingLoadingDescription": "這可能需要一些時間，直到我們配置您的資料夾結構",
+      "noFolderSelected": "未選擇資料夾",
+      "noFolderSelectedDescription": "請選擇一個根資料夾繼續。",
+      "select": "選擇",
+      "quotaUnavailable": "配額不可用",
+      "quotaError": "您的 Google 雲端硬碟配額不夠創建根資料夾。請嘗試使用較小的檔案大小或選擇不同的資料夾。",
+      "used": "已使用",
+      "remaining": "剩餘",
+      "total": "總計",
+      "changeFolder": "更改資料夾",
+      "accessValidation": "存取驗證 :",
+      "writeVerified": "寫入存取已驗證"
+    },
+    "suggestedFolders": {
+      "title": "建議的資料夾名稱",
+      "description": "為了更好地組織您的 Flowclass 文件，建議使用以下資料夾名稱："
+    },
+    "callback": {
+      "processing": "正在處理連接…",
+      "processingDescription": "正在完成您的 Google 驗證並更新配置。",
+      "success": "Google 雲端硬碟連接成功！",
+      "successTitle": "連接成功",
+      "successDescription": "我們已連接您的帳戶並更新了整合狀態。",
+      "error": "處理 Google 雲端硬碟連接失敗：{{error}}",
+      "errorTitle": "連接失敗",
+      "redirecting": "稍後將自動重定向…",
+      "loading": "載入中…",
+      "preparing": "正在準備您的整合…"
+    }
+  },
+  "availability": {
+    "integrationCalendared": "Google 日曆連接成功！",
+    "eventCreated": "日曆事件已成功創建。",
+    "eventUpdated": "日曆事件已成功更新。",
+    "eventDeleted": "日曆事件已成功刪除。",
+    "errors": {
+      "connectCalendar": "連接 Google 日曆失敗",
+      "fetchIntegrationCalendars": "獲取日曆連接失敗",
+      "fetchCalendarEvents": "獲取日曆事件失敗",
+      "fetchCalendarEvent": "獲取日曆事件詳情失敗",
+      "createEventFailed": "創建日曆事件失敗：{{error}}",
+      "updateEventFailed": "更新日曆事件失敗：{{error}}",
+      "deleteEventFailed": "刪除日曆事件失敗：{{error}}"
+    }
+  },
+  "onlineMeeting": {
+    "name": "Google Meet",
+    "connectGoogleMeet": "連接 Google Meet",
+    "refresh": "刷新",
+    "createMeeting": "創建會議",
+    "meetingTitle": "會議標題",
+    "meetingDescription": "會議描述",
+    "startTime": "開始時間",
+    "endTime": "結束時間",
+    "timeZone": "時區",
+    "generateLink": "生成鏈接",
+    "copyLink": "複製鏈接",
+    "linkCopied": "鏈接已複製到剪貼板",
+    "noMeetingsFound": "未找到會議",
+    "noIntegrationMeetings": "未找到會議連接。請先連接您的 Google Meet。",
+    "integrationConnected": "Google Meet 連接成功！",
+    "statusToggled": "整合狀態更新成功",
+    "meetingCreated": "會議創建成功",
+    "meetingUpdated": "會議更新成功",
+    "meetingDeleted": "會議刪除成功",
+    "errors": {
+      "connectOnlineMeeting": "連接 Google Meet 失敗",
+      "fetchIntegrationOnlineMeetings": "獲取會議連接失敗",
+      "fetchMeetings": "獲取會議失敗",
+      "fetchMeeting": "獲取會議詳情失敗",
+      "createMeeting": "創建會議失敗",
+      "updateMeeting": "更新會議失敗",
+      "deleteMeeting": "刪除會議失敗",
+      "toggleStatus": "更新整合狀態失敗"
+    }
+  }
+}

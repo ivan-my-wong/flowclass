@@ -1,0 +1,49 @@
+{
+  "locations": {
+    "title": "地點",
+    "addLocation": "新增地點",
+    "name": "名稱",
+    "capacity": "容納人數",
+    "description": "描述",
+    "address": "地址",
+    "equipment": "設備",
+    "locationGroup": "地點分組",
+    "searchByLocationName": "按地點名稱搜尋...",
+    "searchByCapacity": "按容納人數搜尋...",
+    "searchByLocationGroup": "按地點分組搜尋...",
+    "searchByEquipment": "按設備搜尋...",
+    "action": "操作"
+  },
+  "form": {
+    "newLocation": "新增地點",
+    "updateLocation": "更新地點",
+    "saveAction": "儲存",
+    "cancelAction": "取消",
+    "name": "名稱",
+    "namePlaceholder": "輸入地點名稱",
+    "capacity": "容納人數",
+    "capacityPlaceholder": "輸入容納人數",
+    "description": "描述",
+    "descriptionPlaceholder": "輸入描述",
+    "equipment": "設備",
+    "equipmentPlaceholder": "請選擇或新增設備",
+    "locationGroup": "地點分組",
+    "locationGroupPlaceholder": "請選擇或新增地點分組",
+    "locationOnMap": "地圖上的位置",
+    "locationOnMapPlaceholder": "在地圖上搜尋位置"
+  },
+  "messages": {
+    "createLocationSuccess": "地點創建成功",
+    "updateLocationSuccess": "地點更新成功",
+    "deleteLocationSuccess": "地點刪除成功",
+    "createLocationError": "創建地點失敗",
+    "updateLocationError": "更新地點失敗",
+    "deleteLocationError": "刪除地點失敗"
+  },
+  "confirm": {
+    "deleteLocation": "刪除地點",
+    "deleteLocationDescription": "您確定要刪除此地點嗎？",
+    "deleteLocationConfirm": "刪除",
+    "deleteLocationCancel": "取消"
+  }
+}

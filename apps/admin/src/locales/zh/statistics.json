@@ -1,0 +1,73 @@
+{
+  "common": {
+    "actions": "操作",
+    "activeStudents": "活躍學生",
+    "averageScore": "平均分數",
+    "class": "課堂",
+    "course": "課程",
+    "courseCompletion": "課程完成率",
+    "date": "日期",
+    "email": "電子郵件",
+    "inactiveStudents": "非活躍學生",
+    "instructor": "導師",
+    "lesson": "課程",
+    "loading": "加載中...",
+    "name": "姓名",
+    "noInstructorSelected": "無導師",
+    "noLessonsFound": "未找到課堂",
+    "phone": "電話",
+    "selectClass": "選擇課堂",
+    "selectLesson": "選擇課堂",
+    "selectStatus": "選擇狀態",
+    "statistics": "統計",
+    "status": "狀態",
+    "studentGrowth": "學生增長",
+    "students": "學生",
+    "teacher": "教師",
+    "time": "時間",
+    "totalStudents": "學生總數"
+  },
+  "invoices": {
+    "activeStudents": "活躍學生",
+    "attendanceStatus": "出席狀況",
+    "averageInvoiceValue": "平均發票金額",
+    "completedLessons": "已完成課堂",
+    "creditApplied": "已使用積分",
+    "netPayments": "淨付款",
+    "overdueInvoices": "逾期發票",
+    "paidInvoices": "已付款發票",
+    "paymentStatus": "付款狀況",
+    "revenueGenerated": "產生收入",
+    "searchByStudentName": "按學生姓名搜尋",
+    "studentPaymentsForLessons": "學生課堂付款",
+    "totalInvoices": "發票總數",
+    "totalLessonValue": "課堂總金額",
+    "totalRevenue": "總收入",
+    "unpaidInvoices": "未付款發票"
+  },
+  "revenue": {
+    "noClassData": "無可用課堂數據",
+    "noCourseData": "無可用課程數據",
+    "noInstructorData": "無可用導師數據",
+    "noStudentData": "無可用學生數據"
+  },
+  "status": {
+    "canceled": "已取消",
+    "cancelled": "已取消",
+    "completed": "已完成",
+    "inProgress": "進行中",
+    "notStarted": "未開始",
+    "scheduled": "已排程"
+  },
+  "student": {
+    "activeStudents": "活躍學生",
+    "dropoutRate": "退學率",
+    "dropoutStudents": "退學學生",
+    "dropoutThisMonth": "本月退學人數",
+    "lastAttendance": "最後出席日期",
+    "monthlyDropoutRates": "每月退學率",
+    "newStudentsThisMonth": "本月新學生",
+    "totalDropouts": "總退學人數",
+    "totalStudents": "學生總數"
+  }
+}

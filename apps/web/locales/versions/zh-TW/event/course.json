@@ -1,0 +1,14 @@
+{
+  "searchCourse": "搜尋活動",
+  "selectorNoOptions": "請選擇活動類型",
+  "searchByKeywords": "請選擇活動關鍵字",
+  "courseDetailCard": {
+    "perLesson": "每時段",
+    "forEntire": "整個活動",
+    "classSize": "每個活動參與人數",
+    "minutesPerClass": "每個活動時長",
+    "earliestLesson": "最早活動開始於",
+    "freeLesson": "提供免費活動",
+    "more": "更多"
+  }
+}

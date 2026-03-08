@@ -1,0 +1,19 @@
+{
+  "selectCourseAndClassFirst": "Please select a course and class to view the attendance sheet.",
+  "totalStudents": "Total Students",
+  "avgAttendance": "Avg Attendance",
+  "attendanceGrid": "Attendance Grid",
+  "descriptionAttendanceGrid": "Click on any cell to view detailed information",
+  "students": "Students",
+  "calculatedAttended": "{{attended}}/{{total}} attended",
+  "changeTo": "Change to",
+  "status": {
+    "present": "Present",
+    "absent": "Absent",
+    "pending": "Pending",
+    "postponed": "Postponed",
+    "cancelled": "Cancelled"
+  },
+  "tooltipUnpaid": "The payment status is {{paymentState}}",
+  "noLessonsInThisClass": "There are no lessons scheduled for this class."
+}

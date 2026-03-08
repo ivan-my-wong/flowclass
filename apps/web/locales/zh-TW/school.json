@@ -1,0 +1,158 @@
+{
+  "detailPageTitle": "網上報名及學費平台",
+  "callToAction": "立即瞭解課程",
+
+  "applyNow": "立即報名",
+  "introduction": "簡介",
+  "classList": "課程",
+  "commentList": "評論",
+  "addComment": "留下你的評論",
+  "noClass": "暫無課程",
+  "noGallery": "暫無圖片",
+  "noComment": "暫無評論",
+  "contactCentre": "聯繫中心",
+  "scanQrCode": "掃描QR碼，通過Flowclass應用程式聯繫中心",
+  "online": "線上",
+  "loginPrompt": "請先登錄再發表評論",
+  "commentPrompt": "只有參加課程的學生可以發表評論。如有任何問題，請聯繫Flowclass管理員",
+  "recommendedCentres": "推薦的教學中心",
+
+  "courseCard": {
+    "nPeopleEnrolledAlready": "已有{{count}}人報名",
+    "perCourse": "每門課程或以上",
+    "details": "瀏覽所有詳情",
+    "ratingNumber": "評論",
+    "canUse75Coupon": "可使用優惠券",
+    "discount": "折扣"
+  },
+
+  "helperText": {
+    "commentNumber": "評論"
+  },
+
+  "heading": {
+    "basicInfo": "簡介",
+    "searchTitle": "相關教學中心",
+    "searchTitleAll": "Flowclass上的所有教學中心",
+    "searchSubtitle": "結果數量",
+    "providedCourse": "提供的課程",
+    "gallery": "圖片集",
+    "description": "簡介",
+    "comments": "評論",
+    "courses": "課程",
+    "contact": "聯繫我們",
+    "allCourses": "所有課程",
+    "allImages": "所有圖片",
+    "": "主頁",
+    "home": "主頁",
+    "calendar": "行事曆"
+  },
+
+  "gallery": {
+    "all": "全部",
+    "environment": "環境",
+    "student": "學生",
+    "course": "課程詳情",
+    "qualification": "資格",
+    "exit": "退出"
+  },
+  "description": {
+    "SCHOOL_ABOUT_US": "關於我們",
+    "SCHOOL_FACILITIES": "設施",
+    "SCHOOL_STUDENT_ACHIEVEMENT": "學生成就",
+    "SCHOOL_QUALIFICATION": "資格",
+    "SCHOOL_STUDENT_LIFE": "學生生活",
+    "SCHOOL_AWARDS": "獎項",
+    "SCHOOL_SUCCESS_STORIES": "成功故事"
+  },
+  "imageTag": {
+    "all": "全部",
+    "environment": "環境",
+    "student": "學生",
+    "courseReview": "課程評論",
+    "teacherQualification": "教師資格"
+  },
+  "contact": {
+    "description": "請使用以下任何方式與我們聯繫。我們將盡快回覆您。",
+    "noContactInfo": "暫無聯繫資訊"
+  },
+  "noContent": "暫無內容",
+  "profile": {
+    "login": "登入",
+    "logout": "登出",
+    "save": "儲存",
+    "modalTitle": "查看您在{{institutionName}}的學生檔案",
+    "findMyProfile": "尋找我的檔案",
+    "visitMyProfile": "查看我的檔案",
+    "viewProfile": "查看檔案",
+    "continueTheApplication": "繼續申請",
+    "tryAgain": "重試",
+    "profileNotEnabled": "您的登入已過期。請重新登入。",
+    "profileFound": "您已成功登入您的學生檔案。\n\n未來的申請將會自動填入您現有的資料。\n\n您也可以查看您的檔案以檢視所有申請、付款和通知設定。",
+    "profileNotFound": "您的密碼不正確，或您輸入了錯誤的手機號碼。\n\n如有需要，請聯絡機構透過 {{contactInfo}} 重設您的密碼。",
+    "phoneNumber": "電話號碼",
+    "email": "電郵",
+    "menu": {
+      "upcoming": "即將到來的課程",
+      "past": "過往課程",
+      "payment": "付款紀錄",
+      "notification": "通知設定",
+      "profile": "我的檔案",
+      "creditBalance": "積分",
+      "pendingPayments": "待付款",
+      "paymentHistory": "付款紀錄",
+      "lessons": "課堂"
+    },
+    "notification": {
+      "admin_notif_after_enrollment_submitted": "通知管理員在學生提交申請後",
+      "student_notif_after_enrollment_submitted": "通知學生在學生提交申請後",
+      "student_notif_after_payment_approved": "通知學生在付款獲批後",
+      "student_notif_after_payment_rejected": "通知學生在付款被拒絕後",
+      "student_notif_after_application_confirmed": "通知學生在申請獲批後",
+      "teacher_notif_after_application_submitted": "通知教師在申請提交後",
+      "student_notif_after_add_new_lesson": "通知學生在新增課程後",
+      "teacher_notif_after_add_new_class": "通知教師在新增課程後",
+      "student_notif_payment_reminder": "通知學生在付款提醒後",
+      "student_notif_after_change_lesson_date": "通知學生在更改課程日期後",
+      "student_lesson_reminder": "課程提醒",
+      "admin_notif_after_add_new_class": "通知管理員在新增課程後",
+      "create_invoice": "通知學生在新增發票後",
+
+      "paymentReminder": "付款提醒",
+      "lessonReminder": "課程提醒",
+      "email": "電子郵件",
+      "whatsapp": "WhatsApp"
+    },
+    "updateProfile": "檔案更新成功",
+    "updateNotification": "通知設定更新成功",
+    "paid": "已付款",
+    "unpaid": "未付款",
+    "resendPaymentRecord": "重新發送付款紀錄",
+    "viewUploadedPaymentProof": "查看已上傳的付款證明",
+    "successResend": "付款紀錄已重新發送",
+    "lesson": "課程",
+    "invoiceStatus": {
+      "PENDING": "待付款",
+      "PAID": "已付款",
+      "UNPAID": "未付款"
+    },
+    "attendanceStatus": {
+      "ATTENDED": "已出席",
+      "UNATTENDED": "未出席",
+      "CANCELLED": "已取消",
+      "PENDING": "待定"
+    }
+  },
+  "credit": {
+    "currentBalance": "現時積分",
+    "creditDescription": "你可用的積分及最近活動",
+    "availableCredits": "可用積分",
+    "creditHistory": "使用及變動記錄",
+    "creditHistoryDescription": "追蹤你的積分使用及增值",
+    "date": "日期",
+    "description": "描述",
+    "change": "變動",
+    "balance": "積分",
+    "loadMore": "載入更多"
+  }
+}

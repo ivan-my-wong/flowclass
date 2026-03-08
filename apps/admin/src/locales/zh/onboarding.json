@@ -1,0 +1,1735 @@
+{
+  "countryConfirm": {
+    "title": "你確定要確認嗎？",
+    "description": "一旦繼續，系統將會建立你的平台。你將無法再更改網域和國家。（你仍然可以隨時更改學校名稱。）",
+    "warning": "此操作無法撤銷。請再次檢查你的網域和國家選擇。",
+    "continue": "是的，繼續",
+    "cancel": "不，返回",
+    "buildingTitle": "正在建立你的平台",
+    "buildingMessage": "正在建立你的 Flowclass 平台...",
+    "buildingSubMessage": "這可能需要幾分鐘時間。請不要關閉此視窗。",
+    "step1": "設定你的網域和國家",
+    "step2": "配置地區設定",
+    "step3": "完成平台設定"
+  },
+  "taskTitle": {
+    "site": "建立你的網站",
+    "centre": "個性化你的學校頁面",
+    "tuitionTask": "設置收取學費",
+    "course": "建立課程頁面以招收學生",
+    "payment": "開始接受在線付款",
+    "calendar": "使用課程表制訂計劃",
+    "customPayment": "個性化付款選項",
+    "customForm": "使用自訂的申請表格",
+    "promotion": "新增優惠券以吸引顧客",
+    "siteCheck": "檢查網頁相關設定",
+    "whatsapp": "通過Whatsapp通知學生"
+  },
+  "paymentSettings": {
+    "upgrade": "升級以連接在線支付通道並自動接受付款",
+    "linkStripe": "創建或連接你的信用卡（使用 Stripe）"
+  },
+  "progressBar": {
+    "title": "剛接觸Flowclass？按照以下步驟建立你的平台",
+    "description": "為學生提供更好的應用流程。提高轉化率。自動化收集學費...您的教育業務與我們一起成長。",
+    "orderReminder": "以下是我們建議您遵循的順序。"
+  },
+  "siteSettings": {
+    "domain": "為你的整個網站選擇一個域名（將包含所有你的學校）",
+    "country": "確認你將進行教學的國家和要使用的貨幣",
+    "timezone": "確認學生將使用的時區進行預約"
+  },
+  "schoolSettings": {
+    "domain": "為你的學校選擇一個連結（學生將用於前往你的頁面）",
+    "name": "為你的學校選擇一個名稱",
+    "logo": "上傳你的學校標誌",
+    "banner": "上傳你的學校的橫幅圖片",
+    "description": "為你的學校撰寫至少 200 字的落地頁面描述",
+    "location": "填寫你的學校位置",
+    "contact": "填寫你的學校聯繫訊息",
+    "gallery": "上傳照片到圖庫",
+    "contactInfo": "設置基本聯絡資訊",
+    "email": "個性化你的電郵設定",
+    "socialMedia": "設置社交媒體連結",
+    "terms": "設置條款和條件"
+  },
+  "courseSettings": {
+    "createCourse": "創建你的第一個課程頁面",
+    "setPath": "為你的課程報名頁面設置一個連結",
+    "setPrice": "為你的課程設定一個價格",
+    "setSchedule": "為你的課程設定未來一個月的時間表",
+    "publishCourse": "發布你的課程，使其對外可用",
+    "description": "為你的課程撰寫至少 200 字的落地頁面描述",
+    "seo": "添加 SEO 設定",
+    "createClass": "創建你的第一個班級頁面",
+    "addTag": "為你的課程新增一個標籤(可選)",
+    "setRegistrationMessage": "設置報名後訊息",
+    "addPrerequisite": "新增一個申請先決條件(可選)",
+    "course-description": "撰寫課程描述",
+    "course-upload-banner": "上傳課程橫幅",
+    "course-lesson-time": "設定課程時間和學費",
+    "course-fill-sections": "填寫課程詳細描述的至少2個部分",
+    "class-description": "填寫班別描述和價格",
+    "class-timeslots": "填寫至少2個班別的時間段"
+  },
+  "calendarSettings": {
+    "checkAttendanceModifications": "檢查出席修改",
+    "setClosedDates": "設置閉校時間 (可選)"
+  },
+  "customPaymentSettings": {
+    "addCustomMethods": "新增2個自定義付款方式",
+    "addExtraFees": "新增額外收費(可選)"
+  },
+  "customFormSettings": {
+    "createFields": "創建3個自訂資料欄目",
+    "createForm": "創建一個自訂表單",
+    "useInCourse": "在你的頁面上使用自訂表單"
+  },
+  "promotionSettings": {
+    "createDiscount": "創建一個百分比優惠券",
+    "createFixedAmount": "創建一個固定金額優惠券"
+  },
+  "siteCheckSettings": {
+    "checkRegion": "檢查地區，語言及時區",
+    "checkTemplate": "檢查網站樣式與模板",
+    "checkDomain": "檢查網站域名",
+    "useCustomDomain": "使用自有的域名 (可選)"
+  },
+  "whatsappSettings": {
+    "twilioApiKey": "輸入Twilio API Key與電話號碼",
+    "testSendWhatsapp": "測試發送WhatsApp",
+    "createTemplate": "創建WhatsApp模板",
+    "automationFlow": "進入自動化流程並選擇正確的課程以發送"
+  },
+  "task": {
+    "centre-upload-logo": "上傳網站的標誌和橫幅",
+    "centre-upload-info": "填寫網站位置和聯繫訊息",
+    "centre-write-description": "撰寫網站描述",
+    "centre-upload-gallery": "上傳圖庫圖片",
+    "promotion-discount-code": "創建首個折扣代碼",
+    "payment-connect-stripe": "連接到Stripe",
+    "payment-withdrawal-info": "填寫提款的支付帳戶"
+  },
+  "welcome": {
+    "title": "你還沒有擁有網站。",
+    "secondTitle": "創建一個網站，開始建立你的課程落地頁面！",
+    "textInput": "選擇你的網站域名",
+    "schoolName": "學校名稱",
+    "schoolNamePlaceholder": "輸入你的學校名稱",
+    "siteDomain": "網站域名",
+    "phone": "電話號碼",
+    "country": "國家",
+    "schoolLogo": "上傳你的LOGO",
+    "themeColor": "選擇你的主題顏色",
+    "schoolDesc": "寫下你的網站描述",
+    "custom": "自定義",
+    "courseName": "課程名稱",
+    "courseLink": "課程連結",
+    "courseBanner": "上傳課程橫幅圖",
+    "courseDescription": "寫下課程描述",
+    "courseDescriptionPlaceholder": "提供課程概況，包括課程內容、學習目標和任何獨特功能。這將幫助學生了解課程內容和為何他們應該報名。",
+    "attendanceQrCode": "啟用出席二維碼",
+    "classType": "選擇課程類型",
+    "classTypeDesc": "*建議新用戶選擇周期課程",
+    "className": "課程名稱",
+    "classTuition": "價格",
+    "classQuota": "名額",
+    "tuitionPerClass": "每班次",
+    "tuitionPerLesson": "每節課",
+    "classTimeSlots": "輸入可用時間段",
+    "connectDomain": "或連接你自己的域名（即將推出）",
+    "colleagues": "你的同事邀請你到他們的網站上嗎？",
+    "joinSite": "加入他們的網站，和他們一起創建！",
+    "enterTheirDomain": "輸入你收到的代碼",
+    "linkTheirDomain": "或他們自己的域名（即將推出）",
+    "domainHelper": "你的網站名稱應該簡單，只包含字母和'-'",
+    "siteCreated": "你的網站已成功創建！",
+    "classCreated": "班級創建成功！",
+    "courseCreated": "課程創建成功！",
+    "courseFound": "找到現有課程，將使用該課程！",
+    "availabilityCreated": "可用時段創建成功！",
+    "availabilityCreationFailed": "班級創建成功，但可用時段設置失敗",
+    "siteJoined": "你已成功加入他們的網站！",
+    "setupComplete": "您的網站已經準備就緒！讓我們開始吧。",
+    "themeSettingComplete": "您已成功設定網站主題！"
+  },
+  "dashboard": {
+    "gettingStarted": "開始使用",
+    "quotas": "配額",
+    "statistics": "進階數據統計",
+    "analytics": "基本數據分析",
+    "advanced": "進階",
+    "basicAnalytics": "基本",
+    "toBeReviewed": "待審核",
+    "review": "審核",
+    "currentActiveStudents": "當前活躍學生",
+    "notificationSent": "已發送通知",
+    "allRecords": "所有記錄",
+    "revenue": {
+      "title": "收入",
+      "overview": "總覽",
+      "byCourse": "根據課程",
+      "byClass": "根據班級",
+      "byInstructor": "根據導師",
+      "byStudent": "根據學生"
+    },
+    "student": {
+      "title": "學生",
+      "overview": "總覽",
+      "byInstructor": "根據導師",
+      "byStudent": "根據學生"
+    }
+  },
+  "errors": {
+    "tooShort": "網站域名必須至少3個字符長",
+    "invalidDomain": "你的網站域名只能包含小寫字母、數字和破折號",
+    "tokenDoesNotExist": "你輸入的代碼不存在。請再次檢查你收到的電子郵件。",
+    "domainAlreadyExist": "你選擇的域名已被使用。請選擇另一個。如果你卡在初始屏幕，請嘗試登出並重新登入。",
+    "setSiteError": "設置網站時發生錯誤。請稍後再試。",
+    "siteCreationFailed": "建立平台失敗。請重試。",
+    "domainAlreadyTaken": "此網域已被使用。請選擇其他網域。",
+    "domainCheckFailed": "檢查網域可用性失敗。請重試。"
+  },
+  "newUserSetup": {
+    "welcome": "準備好迎接3倍的學生",
+    "welcomeDesc": "了解 Flowclass 如何自動化你的教學業務 — 學生更多，管理更輕鬆。",
+    "setWebsite": "設定你的Flowclass網站",
+    "whatWillYouBe": "你將如何使用Flowclass？",
+    "howPlan": "你計劃如何使用Flowclass？",
+    "helpIntegrate": "讓我們幫助您輕鬆整合並使用我們的平台，請選擇你打算如何使用 Flowclass。",
+    "recommendOnboarding": "我們將根據此信息為你推薦最適合的功能。",
+    "countrySettings": "國家和地區設定",
+    "countrySettingsDesc": "設定您的營運國家，我們將自動配置貨幣、時區和本地設定",
+    "schoolDetails": "學校簡介",
+    "schoolDetailsDesc": "自訂你的學校身份",
+    "createCourse": "創建你的第一個課程頁面",
+    "createCourseDesc": "為學生建立課程頁面",
+    "createClass": "班別設定",
+    "createClassDesc": "設定班別模式",
+    "setUpAndStart": "設立您的第一種付款方法以開始收取學費",
+    "uploadStudentInfo": "上傳您的學生名單。與您現有的系統一起使用。",
+    "autoNotification": "自動發送付款提醒給所有學生",
+    "onboardingPreference": {
+      "completeNow": "馬上開始",
+      "scheduleLater": "稍後完成",
+      "completeDesc": "在5分鐘內推出您的學生平台",
+      "scheduleDesc": "隨時可以從您的主頁輕鬆恢復設置"
+    },
+    "domainSettings": {
+      "title": "設定你的平台連結",
+      "subtitle": "輸入你的網域並自訂網站，立即預覽全新學生平台。"
+    },
+    "useCase": {
+      "automateTuition": "自動化現有學生的學費支付",
+      "automateDesc": "向現有學生自動發送支付通知和支付鏈接，監控他們的支付狀態*",
+      "websiteDesc": "建立課程登入頁面、申請表單，並接受新生的付款*",
+      "allInOne": "所有支付和應用記錄的單一來源"
+    },
+    "stepIndicators": {
+      "domainSettings": "推出網站",
+      "countrySettings": "地區設定",
+      "useCase": "使用案例",
+      "projectType": "專案類型",
+      "details": "詳細資訊",
+      "payment": "付款",
+      "email": "電子郵件",
+      "uploadStudentInfo": "上傳學生資料",
+      "platformSetup": "域名",
+      "template": "模板",
+      "importStudentProfiles": "模板",
+      "welcome": "歡迎",
+      "basicInfo": "基本資訊",
+      "schoolDetails": "學校詳細資訊",
+      "createCourse": "建立課程",
+      "classSetup": "班級設置",
+      "paymentSetup": "付款設置",
+      "applicationForm": "申請表格",
+      "importStudents": "匯入學生",
+      "connectWhatsApp": "連接 WhatsApp",
+      "tryStudentEnrollment": "嘗試學生註冊",
+      "platformLive": "您的平台已上線！",
+      "subscription": "訂閱",
+      "trialLimitation": "試用資訊",
+      "success": "成功"
+    },
+    "appointmentClassPreview": {
+      "title": "預約課程預覽",
+      "subtitle": "靈活的預約時段和私人課程",
+      "courseInformation": "課程資訊",
+      "courseName": "課程名稱",
+      "coursePath": "課程路徑",
+      "availabilitySettings": "可用性設定",
+      "flexibleBookingSystem": "靈活預約系統",
+      "flexibleBookingDescription": "學生可以根據您的可用時間表預約時段",
+      "generatedTimeSlots": "生成的時段",
+      "available": "可用",
+      "minutes": "分鐘",
+      "workingHours": "工作時間",
+      "workingHoursDescription": "設定學生可以預約的可用時間",
+      "configureInAvailabilitySettings": "在可用性設定中配置",
+      "dateOverrides": "日期覆蓋",
+      "dateOverridesDescription": "設定您不可用或有特殊時間的特定日期"
+    },
+    "recurringClassPreview": {
+      "title": "循環課程預覽",
+      "subtitle": "學生可隨時加入的持續課程，無結束日期",
+      "courseInformation": "課程資訊",
+      "courseName": "課程名稱",
+      "coursePath": "課程路徑",
+      "weeklySchedule": "每週時間表",
+      "numberOfLessons": "課程數量",
+      "minutes": "分鐘",
+      "daysOfWeek": {
+        "sunday": "星期日",
+        "monday": "星期一",
+        "tuesday": "星期二",
+        "wednesday": "星期三",
+        "thursday": "星期四",
+        "friday": "星期五",
+        "saturday": "星期六"
+      }
+    },
+    "regularClassPreview": {
+      "title": "常規課程預覽",
+      "eventTitle": "活動預覽",
+      "subtitle": "有固定時間表和開始/結束日期的固定期限課程",
+      "eventSubtitle": "一次性活動、工作坊和特殊課程",
+      "courseInformation": "課程資訊",
+      "courseName": "課程名稱",
+      "coursePath": "課程路徑",
+      "schedulePattern": "時間表模式",
+      "eventSchedule": "活動時間表",
+      "recurrencePattern": "重複模式",
+      "eventDetails": "活動詳情",
+      "minutes": "分鐘",
+      "daysOfWeek": {
+        "sunday": "星期日",
+        "monday": "星期一",
+        "tuesday": "星期二",
+        "wednesday": "星期三",
+        "thursday": "星期四",
+        "friday": "星期五",
+        "saturday": "星期六"
+      }
+    },
+    "alwaysChange": "您隨時可以在之後更改您的域名和網站名稱。",
+    "registerPaymentMethod": "註冊新的付款方式",
+    "fillInPaymentInfo": "填寫所有必要的資訊，以便開始向學生收取學費",
+    "emailPaymentNoti": "付款通知將根據您選擇的時間表通過電子郵件發送給您的學生",
+    "addPaymentMethod": "您可以選擇稍後添加付款方式",
+    "step": "步驟",
+    "getStarted": "開始吧！",
+    "teachingDescribe": "以下哪一項最能描述你的教學業務？",
+    "starting": "我剛剛起步",
+    "individual": "我是個人家教或教練",
+    "teacher": "我是教育機構的導師",
+    "owner": "我是教育機構的所有人",
+    "teachingLocation": "你的教學業務將位於哪裡？",
+    "teachingBusinessLocation": "教學業務地點",
+    "countryRegion": "國家/地區",
+    "others": "其他",
+    "numOfStudent": {
+      "title": "你總共要教導或管理多少學生？",
+      "subtitle": "只需給出大約數字即可",
+      "choice1": "我還沒開始",
+      "choice2": "1 - 10 名學生",
+      "choice3": "11 - 100 名學生",
+      "choice4": "101 - 1,000 名學生",
+      "choice5": "1,000 - 10,000 名學生",
+      "choice6": "10,000 名學生以上",
+      "choice7": "我不確定"
+    },
+    "finishSetup": {
+      "title": "你已經準備好了！",
+      "content": "請等待我們設置你的網站...",
+      "success": "完成!",
+      "successDesc": "您的系統現已上線，立即輕鬆管理課程與學生吧！",
+      "visitDashboard": "前往主頁",
+      "learnMore": "了解更多 Flowclass 進階功能"
+    },
+    "setSiteDomain": {
+      "question1": "你想要什麼網站域名？",
+      "question2": "你的學校名稱是什麼？"
+    },
+    "teachingService": {
+      "title": "你在哪裡提供教學服務？",
+      "option1": "線上",
+      "option2": "學生的場所",
+      "option3": "共同工作空間或租用的房間",
+      "option4": "你自己的場所",
+      "option5": "在學校"
+    },
+    "uploadCsv": {
+      "uploadStuInfo": "上傳當前學生的資訊",
+      "startAssign": "透過上傳您的 .CSV 文件或手動上傳學生資訊來開始將學生分配到課程",
+      "prepareUpload": "準備上傳文件",
+      "step1": "步驟 1: 下載模板CSV文件",
+      "step2": "步驟 2: 包含電話號碼的國碼",
+      "step3": "步驟 3: 必須上傳的資訊：姓名、電子郵件、項目/課程名稱、付款金額和帳單日期",
+      "step4": "步驟 4: 從 .CSV 中移除您不想導入的列",
+      "step5": "步驟 5: 如果有些資訊遺漏，您可以在學生 CRM 中輸入",
+      "downloadTemplate": "下載模板CSV",
+      "uploadCSVBtn": "上傳 CSV",
+      "manuallyUploadLater": "稍後手動創建學生"
+    },
+    "selectMultipleOptions": "你可以選擇多個選項",
+    "promoteMethod": {
+      "title": "你目前在這些渠道上進行推廣嗎？",
+      "personalWebsite": "個人網站",
+      "companyWebsite": "公司網站",
+      "others": "其他"
+    },
+    "teachTarget": {
+      "title": "你的教學對象是誰？",
+      "children": "兒童",
+      "uniStudent": "大學生",
+      "secondarySchool": "中學生",
+      "adults": "成人",
+      "businessOrganization": "企業和組織",
+      "specificNeeds": "有特殊需求的人",
+      "nonNative": "非母語人士",
+      "generalPopulation": "一般大眾"
+    },
+    "teachCategory": {
+      "title": "以下哪些描述最符合你的教育事業？",
+      "academicTutor": "學業補習",
+      "testPrepare": "考試準備",
+      "music": "音樂",
+      "language": "語言",
+      "businessFinance": "商業與財務",
+      "creativeArts": "創意藝術",
+      "fitness": "健身",
+      "personalSkills": "個人技能",
+      "technology": "科技"
+    },
+    "selectTemplate": {
+      "title": "選擇你的網站主題",
+      "subtitle": "你隨時可以在之後變更網站主題"
+    },
+    "applicationForm": {
+      "title": "申請表",
+      "subtitle": "收集學生信息輕鬆簡單",
+      "name": "表單名稱",
+      "nameDesc": "只提供您辨識，學生不會看到",
+      "description": "表單描述",
+      "personalInfo": "個人信息字段",
+      "personalInfoDesc": "這些字段收集每個申請人的詳細信息，如姓名、出生日期和聯繫信息。如果申請涉及多個人，這些字段將被複製到每個申請人。"
+    },
+    "connectWhatsAppDescription": "設置 WhatsApp 通知，自動向學生發送付款提醒、課程更新和重要公告。",
+    "skipForNow": "暫時跳過",
+    "skipWhatsAppDescription": "您可以稍後從主頁設置 WhatsApp 通知。學生仍會收到重要更新的電子郵件通知。",
+    "mobilePreview": {
+      "title": "您的平台已上線！",
+      "description": "這就是您的學生在移動設備上看到和與您的註冊流程互動的方式。",
+      "openInNewTab": "在新標籤頁中打開",
+      "copyLink": "複製連結",
+      "unableToGenerateUrl": "無法生成註冊網址",
+      "preparingPreview": "正在準備您的移動預覽...",
+      "studentEnrollmentPreview": "學生註冊預覽"
+    },
+    "waitingForUploadReceipt": "完成註冊流程以繼續",
+    "skipMobilePreview": {
+      "title": "跳過移動預覽？",
+      "description": "您確定要跳過移動預覽嗎？您可以稍後從主頁測試註冊流程。"
+    },
+    "classSetup": {
+      "title": "您需要什麼類型的課程？",
+      "subtitle": "啟用正確的課程類型可確保您的排程、註冊和付款工作流程與您組織實際運營課程的方式相匹配。",
+      "scheduleStep": {
+        "title": "您的課程遵循什麼樣的排程？",
+        "options": {
+          "fixed": {
+            "label": "固定排程，時間段由您設定",
+            "example": "（例如：每週一 4-6 PM）"
+          },
+          "flexible": {
+            "label": "靈活排程，學生可以在我們有可用時間段時預訂"
+          },
+          "other": {
+            "label": "一次性活動"
+          }
+        }
+      },
+      "enrollmentStep": {
+        "title": "學生可以隨時加入，還是只能在新的階段開始時加入",
+        "subtitle": "（例如：新的月份或學期）？",
+        "options": {
+          "sameEnd": {
+            "label": "每個學生都在完全相同的課程結束，無論他們何時加入課程",
+            "example": "（例如：課程總是在每月最後一個週六下午 3:00 結束）"
+          },
+          "differentEnd": {
+            "label": "學生根據他們開始加入課程的時間在不同的課程結束",
+            "example": "（例如：課程總是在第 8 課結束）"
+          },
+          "other": {
+            "label": "其他 / 不確定"
+          }
+        }
+      },
+      "resultsStep": {
+        "title": "根據您的運營方式，以下是我們建議的課程類型：",
+        "classTypes": {
+          "regular": {
+            "name": "常規課程",
+            "description": "適用於有固定排程和開始/結束日期的固定期限課程。"
+          },
+          "recurring": {
+            "name": "循環課程",
+            "description": "適用於學生可以隨時加入且沒有結束日期的持續課程。"
+          },
+          "appointment": {
+            "name": "預約課程",
+            "description": "適用於靈活的、可預訂的時間段和私人課程。"
+          },
+          "workshop": {
+            "name": "活動與工作坊",
+            "description": "適用於一次性活動、工作坊和特殊課程。"
+          }
+        },
+        "recommended": "推薦",
+        "note": "🌻 即使活動是明天，您今天也可以設置一切並讓它運行起來。您隨時可以更改課程類型。"
+      },
+      "courseDetailsStep": {
+        "title": "課程詳情",
+        "subtitle": "讓我們設置您的{classType}課程",
+        "courseName": {
+          "label": "課程名稱 *",
+          "placeholder": "輸入課程名稱",
+          "help": "為您的課程輸入一個描述性名稱"
+        },
+        "coursePath": {
+          "label": "課程路徑 *",
+          "placeholder": "課程路徑將自動生成",
+          "help": "課程路徑會根據課程名稱自動生成"
+        },
+        "generateTimeSlots": "生成時間段"
+      },
+      "timeSlotsStep": {
+        "title": "生成的時間段",
+        "subtitle": "以下是我們為您的{classType}課程生成的時間段",
+        "generating": "正在生成時間段...",
+        "slotTypes": {
+          "regularPeriod": "常規時段",
+          "event": "活動",
+          "recurringSchedule": "循環排程"
+        },
+        "duration": "時長：{duration} 分鐘",
+        "oneTimeEvent": "一次性活動",
+        "recurringPattern": "每{every} {unit}{plural}"
+      }
+    },
+    "connectWhatsApp": {
+      "title": "連接 WhatsApp",
+      "subtitle": "連結您的 WhatsApp 以向學生和家長發送自動化訊息。"
+    },
+    "studentEnrollment": {
+      "title": "嘗試以學生身份註冊",
+      "subtitle": "從您學生的角度體驗註冊流程。點擊移動預覽，看看申請您的課程有多麼簡單。"
+    },
+    "platformLive": {
+      "title": "您的平台已上線！",
+      "subtitle": "嘗試以學生身份註冊，體驗您完整的註冊流程。這就是您的學生與您平台互動的確切方式。"
+    },
+    "subscription": {
+      "title": "升級您的平台",
+      "subtitle": "解鎖進階功能，增加學生容量，並使用高級工具來發展您的教育事業。",
+      "timer": {
+        "limitedTime": "限時優惠",
+        "expired": "優惠已過期",
+        "description": "特別入門價格 - 此優惠即將到期！"
+      },
+      "whyUpgrade": {
+        "title": "為什麼現在升級？",
+        "subtitle": "獲得進階功能和高學生限制，以擴展您的教育平台",
+        "unlimitedClasses": {
+          "title": "無限課程和學生",
+          "description": "創建無限課程並招收所需數量的學生"
+        },
+        "advancedFeatures": {
+          "title": "進階功能",
+          "description": "使用高級工具，如進階分析、自定義品牌和整合功能"
+        },
+        "prioritySupport": {
+          "title": "優先支援",
+          "description": "獲得優先客戶支援和更快的回應時間"
+        }
+      },
+      "skipMessage": "您可以稍後從主頁升級",
+      "skipButton": "暫時跳過"
+    },
+    "creating": "創建中..."
+  },
+  "trialLimitation": {
+    "title": "14天退款保證",
+    "description": "我們提供14天退款保證，只要您發送電郵至info@flowclass.io，我們將全額退款。如果您不訂閱付費計劃，您將無法存取任何功能。",
+    "freePlan": {
+      "students": "無訂閱則無存取權限",
+      "studentsDesc": "所有功能都需要有效的付費訂閱",
+      "features": "無免費計劃",
+      "featuresDesc": "需要訂閱才能存取任何平台功能",
+      "support": "無訂閱則無支援",
+      "supportDesc": "客戶支援僅限付費訂閱用戶"
+    },
+    "trialInfo": {
+      "title": "14天退款保證",
+      "description": "您目前正在享受14天的初創計劃試用，可完全存取所有功能。我們提供14天退款保證 - 如果您不滿意，可以獲得全額退款。如果您在試用期後不訂閱，您將失去所有功能的存取權限。"
+    },
+    "freePlanDetails": {
+      "title": "無訂閱時會發生什麼",
+      "students": "無學生管理",
+      "schools": "無學校管理",
+      "managers": "無管理員存取權限",
+      "tutors": "無導師管理",
+      "classTypes": "無課程創建",
+      "studentPortal": "無學生門戶",
+      "emailNotifications": "無通知",
+      "communitySupport": "無支援存取權限"
+    },
+    "note": "立即訂閱以繼續使用 Flowclass 並避免失去所有功能的存取權限。"
+  },
+  "tourStep": {
+    "welcome": "歡迎來到Flowclass。無論您是經驗豐富的教育者還是剛剛起步，我們都為您提供支持。",
+    "welcome2": "Flowclass為您提供創建優雅的落地頁面、個人網站或簡介連結所需的一切，用於推廣您的課程。",
+    "greeting": "只需幾個簡單的步驟，您就可以創建一個功能齊全的網站、課程和班級，吸引學生並幫助您發展業務。讓我們開始吧！",
+    "domain": "首先，你可以創建你的獨特域名，我們提供多種後綴供選擇。擁有一個易於記憶的域名非常重要。",
+    "changeDomain": "您隨時可以在之後更改您的域名和網站名稱。",
+    "schoolName": "學校名稱將顯示在網站標頭、搜索結果和發送給學生的所有電子郵件中。它應該是你教育品牌的官方名稱。"
+  },
+  "acceptInvite": {
+    "title": "您已獲邀與Flowclass網站合作！",
+    "subTitle": "創建帳戶以開始與網站所有者合作",
+    "invitedEmail": "此電子郵件地址將用於登入",
+    "enterPwContinue": "輸入新密碼",
+    "errorToken": "糟糕！您的邀請代碼已不再有效。",
+    "backToLogin": "返回登入頁面"
+  },
+  "notHavePaymentMethod": {
+    "description": "您沒有任何已啟用的付款方式。學生將無法完成申請流程。",
+    "action": "前往付款方式頁面"
+  },
+  "skipDialog": {
+    "skip": "跳過",
+    "title": "跳過初始設置？",
+    "description": "確定要跳過初始設置嗎？您可以在稍後從主頁回來。",
+    "resumeOnboarding": "繼續初始設置"
+  },
+  "pricingCalculator": {
+    "title": "找到您的完美計劃",
+    "subtitle": "精準回答問題，以獲得個性化定價建議",
+    "step": "步驟",
+    "of": "共",
+    "next": "下一步",
+    "previous": "上一步",
+    "getStarted": "開始使用",
+    "questions": {
+      "studentCount": {
+        "title": "你有幾多位學生？",
+        "options": ["0–100", "101–500", "501–1,500", "1,501 或以上"]
+      },
+      "workload": {
+        "title": "你會點形容你團隊日常營運嘅工作量？",
+        "options": [
+          "輕鬆——有時間發展業務同專心教書",
+          "還可以，但的確可以再好啲",
+          "好重手——好多行政工作都要自己搞",
+          "非常攰——成日救火，冇停過"
+        ]
+      },
+      "communication": {
+        "title": "家長或者學生會唔會成日問上堂時間表或者繳費情況？",
+        "options": [
+          "好少——全部資料佢哋自己睇到",
+          "偶爾——有時都要回覆幾個查詢",
+          "經常——成日都係同一啲問題",
+          "幾乎每日都問——inbox 成日爆"
+        ]
+      },
+      "parentUpdates": {
+        "title": "你而家點樣通知家長學生出席、功課或者課堂更改？",
+        "options": [
+          "手動 send WhatsApp 或 email",
+          "用家長 portal 或 app",
+          "由學生自己返去同家長講",
+          "基本上冇一個固定方法"
+        ]
+      },
+      "paymentReminders": {
+        "title": "你要幾多次提醒學生或家長補交費用？",
+        "options": [
+          "幾乎唔使",
+          "一個月幾次",
+          "差唔多每個星期都要",
+          "每日都要追款，好煩！"
+        ]
+      },
+      "tuitionCollection": {
+        "title": "你而家點收學費？",
+        "options": [
+          "全自動——學生自己準時交",
+          "間中都要手動 send reminder",
+          "每個月都要親自催交",
+          "成日追都追唔切，成日蝕錢"
+        ]
+      },
+      "attendanceTracking": {
+        "title": "你而家點樣記錄學生出席？",
+        "options": [
+          "傳統紙本點名",
+          "WhatsApp 群組",
+          "Google Sheets 或 Excel",
+          "自動 QR code 或 app，easy！"
+        ]
+      },
+      "makeupLessons": {
+        "title": "點樣處理補課或者學生想轉班？",
+        "options": [
+          "有自動系統，家長／學生自己搞掂",
+          "職員要手動處理同 update 紀錄",
+          "用 WhatsApp、email、電話溝通，再手動記錄",
+          "成日亂晒大籠，有時都唔記得咗"
+        ]
+      },
+      "bookingProcess": {
+        "title": "學生想預約、改期或者取消堂，要點做？",
+        "options": [
+          "佢哋可以自己 online 處理晒",
+          "有系統但有時都要我哋出手",
+          "主要靠手動——好多 message、tracking 同 spreadsheet",
+          "完全混亂——每日都頭痛！"
+        ]
+      },
+      "multipleLocations": {
+        "title": "你有冇分校？或者諗住開新分校？",
+        "options": [
+          "只得一間校舍",
+          "每間分校各自用 WhatsApp 群組／Excel 管理",
+          "有中央系統，但唔太理想",
+          "真係需要 better 嘅多校管理！"
+        ]
+      },
+      "staffManagement": {
+        "title": "你點樣記錄員工／導師時間表、出糧同表現？",
+        "options": [
+          "全自動，一個系統睇晒",
+          "用 Excel 或 Google Sheets",
+          "以手動方式處理，十分費時",
+          "幾乎冇 track，靠記憶"
+        ]
+      },
+      "website": {
+        "title": "你有冇網站俾學生／家長報名、睇時間表或者網上付款？",
+        "options": [
+          "有，全部功能齊晒",
+          "有，但功能簡單或者唔易更新",
+          "冇網站，只用 Facebook／WhatsApp",
+          "完全冇網站"
+        ]
+      },
+      "support": {
+        "title": "你需要幫手設置系統、搬數據或者整網站嗎？",
+        "options": [
+          "需要全程支援，由頭到尾都要幫",
+          "有人幫開頭 setup 就得",
+          "需要全程支援，由頭到尾都要幫",
+          "唔使幫，我哋自己搞掂"
+        ]
+      }
+    },
+    "results": {
+      "title": "您的個性化計劃",
+      "subtitle": "根據您的回答，這是我們的建議",
+      "monthlyPrice": "每月",
+      "yearlyPrice": "每年",
+      "saveWithYearly": "年付可節省",
+      "features": "包含功能",
+      "startTrial": "開始免費試用",
+      "contactSales": "預約產品演示"
+    }
+  },
+  "pricingPublic": {
+    "hero": {
+      "title": "劃時代收費模式，隨時按業務成長自由升級",
+      "subtitle": "無論您是獨立導師還是有多間分校的教育機構，Flowclass都能靈活配合您的需要。",
+      "startingPrice": "每月只需 $80 港元起",
+      "description": "只選用您現時需要的功能，業務成長隨時升級。",
+      "cta": {
+        "bookDemo": "開始自動化",
+        "viewPlans": "查看方案"
+      },
+      "features": {
+        "flexiblePricing": {
+          "title": "靈活模組化定價",
+          "description": "只需為您需要的功能付費—隨時按業務發展升級。"
+        },
+        "cancelAnytime": {
+          "title": "隨時取消，無鎖定",
+          "description": "享受完全自由—無長期合約，隨時取消訂閱。"
+        }
+      }
+    },
+    "trustedBy": {
+      "title": "獲領先教育機構信賴",
+      "subtitle": "超過 100 間機構已選擇 Flowclass，輕鬆擴展業務。",
+      "cta": "預約產品演示",
+      "logoAlt": "受信賴機構標誌"
+    },
+    "featureBreakdown": {
+      "title": "完整功能與價格明細",
+      "subtitle": "每個功能的定價十分透明",
+      "baseSubscription": "基本訂閱",
+      "totalPlanValue": "計劃總價值",
+      "totalSavings": "預設計劃總節省金額",
+      "saved": "已節省",
+      "getStarted": "開始使用",
+      "contactSales": "預約產品演示"
+    },
+    "pricingCalculator": {
+      "title": "想要建立自己的計劃？",
+      "subtitle": "精準回答問題，以獲得個性化定價建議",
+      "step": "步驟",
+      "of": "共",
+      "previous": "上一步",
+      "next": "下一步",
+      "customPlan": "自訂計劃",
+      "perMonth": "每月",
+      "billedYearlyAt": "年付價格",
+      "getDetailedQuote": "獲取詳細報價",
+      "quoteDescription": "請提供您的詳細資料以獲得全面報價",
+      "personalizedPlan": "您的個人化計劃",
+      "recommendedPlan": "推薦計劃：",
+      "monthlyEquivalent": "月付等值：",
+      "startUsing": "開始使用",
+      "bookDemo": "預約演示",
+      "classTypes": {
+        "regular": {
+          "title": "您需要常規課程嗎？",
+          "description": "固定期限課程，有固定的時間表和開始/結束日期。非常適合傳統學術課程、認證課程和結構化學習路徑。",
+          "yesLabel": "是的，我需要常規課程",
+          "yesDescription": "固定時間表，所有學生同時開始和結束",
+          "noLabel": "不，我不需要常規課程",
+          "noDescription": "跳過此課程類型"
+        },
+        "recurring": {
+          "title": "您需要循環課程嗎？",
+          "description": "持續進行的課程，學生可以隨時加入，無限期繼續，沒有固定的結束日期。非常適合一次性付款和持續招生計劃。",
+          "yesLabel": "是的，我需要循環課程",
+          "yesDescription": "持續課程，學生可以隨時加入",
+          "noLabel": "不，我不需要循環課程",
+          "noDescription": "跳過此課程類型"
+        },
+        "appointment": {
+          "title": "您需要預約預訂嗎？",
+          "description": "靈活的私人課程預訂—學生可以選擇可用的時間段進行一對一或小團體課程。非常適合輔導服務和諮詢課程。",
+          "yesLabel": "是的，我需要預約預訂",
+          "yesDescription": "私人課程的靈活時間段",
+          "noLabel": "不，我不需要預約預訂",
+          "noDescription": "跳過此課程類型"
+        }
+      },
+      "options": {
+        "students": {
+          "0-100": "0-100 學生",
+          "101-500": "101-500 學生",
+          "501-1500": "501-1,500 學生",
+          "1501-3000": "1,501-3,000 學生",
+          "3001-5000": "3,001-5,000 學生",
+          "5001-10000": "5,001-10,000 學生",
+          "10000+": "10,000+ 學生"
+        },
+        "schools": {
+          "1": "1 間學校",
+          "2-4": "2-4 間學校",
+          "5-10": "5-10 間學校",
+          "10+": "10+ 間學校"
+        },
+        "admins": {
+          "1-3": "1-3 名管理員",
+          "4-10": "4-10 名管理員",
+          "10+": "10+ 名管理員"
+        },
+        "tutors": {
+          "0-2": "0-2 名導師",
+          "3-10": "3-10 名導師",
+          "11-20": "11-20 名導師",
+          "21-50": "21-50 名導師",
+          "50+": "50+ 名導師"
+        },
+        "notifications": {
+          "emailOnly": "僅電子郵件",
+          "emailWhatsApp": "電子郵件 + WhatsApp",
+          "emailDescription": "包含標準電子郵件通知",
+          "whatsappDescription": "電子郵件和 WhatsApp 通知"
+        },
+        "promotions": {
+          "basic": "基本（僅優惠券）",
+          "advanced": "進階（試課 + 套裝折扣）",
+          "basicDescription": "建立和管理折扣優惠券",
+          "advancedDescription": "優惠券、試課和套裝折扣"
+        }
+      }
+    },
+    "exampleClientPricing": {
+      "title": "了解靈活定價如何運作",
+      "subtitle": "只為您需要的功能付費—並在成長時升級。",
+      "tableHeaders": {
+        "item": "項目",
+        "quantity": "數量",
+        "pricing": "定價"
+      },
+      "items": {
+        "baseUsers": "基本用戶",
+        "multipleSchools": "多間學校",
+        "multipleAdmins": "多名管理員",
+        "multipleTutors": "多名導師",
+        "multipleStaff": "多名員工",
+        "classTypes": "課程類型",
+        "studentPortal": "功能：學生平台",
+        "qrAttendance": "功能：每堂課的二維碼出席記錄",
+        "emailWhatsApp": "通知：電子郵件 + WhatsApp",
+        "advancedPromotions": "進階推廣"
+      },
+      "quantities": {
+        "baseUsers": "500 名學生",
+        "multipleSchools": "2 間額外學校",
+        "multipleAdmins": "2 名額外管理員",
+        "multipleTutors": "3 名額外導師",
+        "classTypes": "所有類型"
+      },
+      "free": "免費",
+      "total": "總計",
+      "additionalInfo": {
+        "title": "為什麼定價能如此靈活？",
+        "description": "我們的定價以模組化方法設計，您只需為實際需要的功能和使用量付費。"
+      },
+      "contactForDetails": "聯絡了解詳情",
+      "unlimited": "無限制",
+      "all": "全部"
+    },
+    "moneyBackGuarantee": {
+      "title": "14 天無憂退款保證",
+      "description": "我們對 Flowclass 充滿信心。任何方案可享 14 天免費試用——若不滿意，無條件全額退款，絕不問原因。",
+      "onlyForSelfServe": "只適用於自助服務訂閱方案。如果我們團隊已為您進行演示，則不適用於此保證。",
+      "features": {
+        "riskFreeTrial": {
+          "title": "無風險試用",
+          "description": "放心開始，您可以獲得全額退款。"
+        },
+        "instantSetup": {
+          "title": "即時設置",
+          "description": "通過我們簡單的入門流程，幾分鐘內即可開始"
+        },
+        "messagingSupport": {
+          "title": "訊息支援",
+          "description": "通過我們的訊息系統在需要時獲得幫助"
+        }
+      },
+      "cta": "立即試用"
+    },
+    "testimonials": {
+      "title": "客戶真心推薦",
+      "subtitle": "加入數百名信賴 Flowclass 管理其機構的教育者",
+      "rating": "滿分 5 分",
+      "cta": "預約產品演示",
+      "testimonialList": [
+        {
+          "id": 1,
+          "quote": "使用 Flowclass 後，我們的註冊和收費處理能力顯著提升。它為我們減少了大量繁瑣的工作。現在，家長可以自行購買課程計劃並進行預約。",
+          "name": "Jenny To",
+          "title": "創辦人",
+          "company": "新世代空手道學校"
+        },
+        {
+          "id": 2,
+          "quote": "學生可以自行處理所有事情。我不需要花太多時間處理溝通或付款問題。",
+          "name": "Black Cat",
+          "title": "聯合創辦人",
+          "company": "黑貓中文"
+        },
+        {
+          "id": 3,
+          "quote": "Flowclass 對我們幫助很大。它讓我們的註冊和出勤流程變得更加容易。現在我們可以處理數百位參加者，不需要花太多時間處理溝通或付款問題。",
+          "name": "May Lee",
+          "title": "單位主管",
+          "company": "香港青年協會"
+        },
+        {
+          "id": 4,
+          "quote": "隨著學生人數增加，行政工作也變得繁重。自從採用 Flowclass 後，線上註冊和付款對家長來說變得輕鬆，學生管理和課程提醒現在都自動化。",
+          "name": "Yuki Luo",
+          "title": "創辦人",
+          "company": "優悅普通話中心"
+        },
+        {
+          "id": 5,
+          "quote": "自從實施 Flowclass 後，整個流程變得更加直接。我可以輕鬆地向家長發送註冊連結，處理學費，發收據，並在一個地方追蹤收入。用戶友好的設計是一個重要優勢。",
+          "name": "Judy Yiu",
+          "title": "創辦人",
+          "company": "Judy Yiu Dance"
+        }
+      ]
+    },
+    "addOns": {
+      "title": "隨時加購功能——按您所需靈活啟用",
+      "subtitle": "Flowclass 模組化設計，只需啟用適合您的進階工具：",
+      "features": [
+        {
+          "title": "學生專屬平台",
+          "description": "自助預約、請假申請、查閱帳單收據"
+        },
+        {
+          "title": "移除品牌標誌",
+          "description": "打造專屬品牌形象"
+        },
+        {
+          "title": "二維碼點名與導師管理",
+          "description": "現代化點名與導師管理"
+        },
+        {
+          "title": "多種通知渠道",
+          "description": "支援電郵、WhatsApp等"
+        },
+        {
+          "title": "進階推廣工具",
+          "description": "運行優惠券、推薦活動和特別優惠"
+        },
+        {
+          "title": "自訂網域",
+          "description": "使用您自己的網域，打造完全品牌化的體驗"
+        },
+        {
+          "title": "家長/監護人帳戶存取",
+          "description": "讓家長在一個檔案下管理多個孩子"
+        },
+        {
+          "title": "專屬支援渠道",
+          "description": "優先或 WhatsApp 支援作為附加功能"
+        },
+        {
+          "title": "學生積分",
+          "description": "允許學生預先購買積分，用於靈活的課程預約和付款"
+        }
+      ],
+      "description": "所有附加功能價格透明，無隱藏收費、無強制綑綁。",
+      "cta": "預約產品演示"
+    },
+    "completeSubscriptionPlans": {
+      "title": "完整訂閱方案",
+      "subtitle": "探索所有可用的方案和功能，價格透明。",
+      "pricingNote": "💡 學校、管理員和導師按每年每額外項目收費",
+      "pricingStructure": {
+        "title": "了解我們的定價結構",
+        "multipleSchools": {
+          "title": "🏫 多間學校",
+          "description": "每年每額外學校",
+          "note": "已包含首間學校"
+        },
+        "multipleAdmins": {
+          "title": "👥 多位管理員",
+          "description": "每年每額外管理員",
+          "note": "已包含首位管理員"
+        },
+        "multipleTutors": {
+          "title": "👨‍🏫 多位導師",
+          "description": "每年每額外導師",
+          "note": "已包含首兩位導師"
+        }
+      },
+      "selectors": {
+        "currency": "貨幣：",
+        "duration": "時長："
+      },
+      "noPricingAvailable": "沒有 {duration} 價格適用於 {currency}",
+      "noPricingConfigured": "未配置價格",
+      "noPlansAvailable": {
+        "title": "沒有可用的定價方案",
+        "description": "聯繫我們的團隊設置您的訂閱方案"
+      },
+      "planTypeDescriptions": {
+        "BASE_USER": "基礎用戶層級，學生容量固定定價",
+        "MULTIPLE_SCHOOL": "每年每額外學校（首間學校已包含）",
+        "FEATURE_ENABLE": "功能附加項目，年度循環定價",
+        "NOTIFICATION_CHANNEL": "通訊渠道，年度循環定價",
+        "INTEGRATION": "第三方整合，一次性設置費用",
+        "CUSTOMER_SUPPORT": "支援服務層級（大部分已包含在基礎方案中）",
+        "CLASS_TYPE": "課程類型功能，年度循環定價",
+        "SETUP_FEE": "初始配置的一次性設置費用",
+        "MULTIPLE_ADMIN": "每年每額外管理員（首位管理員已包含）",
+        "MULTIPLE_TUTOR": "每年每額外導師（首兩位導師已包含）",
+        "PROMOTION_FEES": "推廣和營銷工具，年度定價",
+        "default": "額外訂閱方案選項"
+      }
+    },
+    "presetPlans": {
+      "title": "不知道從哪裡開始？",
+      "subtitle": "選擇我們最受歡迎的套餐——每個都專為您教育業務的特定階段而設計。",
+      "not_sure_where_to_start": "不知道從哪裡開始？",
+      "choose_from_popular_packages": "選擇我們最受歡迎的套餐——每個都專為您教育業務的特定階段而設計。",
+      "currency": "貨幣：",
+      "duration": "時長：",
+      "monthly": "月付",
+      "yearly": "年付",
+      "most_popular": "最受歡迎",
+      "per_month": "每月",
+      "billed_yearly_at": "年付價格",
+      "billed_monthly": "月付價格",
+      "students": "學生",
+      "unlimited_students": "無限學生",
+      "school": "學校",
+      "schools": "學校",
+      "managers": "管理員",
+      "tutors": "導師",
+      "class_type": "課程類型",
+      "class_types": "課程類型",
+      "reschedule_requests": "在學生平台要求調堂",
+      "qr_code_attendance": "每堂課的二維碼出席記錄",
+      "credit_system": "學生積分",
+      "start_using": "開始使用",
+      "book_demo_with_team": "...或與我們的團隊預約演示",
+      "still_choosing": "還在選擇？",
+      "build_your_own_plans": "您可以使用我們的定價計算器建立自己的計劃。",
+      "try_pricing_calculator": "試試我們的定價計算器",
+      "plans": {
+        "individual": {
+          "name": "個人導師",
+          "basePrice": "$800",
+          "maxStudents": "100",
+          "schoolsIncluded": "1",
+          "adminsIncluded": "3",
+          "tutorsIncluded": "2",
+          "classTypes": "1",
+          "promotions": "基本",
+          "studentPortal": "✔️",
+          "rescheduleRequest": "",
+          "tutorCentral": "",
+          "qrCodeAttendance": "",
+          "creditSystem": "",
+          "notificationChannel": "只限電郵",
+          "totalPlanValue": "$2,400"
+        },
+        "startup": {
+          "name": "初創教育中心",
+          "basePrice": "$3,800",
+          "maxStudents": "500",
+          "schoolsIncluded": "1",
+          "adminsIncluded": "3",
+          "tutorsIncluded": "5",
+          "classTypes": "1",
+          "promotions": "進階",
+          "studentPortal": "✔️",
+          "rescheduleRequest": "✔️",
+          "tutorCentral": "✔️",
+          "qrCodeAttendance": "",
+          "creditSystem": "",
+          "notificationChannel": "WhatsApp（非官方）",
+          "totalPlanValue": "$8,200"
+        },
+        "small": {
+          "name": "小型教育中心",
+          "basePrice": "$6,800",
+          "maxStudents": "1,500",
+          "schoolsIncluded": "4",
+          "adminsIncluded": "3",
+          "tutorsIncluded": "10",
+          "classTypes": "1",
+          "promotions": "進階",
+          "studentPortal": "✔️",
+          "rescheduleRequest": "✔️",
+          "tutorCentral": "✔️",
+          "qrCodeAttendance": "✔️",
+          "creditSystem": "✔️",
+          "notificationChannel": "WhatsApp（非官方）",
+          "totalPlanValue": "$14,500"
+        },
+        "medium": {
+          "name": "中型教育中心",
+          "basePrice": "$12,800",
+          "maxStudents": "5,000",
+          "schoolsIncluded": "10",
+          "adminsIncluded": "10",
+          "tutorsIncluded": "20",
+          "classTypes": "2",
+          "promotions": "進階",
+          "studentPortal": "✔️",
+          "rescheduleRequest": "✔️",
+          "tutorCentral": "✔️",
+          "qrCodeAttendance": "✔️",
+          "creditSystem": "✔️",
+          "notificationChannel": "WhatsApp（非官方）",
+          "totalPlanValue": "$26,220"
+        },
+        "large": {
+          "name": "大型教育中心",
+          "basePrice": "$19,800",
+          "maxStudents": "無限制",
+          "schoolsIncluded": "20",
+          "adminsIncluded": "30",
+          "tutorsIncluded": "40",
+          "classTypes": "3",
+          "promotions": "進階",
+          "studentPortal": "✔️",
+          "rescheduleRequest": "✔️",
+          "tutorCentral": "✔️",
+          "qrCodeAttendance": "✔️",
+          "creditSystem": "✔️",
+          "notificationChannel": "WhatsApp（非官方）",
+          "totalPlanValue": "$47,700"
+        }
+      },
+      "note": "每個方案均設有「立即購買」按鈕，小型或以上方案將額外提供「聯絡銷售團隊」按鈕",
+      "customization": {
+        "title": "每個方案都可隨時自訂和升級。",
+        "subtitle": "想自訂專屬方案？",
+        "description": "立即試用方案計算器，打造最適合您的功能組合！",
+        "cta": "預約產品演示"
+      }
+    },
+    "calculator": {
+      "title": "收費計算機",
+      "subtitle": "幾秒鐘即時估算訂閱費用。請選擇學生人數、校區、管理員及所需功能，立即預覽價格！",
+      "cta": "立即試用"
+    }
+  },
+  "contactSalesModal": {
+    "title": "聯絡銷售團隊",
+    "subtitle": "為您的 {plan} 方案提供個人化協助",
+    "planSummary": {
+      "plan": "{planName} 方案",
+      "perMonth": "每月",
+      "billedYearlyAt": "按年收費",
+      "billedMonthly": "按月收費"
+    },
+    "successMessage": {
+      "title": "查詢已成功發送！",
+      "description": "我們的銷售團隊將在 24 小時內聯絡您，討論您的 {plan} 方案。"
+    }
+  },
+  "contactSalesForm": {
+    "form": {
+      "fullName": "全名 *",
+      "fullNamePlaceholder": "輸入您的全名",
+      "fullNameRequired": "全名為必填項",
+      "email": "電郵地址 *",
+      "emailPlaceholder": "輸入您的電郵地址",
+      "emailRequired": "電郵地址為必填項",
+      "invalidEmail": "無效的電郵地址",
+      "phone": "電話 *",
+      "phoneRequired": "電話為必填項",
+      "company": "公司/機構名稱",
+      "companyPlaceholder": "輸入您的公司名稱",
+      "website": "公司網站",
+      "websitePlaceholder": "https://yourcompany.com"
+    },
+    "submit": {
+      "sending": "發送中...",
+      "sendQuoteRequest": "發送報價請求"
+    },
+    "success": {
+      "title": "查詢已成功發送！",
+      "description": "我們的銷售團隊將在 24 小時內聯絡您，討論您的 {plan} 方案。"
+    },
+    "errors": {
+      "quoteRequestSuccess": "報價請求已成功發送！",
+      "failedToSend": "發送查詢失敗，請重試。",
+      "failedToSendContact": "發送查詢失敗，請重試或直接聯絡我們。"
+    }
+  },
+  "pricingTiers": {
+    "individual": "個人導師",
+    "startup": "初創教育中心",
+    "growing": "成長教育中心",
+    "multiBranch": "多分校教育中心",
+    "largeScale": "大型教育中心",
+    "small": "小型教育中心",
+    "medium": "中型教育中心",
+    "large": "大型教育中心"
+  },
+  "notifications": {
+    "title": "通知",
+    "noNotifications": "暫無通知",
+    "previous": "上一頁",
+    "next": "下一頁",
+    "page": "第",
+    "of": "頁，共",
+    "notificationSent": "通知已發送",
+    "sentTo": "發送至",
+    "paymentApproved": "付款已確認",
+    "newApplication": "新申請",
+    "appliedForCourse": "申請了課程"
+  },
+  "home": {
+    "welcome": "歡迎回來，{{name}}",
+    "subtitle": "繼續您的 Flowclass 之旅，逐步掌握新功能",
+    "tabs": {
+      "starter": "入門",
+      "scaling": "擴張",
+      "multiBranch": "分校"
+    },
+    "tierDescriptions": {
+      "starter": "讓學校管理正常運行的基本功能",
+      "scaling": "適合成長中學校和管理更多學生的進階工具",
+      "multiBranch": "管理多個地點和團隊的企業功能"
+    },
+    "learningPath": {
+      "starter": {
+        "homeDescription": {
+          "title": "創建首頁描述",
+          "description": "為您的學校首頁撰寫引人注目的描述"
+        },
+        "moreClasses": {
+          "title": "創建更多課程",
+          "description": "為您的課程提供添加不同類型的課程"
+        },
+        "courseSettings": {
+          "title": "自定義課程設置",
+          "description": "為您的課程添加詳細描述和設置"
+        },
+        "customFields": {
+          "title": "自定義欄位",
+          "description": "為學生註冊創建自定義信息欄位"
+        },
+        "customForms": {
+          "title": "自定義表單",
+          "description": "設置申請表單以收集學生信息"
+        },
+        "coupons": {
+          "title": "優惠券",
+          "description": "創建折扣代碼以吸引新學生"
+        },
+        "onlinePayment": {
+          "title": "線上付款",
+          "description": "設置 Stripe Connect 以接受線上付款"
+        }
+      },
+      "scaling": {
+        "trackingAttendance": {
+          "title": "追蹤出勤",
+          "description": "將至少一節課標記為「已出席」"
+        },
+        "addingClassToStudents": {
+          "title": "為學生添加課程",
+          "description": "點擊「分配課程」來註冊學生"
+        },
+        "importStudents": {
+          "title": "導入學生",
+          "description": "從外部來源導入學生數據"
+        },
+        "invoiceCampaign": {
+          "title": "發票活動",
+          "description": "創建至少一個發票活動"
+        },
+        "enterAddress": {
+          "title": "輸入地址",
+          "description": "輸入學校地址"
+        }
+      },
+      "multiBranch": {
+        "invitingInstructors": {
+          "title": "邀請其他導師",
+          "description": "發送導師邀請"
+        },
+        "studentCredits": {
+          "title": "學生積分",
+          "description": "為一名學生添加或扣除積分"
+        },
+        "addLocations": {
+          "title": "添加地點",
+          "description": "添加一個地點"
+        },
+        "approvalRequests": {
+          "title": "審批請求",
+          "description": "批准或拒絕一個重新安排請求"
+        },
+        "automationFlows": {
+          "title": "自動化流程",
+          "description": "創建自動化流程帳戶"
+        },
+        "assignHourlyRate": {
+          "title": "為導師分配時薪",
+          "description": "為導師設定時薪以有效管理工資和追蹤成本"
+        }
+      },
+      "milestones": {
+        "reach10Students": {
+          "title": "達到 10 名學生",
+          "description": "將您的學生基礎增長到 10 名註冊學生"
+        },
+        "reach50Students": {
+          "title": "達到 50 名學生",
+          "description": "將您的學生基礎增長到 50 名註冊學生"
+        },
+        "reach200Students": {
+          "title": "達到 200 名學生",
+          "description": "將您的學校擴展到 200 名註冊學生"
+        }
+      }
+    },
+    "status": {
+      "complete": "已完成",
+      "locked": "已鎖定",
+      "notStarted": "未開始",
+      "unmeasurable": "無法追蹤"
+    },
+    "actions": {
+      "learnMore": "了解更多",
+      "start": "開始"
+    },
+    "progress": {
+      "complete": "完成"
+    },
+    "milestones": "里程碑"
+  },
+  "featureData": {
+    "homeDescription": {
+      "title": "創建首頁描述",
+      "description": "引人注目的學校描述幫助潛在學生了解您機構的獨特之處。這通常是訪客在您網站上看到的第一件事，因此留下良好的第一印象至關重要。",
+      "steps": [
+        "導航到學校設置頁面",
+        "點擊「描述」標籤",
+        "寫下您學校的詳細描述（至少50個字）",
+        "包含您的教學理念、專業領域和獨特之處的信息",
+        "添加任何相關的經驗和資格詳情",
+        "保存您的更改"
+      ],
+      "tips": [
+        "使用清晰、引人入勝的語言與目標受眾對話",
+        "包含您教學方法的具體細節",
+        "提及您學校的任何專業化或獨特功能",
+        "保持專業但平易近人"
+      ]
+    },
+    "moreClasses": {
+      "title": "創建更多課程",
+      "description": "提供多種課程類型讓您能夠服務不同學生需求並增加收入潛力。這顯示您學校的多樣性和專業性。",
+      "steps": [
+        "前往教學服務 > 創建課程",
+        "選擇與現有課程不同的課程類型",
+        "填寫基本課程信息",
+        "設置課程時間表和定價",
+        "配置任何特殊要求或先決條件",
+        "發布新課程"
+      ],
+      "tips": [
+        "考慮提供不同技能水平（初級、中級、高級）",
+        "思考不同格式（團體課程、私人課程、工作坊）",
+        "確保每個課程都有明確的價值主張",
+        "為每個課程類型設定適當的定價"
+      ]
+    },
+    "courseSettings": {
+      "title": "自定義課程設置",
+      "description": "詳細的課程描述幫助學生了解他們將學習什麼以及期望什麼。這減少了困惑並提高學生滿意度。",
+      "steps": [
+        "導航到教學服務 > 編輯課程",
+        "點擊「描述」標籤",
+        "寫下全面的描述（至少50個字）",
+        "包含學習目標和成果",
+        "描述教學方法",
+        "添加任何先決條件或要求",
+        "保存您的更改"
+      ],
+      "tips": [
+        "具體說明學生將學習什麼",
+        "包含課程的持續時間和格式",
+        "提及所需的任何材料或設備",
+        "為學生參與設定明確期望"
+      ]
+    },
+    "customFields": {
+      "title": "自定義欄位",
+      "description": "自定義信息欄位讓您在註冊期間從學生收集特定數據。這幫助您更好地了解學生並定制您的服務。",
+      "steps": [
+        "前往設置 > 學生信息欄位",
+        "點擊「添加新欄位」",
+        "選擇欄位類型（文本、下拉菜單、複選框等）",
+        "輸入欄位標籤和描述",
+        "設置欄位是否為必填或可選",
+        "配置任何驗證規則",
+        "保存欄位"
+      ],
+      "tips": [
+        "思考對您的教學最有用的信息",
+        "保持表單簡潔以避免讓學生感到困惑",
+        "為欄位標籤使用清晰、簡單的語言",
+        "從學生的角度測試表單"
+      ]
+    },
+    "customForms": {
+      "title": "自定義表單",
+      "description": "申請表單幫助您從潛在學生收集重要信息並簡化註冊流程。設計良好的表單改善學生體驗。",
+      "steps": [
+        "導航到設置 > 申請表單",
+        "點擊「創建新表單」",
+        "為您的申請添加必要欄位",
+        "如需要設置條件邏輯",
+        "配置表單設置和通知",
+        "測試表單確保正常工作",
+        "發布表單"
+      ],
+      "tips": [
+        "只包含基本信息以保持表單簡短",
+        "使用清晰的說明和有用的佔位符文本",
+        "邏輯性地考慮欄位順序",
+        "在發布前徹底測試表單"
+      ]
+    },
+    "coupons": {
+      "title": "優惠券",
+      "description": "優惠券代碼是強大的營銷工具，可以幫助吸引新學生並鼓勵重複業務。它們對促銷和特別優惠特別有效。",
+      "steps": [
+        "前往促銷 > 優惠券代碼",
+        "點擊「創建新優惠券」",
+        "選擇百分比或固定金額折扣",
+        "設置折扣值和任何最低購買要求",
+        "設置到期日期和使用限制",
+        "創建一個難忘的優惠券代碼",
+        "保存並激活優惠券"
+      ],
+      "tips": [
+        "使用清晰、難忘的優惠券代碼",
+        "設定合理的到期日期以創造緊迫感",
+        "考慮為不同場合提供不同折扣",
+        "追蹤優惠券使用情況以衡量效果"
+      ]
+    },
+    "onlinePayment": {
+      "title": "線上付款",
+      "description": "設置線上付款讓學生更容易支付課程費用並減少管理工作。Stripe Connect提供安全、可靠的付款處理。",
+      "steps": [
+        "導航到設置 > 付款",
+        "點擊「設置Stripe Connect」",
+        "遵循Stripe入職流程",
+        "提供您的業務信息和銀行詳情",
+        "完成身份驗證",
+        "用小額交易測試付款系統",
+        "激活付款處理"
+      ],
+      "tips": [
+        "確保所有業務信息準確以獲得更快批准",
+        "在發布前徹底測試付款",
+        "保持您的Stripe儀表板信息更新",
+        "考慮提供多種付款方式"
+      ]
+    },
+    "trackingAttendance": {
+      "title": "追蹤出勤",
+      "description": "出勤追蹤幫助您監控學生進度並識別模式。這對於維護準確記錄並確保學生從課程中獲得價值至關重要。",
+      "steps": [
+        "前往完整日曆視圖",
+        "找到您要標記出勤的課程",
+        "點擊課程打開詳情",
+        "尋找出勤部分",
+        "將學生標記為「出席」、「缺席」或「遲到」",
+        "如需要添加課程筆記",
+        "保存出勤記錄"
+      ],
+      "tips": [
+        "每節課後及時標記出勤",
+        "使用筆記追蹤任何特殊情況",
+        "定期查看出勤模式",
+        "跟進經常缺席的學生"
+      ]
+    },
+    "addingClassToStudents": {
+      "title": "為學生添加課程",
+      "description": "將學生註冊到課程是管理學校的基本部分。此過程確保學生正確註冊並可以訪問他們的課程。",
+      "steps": [
+        "導航到學生記錄",
+        "找到您要註冊的學生",
+        "點擊他們的姓名打開個人資料",
+        "尋找「分配課程」按鈕",
+        "選擇適當的課程和班級",
+        "設置註冊日期和任何特殊筆記",
+        "確認註冊"
+      ],
+      "tips": [
+        "確認前仔細檢查課程和班級選擇",
+        "設定適當的註冊日期",
+        "為任何特殊安排添加筆記",
+        "確保學生知道他們的註冊"
+      ]
+    },
+    "importStudents": {
+      "title": "導入學生",
+      "description": "如果您在電子表格或其他系統中有現有學生數據，導入可以為您節省大量時間。此功能幫助您高效地遷移數據。",
+      "steps": [
+        "前往學生記錄頁面",
+        "點擊「導入學生」按鈕",
+        "下載模板文件查看所需格式",
+        "以正確格式準備您的學生數據",
+        "上傳完成的文件",
+        "查看導入預覽是否有錯誤",
+        "確認導入將學生添加到您的系統"
+      ],
+      "tips": [
+        "使用提供的模板確保正確格式",
+        "導入前檢查所有數據的準確性",
+        "先用小批次測試流程",
+        "保留原始數據的備份"
+      ]
+    },
+    "invoiceCampaign": {
+      "title": "發票活動",
+      "description": "發票活動幫助您一次向多個學生發送專業發票。這簡化了您的計費流程並確保及時付款。",
+      "steps": [
+        "導航到發票模板",
+        "點擊「創建新活動」",
+        "選擇您要開具發票的學生",
+        "選擇適當的發票模板",
+        "如需要自定義發票內容",
+        "設置到期日期和付款條款",
+        "向學生發送發票"
+      ],
+      "tips": [
+        "使用清晰、專業的發票模板",
+        "為付款設定合理的到期日期",
+        "包含所有必要的付款信息",
+        "及時跟進逾期發票"
+      ]
+    },
+    "enterAddress": {
+      "title": "輸入地址",
+      "description": "添加您學校的地址幫助學生找到您並提供重要的聯繫信息。這對面對面課程特別重要。",
+      "steps": [
+        "前往聯繫頁面",
+        "點擊「編輯聯繫信息」",
+        "輸入您學校的完整地址",
+        "包含任何相關的地標或方向",
+        "如適用添加停車信息",
+        "在地圖上驗證地址是否正確",
+        "保存您的聯繫信息"
+      ],
+      "tips": [
+        "為學生包含清晰的方向",
+        "提及任何停車限制或選項",
+        "如果您搬遷位置則更新地址",
+        "考慮添加地圖或方向鏈接"
+      ]
+    },
+    "invitingInstructors": {
+      "title": "邀請其他導師",
+      "description": "隨著學校的發展，您可能想要添加其他導師來幫助教授課程。此功能讓您高效地管理多個教師。",
+      "steps": [
+        "導航到設置 > 用戶",
+        "點擊「邀請新用戶」",
+        "輸入導師的電子郵件地址",
+        "選擇「導師」作為他們的角色",
+        "設置他們的權限和訪問級別",
+        "如需要添加個人消息",
+        "發送邀請"
+      ],
+      "tips": [
+        "向新導師清楚傳達期望",
+        "為每個導師設定適當的權限級別",
+        "提供您學校系統的培訓",
+        "建立清晰的溝通渠道"
+      ]
+    },
+    "studentCredits": {
+      "title": "學生積分",
+      "description": "積分系統允許學生提前購買課程並靈活使用。這可以改善現金流和學生承諾。",
+      "steps": [
+        "前往功能啟用頁面",
+        "找到「學生積分系統」並啟用它",
+        "導航到學生記錄",
+        "選擇要管理積分的學生",
+        "點擊「管理積分」",
+        "如需要添加或扣除積分",
+        "添加解釋積分交易的筆記",
+        "保存更改"
+      ],
+      "tips": [
+        "為積分使用和到期設定明確政策",
+        "保留所有積分交易的詳細記錄",
+        "向學生清楚傳達積分政策",
+        "考慮提供積分購買激勵"
+      ]
+    },
+    "addLocations": {
+      "title": "添加地點",
+      "description": "多個地點讓您擴展學校的覆蓋範圍並在不同地區服務學生。這對發展業務至關重要。",
+      "steps": [
+        "導航到地點頁面",
+        "點擊「添加新地點」",
+        "輸入地點名稱和地址",
+        "添加地點的聯繫信息",
+        "設置任何地點特定設置",
+        "配置房間或空間詳情",
+        "保存新地點"
+      ],
+      "tips": [
+        "選擇學生容易到達的地點",
+        "確保每個地點都有充足的設施",
+        "考慮當地市場和競爭",
+        "為地點特定營銷做計劃"
+      ]
+    },
+    "approvalRequests": {
+      "title": "審批請求",
+      "description": "管理重新安排請求幫助維護課程時間表同時滿足學生需求。此功能簡化審批流程。",
+      "steps": [
+        "前往重新安排審批頁面",
+        "查看待處理的重新安排請求",
+        "檢查請求原因和新時間",
+        "考慮對其他學生的影響",
+        "批准或拒絕請求",
+        "添加解釋您決定的評論",
+        "通知學生您的決定"
+      ],
+      "tips": [
+        "為重新安排請求設定明確政策",
+        "批准前考慮對其他學生的影響",
+        "及時向學生傳達決定",
+        "保留所有重新安排決定的記錄"
+      ]
+    },
+    "automationFlows": {
+      "title": "自動化流程",
+      "description": "自動化流程幫助您簡化重複任務並提高效率。它們可以處理從學生通訊到付款提醒的一切。",
+      "steps": [
+        "導航到自動化流程",
+        "點擊「創建新流程」",
+        "選擇自動化的觸發器",
+        "設置條件和操作",
+        "測試流程確保正常工作",
+        "激活自動化流程",
+        "監控流程性能"
+      ],
+      "tips": [
+        "從簡單的自動化開始，逐漸建立複雜性",
+        "激活前徹底測試流程",
+        "定期監控自動化性能",
+        "隨著流程變化保持自動化更新"
+      ]
+    },
+    "assignHourlyRate": {
+      "title": "為導師分配時薪",
+      "description": "為導師設定時薪幫助您追蹤成本並高效管理工資。這對於多導師學校確保公平薪酬至關重要。",
+      "steps": [
+        "導航到設置 > 用戶",
+        "找到您要設定費率的導師",
+        "點擊他們的個人資料打開詳情",
+        "尋找「時薪」或「工資」部分",
+        "輸入適當的時薪",
+        "如需要設定任何加班或特殊費率規則",
+        "保存導師的費率設置"
+      ],
+      "tips": [
+        "根據經驗和資格設定費率",
+        "考慮類似職位的市場費率",
+        "記錄費率變更以便工資追蹤",
+        "定期審查和更新費率"
+      ]
+    }
+  },
+  "featureModal": {
+    "closeModal": "關閉模態框",
+    "videoTutorial": "視頻教程",
+    "clickToPlay": "點擊播放",
+    "pause": "暫停",
+    "play": "播放",
+    "howToGetStarted": "如何開始：",
+    "proTips": "💡 專業提示：",
+    "close": "關閉"
+  }
+}

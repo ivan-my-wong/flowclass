@@ -1,0 +1,14 @@
+node_modules
+.DS_Store
+.vscode
+dist
+dist-ssr
+*.local
+coverage
+.env
+build
+doc
+analyze.html
+.idea/
+.cursor/
+mcp.json

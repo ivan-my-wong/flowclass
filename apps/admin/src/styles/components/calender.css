@@ -1,0 +1,85 @@
+.fc {
+  height: 80vh;
+  /* margin:"20px 20px"; */
+  border: unset;
+  z-index: 0;
+}
+.fc-toolbar .fc-button {
+  background-color: 'transparent';
+  border-color: transparent !important;
+  text-transform: capitalize;
+  color: rgb(0, 0, 0);
+  border: none;
+  padding: 5px 8px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 2px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+/* Change the button color on hover */
+.fc-toolbar .fc-button:hover {
+  background-color: transparent;
+  border-radius: '100%';
+  /* color: #4CAF50; */
+  /* border-color:  #4CAF50; */
+  border: 'unset';
+}
+.fc-toolbar .fc-button:focus {
+  background-color: transparent; /* Even darker shade of green when clicked */
+  /* border-color:  #4CAF50; */
+  border: 'unset';
+  border-color: transparent !important;
+}
+.fc-toolbar .fc-button:active {
+  background-color: transparent !important; /* Even darker shade of green when clicked */
+  /* border-color:  #4CAF50; */
+  border: 'unset';
+}
+:root {
+  --fc-button-bg-color: 'transparent';
+  --fc-button-text-color: '#000000';
+  --fc-button-border-color: '#ffffff';
+  --fc-event-bg-color: '#F7F7F7';
+}
+
+/* event */
+.fc-v-event {
+  background-color: #f7f7f7; /* Set your desired background color for events */
+  color: #000000; /* Set your desired text color for events */
+  border: 1px solid #f7f7f7; /* Set your desired border color for events */
+  border-top: unset;
+  border-right: unset;
+  border-bottom: unset;
+  border-left: 10px solid #5c95ff;
+  padding: 5px 10px; /* Optional: Add padding inside events */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add box shadow for events */
+}
+@media screen and (max-width: 600px) {
+  .fc-v-event {
+    display: flex;
+    justify-content: flex-start;
+    background-color: #ffffff;
+    /* align-self:center; */
+  }
+}
+
+.fc-timegrid-slots .fc-timegrid-slot {
+  height: 100px; /* Set your desired height for the slots */
+  /* Additional styles if needed */
+}
+.fc-timegrid-slots .fc-timegrid-slot-label {
+  /* Additional styles if needed */
+  border: unset;
+}
+.fc .fc-scrollgrid {
+  border: unset;
+}
+.fc th .fc-scroller {
+  overflow: hidden !important;
+}

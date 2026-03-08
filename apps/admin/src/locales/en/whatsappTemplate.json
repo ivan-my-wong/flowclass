@@ -1,0 +1,71 @@
+{
+  "whatsappTemplate": "WhatsApp Template",
+  "addWhatsappTemplate": "Add WhatsApp Template",
+  "notYetReady": "We will be releasing a feature to let you automate sending out reminder WhatsApp messages to your students. You can create your message templates first.",
+  "filter": {
+    "searchPlaceholder": "Search template by name",
+    "allStatusesPlaceholder": "All statuses",
+    "assignedToPlaceholder": "None"
+  },
+  "form": {
+    "add": "Add new a WhatsApp Template",
+    "edit": "Update WhatsApp Template",
+    "name": "Template Name",
+    "nameRequirements": "Lowercase alphanumeric characters and underscores only",
+    "namePlaceholder": "Enter template name",
+    "content": "Template Content",
+    "contentPlaceholder": "Enter template content",
+    "tags": "Tags",
+    "language": "Language",
+    "languagePlaceholder": "Select language",
+    "category": "Category",
+    "categoryPlaceholder": "Select category",
+    "assignedTo": "Assigned To",
+    "assignedToPlaceholder": "Select assigned to",
+    "addVariable": "Add Variable",
+    "nameRequired": "Template Name is required",
+    "contentRequired": "Template Content is required",
+    "isDefault": "Set this template as default template",
+    "isDefaultDescription": "If set as default, all other template with same assigned function will be set as non-default templates",
+    "alertPendingTemplate": "Pending Template",
+    "alertPendingTemplateDescription": "This template is pending approval. Cannot be used for sending messages.",
+    "alertUnsubmittedTemplate": "Unsubmitted Template",
+    "alertUnsubmittedTemplateDescription": "This template is unsubmitted. Cannot be used for sending messages.",
+    "alertRejectedTemplate": "Rejected Template",
+    "alertRejectedTemplateDescription": "This template is rejected. Cannot be used for sending messages.",
+    "twilioIntegration": "Twilio Integration",
+    "twilioIntegrationDescription": "Configure your Twilio credentials to send WhatsApp messages."
+  },
+  "action": {
+    "checkApprovalStatus": "Check the approval request status"
+  },
+  "delete": {
+    "title": "Delete Template",
+    "description": "Are you sure you want to delete this template?"
+  },
+  "message": {
+    "createSuccess": "Create WhatsApp Template successfully",
+    "updateSuccess": "Update WhatsApp Template successfully",
+    "deleteSuccess": "Delete WhatsApp Template successfully",
+    "submitApprovalSuccess": "Submit for approval successfully",
+    "alreadyApproved": "Template: {{name}} already approved!!"
+  },
+  "category": {
+    "all": "All Categories",
+    "authentication": "Authentication",
+    "utility": "Utility",
+    "marketing": "Marketing"
+  },
+  "language": {
+    "all": "All Languages",
+    "english": "English",
+    "chinese": "Chinese"
+  },
+  "status": {
+    "all": "All Status",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "pending": "Pending",
+    "unsubmitted": "Unsubmitted"
+  }
+}

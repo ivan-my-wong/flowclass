@@ -1,0 +1,49 @@
+{
+  "locations": {
+    "title": "Locations",
+    "addLocation": "Add Location",
+    "name": "Name",
+    "capacity": "Capacity",
+    "description": "Description",
+    "address": "Address",
+    "equipment": "Equipment",
+    "locationGroup": "Location Group",
+    "searchByLocationName": "Search by Location name...",
+    "searchByCapacity": "Search by Capacity...",
+    "searchByLocationGroup": "Search by Location Group...",
+    "searchByEquipment": "Search by Equipment...",
+    "action": "Action"
+  },
+  "form": {
+    "newLocation": "New Location",
+    "updateLocation": "Update Location",
+    "saveAction": "Save",
+    "cancelAction": "Cancel",
+    "name": "Name",
+    "namePlaceholder": "Enter Location Name",
+    "capacity": "Capacity",
+    "capacityPlaceholder": "Enter Capacity",
+    "description": "Description",
+    "descriptionPlaceholder": "Enter Description",
+    "equipment": "Equipment",
+    "equipmentPlaceholder": "Please select or add Equipment",
+    "locationGroup": "Location Group",
+    "locationGroupPlaceholder": "Please select or add Location Group",
+    "locationOnMap": "Location on Map",
+    "locationOnMapPlaceholder": "Search Location on Map"
+  },
+  "messages": {
+    "createLocationSuccess": "Location created successfully",
+    "updateLocationSuccess": "Location updated successfully",
+    "deleteLocationSuccess": "Location deleted successfully",
+    "createLocationError": "Failed to create location",
+    "updateLocationError": "Failed to update location",
+    "deleteLocationError": "Failed to delete location"
+  },
+  "confirm": {
+    "deleteLocation": "Delete Location",
+    "deleteLocationDescription": "Are you sure you want to delete this location?",
+    "deleteLocationConfirm": "Delete",
+    "deleteLocationCancel": "Cancel"
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "tiers": {
+    "trialTier": "試用方案",
+    "freeTier": "免費方案",
+    "starterTier": "初始方案",
+    "growthTier": "成長方案",
+    "proTier": "專業方案",
+    "enterpriseTier": "企業方案"
+  },
+  "quotas": {
+    "currentActiveStudents": "目前活躍學生數量",
+    "currentSentReminder": "已發送通知數量"
+  },
+  "target": {
+    "freeTier": "所有人",
+    "starterTier": "個人教練和導師",
+    "growthTier": "小型教育中心",
+    "proTier": "中型教育中心",
+    "enterpriseTier": "中型教育中心"
+  },
+  "pricing": {
+    "starterTier": "（僅限一個網站）",
+    "growthTier": "$29.9 / 月 / 網站",
+    "proTier": "$199.9 / 月 / 網站",
+    "enterpriseTier": ""
+  },
+  "features": {
+    "target": {
+      "": "目標",
+      "everyone": "所有人",
+      "starterPlan": "個人導師和教育家",
+      "growthPlan": "小型教育中心",
+      "proPlan": "大學、學校和學習中心連鎖店"
+    },
+    "userManagement": {
+      "": "職員管理",
+      "noOfUsers": "使用者數量"
+    },
+    "landingPageBuilder": {
+      "": "登入頁面建立器",
+      "usersBySite": "使用者（按網站）",
+      "mobileOptimized": "教育家移動優化網站建立器",
+      "confirmation": "選擇時段的課程註冊和電子郵件通知",
+      "regularCoursePagesAppointmentPages": "常規課程頁面/預約頁面/活動和研討會頁面（總數）",
+      "eventsWorkshopPagesTotal": "活動和研討會頁面（總數）",
+      "removeFlowclassBranding": "移除 Flowclass 品牌",
+      "customDomainPlugin": "高級 .course.site 域名",
+      "gpt3WriterNoOfWords": "AI 寫作器（嘗試次數）"
+    },
+    "promotion": {
+      "": "優惠活動",
+      "directDiscounts": "直接折扣",
+      "trialLessons": "試聽課程",
+      "recurringBundleDiscounts": "定期/套餐折扣",
+      "couponCode": "優惠碼"
+    },
+    "postSales": {
+      "": "售後",
+      "searchEngineVisibility": "搜索引擎可見性",
+      "commentEmailsForStudents": "學生評論郵件",
+      "referralEmailsForStudents": "學生轉介郵件"
+    },
+    "payment": {
+      "": "支付",
+      "connectWithDigitalPayments": "連接數字支付",
+      "customFields": "自訂欄位"
+    },
+    "integration": {
+      "connectWithSchoolManagementSystem": "連接學校管理系統",
+      "connectWithCalendars": "連接日曆"
+    },
+    "support": {
+      "": "支援",
+      "marketingConsultancy": "營銷諮詢"
+    }
+  },
+  "freePlan": {
+    "mobileSiteBuilder": "為教育者設計的移動優化網站建立工具",
+    "optimizedProfileSite": "完全搜尋引擎優化並索引的個人檔案網站",
+    "publishedCoursePage": "1個任何類型的已發布課程頁面（常規課程、活動和工作坊）",
+    "embedPageToWebsite": "將頁面嵌入現有網站",
+    "aiProfileCreatorAttempts": "10次AI教育者檔案創建嘗試",
+    "courseRegistration": "課程註冊系統，包含班別時間選擇和電子郵件通知",
+    "ownDomain": "您的 .flowclass.site 域名"
+  },
+  "starterPlan": {
+    "allFeatures": "起始方案中的所有功能以及：",
+    "publishedCoursePages": "5個任何類型的已發布課程頁面（常規課程、活動和工作坊）",
+    "aiProfileCreatorAttempts": "100次AI教育者檔案創建嘗試",
+    "stripeIntegration": "與Stripe整合，自動確認線上付款",
+    "coupons": "為您的課程創建折扣優惠券"
+  },
+  "growthPlan": {
+    "allFeatures": "成長方案中的所有功能以及：",
+    "publishedCoursePages": "20個任何類型的已發布課程頁面（常規課程、活動和工作坊）",
+    "aiProfileCreatorAttempts": "500次AI教育者檔案創建嘗試",
+    "ownDomain": "您的高級 .course.site 域名"
+  },
+  "proPlan": {
+    "allFeatures": "專業方案中的所有功能以及：",
+    "publishedCoursePages": "100個任何類型的已發布課程頁面（常規課程、活動和工作坊）",
+    "coursePlatform": "擁有篩選和搜索功能的課程平台",
+    "integrationAvailable": "可與學校管理系統、CRM和日曆集成",
+    "customEnrollmentForm": "使用自訂資料欄位定制學生報名表格",
+    "promotion": "通過直接折扣、試堂、定期/套餐折扣和優惠券代碼進行優惠活動"
+  },
+  "confirmDialog": {
+    "title": "確認訂閱分配",
+    "clientInformation": {
+      "title": "客戶資訊",
+      "name": "姓名：",
+      "email": "電子郵件：",
+      "phone": "電話：",
+      "clientId": "客戶ID："
+    },
+    "billingSummary": {
+      "title": "計費摘要",
+      "monthly": "月付",
+      "yearly": "年付",
+      "plans": "方案",
+      "subtotal": "小計：",
+      "setupFeeProportional": "設置費用（按比例）：",
+      "setupFeeOneTime": "設置費用（一次性）：",
+      "recordTotal": "記錄總計：",
+      "grandTotal": "總計：",
+      "totalFirstYear": "第一年總計："
+    },
+    "billingPeriod": {
+      "title": "計費週期",
+      "start": "開始：",
+      "expires": "到期：",
+      "currency": "幣別："
+    },
+    "note": {
+      "label": "注意：",
+      "multipleIntervals": "這將創建{{count}}個獨立的訂閱記錄（每個計費間隔一個：{{intervals}}）。每個都將根據其各自的間隔進行計費。",
+      "singleInterval": "這將為所選客戶創建一個訂閱方案記錄。計費將根據方案的間隔進行處理。"
+    },
+    "buttons": {
+      "cancel": "取消",
+      "creating": "創建中...",
+      "confirmCreate": "確認並創建"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://localhost:4000
+
+# Sitemaps
+Sitemap: https://localhost:4000/sitemap.xml
+Sitemap: https://localhost:4000/sitemap-server.xml
+Sitemap: https://localhost:4000/sitemap_index.xml

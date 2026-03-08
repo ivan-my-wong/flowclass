@@ -1,0 +1,147 @@
+{
+  "userName": "User Name",
+  "emailOrUserName": "Email or User Name",
+  "email": "Email",
+  "password": "Password",
+  "login": "Login",
+  "forgetPassword": "Forgot Password?",
+  "welcomeBack": "Welcome Back",
+  "noAccountYet": "No account yet?",
+
+  "areaCode": "Country Code",
+  "phoneNumber": "Phone Number",
+
+  "resetPassword": "Reset Password",
+  "back": "Back",
+  "forgetPasswordHint": "Please enter the email used for your Flowclass account",
+  "sendSuccess": "Request successfully sent. Please check your email.",
+  "resetSuccess": "Password successfully reset. Please login with your new password.",
+  "required": "Required",
+
+  "goToRegister": "Go to Flowclass",
+
+  "submit": "Submit",
+  "submitting": "Submitting...",
+
+  "errors": {
+    "loginError": "Login Failed. Please check your email or password.",
+    "failedToCreateUser": "Failed to create user. Please try again.",
+    "userNotFoundError": "The email is not associated with a Flowclass account.",
+    "noAccountWithThisSocialMedia": "You have not registered with this login method. Please visit app.flowclass.io/register to register with this login method.",
+    "forgetPasswordRequestAlreadyExists": "You already have a forget password request. Please check your email.",
+    "userNotExist": "Your account does not exist. Please visit app.flowclass.io/register to link your login method account.",
+    "passwordTooShort": "Password is too short. Please enter at least 8 characters.",
+    "passwordNotSame": "Password is not the same. Please enter the same password.",
+    "required": "Please fill in this field.",
+    "emailAlreadyExists": "A user already exists with this email address. Please login directly.",
+    "phoneAlreadyExists": "A user already exists with this phone number. Please use another phone number.",
+    "tryLogin": "User exists. Please login directly at https://app.flowclass.io/login if it is you.",
+    "invalidEmail": "Please enter a valid email",
+    "tryAnotherEmail": "This email cannot be registered. Please try another email address.",
+    "strongPassword": "Your password must include at least one lowercase letter, one uppercase letter and a number.",
+    "notAllowReset": "Your forget password token is incorrect",
+    "checkEmail": "Please enter the proper email address.",
+    "accountExists": "You have previously logged in with another social media. Please login with that social media account with the same email again."
+  },
+
+  "register": {
+    "here": "Register",
+    "goToCMS": "Login Now",
+    "orRegisterWith": "or",
+    "continue": "Continue",
+    "start": "Build a better course application experience for your students",
+    "alreadyHaveAccount": "Already have an account?",
+    "registerWithGoogle": "Register with Google account",
+    "registerWithFacebook": "Register with Facebook account",
+    "consent": "By clicking 'Register', you agree to our ",
+    "createAccount": "Create Account",
+    "chooseSignupMethod": "Choose how you'd like to sign up",
+    "continueWithGoogle": "Continue with Google",
+    "or": "or",
+    "continueWithEmail": "Continue with Email",
+    "almostDone": "Almost Done!",
+    "enterPhoneForGoogle": "Please enter your phone number to complete registration",
+    "whatsYourEmail": "What's your email address?",
+    "enterEmailToContinue": "Enter your email to continue",
+    "whatsYourPhone": "What's your phone number?",
+    "enterPhoneToContinue": "Enter your phone number to continue",
+    "whatsYourName": "What's your name?",
+    "enterNameToContinue": "Enter your name so we can support you better",
+    "createPassword": "Create your password",
+    "enterPasswordToComplete": "Enter your password to complete registration",
+    "chooseMethod": "Choose Method",
+    "email": "Email",
+    "phone": "Phone",
+    "name": "Name",
+    "password": "Password",
+    "progress": "Registration Progress",
+
+    "success": "Account successfully created! Please check your mailbox to verify your email.",
+    "inviteSuccess": "You have now accepted the invitation. Please login with the email and password you have just set.",
+
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "passwordAgain": "Confirm Password",
+    "verifyEmail": "Account successfully created! Please check your mailbox to verify your email.",
+    "socialMediaLinked": "Your social media account has been linked to your Flowclass account.",
+    "socialMediaLinkedError": "We could not link your social media account. We have logged you in using the social media account you used to register.",
+    "termsAgreement": "By creating an account, you agree to our",
+    "alreadyHaveAccountSignIn": "Already have an account?"
+  },
+
+  "acceptInvite": {
+    "title": "You've been invited to collaborate!",
+    "description": "Create an account to start collaborating on the Flowclass site",
+    "emailAddressWillBeUsed": "This email address will be used for login",
+    "nameLabel": "Name (For communication)",
+    "passwordLabel": "Create Password",
+    "passwordAgainLabel": "Confirm Password",
+    "passwordNotMatch": "Password is not the same. Please enter the same password."
+  },
+
+  "eBook": {
+    "title": "Register now to get our e-book, straight to your email",
+    "description": "Vol.1: Starting and Scaling an Education Enterprise"
+  },
+
+  "guides": "User Guidelines",
+
+  "loginModal": {
+    "smsLogin": "SMS login",
+    "passwordLogin": "Use password to log in",
+    "linkWithSocial": "Connect to social media",
+    "registerNow": "Don't have an account? Click here to register",
+    "loginFailed": "Login failed",
+    "popupClosed": "The pop-up window is closed.",
+    "loginSucceeded": "Signed in suceesfully",
+    "welcomeTitle": "Welcome back!",
+    "email": "Email",
+    "password": "Password",
+    "login": "Login",
+    "title": {
+      "sms": "login",
+      "password": "login",
+      "forgetPassword": "Forgot password",
+      "linkWithSocial": "Link social media accounts"
+    },
+    "alreadyHaveAccount": "Already have an account?"
+  },
+  "socialLogin": {
+    "loginWithGoogle": "Continue with Google account",
+    "loginWithFacebook": "Continue with Facebook account",
+    "error": "Social media login unsuccessful. Please try again."
+  },
+
+  "updateShowcase": {
+    "v2_2_0": {
+      "title": "v2.2.0 - Complete Invoice Management",
+      "description": "A huge upgrade to the invoice management system. Now, you can manage invoices for your students and assign them to your students."
+    },
+    "updateNotesButton": "View Update Notes",
+    "documentationButton": "Documentation"
+  },
+
+  "lastUpdate": {
+    "dateText": "Last updated: {{date}}"
+  }
+}

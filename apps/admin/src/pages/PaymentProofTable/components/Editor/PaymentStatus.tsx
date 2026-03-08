@@ -1,0 +1,92 @@
+import { FC, useMemo } from 'react'
+
+import { useTranslation } from 'react-i18next'
+
+import usePaymentEvidenceData from '@/hooks/usePaymentEvidenceData'
+import { handleStatusPayment } from '@/pages/StudentCRM/components/TeachingServiceEnrolledRow'
+import { Invoice } from '@/types/enrollCourse'
+import dayjs from '@/utils/dayjs'
+
+import PaymentReceiptStatusCell from '../../PaymentProofTableCells/PaymentReceiptStatusCell'
+
+import UpdatePayAmount from './UpdatePayAmount'
+import UpdatePayLeterMethod from './UpdatePayLeterMethod'
+import UploadPaymentProof from './UploadPaymentProof'
+
+interface Props {
+  invoiceData: Invoice
+  refetch: () => void
+}
+
+const PaymentStatus: FC<Props> = ({ invoiceData, refetch }): JSX.Element => {
+  const { t } = useTranslation()
+
+  const { useFetchPaymentEvidence } = usePaymentEvidenceData()
+  const { data: paymentEvidences, refetch: refetchPaymentEvidences } =
+    useFetchPaymentEvidence(invoiceData.id)
+  const paymentEvidenceList = useMemo(
+    () => paymentEvidences || [],
+    [paymentEvidences]
+  )
+  return (
+    <div className="space-y-3 border border-gray-300 p-4 rounded-lg">
+      <div className="font-semibold text-lg">
+        {t('student:paymentProof.paymentStatusLabel')}
+      </div>
+      <div className="space-y-5">
+        <div className="flex items-center justify-between font-medium">
+          <div className="text-sm">{t('student:paymentProof.totalAmount')}</div>
+          <UpdatePayAmount data={invoiceData} refetch={refetch} />
+        </div>
+        <div className="flex items-center justify-between font-medium">
+          <div className="text-sm">{t('student:paymentProof.status')}</div>
+          <div className="flex items-center gap-2">
+            <div className="mt-1 flex-shrink-0">
+              {handleStatusPayment(invoiceData.paymentState, t)}
+            </div>
+            <PaymentReceiptStatusCell
+              params={invoiceData}
+              paymentEvidenceList={paymentEvidenceList}
+              refetch={refetch}
+            />
+          </div>
+        </div>
+        <div className="flex items-center justify-between font-medium">
+          <div className="text-sm">{t('student:paymentProof.method')}</div>
+          <UpdatePayLeterMethod data={invoiceData} refetch={refetch} />
+        </div>
+        <div className="flex items-center justify-between font-medium">
+          <div className="text-sm">
+            {t('student:paymentProof.paymentProofLabel')}
+          </div>
+          <UploadPaymentProof
+            data={invoiceData}
+            paymentEvidence={paymentEvidenceList?.[0]}
+            refetch={() => {
+              refetch()
+              refetchPaymentEvidences()
+            }}
+          />
+        </div>
+        {invoiceData.createdAt != null && (
+          <div className="flex items-center justify-between font-medium">
+            <div className="text-sm">{t('student:createdDate')}</div>
+            <div className="text-sm text-muted-foreground">
+              {dayjs(invoiceData.createdAt).format('D MMM YYYY HH:mm')}
+            </div>
+          </div>
+        )}
+        {invoiceData.updatedAt != null && (
+          <div className="flex items-center justify-between font-medium">
+            <div className="text-sm">{t('student:lastUpdated')}</div>
+            <div className="text-sm text-muted-foreground">
+              {dayjs(invoiceData.updatedAt).format('D MMM YYYY HH:mm')}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+export default PaymentStatus

@@ -1,0 +1,378 @@
+import moment from 'moment'
+import { useRouter } from 'next/router'
+import useTranslation from 'next-translate/useTranslation'
+import { useEffect, useMemo, useState } from 'react'
+import { FaChevronRight } from 'react-icons/fa'
+import { useMutation } from 'react-query'
+import { toast } from 'sonner'
+import { useRecoilState } from 'recoil'
+
+import { getEnrolPrice } from '@/api/enrolApi'
+import BoxWithTextAction from '@/components/PresetBlocks/BoxWithTextAction'
+import Heading from '@/components/Texts/Heading'
+import Text from '@/components/Texts/Text'
+import { enrolState, prevSelectedOptionState, SelectedSessionDataState } from '@/stores/enrol'
+import { useEnrolState } from '@/stores/enrolContext'
+import { currentWebsiteTheme } from '@/stores/schoolContext'
+import { Session, SessionWithEnrollCount } from '@/types'
+import { GetEnrolPriceData, GetEnrolPriceResponse } from '@/types/enrol'
+import { rearrangeOrder } from '@/utils/convert'
+import { enrolCourseScrollAction } from '@/utils/courseDisplay'
+import { getPriceWithCurrency } from '@/utils/string.utils'
+
+type DayTimeslotsData = {
+  day: Date
+  timeslots: string[]
+}
+
+export const PickTotalFeeStep = (): JSX.Element => {
+  const { course, siteSetting } = useEnrolState()
+  const { t } = useTranslation()
+
+  const [enrolForm, setEnrolForm] = useRecoilState(enrolState)
+
+  const selectedSession =
+    enrolForm.selectedClassData[enrolForm.currentSelectedClassIndex].selectedClass
+  const selectedSessionDates =
+    enrolForm.selectedClassData[enrolForm.currentSelectedClassIndex].selectedRegularPeriod
+
+  useEffect(() => {
+    if (!selectedSession || !selectedSessionDates) {
+      setEnrolForm((prev) => ({ ...prev, currentStep: enrolForm.currentStep - 1 }))
+      toast.warning(t('errors:ENROL.PLEASE_PICK_SESSION') as string)
+    }
+  }, [])
+
+  if (!selectedSession || !selectedSessionDates) {
+    return <></>
+  }
+
+  const singlePrice = getPriceWithCurrency(siteSetting?.currency, selectedSession.totalFee ?? 0)
+
+  return (
+    <div className="box-col items-start p-0">
+      <Heading>{t('enrol:pickWorkshopFeeStep.pickOption')}</Heading>
+      <Text>{t('enrol:pickWorkshopFeeStep.confirmDetail')}</Text>
+
+      <BoxWithTextAction
+        text={singlePrice}
+        icon={<FaChevronRight />}
+        action={() => {
+          setEnrolForm((prev) => ({
+            ...prev,
+            currentStep: enrolForm.currentStep + 1,
+            tuition: {
+              originalFee: selectedSession.totalFee,
+              paymentAmount: selectedSession.totalFee,
+            },
+          }))
+        }}
+      />
+    </div>
+  )
+}
+// const PickTimeslotStep = (): JSX.Element => {
+//   const { t } = useTranslation()
+//   const { course } = useEnrolState()
+//
+//   const currentDate = moment()
+//   const today = currentDate.format('YYYY-MM-DD')
+//   const todayISOString = currentDate.toISOString()
+//   const [dayTimeslots, setDateTimeslots] = useState<DayTimeslotsData>()
+//
+//   const rrule = new RRule({
+//     freq: RRule.WEEKLY,
+//     dtstart: new Date(todayISOString),
+//     interval: 1,
+//   })
+//
+//   useEffect(() => {
+//     const datesArray = [...Array(7)].map((_, i) => {
+//       const date = currentDate.add(i, 'days')
+//       const dayOfWeek = date.format('dddd')
+//       const formattedDate = date.format('MMMM Do YYYY')
+//
+//       return {
+//         dayOfWeek,
+//         formattedDate,
+//         timeslots,
+//       }
+//     })
+//   }, [])
+//
+//   if (!course?.appointments || course?.appointments.length === 0) {
+//     return <></>
+//   }
+//
+//   const timeslots = course?.appointments[0].availableTimeWs
+//
+//   const dateOverrides = course?.appointments[0].dateOverrides
+//
+//   if (!timeslots || timeslots.length === 0) {
+//     return <></>
+//   }
+//
+//   const defaultDuration = timeslots[0].duration
+//   const validTimeslots = getAvailableTimeslots(timeslots, dateOverrides ?? [], defaultDuration)
+//   const weekBucket = groupByWeekdays(validTimeslots, new Date(todayISOString))
+//
+//   return (
+//     <div className="box-col w-full items-start">
+//       <Heading>{t('enrol:pickTimeslotStep.pickDate')}</Heading>
+//       {/*<Text>{t('enrol:pickTimeslotStep.timeExplain')}</Text>*/}
+//       <Text>
+//         {t('enrol:pickPeriodStep.time')}
+//         {course.site.timeZone.id} {moment.tz(course.site.timeZone.id).format('Z')}
+//         {t('enrol:pickPeriodStep.timeExplain')}{' '}
+//       </Text>
+//       <SliderPagination itemsPerPage={3}>
+//         <>
+//           {Object.keys(weekBucket).map((day) => {
+//             const week = weekBucket[day]
+//             return Object.keys(week).map((weekDay, index) => {
+//               return (
+//                 <div className="box-col" key={weekDay}>
+//                   <Heading>{weekDay}</Heading>
+//                   <Text>{moment(day).add(index, 'days').format('YYYY-MM-DD')}</Text>
+//                   {week[weekDay as Weekday].length > 0 &&
+//                     week[weekDay as Weekday].map((timeslot: string) => {
+//                       return <div key={timeslot}>{moment(timeslot).format('HH:mm')}</div>
+//                     })}
+//                 </div>
+//               )
+//             })
+//           })}
+//         </>
+//       </SliderPagination>
+//     </div>
+//   )
+// }
+
+export const PickTimeslotStep = (): JSX.Element => {
+  const { t } = useTranslation()
+  const { course, originalUrl } = useEnrolState()
+  const [enrolForm, setEnrolForm] = useRecoilState(enrolState)
+  const today = new Date()
+  const router = useRouter()
+  const [currentTheme, setCurrentTheme] = useRecoilState(currentWebsiteTheme)
+
+  const [prevSelectedOption, setPrevSelectedOption] = useRecoilState(prevSelectedOptionState)
+
+  const { mutateAsync } = useMutation({
+    mutationFn: (body: GetEnrolPriceData) => getEnrolPrice(body),
+    onSuccess: (data: GetEnrolPriceResponse) => {
+      if (data) {
+        handleUpdateEnrolFormTuition(data)
+        toast.success(t('enrol:payment.success') as string)
+      } else {
+        toast.error(t('enrol:payment.failure') as string)
+      }
+    },
+    onError: (e) => {
+      toast.error(t('enrol:payment.failure') as string)
+    },
+  })
+
+  const sessionDates = (enrolForm.selectedSessionData as SelectedSessionDataState)?.selectedSession
+    ?.sessionDates
+
+  useEffect(() => {
+    if (!course) {
+      toast.error(t('errors:ENROL.PLEASE_PICK_SESSION') as string)
+      if (!originalUrl || originalUrl === '') {
+        router.push('/')
+      } else {
+        router.push(originalUrl)
+      }
+    }
+
+    if (!enrolForm.selectedSessionData || !('selectedSession' in enrolForm.selectedSessionData)) {
+      toast.warning(t('errors:ENROL.PLEASE_PICK_SESSION') as string)
+      setEnrolForm((prev) => ({ ...prev, currentStep: enrolForm.currentStep - 1 }))
+    }
+  }, [course, sessionDates])
+
+  if (!course || !sessionDates || sessionDates.length === 0) {
+    return <Text>{t('enrol:pickPeriodStep.noSessions')}</Text>
+  }
+
+  const handleUpdateEnrolFormTuition = (data: GetEnrolPriceResponse) => {
+    const newTuition = {
+      originalFee: data.originalFee,
+      paymentAmount: data.paymentAmount,
+      currency: data.currency,
+    }
+    setPrevSelectedOption(enrolForm)
+    setEnrolForm((prev) => ({ ...prev, tuition: newTuition }))
+  }
+
+  const sessionDateAfterToday = sessionDates.filter((session) => {
+    const startTime = new Date(session.startTime)
+    return startTime > new Date()
+  })
+
+  return (
+    <div className="box-col w-full items-start p-0">
+      <Heading>{t('enrol:pickPeriodStep.pickDateSession')}</Heading>
+      <div className="font-bold" id="selectedSession">
+        {enrolForm.selectedSessionData?.selectedSession?.name}
+      </div>
+      <div className="font-bold">{t('enrol:pickTimeslotStep.sessionRemind')}</div>
+
+      {/* <Text>
+        {t('enrol:pickPeriodStep.time')}
+        {course.site.timeZone.id} {moment.tz(course.site.timeZone.id).format('Z')}
+        {t('enrol:pickPeriodStep.pickDateSession')}{' '}
+      </Text> */}
+      {sessionDateAfterToday.length > 0 ? (
+        <div className="flex w-full transform flex-col gap-2 rounded-lg border p-1">
+          {sessionDateAfterToday.map((sessionDateItem, index) => {
+            const start = moment(new Date(sessionDateItem.startTime)).format('YYYY/MM/DD hh:mm a')
+            const end = moment(new Date(sessionDateItem.endTime)).format('YYYY/MM/DD hh:mm a')
+            return (
+              <BoxWithTextAction
+                key={sessionDateItem.id}
+                text={start + ' - ' + end}
+                icon={<FaChevronRight />}
+                action={() => {
+                  // handlePickTuition({ scheduleItem, period: scheduleItem.period, lesson })
+                  const newClassData = {
+                    ...enrolForm.selectedSessionData,
+                    selectedSessionDates: sessionDates,
+                    selectedDate: sessionDateItem,
+                  }
+                  setPrevSelectedOption(enrolForm)
+                  setEnrolForm((prev) => ({
+                    ...prev,
+                    currentStep: enrolForm.currentStep + 1,
+                    selectedSessionData: newClassData,
+                  }))
+                  enrolCourseScrollAction(currentTheme)
+                }}
+                disabled={!!index}
+              />
+            )
+          })}
+        </div>
+      ) : (
+        <Text className="font-bold">{t('enrol:pickPeriodStep.noCurrentSessions')}</Text>
+      )}
+    </div>
+  )
+}
+
+export const PickSessionStep = (): JSX.Element => {
+  const { course, originalUrl } = useEnrolState()
+  const [enrolForm, setEnrolForm] = useRecoilState(enrolState)
+  const [sessions, setSessions] = useState(course?.sessions)
+  const [currentTheme, setCurrentTheme] = useRecoilState(currentWebsiteTheme)
+  const { t } = useTranslation()
+  const [prevSelectedOption, setPrevSelectedOption] = useRecoilState(prevSelectedOptionState)
+  const router = useRouter()
+
+  const sortSessionsByNumberOfTimeslot = () => {
+    const sessions = course?.sessions?.sort((sessionA, sessionB) => {
+      const sessionDateAfterTodayA = sessionA.sessionDates.filter((session) => {
+        const startTime = new Date(session.startTime)
+        return startTime > new Date()
+      })
+      const sessionDateAfterTodayB = sessionB.sessionDates.filter((session) => {
+        const startTime = new Date(session.startTime)
+        return startTime > new Date()
+      })
+
+      return sessionDateAfterTodayB.length - sessionDateAfterTodayA.length
+    })
+    return sessions
+  }
+
+  const sortedSessions = useMemo(() => {
+    if (!sessions) return []
+    if (!course?.courseActivitiesOrder) {
+      return sortSessionsByNumberOfTimeslot()
+    }
+    const { activityOrder } = course.courseActivitiesOrder
+    const sortedWithOrder = rearrangeOrder(sessions, activityOrder)
+    return sortedWithOrder
+  }, [sessions, course?.courseActivitiesOrder])
+
+  const getSortedSessionsByApplicationStatus = (
+    status: 'applicable' | 'notApplicable'
+  ): SessionWithEnrollCount[] => {
+    const isApplicable = (session: Session) => {
+      return status === 'applicable'
+        ? session.sessionDates.every(({ startTime }) => new Date(startTime) > new Date())
+        : session.sessionDates.some(({ startTime }) => new Date(startTime) <= new Date())
+    }
+
+    return (sortedSessions as SessionWithEnrollCount[])?.filter(isApplicable) ?? []
+  }
+
+  const SessionSelectionBox = ({ applicable }: { applicable: boolean }): JSX.Element => {
+    return (
+      <>
+        {getSortedSessionsByApplicationStatus(applicable ? 'applicable' : 'notApplicable').map(
+          (sessionItem) => {
+            return (
+              <div key={sessionItem.id} className="box-col">
+                <BoxWithTextAction
+                  percentage={
+                    applicable ? (sessionItem.enrollCount / sessionItem.quota) * 100 : undefined
+                  }
+                  text={sessionItem.name}
+                  icon={<FaChevronRight />}
+                  action={() => {
+                    const newClassData = {
+                      ...enrolForm.selectedSessionData,
+                      selectedSession: sessionItem,
+                    }
+                    setPrevSelectedOption(enrolForm)
+                    setEnrolForm((prev) => ({
+                      ...prev,
+                      currentStep: enrolForm.currentStep + 1,
+                      selectedSessionData: newClassData,
+                    }))
+                    enrolCourseScrollAction(currentTheme)
+                  }}
+                  disabled={!applicable || sessionItem.enrollCount >= sessionItem.quota}
+                />
+              </div>
+            )
+          }
+        )}
+      </>
+    )
+  }
+
+  useEffect(() => {
+    if (!course) {
+      toast.error(t('errors:ENROL.PLEASE_PICK_SESSION') as string)
+      if (!originalUrl || originalUrl === '') {
+        router.push('/')
+      } else {
+        router.push(originalUrl)
+      }
+    }
+
+    if (!sessions || sessions.length === 0) {
+      toast.error(t('errors:ENROL.WORKSHOP_NOT_OPEN') as string)
+      setEnrolForm((prev) => ({ ...prev, currentStep: enrolForm.currentStep - 1 }))
+    }
+  }, [])
+
+  if (!course || !sessions || sessions.length === 0) {
+    return <Text>{t('enrol:pickPeriodStep.noSessions')}</Text>
+  }
+
+  return (
+    <div className="box-col items-start p-0">
+      <Heading>{t('enrol:workshop.pickSession')}</Heading>
+      <SessionSelectionBox applicable />
+      {getSortedSessionsByApplicationStatus('notApplicable').length > 0 && (
+        <Text className="mt-4">{t('enrol:pickPeriodStep.statedSession')}</Text>
+      )}
+      <SessionSelectionBox applicable={false} />
+    </div>
+  )
+}
+export default PickSessionStep

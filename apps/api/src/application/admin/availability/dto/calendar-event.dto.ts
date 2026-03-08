@@ -1,0 +1,98 @@
+import { ApiProperty } from '@nestjs/swagger'
+import { Type } from 'class-transformer'
+import { IsISO8601, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator'
+
+export class EventTimeDto {
+  @ApiProperty({
+    description: 'The date and time in ISO 8601 format',
+    example: '2025-04-24T10:00:00+08:00',
+  })
+  @IsNotEmpty()
+  @IsISO8601()
+  dateTime: string
+
+  @ApiProperty({
+    description: 'The timezone identifier',
+    example: 'Asia/Singapore',
+  })
+  @IsNotEmpty()
+  @IsString()
+  timeZone: string
+}
+
+export class CreateCalendarEventDto {
+  @ApiProperty({
+    description: 'The summary/title of the event',
+    example: 'Math Class',
+  })
+  @IsNotEmpty()
+  @IsString()
+  summary: string
+
+  @ApiProperty({
+    description: 'The description of the event',
+    example: 'Weekly math class for Grade 5',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  description?: string
+
+  @ApiProperty({
+    description: 'The start time of the event',
+    type: EventTimeDto,
+  })
+  @ValidateNested()
+  @Type(() => EventTimeDto)
+  @IsNotEmpty()
+  start: EventTimeDto
+
+  @ApiProperty({
+    description: 'The end time of the event',
+    type: EventTimeDto,
+  })
+  @ValidateNested()
+  @Type(() => EventTimeDto)
+  @IsNotEmpty()
+  end: EventTimeDto
+}
+
+export class UpdateCalendarEventDto {
+  @ApiProperty({
+    description: 'The summary/title of the event',
+    example: 'Math Class',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  summary?: string
+
+  @ApiProperty({
+    description: 'The description of the event',
+    example: 'Weekly math class for Grade 5',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  description?: string
+
+  @ApiProperty({
+    description: 'The start time of the event',
+    type: EventTimeDto,
+    required: false,
+  })
+  @ValidateNested()
+  @Type(() => EventTimeDto)
+  @IsOptional()
+  start?: EventTimeDto
+
+  @ApiProperty({
+    description: 'The end time of the event',
+    type: EventTimeDto,
+    required: false,
+  })
+  @ValidateNested()
+  @Type(() => EventTimeDto)
+  @IsOptional()
+  end?: EventTimeDto
+}

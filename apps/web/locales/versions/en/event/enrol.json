@@ -1,0 +1,49 @@
+{
+  "pickedClass": "Event type selected",
+  "pickedPrice": "Event Fee",
+  "uploadReceipt": {
+    "waitConfirm": "Please wait for payment confirmation."
+  },
+  "stepTitles": {
+    "selectOption": {
+      "normal": "Please select your event type"
+    },
+    "pickedClass": "Event type selected",
+    "pickedLesson": "Event time slot",
+    "pickedPhase": "Event time period",
+    "pickedPrice": "Event Fee",
+    "stepIndicator": {
+      "selectRecurStartLesson": "Select First Event"
+    }
+  },
+  "pickPeriodStep": {
+    "selectTimeSlot": {
+      "normal": "Select the first event for the event type you are going to apply for",
+      "event": "Select the time slot of the event which you are applying for",
+      "recurring": "Select the time slot when you want to start your event",
+      "lessonsChosen": "Events Chosen"
+    },
+    "lessonsInClass": "sessions in event"
+  },
+  "confirmDetailStep": {
+    "tuitionFee": "Fee",
+    "specificT&C": "Please read and agree to the terms and conditions before registering for this event."
+  },
+  "pickTuitionStep": {
+    "recurTuitionReminder": "The organizer may have set some dates as unavailable. Therefore, some of the events may be delayed until the next week."
+  },
+  "successPayment": {
+    "allLesson": "Events",
+    "feePerLesson": "Event Fee",
+    "selectedLessons": "Sessions Chosen",
+    "lessons": "Sessions"
+  },
+  "payment": {
+    "success": "Your event application has been submitted. A confirmation email will be sent to you shortly.",
+    "completeRegistration": "Complete Application",
+    "failure": "Your event application has failed. Please contact the organizer directly.",
+    "incomplete": "You have not completed all steps. Please return and select event type, time, and fee options.",
+    "waitingPayment": "You have submitted the form. Please complete the payment to confirm your registration.",
+    "proceed": "Proceed"
+  }
+}

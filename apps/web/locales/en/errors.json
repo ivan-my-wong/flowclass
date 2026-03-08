@@ -1,0 +1,66 @@
+{
+  "NETWORK": "Network error. Either our servers are down or your Internet connection is unstable.",
+  "UNKNOWN_ERROR": "An unknown error occurred",
+  "INVAID_VERIFICATION_CODE": "Wrong captcha",
+  "TOO_MANY_REQUEST": "Too many requests, please try again later",
+  "NO_CLASS_CHOSEN": "Please select the course you want to enroll in",
+  "MISSING_CLASS_DATA": "The course information is missing, please choose again",
+  "SERVER_ERROR": "We cannot authenticate your account. Please refresh the page or login again.",
+  "NAME_LENGTH_ERROR": "Name input is too long",
+  "WRONG_DOMAIN": "This domain does not exists. Please check the link you have entered",
+
+  "PAYMENT": {
+    "paymentFailed": "Payment Failed",
+    "failed": "Failed to proceed to the next step. You have likely applied for a class that is full. Please contact the educator directly.",
+    "serverError": "An unknown error is encountered. Please use the 'Enquire' button to contact technical support.",
+    "back": "Back",
+    "message": "Unable to process your payment. Please try again later. ",
+    "invalidPhone": "*The phone number is invalid. Please enter a valid phone number.",
+    "creditCardNotActivated": "The educator has not activated this payment method. Please try the 'pay by cash or bank' method."
+  },
+
+  "AUTHENTICATE": {
+    "PLEASE_AUTHENTICATE": "You are not yet logged in. Please refresh the page or try logging in again.",
+    "ACCOUNT_NOT_FOUND": "Login failed. Please check your email or password.",
+    "AUTHENTICATION_FAIL": "Incorrect login credentials"
+  },
+
+  "VALIDATE": {
+    "FIELD_REQUIRED": "Please fill in this required field",
+    "AT_LEAST_ONE_OPTION": "Please select at least one option",
+    "MUST_SELECT_YES": "You must select 'yes' for this question",
+    "VALIDATION_ERROR": "Incorrect input",
+    "INVALID_PHONE_NUMBER": "Invalid phone number",
+    "INVALID_EMAIL": "Invalid email"
+  },
+
+  "SITE": {
+    "NOT_FOUND": "Site is not found."
+  },
+
+  "COUPON": {
+    "EXPIRED": "Coupon has expired or is invalid",
+    "USED_UP": "Coupon has been used up"
+  },
+
+  "ENROL": {
+    "PLEASE_PICK_CLASS": "Please pick your class first.",
+    "CLASS_QUOTA_IS_FULL": "The class you have chosen is full. Please pick another class.",
+    "START_TIME_EARLIER_THAN_END_TIME": "The start time is earlier than the end time. Please check your input again.",
+    "PLEASE_PICK_STARTING_LESSON": "Please pick your starting lesson first.",
+    "PLEASE_PICK_COURSE": "Please try to enrol again.",
+    "COURSE_NOT_OPEN": "This course is not open for application. Please contact the educator directly",
+    "WORKSHOP_NOT_OPEN": "This workshop is not open for application. Please contact the educator directly",
+    "COURSE_RECRUITMENT_NOT_STARTED": "The course has not started recruiting students yet. Please contact the educator directly",
+    "DATE_PICKED_IS_IN_PAST": "The starting date you picked is in the past. Please pick another date",
+    "INCORRECT_DATA_FORMAT": "The data you have entered is incorrect. Please check your input again or contact technical support.",
+    "RECORDNOTFOUND": "Unable to find a previous booking",
+    "ONLINE_PAYMENT_NOT_AVAILABLE": "Online payment is not available for this course. You can still pay using digital payment methods and then upload the receipt for verification.",
+    "LESSON_DATE_TIME_BLOCKED": "The date and time you have chosen is not available. Please pick another date and time.",
+    "PAYMENT_AMOUNT_TOO_LOW": "The payment amount set by the educator is invalid. Please contact the educator directly with the button below.",
+    "DUPLICATE_ENROLLMENT": "You have already enrolled in this course. Please contact the educator directly.",
+    "URL_NOT_FOUND": "The link you have entered is not valid. Please check the link and try again.",
+    "REGISTRATION_ERROR": "I'm sorry, we have encountered an error during your registration. Here are the error messages:",
+    "CONTACT_SUPPORT": "Note that your registration has not been completed. Please contact our support to let us know and we will help you proceed in the registration."
+  }
+}

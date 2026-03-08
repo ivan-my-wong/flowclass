@@ -1,0 +1,60 @@
+# compiled output
+/client-requests
+/dist
+/node_modules
+/pgdata
+/media
+postgresql.conf
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+
+# Tests
+/coverage
+/.nyc_output
+/exports/*
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/extensions.json
+
+.env
+# .env.stage.dev
+# .env.stage.stg
+# .env.stage.prod
+.env.local
+.env.staging.local
+.env.production.local
+.env.docker
+.env.windows
+runw.sh
+rund.sh
+/*.lock
+
+/uploads
+/__uploads
+
+**/debug.ts
+.wwebjs_*
+.trigger
+ngrok.yml
+.trae
+.cursor

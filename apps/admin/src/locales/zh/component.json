@@ -1,0 +1,363 @@
+{
+  "delete": "刪除",
+  "editor": {
+    "typeHere": "在這裏開始輸入...",
+    "enableToEdit": "啟用以開始編輯"
+  },
+  "classCard": {
+    "moreInfo": "更多",
+    "name": "名稱",
+    "locality": "地區",
+    "venue": "地點",
+    "time": "時間",
+    "teachingLanguage": "教學語言",
+    "teachLevels": "教學年級",
+    "teachStyles": "教學風格",
+    "schedules": "時段",
+    "to": "至",
+    "quota": "學生人數",
+    "applied": "已報名",
+    "enrollmentOffset": "報名人數調整",
+    "price": "學費",
+    "classDescription": "簡介",
+    "discountedPrice": "折扣學費",
+    "applyNow": "立即報名",
+    "notOpen": "未開放報名",
+    "stillHaveQuota": "尚有名額",
+    "limitedQuota": "名額有限",
+    "full": "名額已滿！",
+    "expand": "展開",
+    "collapse": "摺疊",
+    "edit": "修改",
+    "notSet": "沒有設定"
+  },
+  "dataCard": {
+    "pending": "處理中"
+  },
+  "statsChip": {
+    "pending": "處理中"
+  },
+  "createCentre": {
+    "field": {
+      "name": "專頁名稱",
+      "email": "聯絡電郵",
+      "teachSubjects": "教學科目或項目",
+      "teachLevels": "目標學生程度",
+      "phone": "聯絡電話",
+      "areaCode": "區號"
+    },
+    "helperText": {
+      "name": "這將用作您的專頁名稱，在頁首及Google顯示。例如: 「紅豆教育中心」、「Austin英語角」、「Yoga Fitness Plus」等等。",
+      "teachLevels": "挑選您將會教授的目標學生的程度。如沒有您需要的選項，可自由輸入然後按「Enter」。可多選。",
+      "teachSubjects": "挑選您將會教授的科目或項目。如沒有您需要的選項，可自由輸入然後按「Enter」。可多選。",
+      "email": "您希望學生聯絡您的電郵，公司電郵、個人電郵皆可。如不填寫，將使用您Flowclass帳號的電郵。",
+      "phone": "建議輸入有Whatsapp的電話號碼，以讓學生能即時查詢。"
+    },
+    "validate": {
+      "name": "您必須輸入專頁名稱",
+      "email": "請確保電郵格式正確",
+      "phone": "電話格式輸入錯誤，請重新檢查",
+      "existingTc": "此專頁名稱已被使用，請嘗試另一名稱。如果您認為這是個錯誤，請以Whatsapp聯絡我們。",
+      "unknownError": "發生未知錯誤，請嘗試重新載入或以Whatsapp聯絡我們。",
+      "forbidden": "您尚未擁有建立者權限，這可能是因為您的Flowclass帳號比較舊，請以Whatsapp聯絡我們以升級帳號。",
+      "alreadyHaveTcAdmin": "已成功新增建立者權限。"
+    },
+    "welcomeTitle": "只差一步就能讓您的課程網頁上線👋",
+    "welcomeSubtitle": "以下資料只為設置專頁，日後可隨時更改",
+    "create": "創立專頁"
+  },
+  "defaultPage": {
+    "choosePage": "請在左側下拉式選單選取您的專頁，前往資料主頁。"
+  },
+  "courseEditDialog": {
+    "uploadImage": {
+      "pleaseUpload": "錯誤！請上載圖片",
+      "wrongFormat": "檔案格式錯誤！請重新上載",
+      "finishCrop": "請完成課程封面裁剪",
+      "upload": "上載課程封面",
+      "crop": "裁剪課程封面",
+      "finish": "完成裁剪",
+      "noImage": "無課程封面",
+      "dragAndDrop": "拖放您的檔案，或點擊選取"
+    },
+    "description": "課程描述",
+    "name": "課程名稱",
+    "success": "課程新增或更新成功!",
+    "category": "課程分類",
+    "addCategory": "新增分類",
+    "newCourse": "新增課程",
+    "newClass": "新增班別/時間表",
+    "unsaved": "你有未儲存的變更",
+    "unnamedClass": "未命名班別",
+    "pleaseFinishInfo": "請完成基本資料",
+    "pleaseFinishClass": "請完成班別內容",
+    "class": {
+      "name": "班別名稱",
+      "classId": "此班別識別碼:",
+      "locality": "上課地點",
+      "area": "上課地區",
+      "country": "上課國家/地區",
+      "address": "上課地址",
+      "onlineLink": "網上課程連結",
+      "brief": "班別簡介",
+      "timetable": "上課時段",
+      "memo": "學生備忘",
+      "startTime": "開始時間",
+      "endTime": "結束時間",
+      "deleteClass": "刪除班別後，若提交課程變更，班別將永久刪除",
+      "addReminder": "讓學生在報名時選擇不同的時間段、級別或上課地點。",
+      "freeReminder": "提示：您可以將其中一個班別的價格設置為$0，作為試堂，學生無需輸入付款資料即可報名。"
+    },
+    "application": {
+      "start": "開始報名時間",
+      "end": "結束報名時間",
+      "people": "報名人數調整"
+    },
+    "header": {
+      "class": "班別資料",
+      "time": "上課時間",
+      "priceAndQuota": "學費及名額"
+    },
+    "helper": {
+      "noEmpty": "此欄不能為空白",
+      "video": "影片 (只限Youtube link)",
+      "onlyYoutube": "只限Youtube link",
+      "keyword": "用逗號','分開每個關鍵字, e.g. '小班教學,SEN'",
+      "removeDate": "*如不開放請清除日期",
+      "noNegative": "此欄不能為負數",
+      "adjustment": "調整於系統外報名、調班、或退出的學生人數",
+      "online": "如果是網上課程, 請填上 '網上'",
+      "wrongLink": "連結格式錯誤",
+      "meetingUrl": "如果是網上課程，請填上Meeting URL，此連結會於學生成功報讀後發送到他們的電郵",
+      "memo": "此備忘只會於學生成功報讀後發送到他們的電郵",
+      "brief": "您可以輸入課程時間表、目標學生、學習目標等等。",
+      "noSchedule": "(未有上課時段)",
+      "plsAddSchedule": "請為每一堂分別新增上課時段"
+    }
+  },
+  "subscriptionDialog": {
+    "dialogTitle": "您已超出計劃限制",
+    "upgradePlan": "你可升級現有計劃，建立更多課程專頁和享受進階招生功能。",
+    "upgrade": "計劃與訂閱收費",
+    "contactSales": "諮詢銷售團隊",
+    "messages": {
+      "starterPlanCourse": "升級至起動計劃以創建立3個課程專頁及使用自訂連結",
+      "premiumPlanCourse": "升級至進階計劃以創建立10個課程專頁",
+      "discountCode": "升級至起動計劃以創建立優惠碼。"
+    }
+  },
+  "errorPage": {
+    "notFound": "找不到此頁面",
+    "forbidden": "您無權前往此頁面"
+  },
+  "table": {
+    "exportToCsv": "匯出CSV檔案",
+    "selectSortBy": "排序方式"
+  },
+  "menubar": {
+    "home": "首頁",
+    "dashboard": "總覽",
+    "homepage": "品牌及設計",
+    "student": "發票列表",
+    "rescheduleApproval": "調課申請審批",
+    "lessonMatrix": "點名紙",
+    "payment": "收款方式",
+    "chargeClients": "管理客戶",
+    "teachingService": "課程與活動",
+    "promotion": "優惠活動",
+    "settings": "學校設定",
+    "subscription": "訂閱",
+    "account": "帳戶",
+    "logout": "登出",
+    "site": "網站",
+    "embed": "新增至網站",
+    "info": "自訂網站",
+    "notificationLog": "通知記錄",
+    "onboarding": "引導設置",
+    "schoolList": "學校列表",
+    "contact": "聯絡資訊",
+    "educator": "教育工作者資訊",
+    "photo": "照片相簿",
+    "userManagement": "職員管理",
+    "siteSettings": "網站設定",
+    "backToSchool": "返回學校設定",
+    "integrations": "整合工具",
+    "admin": "管理員",
+    "profile": "個人資料",
+    "preferences": "偏好",
+    "notifications": "通知",
+    "updates": "更新",
+    "studentRecord": "學生管理中心",
+    "paymentCampaign": "創建發票",
+    "classSchedule": "課程表",
+    "mySchools": "我的學校",
+    "locations": "地點",
+    "whatsappTemplate": "WhatsApp訊息設定",
+    "automationFlow": "自動化發訊",
+    "customDataField": "自訂資料欄目",
+    "applicationForm": "報名表格",
+    "blockTime": "閉校時間",
+    "featureEnable": "啟用功能",
+    "visitSubscription": "前往訂閱頁面",
+    "support": "聯絡客服",
+    "availability": "可用時間",
+
+    "certificateTemplates": "證書範本",
+    "receiptTemplates": "收據範本",
+    "bulkSendDocuments": "批量發送文件",
+    "classMaterials": "課堂文件",
+    "classMaterialsSubMenu": "課堂文件",
+    "studentSubmission": "學生功課",
+    "headings": {
+      "setup": "網站",
+      "applications": "管理",
+      "messages": "訊息",
+      "courses": "課程",
+      "revenue": "報名及收入",
+      "schedule": "時間表",
+      "settings": "設定",
+      "students": "學生",
+      "templateManagement": "範本管理",
+      "staffAndLocation": "職員及地點"
+    },
+    "aiTools": {
+      "descriptionGenerator": "描述產生器",
+      "getMoreCredits": "獲取更多積分"
+    }
+  },
+  "select": {
+    "placeholder": "請選擇",
+    "selectSite": "選擇網站",
+    "selectSchool": "選擇學校",
+    "addSite": "新增網站",
+    "addSchool": "新增學校",
+    "section": "區域",
+    "selectCourse": "選擇課程",
+    "proPlanOnly": "僅適用於專業版計劃",
+    "createSchool": "創建新學校",
+    "createSchoolSuccess": "成功創建新學校",
+    "expand": "展開",
+    "selectSocialMedia": "選擇社交媒體",
+    "deselectAllClasses": "取消選擇所有班級",
+    "selectAllClasses": "選擇所有班級",
+    "deselectAll": "取消全選",
+    "selectAll": "全選"
+  },
+  "ImageUpload": {
+    "title": "選擇要上傳的圖片",
+    "updateTitle": "更新圖片資料",
+    "uploadImage": "上傳圖片",
+    "cropImage": "裁剪圖片",
+    "finishCrop": "完成裁剪",
+    "pleaseUpload": "請上傳圖片",
+    "wrongFormat": "圖片格式錯誤",
+    "error": "錯誤，請重新上傳圖片",
+    "noImage": "無圖片",
+    "confirm": "確認",
+    "cancel": "取消",
+    "update": "更新",
+    "uploadSuccess": "圖片上傳成功",
+    "updateSuccess": "圖片資訊更新成功",
+    "cropImageTips": "您可以拖動和調整框框大小以調整圖片大小和位置",
+    "tags": "標籤",
+    "caption": "圖片說明",
+    "loader": "載入中..."
+  },
+  "SectionTag": {
+    "DEFAULT": "默認章節",
+    "COURSE_FEATURES": "課程特點",
+    "COURSE_DESC": "課程描述",
+    "COURSE_REVIEW": "課程評價",
+    "COURSE_SYLLABUS": "課程大綱",
+    "COURSE_ARTICULATION": "課程關聯",
+    "COURSE_INSTRUCTOR": "課程導師",
+    "COURSE_STUDENT_PERF": "學生表現",
+    "COURSE_CERTIFICATION": "課程證書",
+    "COURSE_APPLICATION": "課程申請",
+    "COURSE_TARGET": "目標人群",
+    "COURSE_TIMETABLE": "時間表",
+    "COURSE_LOCATION": "地點",
+    "COURSE_ENQUIRY": "課程查詢",
+    "SCHOOL_ABOUT_US": "關於我們",
+    "SCHOOL_FACILITIES": "設施設備",
+    "SCHOOL_STUDENT_ACHIEVEMENT": "學生成就",
+    "SCHOOL_QUALIFICATION": "資格認證",
+    "SCHOOL_STUDENT_LIFE": "學生生活",
+    "SCHOOL_AWARDS": "獎項",
+    "SCHOOL_SUCCESS_STORIES": "成功故事",
+    "SCHOOL_QUALIFICATION_AWARDS": "資歷及獎項",
+    "SCHOOL_SUPPORT": "學校支援",
+    "SCHOOL_FAQS": "FAQs"
+  },
+  "colorPicker": {
+    "error": "顏色代碼無效。請輸入有效的十六進位代碼。"
+  },
+  "dateSelector": {
+    "title": "選擇日期",
+    "confirm": "確認"
+  },
+  "darkModeToggle": {
+    "darkMode": "深色模式",
+    "lightMode": "淺色模式",
+    "on": "開",
+    "off": "關"
+  },
+  "tourGuide": {
+    "tips": "進行網頁導覽!"
+  },
+  "calendar": {
+    "today": "今天",
+    "month": "月份",
+    "list": "列表",
+    "noEventsToDisplay": "沒有活動"
+  },
+  "chartDate": {
+    "today": "今天",
+    "thisWeek": "本週",
+    "lastWeek": "上週",
+    "thisMonth": "本月",
+    "lastMonth": "上個月",
+    "last3Months": "過去三個月",
+    "thisYear": "今年",
+    "lastYear": "去年",
+    "latest7Days": "最近7天",
+    "latest30Days": "最近30天",
+    "latest90Days": "最近90天",
+    "latest365Days": "最近365天",
+    "cancel": "取消",
+    "apply": "應用",
+    "confirm": "確認"
+  },
+  "googleAnalytics": {
+    "retrievingData": "我們正在整理的您網站資料",
+    "channelGroupFirstAcquiredTheUser": "首次獲取用戶的渠道組",
+    "coursePurchaseRevenue": "課程購買收入",
+    "pageView": "頁面瀏覽次數",
+    "schoolTotalPurchaseRevenue": "學校總購買收入",
+    "dailyWebsiteVisitorCount": "每日網站訪客數",
+    "visitorCountByCountry": "各國訪客數",
+
+    "today": "今天",
+    "thisWeek": "本週",
+    "lastWeek": "上週",
+    "thisMonth": "本月",
+    "lastMonth": "上個月",
+    "last3Months": "過去三個月",
+    "thisYear": "今年",
+    "lastYear": "去年",
+    "latest7Days": "最近7天",
+    "latest30Days": "最近30天",
+    "latest90Days": "最近90天",
+    "latest365Days": "最近365天",
+
+    "cancel": "取消",
+    "apply": "應用",
+    "confirm": "確認",
+    "revenue": "收入",
+    "display": "顯示資料來源",
+    "tryAgainLater": "您的網站數據還在準備中。明天再回來看看吧！"
+  },
+  "progress": {
+    "tasksComplete": "已完成 {{total}} 個任務中的 {{completedCount}} 個"
+  }
+}
