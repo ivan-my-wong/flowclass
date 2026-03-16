@@ -1,3 +1,5 @@
+'use client'
+
 import * as React from 'react'
 
 import * as SelectPrimitive from '@radix-ui/react-select'
@@ -5,16 +7,7 @@ import { LuCheck, LuChevronDown, LuChevronUp } from 'react-icons/lu'
 
 import { cn } from '@/utils/cn'
 
-type SelectProps = React.ComponentProps<typeof SelectPrimitive.Root>
-const Select: React.FC<SelectProps> = ({ onValueChange, ...props }) => {
-  const handleValueChange = (value: string) => {
-    document.body.style.pointerEvents = 'auto'
-    if (onValueChange) {
-      onValueChange(value)
-    }
-  }
-  return <SelectPrimitive.Root {...props} onValueChange={handleValueChange} />
-}
+const Select = SelectPrimitive.Root
 
 const SelectGroup = SelectPrimitive.Group
 
@@ -22,22 +15,19 @@ const SelectValue = SelectPrimitive.Value
 
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
-    dataTestId?: string
-  }
->(({ className, children, dataTestId, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
+>(({ className, children, ...props }, ref) => (
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      'flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1',
+      'flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1',
       className
     )}
     {...props}
-    data-testid={dataTestId}
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <LuChevronDown className="h-4 w-4 min-w-4 opacity-50" />
+      <LuChevronDown className="h-4 w-4 opacity-50" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ))
@@ -45,8 +35,12 @@ SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
 
 const SelectScrollUpButton = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton> & {
+    className?: string
+    children?: React.ReactNode
+  }
 >(({ className, ...props }, ref) => (
+  // @ts-expect-error - Radix SelectScrollUpButtonProps omits children/className but accepts them at runtime
   <SelectPrimitive.ScrollUpButton
     ref={ref}
     className={cn(
@@ -62,8 +56,12 @@ SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName
 
 const SelectScrollDownButton = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.ScrollDownButton>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollDownButton>
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollDownButton> & {
+    className?: string
+    children?: React.ReactNode
+  }
 >(({ className, ...props }, ref) => (
+  // @ts-expect-error - Radix SelectScrollDownButtonProps omits children/className but accepts them at runtime
   <SelectPrimitive.ScrollDownButton
     ref={ref}
     className={cn(
@@ -86,7 +84,7 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        'relative z-popover max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-background text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+        'relative z-50 max-h-[--radix-select-content-available-height] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-select-content-transform-origin]',
         position === 'popper' &&
           'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
         className

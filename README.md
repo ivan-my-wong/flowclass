@@ -2,17 +2,10 @@
 
 Flowclass is organized as a minimal `pnpm` workspaces monorepo for simple local development and open-source collaboration.
 
-## Workspace layout
+## Links
 
-- `apps/web` - Next.js frontend
-- `apps/api` - Nest.js backend
-- `apps/admin` - Vite + React admin app
-
-## Prerequisites
-
-- **Node.js 24** (use `nvm use` or `fnm use` if you have `.nvmrc` / `.node-version`)
-- **pnpm** (>=10)
-- **Docker** (for PostgreSQL and SMTP)
+- **Website:** [flowclass.io](https://flowclass.io)
+- **Documentation:** [flowclass.io/docs](https://flowclass.io/docs)
 
 ## Quick start
 
@@ -29,15 +22,6 @@ This script will:
 3. Create `.env` from `.env.example` if missing
 4. Install dependencies and start all apps (web, api, admin)
 
-Manual steps (if you prefer):
-
-```bash
-docker compose up postgres smtp cloudbeaver -d
-pnpm install
-cp .env.example .env
-pnpm dev
-```
-
 ## Environment
 
 A single `.env` file at the project root is used by all apps. Copy from the template:
@@ -52,12 +36,12 @@ Edit `.env` with your database credentials and any other required values.
 
 ## Ports
 
-| App    | Port | URL                    |
-|--------|------|------------------------|
-| API    | 3100 | http://localhost:3100  |
+| App        | Port | URL                   |
+|------------|------|------------------------|
+| API        | 3100 | http://localhost:3100  |
 | CloudBeaver| 3101 | http://localhost:3101  |
-| Admin  | 3000 | http://localhost:3000  |
-| Web    | 3001 | http://localhost:3001  |
+| Admin      | 3000 | http://localhost:3000  |
+| Web        | 3001 | http://localhost:3001  |
 
 ## CloudBeaver (Database Management)
 
@@ -88,6 +72,20 @@ pnpm test
 pnpm evaluate:functionality
 ```
 
+## Contributing
+
+1. Fork and clone the repository.
+2. Create a branch for your change.
+3. Run lint, type-check, and functional evaluation before opening a PR.
+4. Submit a PR with a clear test plan.
+
+## Licenses
+
+- Root open-source code: MIT (`LICENSE`)
+- Self-host/server copyleft terms: AGPL-3.0 (`LICENSE-AGPL`)
+
+---
+
 ## Docker deployment
 
 ```bash
@@ -104,6 +102,17 @@ This Docker setup runs:
 
 Uploaded media is stored in a Docker named volume `media-data` (mounted at `/workspace/uploads` in the API container) and served by the API (`/media/file/*`). CloudBeaver data (connections, settings) persists in `cloudbeaver-data`. Data persists across container restarts. No S3 bucket is required.
 
+## Manual setup
+
+If you prefer to run services manually instead of `pnpm start`:
+
+```bash
+docker compose up postgres smtp cloudbeaver -d
+pnpm install
+cp .env.example .env
+pnpm dev
+```
+
 ## Open-source mode defaults
 
 This repository is configured for open-source distribution:
@@ -112,14 +121,14 @@ This repository is configured for open-source distribution:
 - no production secrets are stored in source control,
 - environment variables must be provided via the root `.env` file (copy from `.env.example`).
 
-## Contributing
+## Workspace layout
 
-1. Fork and clone the repository.
-2. Create a branch for your change.
-3. Run lint, type-check, and functional evaluation before opening a PR.
-4. Submit a PR with a clear test plan.
+- `apps/web` - Next.js frontend
+- `apps/api` - Nest.js backend
+- `apps/admin` - Vite + React admin app
 
-## Licenses
+## Prerequisites
 
-- Root open-source code: MIT (`LICENSE`)
-- Self-host/server copyleft terms: AGPL-3.0 (`LICENSE-AGPL`)
+- **Node.js 24** (use `nvm use` or `fnm use` if you have `.nvmrc` / `.node-version`)
+- **pnpm** (>=10)
+- **Docker** (for PostgreSQL and SMTP)

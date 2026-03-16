@@ -35,6 +35,8 @@ const ActionCard = ({ items, grid }: ActionCardProps) => {
         return (
           <div
             key={item.label}
+            role="button"
+            tabIndex={item.disabled ? -1 : 0}
             className={cn(
               'basis-1/3 bg-background-layer-2 rounded mr-5 h-auto flex justify-center items-center sm:mb-2 cursor-pointer hover:bg-background-layer-3',
               item.disabled &&
@@ -42,6 +44,16 @@ const ActionCard = ({ items, grid }: ActionCardProps) => {
             )}
             onClick={() => {
               if (!item.disabled) {
+                if (item.action) {
+                  item.action()
+                } else {
+                  navigate(`${item.path}`)
+                }
+              }
+            }}
+            onKeyDown={e => {
+              if (!item.disabled && (e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault()
                 if (item.action) {
                   item.action()
                 } else {

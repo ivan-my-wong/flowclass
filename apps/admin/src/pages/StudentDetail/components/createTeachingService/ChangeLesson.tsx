@@ -98,6 +98,10 @@ const ChangeLesson = (props: Props) => {
         params.lessonDateTime = lessonDateTimeValue
       }
     }
+    if (classType === ClassTypeEnum.regularV2 && data?.classLessonDate) {
+      // For regularV2, classLessonDate from date picker is already "startTime endTime" format
+      params.lessonDateTime = data.classLessonDate
+    }
 
     await mutationChangeLesson.mutateAsync(params)
     handleCloseAndClearData()

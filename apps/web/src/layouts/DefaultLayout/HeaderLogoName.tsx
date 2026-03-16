@@ -4,13 +4,12 @@ import { useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
 
 import ImageWithFallback from '@/components/Images/ImageWithFallback'
-import { TabsProps } from '@/components/Tabs/Tabs'
 import Heading from '@/components/Texts/Heading'
 import imageUrls from '@/constants/imageUrls'
 import { currentWebsiteTheme } from '@/stores/schoolContext'
 import { useTabContext } from '@/stores/tabContext'
 import { School } from '@/types'
-import { WebsiteTemplate } from '@/types/websiteTemplate'
+import { MenuTabsProps, WebsiteTemplate } from '@/types/websiteTemplate'
 import { cn } from '@/utils/cn'
 import { getMediaFileUrl } from '@/utils/convert'
 
@@ -18,7 +17,7 @@ const Header = ({
   school,
 }: {
   school: School
-  menu?: TabsProps
+  menu?: MenuTabsProps
   showMenu?: boolean
 }): JSX.Element => {
   const router = useRouter()

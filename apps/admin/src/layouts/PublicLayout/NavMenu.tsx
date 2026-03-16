@@ -32,7 +32,7 @@ const NavMenuItemTrigger = forwardRef<
       ref={ref}
       className={cn(
         itemBaseClasses,
-        'group [all:unset] p-2 flex items-center justify-between gap-2'
+        'group p-2 flex items-center justify-between gap-2'
       )}
     >
       {children}
@@ -108,7 +108,7 @@ const NavMenu = ({
 }): JSX.Element => {
   return (
     <Root className="relative flex justify-center w-full z-[1]">
-      <List className="[all:unset] flex justify-center gap-4 p-1 rounded-lg list-none">
+      <List className="flex justify-center gap-4 p-1 rounded-lg list-none">
         {routes.map((el, idx) => {
           if (isSingleRouteItem(el)) {
             // eslint-disable-next-line react/no-array-index-key

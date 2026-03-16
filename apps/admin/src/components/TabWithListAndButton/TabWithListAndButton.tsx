@@ -123,12 +123,15 @@ const TabWithListAndButton = forwardRef<TabWithListAndButtonHandle, TabsProps>(
                   onClick={() => handleTabChange(tab.value)}
                   data-testid={`tab-${tab.value}`}
                   className={cn(
-                    '[all:unset] cursor-pointer text-text-subtle rounded-[5px] border border-gray-400',
-                    'px-5 h-12 flex-1 flex items-center justify-center text-base leading-none mx-1 min-w-16 select-none',
-                    'hover:text-primary',
-                    'data-[state=active]:text-primary data-[state=active]:shadow-[inset_0_-4px_0_0_var(--primary)] data-[state=active]:border-primary',
+                    'inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium',
+                    'ring-offset-background transition-all',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                    'disabled:pointer-events-none disabled:opacity-50',
+                    'text-muted-foreground hover:text-primary',
+                    'data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-sm',
+                    'flex-1 min-w-16 mx-1',
                     tab.status === 'error' &&
-                      'text-text shadow-[inset_0_-2px_0_0_var(--tertiary)] border-tertiary'
+                      'text-destructive data-[state=active]:border-destructive'
                   )}
                 >
                   <div>{tab.label}</div>

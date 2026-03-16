@@ -38,7 +38,6 @@ import { ClassRepository } from '@/models/classes.repository'
 import { StudentPrimaryIdentifier } from '@/models/enums'
 import { InvoiceRepository } from '@/models/invoice.repository'
 import { StudentLessonRepository } from '@/models/student-lesson.repository'
-import { StudentMemo } from '@/models/student-memo.entity'
 import { StudentScheduleRepository } from '@/models/student-schedule.repository'
 import { UserAlias } from '@/models/user-aliases.entity'
 import { UserAliasesRepository } from '@/models/user-aliases.repository'
@@ -465,23 +464,6 @@ export class UsersService extends BaseService<User> {
             isStudent: true,
           }
         )
-      }
-
-      const studentMemo = await transactionalEntityManager.findOne(StudentMemo, {
-        where: {
-          userId: baseUserToBeCreatedUserRole.id,
-          institutionId,
-        },
-      })
-
-      if (!studentMemo) {
-        await transactionalEntityManager.save(StudentMemo, {
-          userId: baseUserToBeCreatedUserRole.id,
-          institutionId,
-          contactEmail: registerDto.email,
-          contactPhone: registerDto.phone,
-          contactName: registerDto.firstName,
-        })
       }
 
       let studentAlias: UserAlias | null = null

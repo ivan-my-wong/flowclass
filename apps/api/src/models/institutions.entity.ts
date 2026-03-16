@@ -5,7 +5,6 @@ import { InstitutionDetailDto } from '@/application/admin/institutions/dto/insti
 import { PhoneContactMethod, StudentPrimaryIdentifier } from '@/models/enums'
 import { Invoice } from '@/models/invoice.entity'
 import { NotificationRecord } from '@/models/notification-record.entity'
-import { StudentMemo } from '@/models/student-memo.entity'
 import { BaseEntity } from '@/modules/base/base.entity'
 import { MediaDetailDto } from '@/modules/media/dto/media.dto'
 
@@ -53,13 +52,10 @@ export class addressDetail {
   }
 }
 
-export type InstitutionWithSettingsDTO = Omit<
-  InstitutionDetailDto,
-  'medias' | 'siteSetting' | 'studentMemo'
-> & {
+export type InstitutionWithSettingsDTO = Omit<InstitutionDetailDto, 'medias' | 'siteSetting'> & {
   siteSetting: SettingSite
   medias: MediaDetailDto[]
-  studentMemo: StudentMemo[]
+  studentMemo: UserAlias[]
 }
 
 @Entity('institutions')
@@ -158,9 +154,6 @@ export class Institution extends BaseEntity {
 
   @OneToMany(() => InstitutionGallery, (gallery) => gallery.institution)
   galleries: InstitutionGallery[]
-
-  @OneToMany(() => StudentMemo, (studentMemo) => studentMemo.institution)
-  studentMemo: StudentMemo[]
 
   @OneToOne(() => SettingNotifications, (setting) => setting.institution, {
     createForeignKeyConstraints: false,

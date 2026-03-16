@@ -26,7 +26,7 @@ const CheckboxCourse: React.FC<CheckboxCourseProps> = ({
     <Box className="flex gap-4 w-full flex-wrap">
       {items.map(item => (
         <Box key={item.id} direction="column" className="mt-6">
-          <Box className="w-full h-full flex items-center [all:unset]">
+          <Box className="w-full h-full flex items-center">
             <Box gap="large" justify="flex-start">
               <Checkbox
                 name="test"
@@ -58,7 +58,7 @@ const CheckboxCourse: React.FC<CheckboxCourseProps> = ({
             {item.children &&
               item.children.map(subItem => (
                 <Box key={subItem.id} direction="column" className="mb-6">
-                  <Box className="w-full h-full flex items-center [all:unset]">
+                  <Box className="w-full h-full flex items-center">
                     <Box gap="large" justify="flex-start">
                       <Checkbox
                         name="test"

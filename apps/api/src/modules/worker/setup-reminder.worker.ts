@@ -10,8 +10,8 @@ import { StudentNotifSettingService } from '@/domain/service/student-notif-setti
 import { CoursesRepository } from '@/models/courses.repository'
 import { Invoice } from '@/models/invoice.entity'
 import { StudentLesson } from '@/models/student-lesson.entity'
-import { StudentMemoRepository } from '@/models/student-memo.repository'
 import { User } from '@/models/user.entity'
+import { UserAliasesRepository } from '@/models/user-aliases.repository'
 import { UsersRepository } from '@/models/users.repository'
 import { buildUploadReceiptLink } from '@/utils/payment-link.utils'
 import { shallow } from '@/utils/shallow.utils'
@@ -24,7 +24,7 @@ export class SetupReminderWorker {
   constructor(
     private readonly settingSiteService: SettingSiteService,
     private readonly courseRepository: CoursesRepository,
-    private readonly studentMemoRepository: StudentMemoRepository,
+    private readonly userAliasesRepository: UserAliasesRepository,
     private readonly userRepository: UsersRepository,
     private readonly studentNotifSettingService: StudentNotifSettingService
   ) {}
@@ -136,18 +136,19 @@ export class SetupReminderWorker {
     let contactName = enrollCourse.preferredName
     let contactPhone = enrollCourse.preferredPhone
 
-    const studentMemo = await this.studentMemoRepository.findOneBy({
-      userId: enrollCourse.userId,
-      institutionId: institution.id,
-    })
+    const userAlias = await this.userAliasesRepository.findFirstByUserIdAndInstitution(
+      institution.id,
+      enrollCourse.userId,
+      { user: true }
+    )
 
-    if (studentMemo) {
-      contactEmail = studentMemo.preferredEmail || contactEmail
-      contactName = studentMemo.preferredName || contactName
-      contactPhone = studentMemo.preferredPhone || contactPhone
+    if (userAlias) {
+      contactEmail = userAlias.email ?? userAlias.user?.email ?? contactEmail
+      contactName = userAlias.name ?? contactName
+      contactPhone = userAlias.user?.phone ?? contactPhone
     }
     const studentNotificationSetting = await this.studentNotifSettingService.getByStudentAndType(
-      studentMemo?.userId ?? enrollCourse.userId,
+      userAlias?.userId ?? enrollCourse.userId,
       institution.id,
       SupportedType.STUDENT_LESSON_REMINDER
     )

@@ -137,7 +137,6 @@ export class NotificationRecordService {
           siteId: msgData.siteId,
           message: message.body,
           whatsappTemplateId: whatsappTemplate?.id,
-          automationFlowId: undefined,
           associatedClass: associatedClass.map((d) =>
             shallow({
               source: d,
@@ -183,7 +182,6 @@ export class NotificationRecordService {
       message: messageContent,
       notificationStatus: NotificationStatus.QUEUED,
       whatsappTemplateId: whatsappTemplate?.id,
-      automationFlowId: undefined,
       invoiceMetadata,
       sentAt,
       associatedClass: associatedClass.map((d) =>

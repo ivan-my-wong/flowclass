@@ -17,8 +17,8 @@ import { EnrollCourseRepository } from '@/models/enroll-courses.repository'
 import { PaymentStatus } from '@/models/enums/status'
 import { InvoiceRepository } from '@/models/invoice.repository'
 import { StudentLessonRepository } from '@/models/student-lesson.repository'
-import { StudentMemoRepository } from '@/models/student-memo.repository'
 import { StudentScheduleRepository } from '@/models/student-schedule.repository'
+import { UserAliasesRepository } from '@/models/user-aliases.repository'
 import { UserRolesRepository } from '@/models/user-roles.repository'
 import { BaseService } from '@/modules/base/base.service'
 
@@ -33,7 +33,7 @@ export class PrerequisitesCoursesService extends BaseService<Course> {
     private enrollCourseRepository: EnrollCourseRepository,
     private studentLessonRepository: StudentLessonRepository,
     private userRolesRepository: UserRolesRepository,
-    private studentMemoRepository: StudentMemoRepository,
+    private userAliasesRepository: UserAliasesRepository,
     private classRepository: ClassRepository,
     private studentScheduleRepository: StudentScheduleRepository,
     private userService: UsersService
@@ -72,19 +72,20 @@ export class PrerequisitesCoursesService extends BaseService<Course> {
 
     if (!course?.prerequisites?.groups) return result
 
-    const studentMemo = await this.studentMemoRepository.findOne({
+    const userAlias = await this.userAliasesRepository.findOne({
       where: {
         institutionId,
-        userAlias: {
-          user: {
-            email,
-            phone,
-          },
+        user: {
+          email,
+          phone,
         },
+      },
+      relations: {
+        user: true,
       },
     })
 
-    let student = await this.userService.findOneBy({ id: studentMemo?.userId })
+    let student = await this.userService.findOneBy({ id: userAlias?.userId })
 
     if (!student) {
       student = await this.userService.findOneBy({ email, phone })

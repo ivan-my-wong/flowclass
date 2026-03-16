@@ -27,7 +27,6 @@ import { ChargeFrequency, FilterMatchMode, Operator } from '@/models/enums/'
 import { AttendanceStatus, EnrollConfirmStatus, PaymentStatus } from '@/models/enums/status'
 import { StudentFormMetadata } from '@/models/student-form.entity'
 import { StudentLesson } from '@/models/student-lesson.entity'
-import { StudentMemo } from '@/models/student-memo.entity'
 import { UserAlias } from '@/models/user-aliases.entity'
 import { User, UserStatus } from '@/models/user.entity'
 
@@ -142,14 +141,11 @@ export class GetStudentDetailResponseDto extends PartialType(User) {
   id: number
 
   @ApiPropertyOptional({
-    description: 'The memo associated with the student',
-    type: StudentMemo,
+    description: 'The student info (user alias with memo fields)',
+    type: UserAlias,
   })
   @Expose()
-  studentInfo?: StudentMemo & {
-    userAlias: UserAlias
-    userAliasId: number
-  }
+  studentInfo?: UserAlias
 
   @ApiPropertyOptional({
     description: 'See if the user has user aliases in other institutions',
@@ -910,8 +906,8 @@ export class ImportStuResponseDto {
   userAlias: UserAlias
 
   @Expose()
-  @Type(() => StudentMemo)
-  studentMemo: StudentMemo
+  @Type(() => UserAlias)
+  studentMemo: UserAlias
 
   @Expose()
   @Type(() => StudentFormMetadata)

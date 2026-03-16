@@ -121,13 +121,6 @@ export class NotificationRecord extends BaseEntity {
   notificationStatus: NotificationStatus | SupportedType
 
   @Column({
-    name: 'automation_flow_id',
-    type: 'number',
-    nullable: true,
-  })
-  automationFlowId?: number
-
-  @Column({
     name: 'whatsapp_template_id',
     type: 'number',
     nullable: true,

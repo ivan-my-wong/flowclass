@@ -254,6 +254,7 @@ const CouponCard: React.FC<CouponCardProps> = ({
       </Box>
 
       <div
+        role="group"
         className="absolute w-fit top-4 right-4 z-[1]"
         onClick={e => e.stopPropagation()}
       >

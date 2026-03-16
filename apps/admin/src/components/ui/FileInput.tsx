@@ -224,7 +224,11 @@ const DraggableFileInput = forwardRef<HTMLInputElement, IProps>(
                     fileInputRef as React.MutableRefObject<HTMLInputElement | null>
                   ).current = el
                   if (typeof ref === 'function') ref(el)
-                  else if (ref) ref.current = el
+                  else if (ref) {
+                    const refToAssign =
+                      ref as React.MutableRefObject<HTMLInputElement | null>
+                    refToAssign.current = el
+                  }
                 }}
                 className="hidden"
                 onChange={handleFileChange}

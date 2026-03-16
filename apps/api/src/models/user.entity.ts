@@ -4,7 +4,6 @@ import { AfterLoad, Column, Entity, Index, OneToMany } from 'typeorm'
 import { Permission } from '@/application/admin/users/dto/user-role.dto'
 import { Invoice } from '@/models/invoice.entity'
 import { NotificationRecord } from '@/models/notification-record.entity'
-import { StudentMemo } from '@/models/student-memo.entity'
 import { BaseEntity } from '@/modules/base/base.entity'
 import { permissionsOfUser } from '@/utils/user-roles.utils'
 
@@ -81,11 +80,6 @@ export class User extends BaseEntity {
 
   @OneToMany(() => NotificationRecord, (notificationRecord) => notificationRecord.user)
   notificationRecord: NotificationRecord[]
-
-  @OneToMany(() => StudentMemo, (memo) => memo.user, {
-    createForeignKeyConstraints: false,
-  })
-  studentMemos: StudentMemo[]
 
   @AfterLoad()
   async getPermissions(): Promise<void> {

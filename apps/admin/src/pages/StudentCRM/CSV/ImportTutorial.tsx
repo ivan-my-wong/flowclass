@@ -60,12 +60,13 @@ const ImportTutorialCSV = ({ open, handleClose }: Props) => {
           <Box direction="column" align="flex-start">
             <div className="leading-[22px]">
               1.{t('student:importCsv.step1')}
-              <span
+              <button
+                type="button"
                 onClick={() => navigate('/settings/student-information-field')}
-                className="cursor-pointer text-primary px-1"
+                className="cursor-pointer text-primary px-1 bg-transparent border-0 font-inherit"
               >
                 {t('student:importCsv.step11')}
-              </span>
+              </button>
               {t('student:importCsv.step12')}
             </div>
             <Text>2.{t('student:importCsv.step2')}</Text>

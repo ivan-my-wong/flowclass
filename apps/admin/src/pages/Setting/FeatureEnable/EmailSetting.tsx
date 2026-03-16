@@ -158,11 +158,6 @@ const EmailSetting = ({ tabName }: { tabName?: string }) => {
                       ...schoolSetting,
                       customEmailSender: value,
                     })
-                  } else {
-                    setShowSubscriptionPopup({
-                      open: true,
-                      message: t(`subscription:subscriptionDialog.upgradePlan`),
-                    })
                   }
                 }}
                 label={t(`setting:emailSenderSetting.sendByCustomEmail`)}

@@ -196,7 +196,7 @@ const AppHeader: React.FC = () => {
             <SiteSelector />
           ) : (
             <>
-              <SchoolSelector triggerVariant="compact" />
+              <SchoolSelector />
               {(userPermission === UserRole.MasterAdmin ||
                 userPermission === UserRole.SiteAdmin) && (
                 <Button
@@ -231,11 +231,16 @@ const AppHeader: React.FC = () => {
         <Box justify="end">
           <RightHeader />
 
-          <div className="cursor-pointer" onClick={toggleMenu}>
+          <button
+            type="button"
+            className="cursor-pointer bg-transparent border-0 p-0"
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
             <SvgIcon>
               <MenuIcon />
             </SvgIcon>
-          </div>
+          </button>
         </Box>
       </header>
       <CSSTransition
@@ -246,8 +251,16 @@ const AppHeader: React.FC = () => {
         unmountOnExit
       >
         <div
+          role="button"
+          tabIndex={0}
           className="fixed top-0 left-0 w-screen h-screen [&_.menubar-enter]:-translate-x-full [&_.menubar-enter-active]:translate-x-0 [&_.menubar-enter-active]:transition-transform [&_.menubar-enter-active]:duration-300 [&_.menubar-exit]:translate-x-0 [&_.menubar-exit-active]:-translate-x-full [&_.menubar-exit-active]:transition-transform [&_.menubar-exit-active]:duration-300"
           onClick={toggleMenu}
+          onKeyDown={e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              toggleMenu()
+            }
+          }}
         >
           <div ref={nodeRef} className="w-72 shadow-lg bg-background-layer-2">
             <MenuBar />

@@ -1,11 +1,10 @@
 import { StudentLesson } from '@/models/student-lesson.entity'
-import { StudentMemo } from '@/models/student-memo.entity'
 import { UserAlias } from '@/models/user-aliases.entity'
 
 import { ClassLesson } from '../class-lessons.entity'
 
 export type StudentLessonWithUserMemo = {
-  userMemo?: StudentMemo
+  userMemo?: UserAlias
   aliases?: UserAlias
 } & StudentLesson
 

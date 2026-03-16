@@ -53,8 +53,8 @@ import { SettingNotificationsRepository } from '@/models/setting-notifications.e
 import { SettingWebpageInstitutionRepository } from '@/models/setting-webpage-institutions.repository'
 import { Site } from '@/models/site.entity'
 import { SitesRepository } from '@/models/sites.repository'
-import { StudentMemoRepository } from '@/models/student-memo.repository'
 import { User } from '@/models/user.entity'
+import { UserAliasesRepository } from '@/models/user-aliases.repository'
 import { UsersRepository } from '@/models/users.repository'
 import { BaseService } from '@/modules/base/base.service'
 import { MediaDetailDto } from '@/modules/media/dto/media.dto'
@@ -81,7 +81,7 @@ export class InstitutionsService extends BaseService<Institution> {
     private readonly institutionGalleryRepository: InstitutionGalleryRepository,
     private readonly settingWebpageInstitutionRepository: SettingWebpageInstitutionRepository,
     private readonly userRepository: UsersRepository,
-    private readonly studentMemoRepository: StudentMemoRepository,
+    private readonly userAliasesRepository: UserAliasesRepository,
     private readonly courseRepository: CoursesRepository,
     private readonly classRepository: ClassRepository,
     private readonly recurringSchedulesRepository: RecurringSchedulesRepository,
@@ -250,7 +250,7 @@ export class InstitutionsService extends BaseService<Institution> {
 
     const listMedia = mediaSerializer(media)
 
-    const studentMemo = await this.studentMemoRepository.find({
+    const userAliases = await this.userAliasesRepository.find({
       where: {
         institutionId: institution.id,
       },
@@ -260,7 +260,7 @@ export class InstitutionsService extends BaseService<Institution> {
       ...plainToInstance(InstitutionDetailDto, institution),
       siteSetting: await site.siteSettings,
       medias: listMedia,
-      studentMemo,
+      studentMemo: userAliases,
     }
   }
 

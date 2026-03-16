@@ -23,9 +23,18 @@ const ViewSiteButton = ({
 
   const customDomain = siteData.currentSite?.customDomain
 
-  let customLink = `https://${
-    customDomain && customDomain !== '' ? customDomain : domain
-  }`
+  const isDev = import.meta.env.DEV
+  const webBaseUrl =
+    import.meta.env.VITE_WEB_BASE_URL || 'http://localhost:3001'
+
+  let customLink: string
+  if (isDev) {
+    customLink = webBaseUrl
+  } else {
+    customLink = `https://${
+      customDomain && customDomain !== '' ? customDomain : domain
+    }`
+  }
   if (schoolUrl) {
     customLink += `/@${encodeURI(schoolUrl)}`
   }

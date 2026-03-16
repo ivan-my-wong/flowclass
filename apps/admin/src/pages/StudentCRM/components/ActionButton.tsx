@@ -5,26 +5,21 @@ import { useTranslation } from 'react-i18next'
 import { AiOutlineUserSwitch } from 'react-icons/ai'
 import { IoBookOutline } from 'react-icons/io5'
 import {
-  LuArrowDownToDot,
   LuCreditCard,
   LuEye,
   LuLink,
-  LuPrinter,
   LuUserCheck,
   LuUserMinus,
   LuUserPlus,
 } from 'react-icons/lu'
-import { TbCreditCardPay, TbCreditCardRefund } from 'react-icons/tb'
 import { useMutation, useQueryClient } from 'react-query'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { toast } from 'sonner'
 
 import ApiError, { handleApiError } from '@/api/errors/apiError'
 import { deleteStudent, editStatusStudent } from '@/api/student'
-import CouponIcon from '@/assets/svgs/student/CouponIcon'
 import DeleteIcon from '@/assets/svgs/student/DeleteIcon'
 import RemarkIcon from '@/assets/svgs/student/RemarkIcon'
-import TeachingServiceIcon from '@/assets/svgs/student/TeachingServiceIcon'
 import ViewIcon from '@/assets/svgs/student/ViewIcon'
 import DropdownMenu, {
   DropDownMenuItemType,
@@ -51,7 +46,6 @@ import {
   studentState,
 } from '@/stores/studentData'
 import { userPermissionState, UserRole } from '@/stores/userPermissionData'
-import { CreditTransactionType } from '@/types/credit'
 import {
   StudentEnrolmentRecord,
   TypeDeleteStudentParams,
@@ -60,7 +54,6 @@ import {
 import { StudentUser } from '@/types/user'
 import { generateDataTestId } from '@/utils/data-testid.utils'
 
-import AddOrDeductCreditModal from './AddOrDeductCreditModal'
 import AddToParentGroupModal, {
   AddToParentGroupModalHandle,
 } from './AddToParentGroupModal'
@@ -90,7 +83,6 @@ const ActionButton = ({
 }: ActionButtonProps): React.ReactElement => {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
   const [schoolData] = useRecoilState(schoolState)
   const currentSchoolId = schoolData.currentSchool?.id || 0
   const [siteData] = useRecoilState(siteState)
@@ -125,15 +117,6 @@ const ActionButton = ({
       enrollCourse => enrollCourse.registrationForm || []
     )
   }, [studentInfo?.enrollCourses])
-  const printData = useMemo(() => {
-    return {
-      studentId: userId,
-      name: studentInfo.name,
-      email,
-      phone: studentInfo.phone,
-      registrationForm,
-    }
-  }, [userId, studentInfo.name, studentInfo.phone, email, registrationForm])
 
   const { useCheckCreditSystemActive } = useCredit()
   const { isActive: showCreditSystem } = useCheckCreditSystemActive()
@@ -302,9 +285,6 @@ const ActionButton = ({
         }),
       },
       {
-        type: 'separator',
-      },
-      {
         ...renderMenuItem({
           icon: <LuLink size={20} />,
           title: t('student:menu:addTeachingService'),
@@ -328,32 +308,6 @@ const ActionButton = ({
         }),
       },
 
-      // {
-      //   ...renderMenuItem({
-      //     icon: <LuArrowDownToDot size={20} />,
-      //     title: t('student:menu:addCourseDirectly'),
-      //     funcHandleEvent: async () => {
-      //       await navigate(
-      //         `/student-record/${studentInfo.id}?userId=${studentInfo.userId}&student=${userId}`
-      //       )
-      //       setStudentData(prev => ({
-      //         ...prev,
-      //         tableDrawers: {
-      //           ...prev.tableDrawers,
-      //           isOpenAssignCourse: true,
-      //           assignCourseMode: AddTeachingServiceMode.addCourseDirectly,
-      //         },
-      //         currentStudent: {
-      //           id: studentInfo.id,
-      //           fullName: studentInfo.name,
-      //           phone: studentInfo.phone,
-      //           email: studentInfo.user?.email || studentInfo.email,
-      //         } as StudentUser,
-      //       }))
-      //     },
-      //   }),
-      // },
-
       {
         ...renderMenuItem({
           icon: <IoBookOutline size={20} />,
@@ -368,44 +322,18 @@ const ActionButton = ({
 
       INCOMPLETE_FEATURE_FLAG.STUDENT_CRM_MEMO_FEATURE
         ? {
-            ...renderMenuItem(
-              {
-                icon: <RemarkIcon />,
-                title: `${t('student:menu:addRemark')}`,
-                funcHandleEvent: () => {
-                  handleAddRemarks()
-                },
-              }
-              // true
-            ),
+            ...renderMenuItem({
+              icon: <RemarkIcon />,
+              title: `${t('student:menu:addRemark')}`,
+              funcHandleEvent: () => {
+                handleAddRemarks()
+              },
+            }),
           }
         : {
             type: 'separator',
           },
 
-      // {
-      //   ...renderMenuItem({
-      //     icon: <CouponIcon />,
-      //     title: t('student:menu:assignCoupon'),
-      //     funcHandleEvent: () => {
-      //       navigate(`?student=${userId}`)
-      //       setSearchParams(prev => ({
-      //         ...prev,
-      //         back: `/student-record`,
-      //       }))
-      //       setStudentData(prev => ({
-      //         ...prev,
-      //         tableDrawers: {
-      //           ...prev.tableDrawers,
-      //           isOpenCreateCoupon: true,
-      //         },
-      //       }))
-      //     },
-      //   }),
-      // },
-      // {
-      //   type: 'separator',
-      // },
       ...(!childOfUserAliasId && showCreditSystem
         ? [
             {
@@ -417,27 +345,6 @@ const ActionButton = ({
                 },
               }),
             },
-            // I think we just need to have the main credit balance button
-            // {
-            //   ...renderMenuItem({
-            //     icon: <TbCreditCardRefund className="text-xl" />,
-            //     title: t('student:menu.addCreditBalance'),
-            //     funcHandleEvent: () => {
-            //       addCreditModalHandle.current?.handleOpenChange?.()
-            //     },
-            //     disabled: !isStudentParent,
-            //   }),
-            // },
-            // {
-            //   ...renderMenuItem({
-            //     icon: <TbCreditCardPay className="text-xl" />,
-            //     title: t('student:menu.deductCreditBalance'),
-            //     funcHandleEvent: () => {
-            //       deductCreditModalHandle.current?.handleOpenChange?.()
-            //     },
-            //     disabled: !isStudentParent,
-            //   }),
-            // },
           ]
         : []),
       ...(!isStudentParent && !childOfUserAliasId
@@ -491,21 +398,6 @@ const ActionButton = ({
           ]
         : []),
 
-      {
-        type: 'separator',
-      },
-      // {
-      //   ...renderMenuItem({
-      //     icon: <LuPrinter size={20} />,
-      //     title: t('student:menu.printLabel'),
-      //     funcHandleEvent: () => {
-      //       printLabelModalHandle.current?.handleOpenChange?.()
-      //     },
-      //   }),
-      // },
-      // {
-      //   type: 'separator',
-      // },
       {
         ...renderMenuItem({
           icon: <DeleteIcon fill="#F87575" />,

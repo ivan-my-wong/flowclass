@@ -17,7 +17,6 @@ import { StudentRegularSchedulesController } from '@/application/student/course/
 import { EnrollCoursesController } from '@/application/student/enroll-courses/enroll-courses.controller'
 import { MediaStudentController } from '@/application/student/media/media-student.controller'
 import { PaymentEvidenceController } from '@/application/student/payment-evidence/payment-evidence.controller'
-import { PricingPageController } from '@/application/student/pricing-page/pricing-page.controller'
 import { ProfileStudentController } from '@/application/student/profile/profile.controller'
 import { BundleDiscountsController } from '@/application/student/promotions/bundle-discounts.controller'
 import { CouponsController } from '@/application/student/promotions/coupons.controller'
@@ -79,7 +78,6 @@ import { DatabaseModule } from './database.module'
     UsersController,
     MediaStudentController,
     PaymentEvidenceController,
-    PricingPageController,
     SitesStudentController,
     SchoolsStudentController,
     RequestPayoutController,

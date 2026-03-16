@@ -63,9 +63,17 @@ const WeekHeaderCustom = ({
         return (
           <div
             key={item.id}
+            role="button"
+            tabIndex={0}
             className="flex flex-col justify-center items-center"
             onClick={() => {
               handleClick(item)
+            }}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                handleClick(item)
+              }
             }}
           >
             <div className="text-base font-normal h-fit">{item.dateString}</div>

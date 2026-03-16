@@ -91,7 +91,6 @@ import { CountryOption } from '../Setting/Site/RegionLanguageSetting'
 import { initializeCourseSectionValues } from '../TeachingService/EditCourse/PageContent'
 
 import OnboardingPreview from './components/OnboardingPreview'
-import ConnectWhatsAppStep from './steps/ConnectWhatsAppStep'
 import CreateClassStep from './steps/CreateClassStep'
 import FinishSetupStep from './steps/FinishSetupStep'
 import MobilePreviewStep from './steps/MobilePreviewStep'
@@ -122,9 +121,8 @@ const ONBOARDING_STEPS = {
   COUNTRY_SETTINGS: 2,
   CLASS_SETUP: 3,
   PAYMENT_METHOD: 4,
-  CONNECT_WHATSAPP: 5,
-  STUDENT_ENROLLMENT: 6,
-  SUCCESS: 7, // This is the last step (finishSetupSection)
+  STUDENT_ENROLLMENT: 5,
+  SUCCESS: 6, // This is the last step (finishSetupSection)
 } as const
 
 type OnboardingStep = (typeof ONBOARDING_STEPS)[keyof typeof ONBOARDING_STEPS]
@@ -138,8 +136,6 @@ const isMobilePreviewStep = (step: number) =>
 const isClassSetupStep = (step: number) => step === ONBOARDING_STEPS.CLASS_SETUP
 const isPaymentMethodStep = (step: number) =>
   step === ONBOARDING_STEPS.PAYMENT_METHOD
-const isWhatsAppStep = (step: number) =>
-  step === ONBOARDING_STEPS.CONNECT_WHATSAPP
 const isStudentEnrollmentStep = (step: number) =>
   step === ONBOARDING_STEPS.STUDENT_ENROLLMENT
 
@@ -424,11 +420,6 @@ const SetUpPage: React.FC = () => {
     // Payment method step
     if (isPaymentMethodStep(currentSectionIndex)) {
       return !formPaymentMethod.formState.isValid
-    }
-
-    // WhatsApp step - always allow next (optional step)
-    if (isWhatsAppStep(currentSectionIndex)) {
-      return false
     }
 
     // Student enrollment step - only allow next when upload receipt is reached
@@ -961,9 +952,9 @@ const SetUpPage: React.FC = () => {
     2: formSchool,
     3: formClass,
     4: formPaymentMethod,
-    5: formSchool,
+    5: formPaymentMethod,
     6: formPaymentMethod,
-    7: formPaymentMethod,
+    7: formSchool,
     8: formSchool,
     9: formSchool,
     10: formSchool,
@@ -1016,7 +1007,6 @@ const SetUpPage: React.FC = () => {
         }
       case 5:
       case 6:
-      case 7:
         return {
           fields: [],
           total: 0,
@@ -1057,8 +1047,8 @@ const SetUpPage: React.FC = () => {
             existingPaymentMethods?.content &&
             existingPaymentMethods.content.length > 0
           ) {
-            // User has payment methods, skip to connect WhatsApp step
-            setCurrentSectionIndex(ONBOARDING_STEPS.CONNECT_WHATSAPP)
+            // User has payment methods, skip to student enrollment step
+            setCurrentSectionIndex(ONBOARDING_STEPS.STUDENT_ENROLLMENT)
             return
           }
           if (existingCourses.length > 0 || existingClasses.length > 0) {
@@ -1147,12 +1137,6 @@ const SetUpPage: React.FC = () => {
       return
     }
 
-    // WhatsApp step - always allow next (optional step)
-    if (isWhatsAppStep(currentSectionIndex)) {
-      setCurrentSectionIndex(currentSectionIndex + 1)
-      return
-    }
-
     // Student enrollment step - always allow next (testing step)
     if (isStudentEnrollmentStep(currentSectionIndex)) {
       setCurrentSectionIndex(currentSectionIndex + 1)
@@ -1212,12 +1196,6 @@ const SetUpPage: React.FC = () => {
         onClassDataReady={setClassDataFromStep}
       />
     ),
-  }
-
-  const connectWhatsAppSection = {
-    title: t('onboarding:newUserSetup.connectWhatsApp.title'),
-    subtitle: t('onboarding:newUserSetup.connectWhatsApp.subtitle'),
-    content: <ConnectWhatsAppStep />,
   }
 
   const handleSkipMobilePreview = () => {
@@ -1323,7 +1301,6 @@ const SetUpPage: React.FC = () => {
     countrySection,
     classSetupSection,
     paymentMethodSection,
-    connectWhatsAppSection,
     studentEnrollmentSection,
     // schoolDetailsSection,
     // createCourseSection,
@@ -1583,7 +1560,6 @@ const SetUpPage: React.FC = () => {
                 t('onboarding:newUserSetup.stepIndicators.countrySettings'),
                 t('onboarding:newUserSetup.stepIndicators.classSetup'),
                 t('onboarding:newUserSetup.stepIndicators.paymentSetup'),
-                t('onboarding:newUserSetup.stepIndicators.connectWhatsApp'),
                 t(
                   'onboarding:newUserSetup.stepIndicators.tryStudentEnrollment'
                 ),
@@ -1694,17 +1670,16 @@ const SetUpPage: React.FC = () => {
                   <div className="sticky w-full bottom-2 mt-4 left-0 right-0 shadow-md rounded-lg bg-white border-gray-200 p-4 lg:relative lg:border-t-0">
                     <Box direction="row" className="my-2 h-[34px] gap-3">
                       {/* Back button - hide for class setup step */}
-                      {!isClassSetupStep(currentSectionIndex) &&
-                        !isWhatsAppStep(currentSectionIndex) && (
-                          <Button
-                            onClick={handlePrevSection}
-                            variant="outline"
-                            iconBefore={<LuArrowLeft />}
-                            className="w-[99px] h-full"
-                          >
-                            {t(`common:action.back`)}
-                          </Button>
-                        )}
+                      {!isClassSetupStep(currentSectionIndex) && (
+                        <Button
+                          onClick={handlePrevSection}
+                          variant="outline"
+                          iconBefore={<LuArrowLeft />}
+                          className="w-[99px] h-full"
+                        >
+                          {t(`common:action.back`)}
+                        </Button>
+                      )}
 
                       {/* Next button - hide for last step */}
                       {!isLastStep(currentSectionIndex) && (

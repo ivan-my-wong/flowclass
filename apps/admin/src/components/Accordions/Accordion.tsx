@@ -39,7 +39,7 @@ const CustomAccordion: React.FC<AccordionProps> = ({ items, className }) => (
         value={item.itemValue}
         className="overflow-hidden mt-px first:mt-0 first:rounded-t-md last:rounded-b-md focus-within:relative focus-within:z-10 focus-within:shadow-[0_0_0_2px_hsl(var(--mauve-12))]"
       >
-        <Accordion.Header className="flex justify-center w-full [all:unset]">
+        <Accordion.Header className="flex justify-center w-full">
           <Accordion.Trigger
             className={cn(
               'flex flex-1 items-center justify-center w-full h-11 px-5',

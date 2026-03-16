@@ -375,8 +375,8 @@ const StudentDatabase = (): JSX.Element => {
           }
 
           if (student.studentMemo) {
-            if (student.studentMemo.userAlias?.name) {
-              currentName = student.studentMemo.userAlias.name
+            if (student.studentMemo.name) {
+              currentName = student.studentMemo.name
             }
           }
 
@@ -1011,8 +1011,8 @@ const StudentDatabase = (): JSX.Element => {
           currentEmail = student.user.email
         }
         if (student.studentMemo && !currentName) {
-          if (student.studentMemo.userAlias?.name) {
-            currentName = student.studentMemo.userAlias.name
+          if (student.studentMemo.name) {
+            currentName = student.studentMemo.name
           }
         }
         return {

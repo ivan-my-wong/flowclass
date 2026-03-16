@@ -97,6 +97,9 @@ const FormTeachingService = (
     currentClassType === ClassTypeEnum.regular ||
     currentClassType === ClassTypeEnum.workshop
 
+  const isPeriodRequiredClass =
+    isRegularOrWorkshopClass || currentClassType === ClassTypeEnum.regularV2
+
   const [isCoppied, setIsCoppied] = useState(false)
   const [isLoadingPeriods, setIsLoadingPeriods] = useState(false)
 
@@ -174,14 +177,14 @@ const FormTeachingService = (
 
   // Track loading state for period options
   useEffect(() => {
-    if (watchedClassId && isRegularOrWorkshopClass && periodOpts.length === 0) {
+    if (watchedClassId && isPeriodRequiredClass && periodOpts.length === 0) {
       // Class is selected but period options haven't loaded yet
       setIsLoadingPeriods(true)
     } else if (periodOpts.length > 0) {
       // Period options have loaded
       setIsLoadingPeriods(false)
     }
-  }, [watchedClassId, isRegularOrWorkshopClass, periodOpts.length])
+  }, [watchedClassId, isPeriodRequiredClass, periodOpts.length])
 
   // Get current selected value for CourseAndClassSingleSelector
   const currentValue = useMemo(() => {
@@ -459,16 +462,14 @@ const FormTeachingService = (
       >
         <div className="flex gap-1 items-center">
           <LabelField>{t('student:teachingService.choosePeriod')}</LabelField>
-          {isRegularOrWorkshopClass && (
-            <span className="text-destructive">*</span>
-          )}
+          {isPeriodRequiredClass && <span className="text-destructive">*</span>}
         </div>
 
         <Controller
           name="periodId"
           control={control}
           rules={{
-            required: isRegularOrWorkshopClass,
+            required: isPeriodRequiredClass,
           }}
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <>
@@ -537,26 +538,29 @@ const FormTeachingService = (
             required: !isSubscriptionClass,
           }}
           render={() => (
-            // For this part, appointment class will need to show the time
-            <CustomDatePicker
-              includeDates={dateTimePickerOpts.map(
-                date => new Date(date.split(' ')[0])
-              )}
-              includeTimes={
-                isAppointmentClass
-                  ? dateTimePickerOpts.map(date => new Date(date.split(' ')[1]))
-                  : []
-              }
-              selected={selectedDate}
-              showTimeSelect={isAppointmentClass}
-              dateFormat={
-                isAppointmentClass ? 'yyyy-MM-dd hh:mm a' : 'yyyy-MM-dd'
-              }
-              onChange={value => handleSelectDate(value)}
-              selectedDate={selectedDate?.toString() ?? ''}
-              timeIntervals={5}
-              dataTestId="classLessonDate"
-            />
+            <div className="w-full">
+              <CustomDatePicker
+                includeDates={dateTimePickerOpts.map(
+                  date => new Date(date.split(' ')[0])
+                )}
+                includeTimes={
+                  isAppointmentClass
+                    ? dateTimePickerOpts.map(
+                        date => new Date(date.split(' ')[1])
+                      )
+                    : []
+                }
+                selected={selectedDate}
+                showTimeSelect={isAppointmentClass}
+                dateFormat={
+                  isAppointmentClass ? 'yyyy-MM-dd hh:mm a' : 'yyyy-MM-dd'
+                }
+                onChange={value => handleSelectDate(value)}
+                selectedDate={selectedDate?.toString() ?? ''}
+                timeIntervals={5}
+                dataTestId="classLessonDate"
+              />
+            </div>
           )}
         />
 
@@ -583,18 +587,19 @@ const FormTeachingService = (
           control={control}
           rules={{ required: true }}
           render={() => (
-            // For this part, appointment class will need to show the time
-            <CustomDatePicker
-              includeDates={dateTimePickerOpts.map(
-                date => new Date(date.split(' ')[0])
-              )}
-              selected={selectedDate}
-              showTimeSelect={false}
-              dateFormat="yyyy-MM-dd"
-              onChange={value => handleSelectDate(value)}
-              selectedDate={selectedDate?.toString() ?? ''}
-              dataTestId="classLessonDate"
-            />
+            <div className="w-full">
+              <CustomDatePicker
+                includeDates={dateTimePickerOpts.map(
+                  date => new Date(date.split(' ')[0])
+                )}
+                selected={selectedDate}
+                showTimeSelect={false}
+                dateFormat="yyyy-MM-dd"
+                onChange={value => handleSelectDate(value)}
+                selectedDate={selectedDate?.toString() ?? ''}
+                dataTestId="classLessonDate"
+              />
+            </div>
           )}
         />
 

@@ -1,12 +1,19 @@
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { defineConfig, UserConfig } from 'vite';
+import { defineConfig, loadEnv, UserConfig } from 'vite';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
+  const root = path.resolve(__dirname, '../..');
+  const env = loadEnv(mode, root, '');
+  const webBaseUrl = env.NEXT_PUBLIC_WEB_BASE_URL || env.VITE_WEB_BASE_URL || 'http://localhost:3001';
+
   return {
-    envDir: path.resolve(__dirname, '../..'),
+    envDir: root,
+    define: {
+      'import.meta.env.VITE_WEB_BASE_URL': JSON.stringify(webBaseUrl),
+    },
     plugins: [react(), visualizer({ filename: 'analyze.html', gzipSize: true })],
     assetsInclude: ['**/*.md', '**/*.csv'],
     server: {

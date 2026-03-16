@@ -454,6 +454,7 @@ export type RequestTimeChangeEmailProps = {
   studentEmail: string
   studentName: string
   status: RequestTimeChangeStatus
+  institutionId: number
   institutionName: string
   newClassDateTime: string
   originalClassDateTime: string
@@ -473,6 +474,7 @@ export type SendClassMaterialsEmailProps = {
   emailAddress: string
   courseName: string
   className: string
+  institutionId: number
   institutionName: string
   studentName: string
   siteLink: string

@@ -98,7 +98,8 @@ const WhatsappTemplateItem = ({ item, onDelete }: PropType): JSX.Element => {
         <div className="text-right">
           Assigned to:{' '}
           {(item.assignedTo as Record<string, any> | undefined)?.name ??
-            (item.assignedTo as Record<string, any> | undefined)?.functionName ??
+            (item.assignedTo as Record<string, any> | undefined)
+              ?.functionName ??
             '-'}
         </div>
       </div>

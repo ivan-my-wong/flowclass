@@ -100,6 +100,7 @@ const ApplicationCard = ({
           formatTs(data.updatedAt.toString(), 'YYYY/MM/DD hh:mm')}
       </Text>
       <div
+        role="group"
         className="absolute w-fit top-4 right-4 z-[1]"
         onClick={e => e.stopPropagation()}
       >

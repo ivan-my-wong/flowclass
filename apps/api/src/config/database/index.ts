@@ -94,7 +94,6 @@ import { InstitutionsRepository } from '@/models/institutions.repository'
 import { IntegrationGoogleService } from '@/domain/external/integration-google.service'
 import { StudentNotifSettingService } from '@/domain/service/student-notif-setting.service'
 import { WhatsappWebService } from '@/domain/service/whatsapp-web.service'
-import { AutomationSettingsRepository } from '@/models/automation-settings.repository'
 import {
   IntegrationGoogleEntity,
   IntegrationGoogleRepository,
@@ -144,8 +143,6 @@ import { StripeProductPricesRepository } from '@/models/stripe-product-prices.re
 import { StudentForm } from '@/models/student-form.entity'
 import { StudentLesson } from '@/models/student-lesson.entity'
 import { StudentLessonRepository } from '@/models/student-lesson.repository'
-import { StudentMemo } from '@/models/student-memo.entity'
-import { StudentMemoRepository } from '@/models/student-memo.repository'
 import {
   StudentNotificationSetting,
   StudentNotificationSettingRepository,
@@ -183,7 +180,6 @@ import { InvoiceCampaignService } from '@/domain/service/invoice-campaign.servic
 import { InvoiceStatisticsService } from '@/domain/service/invoice-statistics.service'
 import { SitesFeatureEnabledService } from '@/domain/service/sites-feature-enabled.service'
 import { StudentSubmissionService } from '@/domain/service/student-submission.service'
-import { PricingPageService } from '@/domain/service/pricing-page.service'
 import { TemplateManagementService } from '@/domain/service/template-management.service'
 
 import { ClassMaterials } from '@/models/class-materials.entity'
@@ -270,7 +266,6 @@ export const getAllEntities = () => [
   RecurringSchedules,
   SettingNotifications,
   AdditionalFee,
-  StudentMemo,
   AiRunsRecord,
   RepeatFormats,
   NotificationRecord,
@@ -344,7 +339,6 @@ export const getAllRepositories = () => [
   SettingNotificationsRepository,
   StudentScheduleRepository,
   AdditionalFeeRepository,
-  StudentMemoRepository,
   RepeatFormatsRepository,
   StudentLessonRepository,
   AiRunsRecordRepository,
@@ -360,7 +354,6 @@ export const getAllRepositories = () => [
   CustomMessageRepository,
   WhatsappSessionRepository,
   StudentNotificationSettingRepository,
-  AutomationSettingsRepository,
   DocumentTemplateRepository,
   DocumentCampaignRepository,
   DocumentCampaignRecipientsRepository,
@@ -443,7 +436,6 @@ export const getAllServices = () => [
   CustomMessageService,
   WhatsappWebService,
   StudentNotifSettingService,
-  PricingPageService,
   TemplateManagementService,
   InstructorProfilesService,
   ClassRegularSchedulesV2Service,

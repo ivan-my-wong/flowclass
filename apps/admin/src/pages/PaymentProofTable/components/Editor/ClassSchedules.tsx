@@ -280,8 +280,16 @@ const LessonRow: FC<{
           )}
 
           <div
+            role="button"
+            tabIndex={0}
             className="flex items-center gap-1 cursor-pointer"
             onClick={() => onChange(lesson)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                onChange(lesson)
+              }
+            }}
           >
             {changeDate ? (
               <span className="text-base font-normal text-[#5C95FF]">

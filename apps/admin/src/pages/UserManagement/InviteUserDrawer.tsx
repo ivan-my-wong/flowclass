@@ -26,10 +26,6 @@ const InviteUserDrawer = ({
   open,
 }: InviteUserDrawerProps): JSX.Element => {
   const { t } = useTranslation()
-  const [, setShowSubscriptionPopup] = useRecoilState(
-    subscriptionDialogOpenState
-  )
-  const { checkQuota } = useCheckPermissionAndQuota()
   const formData = useForm<InviteUserFormData>()
   const headerBackButton: HeaderBackButtonStatus = {
     mode: 'back',

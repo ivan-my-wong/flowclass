@@ -39,7 +39,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       <>{icon}</>
     ) : (
       <button
-        type={type}
+        type={type === 'submit' ? 'submit' : 'button'}
         ref={ref}
         data-testid={dataTestId}
         className={cn(

@@ -305,7 +305,7 @@ const ToggleGroupItemComponent = ({
         aria-placeholder={item.label}
         data-testid={dataTestId}
         className={cn(
-          '[all:unset] cursor-pointer gap-2 bg-background-layer-2 text-text flex items-center justify-center p-2 rounded-sm w-full min-w-32',
+          'cursor-pointer gap-2 bg-background-layer-2 text-text flex items-center justify-center p-2 rounded-sm w-full min-w-32',
           isStandalone
             ? 'h-8 p-2 pl-4 hover:bg-primary-subtle hover:text-text-contrast data-[state=on]:border-[3px] data-[state=on]:border-primary'
             : 'min-h-8 py-2 px-1',

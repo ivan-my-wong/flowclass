@@ -198,13 +198,6 @@ const EditCourse = (): JSX.Element => {
     [dispatch]
   )
 
-  const { handlePublishCourse } = usePublishCourseHandlingDeprecated(
-    editCourseState,
-    dispatch,
-    courseRecoilState,
-    setCourseRecoilState
-  )
-
   const { handleArchiveCourse } = useArchiveCourseHandling(
     editCourseState,
     dispatch,

@@ -24,8 +24,9 @@ export const TextInputLabel = ({
   <Label
     className={cn(
       'flex items-center shrink-0 pl-0 text-sm',
-      'w-[30%] max-w-[40%] sm:w-full sm:max-w-none sm:my-2',
-      fullWidth && 'max-w-full w-full',
+      fullWidth
+        ? 'w-full max-w-full sm:my-2'
+        : 'w-[30%] min-w-[80px] max-w-[40%] shrink-0',
       className
     )}
     {...props}
@@ -81,7 +82,12 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           </TextInputLabel>
         )}
 
-        <Box direction="column" align="flex-start" gap="none">
+        <Box
+          direction="column"
+          align="flex-start"
+          gap="none"
+          className="min-w-0 flex-1"
+        >
           <RawInput
             placeholder={placeholder}
             error={isError}

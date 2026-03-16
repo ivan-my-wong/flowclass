@@ -28,11 +28,19 @@ const DarkModeToggle = ({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       className={cn(
         'flex items-center justify-center gap-4 cursor-pointer select-none',
         className
       )}
       onClick={toggleDarkMode}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          toggleDarkMode()
+        }
+      }}
       {...props}
     >
       <IconButton

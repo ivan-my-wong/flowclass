@@ -89,7 +89,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         ref={ref}
-        type={type}
+        type={type === 'submit' ? 'submit' : 'button'}
         className={cn(
           'box-border relative text-base font-bold rounded-md min-w-fit text-center leading-none cursor-pointer border-0',
           'flex items-center justify-center',

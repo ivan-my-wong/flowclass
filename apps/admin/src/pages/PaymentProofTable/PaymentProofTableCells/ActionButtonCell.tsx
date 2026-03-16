@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import type { NavigateFunction } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
 import { BsThreeDots } from 'react-icons/bs'
@@ -9,7 +10,6 @@ import {
   LuMessageCircle,
   LuPencil,
 } from 'react-icons/lu'
-import { useNavigate } from 'react-router'
 import { useRecoilValue } from 'recoil'
 import { toast } from 'sonner'
 
@@ -41,14 +41,15 @@ type ActionButtonProps = {
   studentInfo: PaymentProofTableItem
   paymentEvidenceList: PaymentEvidence[]
   onPaymentStateUpdate: () => void
+  navigate: NavigateFunction
 }
 
 const ActionButtonCell = ({
   studentInfo,
   paymentEvidenceList,
   onPaymentStateUpdate,
+  navigate,
 }: ActionButtonProps): JSX.Element => {
-  const navigate = useNavigate()
   const { t } = useTranslation()
   const { schoolData, currentSchool } = useSchoolData()
 

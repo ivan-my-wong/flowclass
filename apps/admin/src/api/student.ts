@@ -143,7 +143,7 @@ export const getStudentInvoiceStatistics = async ({
   institutionId: number
 }): Promise<Invoice[]> => {
   const res = await apiClient.get({
-    url: '/admin/invoices/statistics',
+    url: '/admin/invoices/statistics/basic',
     needAuth: true,
     params: { siteId, institutionId, startDate, endDate },
   })

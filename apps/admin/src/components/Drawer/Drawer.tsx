@@ -6,10 +6,11 @@ type Props = {
   children: ReactElement
   open: boolean
   onClose?: () => void
+  maxWidth?: string
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const Drawer = ({ children, open, onClose }: Props) => {
+const Drawer = ({ children, open, onClose, maxWidth }: Props) => {
   const refDrawer = useRef<HTMLDivElement>(null)
 
   return (
@@ -23,9 +24,12 @@ const Drawer = ({ children, open, onClose }: Props) => {
       <div
         ref={refDrawer}
         className={cn(
-          'absolute bg-background-layer-2 shadow-md top-0 right-0 max-w-[500px] px-2 py-8 h-screen min-w-[600px] overflow-y-auto',
-          'sm:min-w-[95%] xs:p-5'
+          'absolute bg-background-layer-2 shadow-md top-0 right-0 px-2 py-8 h-screen overflow-y-auto',
+          maxWidth
+            ? 'w-full'
+            : 'max-w-[500px] min-w-[600px] sm:min-w-[95%] xs:p-5'
         )}
+        style={maxWidth ? { maxWidth } : undefined}
       >
         {children}
       </div>

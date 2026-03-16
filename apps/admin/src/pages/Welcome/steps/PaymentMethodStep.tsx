@@ -50,10 +50,10 @@ const PaymentMethodStep: React.FC<PaymentMethodStepProps> = ({
       <FormProvider {...formPaymentMethod}>
         <div className="flex flex-col px-3 py-6 gap-1 h-[450px] sm:h-[460px] overflow-y-auto">
           <div className="space-y-4 mt-2 h-auto">
-            <div className="box-col-full">
+            <div className="box-col-full items-start">
               <label
                 htmlFor="methodName"
-                className="text-sm font-medium block mb-1"
+                className="text-sm font-medium block mb-1 text-left"
               >
                 {t('payout:paymentMethodName')}
                 <span className="text-red-500 ml-1">*</span>

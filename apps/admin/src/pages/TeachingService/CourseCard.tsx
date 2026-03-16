@@ -410,6 +410,7 @@ const CourseCard = ({
 
       <div
         id={`${course.name}-dropdown`}
+        role="group"
         className="absolute w-fit top-6 right-6 z-[1]"
         onClick={e => e.stopPropagation()}
       >

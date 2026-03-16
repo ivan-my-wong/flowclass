@@ -32,18 +32,3 @@ export const schoolSubscriptionState = atom<{
   key: ATOM_KEY.SchoolSubscriptionState,
   default: defaultSubscriptionState,
 })
-
-export type SubscriptionDialogState = {
-  open: boolean
-  message: string | null
-}
-
-const defaultSubscriptionDialogState: SubscriptionDialogState = {
-  open: false,
-  message: null,
-}
-
-export const subscriptionDialogOpenState = atom<SubscriptionDialogState>({
-  key: ATOM_KEY.SubscriptionDialogOpenState,
-  default: defaultSubscriptionDialogState,
-})

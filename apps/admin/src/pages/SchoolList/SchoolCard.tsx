@@ -86,27 +86,18 @@ const SchoolCard = ({
   }
 
   return (
-    <div className="flex flex-col !important relative rounded-lg border border-text-disabled shadow-sm w-[45%] overflow-hidden sm:w-full">
-      <div className="flex rounded-md">
+    <div className="flex w-full flex-row relative rounded-lg border border-text-disabled shadow-sm overflow-hidden">
+      <div className="flex-shrink-0 w-60 rounded-l-md overflow-hidden">
         <ImageAspect
           s3="public"
           ratio={16 / 9}
           width="100%"
           src={bannerImage ?? banner}
           alt="Banner image"
-          borderRadius="1rem"
+          borderRadius="0"
         />
       </div>
-      <Box responsive justify="flex-start" className="pb-4 px-4">
-        <ImageAspect
-          s3="public"
-          ratio={1}
-          width="20%"
-          src={logo ?? logoImage}
-          alt="Logo image"
-          borderRadius="1rem"
-        />
-
+      <Box responsive justify="flex-start" className="flex-1 pb-4 px-4 py-4">
         <Box direction="column" align="flex-start" className="ml-4">
           <Heading align="left">{name}</Heading>
           <Text className="mb-2">{schoolUrl}</Text>

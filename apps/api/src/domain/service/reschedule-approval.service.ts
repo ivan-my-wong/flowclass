@@ -216,6 +216,7 @@ export class RescheduleApprovalService {
         status,
         studentEmail: email,
         studentName: firstName,
+        institutionId,
         institutionName: institution.name,
         originalClassDateTime: lessonDateToString(
           `${classLesson.startTime.toISOString()} ${classLesson.endTime.toISOString()}`,

@@ -1,6 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
 
-import { StudentMemo } from '@/models/student-memo.entity'
+import { StudentNotificationSettings } from '@/application/admin/student-onboard/dtos/student-memo.dto'
 import { User } from '@/models/user.entity'
 import { BaseEntity } from '@/modules/base/base.entity'
 
@@ -60,8 +60,20 @@ export class UserAlias extends BaseEntity {
   @JoinColumn({ name: 'ref_user_id' })
   refUser: User
 
-  @OneToMany(() => StudentMemo, (studentMemo) => studentMemo.userAlias)
-  studentMemos: StudentMemo[]
+  @Column({ name: 'memo', default: '', nullable: true })
+  memo: string
+
+  @Column({ name: 'assignable_lesson_count', default: 0, nullable: true })
+  assignableLessonCount: number
+
+  @Column({ name: 'overdue_reminder', type: 'jsonb', nullable: true, default: {} })
+  overdueReminder?: StudentNotificationSettings
+
+  @Column({ name: 'lesson_reminder', type: 'jsonb', nullable: true, default: {} })
+  lessonReminder?: StudentNotificationSettings
+
+  @Column({ name: 'payment_reminder', type: 'jsonb', nullable: true, default: {} })
+  paymentReminder?: StudentNotificationSettings
 
   @OneToMany(() => StudentForm, (studentForm) => studentForm.userAlias)
   studentForms: StudentForm[]

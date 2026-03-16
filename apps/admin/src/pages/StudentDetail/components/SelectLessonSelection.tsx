@@ -111,9 +111,14 @@ const SelectLessonSelection = ({
             <Text bold size="large">
               {t('student:teachingService.lessonSelection')}
             </Text>
-            <div className="cursor-pointer" onClick={handleCloseDrw}>
+            <button
+              type="button"
+              className="cursor-pointer bg-transparent border-0 p-0"
+              onClick={handleCloseDrw}
+              aria-label="Close"
+            >
               <CloseIcon />
-            </div>
+            </button>
           </div>
         </div>
         <div className="w-full h-px bg-[#BFBFBF] my-[22px]" />

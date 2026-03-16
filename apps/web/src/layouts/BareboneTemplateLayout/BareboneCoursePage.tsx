@@ -1,18 +1,15 @@
 import { useRef, useState } from 'react'
 
 import useTranslation from 'next-translate/useTranslation'
-import { useInView } from 'react-intersection-observer'
 
 import { CourseMobileButtonGroup } from '@/components/Buttons/CourseMobileButtonGroup'
 import ImageAspect from '@/components/Images/ImageAspect'
-import Tabs from '@/components/Tabs/Tabs'
-// import Heading from '@/components/Texts/Heading'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs'
 import { courseDefaultSectionTitle } from '@/constants/defaultSectionTitle'
 import useResponsive, { NotDesktop } from '@/hooks/useResponsive'
 import CourseDetailCard from '@/page-components/courses/CourseDetailCard'
 import CourseDetailInfo from '@/page-components/courses/CourseDetailInfo'
 import { Course, LongDescription, School } from '@/types/index'
-import { tabs } from '@/types/websiteTemplate'
 import { cn } from '@/utils/cn'
 
 import { CoursePageDescription } from '../LayoutElements/PageDescription'
@@ -65,15 +62,9 @@ const BareboneTemplateCoursePage = ({ course, school }: CourseDetailProps): JSX.
   //   )
   // }
 
-  const [, inViewHeader] = useInView({
-    threshold: 0,
-    initialInView: true,
-    rootMargin: !isDesktop ? '-22% 0%' : '0% 0%',
-  })
-
   const scrollRefs = useRef<Record<string, HTMLDivElement>>({})
 
-  const [currentTab, setCurrentTab] = useState(tabs[0])
+  const [currentTab, setCurrentTab] = useState(tabData[0]?.value ?? '')
   const [showHeader, setShowHeader] = useState(false)
   //   const router = useRouter()
   //   const menuTabData = tabs.map((tab) => ({ value: tab, label: t(`school:heading.${tab}`) }))
@@ -95,25 +86,29 @@ const BareboneTemplateCoursePage = ({ course, school }: CourseDetailProps): JSX.
   // />
 
   const handleTabChange = (value: string) => {
-    scrollRefs.current[value].scrollIntoView({ behavior: 'smooth' })
+    scrollRefs.current[value]?.scrollIntoView({ behavior: 'smooth' })
     setCurrentTab(value)
   }
 
   return (
     <BareboneTemplateLayout school={school} site={site}>
-      <header
-        className={`bg-background fixed top-0 z-10 flex min-h-16 w-full shrink-0 flex-col justify-between px-4 py-2 lg:flex-row ${
-          showHeader ? 'block' : 'hidden'
-        }`}
-      >
-        <Tabs
-          items={tabData}
-          onChange={value => {
-            handleTabChange(value)
-          }}
-          currentSelectedTab={currentTab}
-        />
-      </header>
+      {tabData.length > 0 && (
+        <header
+          className={`bg-background fixed top-0 z-10 flex min-h-16 w-full shrink-0 flex-col justify-between px-4 py-2 lg:flex-row ${
+            showHeader ? 'block' : 'hidden'
+          }`}
+        >
+          <Tabs value={currentTab} onValueChange={handleTabChange}>
+            <TabsList className="flex w-full overflow-x-auto">
+              {tabData.map(tab => (
+                <TabsTrigger key={tab.value} value={tab.value} className="shrink-0">
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </header>
+      )}
 
       <div className="box-row sticky top-5 w-full justify-start">
         <div

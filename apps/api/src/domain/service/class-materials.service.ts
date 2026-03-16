@@ -441,6 +441,7 @@ export class ClassMaterialsService {
       emailAddress: userAlias.email,
       courseName: course.name,
       className: classEntity?.name,
+      institutionId: institution.id,
       institutionName: institution.name,
       studentName: userAlias.name,
       siteLink,

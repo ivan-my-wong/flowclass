@@ -20,7 +20,6 @@ import { getFreeDomainList } from '@/constants/domain'
 import { useSchoolEditSave } from '@/hooks/useSchoolEditSave'
 import useSiteData from '@/hooks/useSiteData'
 import { getAppDomain } from '@/lib/config'
-import { subscriptionDialogOpenState } from '@/stores/schoolSubscriptionData'
 import { CustomSiteUpdateProps, Site } from '@/stores/siteData'
 import { getDomainFromUrl } from '@/utils/generate-link.utils'
 import { validateCustomDomain, validateDomain } from '@/utils/validate'
@@ -34,9 +33,6 @@ const BasicSite = ({
 }): JSX.Element => {
   const { t } = useTranslation()
   const { siteData, updateCurrentSite } = useSiteData()
-  const [, setShowSubscriptionPopup] = useRecoilState(
-    subscriptionDialogOpenState
-  )
 
   const { currentSite } = siteData
   const fixedDomain = `.${getAppDomain()}`

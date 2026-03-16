@@ -113,12 +113,13 @@ const Content = ({
         </div>
         <Text className="mb-4">
           {t('setting:applicationForm.descriptionApplicatFields')}{' '}
-          <span
-            className="text-primary cursor-pointer"
+          <button
+            type="button"
+            className="text-primary cursor-pointer bg-transparent border-0 p-0 font-inherit"
             onClick={() => navigate('/settings/student-information-field')}
           >
             {t('setting:applicationForm.settingInformationFields')}
-          </span>
+          </button>
         </Text>
       </>
     ),
@@ -131,12 +132,13 @@ const Content = ({
         </div>
         <Text className="mb-4">
           {t('setting:applicationForm.descriptionCommonFields')}{' '}
-          <span
-            className="text-primary cursor-pointer"
+          <button
+            type="button"
+            className="text-primary cursor-pointer bg-transparent border-0 p-0 font-inherit"
             onClick={() => navigate('/settings/student-information-field')}
           >
             {t('setting:applicationForm.settingInformationFields')}
-          </span>
+          </button>
         </Text>
         {!(items[FlagInformationFieldTypes.common].length > 1) && (
           <div className="border-dashed border-2 p-4 rounded-md border-gray-400 flex flex-col items-center mt-4">

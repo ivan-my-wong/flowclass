@@ -62,6 +62,8 @@ export const DatePickerInput = forwardRef<HTMLInputElement, DateInputProps>(
       disabled,
       readOnly,
       dataTestId,
+      containerClassName,
+      ...rest
     },
     ref
   ) => {
@@ -80,7 +82,9 @@ export const DatePickerInput = forwardRef<HTMLInputElement, DateInputProps>(
         readOnly={readOnly || type === 'end'}
         disabled={disabled || type === 'end'}
         dataTestId={dataTestId}
+        containerClassName={containerClassName}
         className="w-full"
+        {...rest}
       />
     )
   }
@@ -107,6 +111,7 @@ const CustomDatePicker = ({
 
   return (
     <Box
+      className="w-full"
       css={{
         width: '100%',
         '.react-datepicker-popper': {
@@ -164,6 +169,7 @@ const CustomDatePicker = ({
             <DatePickerInput
               id="datepicker"
               className="w-full"
+              containerClassName="w-full"
               label={label}
               type={type}
               readOnly={readOnly}

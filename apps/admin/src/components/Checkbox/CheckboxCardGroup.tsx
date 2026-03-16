@@ -30,7 +30,7 @@ const CheckboxCardGroup: React.FC<CheckboxCardProps> = ({
     <Box className="flex gap-3 w-full flex-wrap">
       {items.map(item => (
         <HorizontalBaseCard key={item.id}>
-          <Box className={cn('[all:unset] w-full h-full flex items-center')}>
+          <Box className={cn('w-full h-full flex items-center')}>
             <Box gap="large" justify="flex-start">
               <Checkbox
                 name="test"

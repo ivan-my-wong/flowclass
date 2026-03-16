@@ -184,8 +184,8 @@ const CreateTeachingService = ({
   )
 
   const displayName = useMemo(
-    () => studentMemo?.userAlias?.name || firstName || firstStudent?.name || '',
-    [studentMemo?.userAlias?.name, firstName, firstStudent?.name]
+    () => studentMemo?.name || firstName || firstStudent?.name || '',
+    [studentMemo?.name, firstName, firstStudent?.name]
   )
   const displayPhone = useMemo(
     () => phone || firstStudent?.phone || '',
@@ -800,7 +800,13 @@ const CreateTeachingService = ({
 
   if (open) {
     return (
-      <Drawer open={open} onClose={handleCloseAndClearData}>
+      <Drawer
+        open={open}
+        onClose={handleCloseAndClearData}
+        maxWidth={
+          mode === AddTeachingServiceMode.addCourseDirectly ? '40%' : undefined
+        }
+      >
         <div className="pb-4">
           {mode === AddTeachingServiceMode.addCourseDirectly && (
             <AddCourseDirectly {...defaultProps} />

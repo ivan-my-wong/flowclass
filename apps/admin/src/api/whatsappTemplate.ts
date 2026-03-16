@@ -89,4 +89,3 @@ export const deleteWhatsappTemplate = async (
   })
   return res.data.data
 }
-

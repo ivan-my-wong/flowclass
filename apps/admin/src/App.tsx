@@ -15,7 +15,6 @@ import useSiteData from '@/hooks/useSiteData'
 import AppLayout from '@/layouts/AppLayout'
 import DefaultContentLayout from '@/layouts/ContentLayout/DefaultContentLayout'
 import Preview from '@/pages/Embed/Preview'
-import MySchool from '@/pages/Legacy/MySchool'
 import CouponDetailPage from '@/pages/Promotion/Coupons/CouponDetailPage'
 import AdditionalFee from '@/pages/Setting/AdditionalFee'
 import StudentInfomationField from '@/pages/Setting/CustomDataField'
@@ -85,15 +84,11 @@ const SiteSetting = lazy(() => import('@/pages/Setting/Site/SiteSettings'))
 const PaymentSettings = lazy(
   () => import('@/pages/PaymentMethods/PaymentMethodList')
 )
-const CourseCalendar = lazy(() => import('@/pages/Legacy/CourseCalendar'))
 const DetailLessonPage = lazy(
   () => import('@/pages/FullCalendar/components/LessonDetail')
 )
 const ChangeEntireLessonPage = lazy(
   () => import('@/pages/FullCalendar/ChangeEntireLesson')
-)
-const DelayFollowingLessonsPage = lazy(
-  () => import('@/pages/FullCalendar/DelayFollowingLessons')
 )
 
 const CreateTeachingService = lazy(
@@ -118,7 +113,6 @@ const LessonMatrix = lazy(() => import('@/pages/AttendanceSheet'))
 const ConfirmSendPaymentProof = lazy(
   () => import('@/pages/PaymentProofTable/components/ConfirmSendPaymentProof')
 )
-
 
 const SendCustomMessages = lazy(
   () => import('@/pages/PaymentProofTable/SendCustomMessages')
@@ -171,7 +165,6 @@ const ResetPassword = lazy(() => import('@/pages/Login/ResetPassword'))
 const EmailSetting = lazy(
   () => import('@/pages/Setting/FeatureEnable/EmailSetting')
 )
-const ListBlockTime = lazy(() => import('@/pages/Legacy/ListBlockTime'))
 const WhatsappTemplate = lazy(() => import('@/pages/WhatsappTemplate'))
 const ManageWhatsappTemplate = lazy(
   () => import('@/pages/WhatsappTemplate/ManageWhatsappTemplateModal')
@@ -425,10 +418,7 @@ const App = (): JSX.Element => {
                 element={<ProtectedRoute element={<SchoolList />} />}
               />
 
-              <Route
-                path="admin"
-                element={<ProtectedRoute element={<MySchool />} />}
-              />
+              <Route path="admin" element={<Navigate to="/site" replace />} />
 
               <Route path="settings" element={<SiteSetting />} />
             </Route>
@@ -533,12 +523,6 @@ const App = (): JSX.Element => {
                     <ProtectedRoute element={<ConfirmSendPaymentProof />} />
                   }
                 />
-                <Route
-                  path="automation"
-                  element={
-                    <ProtectedRoute element={<AutomationCreateInvoice />} />
-                  }
-                />
               </Route>
               <Route path="availability">
                 <Route
@@ -609,10 +593,8 @@ const App = (): JSX.Element => {
               />
               <Route
                 path="course-calendar"
-                element={<ProtectedRoute element={<CourseCalendar />} />}
-              >
-                {LessonRoutes('course-calendar')}
-              </Route>
+                element={<Navigate to="/full-calendar" replace />}
+              />
 
               {enabledBundleDiscounts && (
                 <>
@@ -932,7 +914,7 @@ const App = (): JSX.Element => {
 
               <Route
                 path="block-time"
-                element={<ProtectedRoute element={<ListBlockTime />} />}
+                element={<Navigate to="/settings" replace />}
               />
 
               <Route

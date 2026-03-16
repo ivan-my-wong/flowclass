@@ -431,6 +431,7 @@ const PaymentProofPage = (): JSX.Element => {
               refreshData()
               refetch()
             }}
+            navigate={navigate}
           />
         )
       },

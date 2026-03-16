@@ -37,7 +37,7 @@ const CollapsibleWrapper = ({
             <button
               type="button"
               className={cn(
-                '[all:unset] font-inherit rounded-full h-8 w-8',
+                'font-inherit rounded-full h-8 w-8',
                 'inline-flex items-center justify-center text-primary',
                 'data-[state=closed]:bg-background',
                 'data-[state=open]:bg-background-layer-3',

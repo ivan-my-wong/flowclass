@@ -28,7 +28,7 @@ import { CouponStatus, PromotionUsedStatus } from '@/models/enums/status'
 import { InstitutionsRepository } from '@/models/institutions.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
 import { SitesRepository } from '@/models/sites.repository'
-import { StudentMemoRepository } from '@/models/student-memo.repository'
+import { UserAliasesRepository } from '@/models/user-aliases.repository'
 import { User } from '@/models/user.entity'
 import { UsersRepository } from '@/models/users.repository'
 import { BaseService } from '@/modules/base/base.service'
@@ -71,7 +71,7 @@ export class CouponsService extends BaseService<Coupon> {
     private recordLogService: RecordLogService,
 
     // private studentOnbService: StudentOnbService
-    private studentMemoRepository: StudentMemoRepository,
+    private userAliasesRepository: UserAliasesRepository,
     private coursePromotionUsedRepository: CoursePromotionUsedRepository,
     private emailService: EmailService,
     private enrollCourseRepository: EnrollCourseRepository,
@@ -649,10 +649,13 @@ export class CouponsService extends BaseService<Coupon> {
       select: ['id', 'email', 'firstName', 'lastName'],
     })
 
-    const studentMemos = await this.studentMemoRepository.find({
+    const userAliases = await this.userAliasesRepository.find({
       where: {
         userId: In(userIds),
         institutionId,
+      },
+      relations: {
+        user: true,
       },
     })
 
@@ -668,11 +671,11 @@ export class CouponsService extends BaseService<Coupon> {
       let contactEmail = user.email
       let contactName = user.fullName
 
-      const studentMemo = studentMemos.find((sm) => sm.userId === user.id)
+      const userAlias = userAliases.find((ua) => ua.userId === user.id)
 
-      if (studentMemo) {
-        contactEmail = studentMemo.preferredEmail || contactEmail
-        contactName = studentMemo.preferredName || contactName
+      if (userAlias) {
+        contactEmail = userAlias.email ?? userAlias.user?.email ?? contactEmail
+        contactName = userAlias.name ?? contactName
       }
 
       const params = {

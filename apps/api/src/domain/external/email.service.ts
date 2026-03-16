@@ -130,6 +130,20 @@ export class EmailService {
     this.defaultSentFrom = new Sender('info@flowclass.ai', 'Flowclass')
   }
 
+  private async getSenderForInstitution(
+    institutionId: number | null,
+    fallbackName?: string
+  ): Promise<Sender> {
+    if (!institutionId) return this.defaultSentFrom
+    const institution = await this.institutionsRepository.findOneById(institutionId)
+    if (institution?.email) {
+      return new Sender(institution.email, institution.name ?? fallbackName ?? 'Institution')
+    }
+    return fallbackName
+      ? new Sender(this.defaultSentFrom.email, fallbackName)
+      : this.defaultSentFrom
+  }
+
   async buildSendClassStudentWaitingPayload(
     firstStudentAccount: StudentEnrollCourseAlias,
     params: SendEmailFunctionBuildParams
@@ -2084,38 +2098,6 @@ export class EmailService {
     return await this.sendEmail({ emailPayload })
   }
 
-  public async linkSocialConfirmationEmail({
-    emailAddress,
-    userName,
-    displayName,
-    phone,
-  }: {
-    emailAddress: string
-    userName: string
-    displayName: string
-    phone: string
-  }): Promise<void | APIResponse> {
-    // this.mailgunClient.messages
-    //   .create('flowclass.io', {
-    //     from: 'Flowclass <>info@flowclass.ai',
-    //     to: emailAddress,
-    //     // cc: 'admin@flowsophic.com;',
-    //     subject: 'Your Flowclass account has been linked.',
-    //     template: 'link_social_confirmation',
-    //     'v:userName': userName,
-    //     'v:displayName': displayName,
-    //     'v:phone': phone,
-    //   })
-    //   .then((msg) => {
-    //     this.logger.log(msg.toString());
-    //     return msg;
-    //   }) // logs response data
-    //   .catch((err) => {
-    //     this.logger.error('sendEmail', err.stack);
-    //     throw new ServiceUnavailableException(EmailServiceErrorMessage.DELIVERY_FAILED);
-    //   });
-  }
-
   async buildStudentUploadPaymentReceiptPayload(
     params: SendEmailFunctionBuildParams
   ): Promise<UploadPaymentReceiptEmailParams> {
@@ -2588,7 +2570,6 @@ export class EmailService {
       subject: emailSubject,
       notificationStatus: status,
       notificationType,
-      automationFlowId: undefined,
       associatedClass: (classes || []).map((d) =>
         shallow({
           source: d,
@@ -2634,8 +2615,12 @@ export class EmailService {
         })
 
         if (notiSetting && notiSetting.customEmailSender && institutionName) {
-          // The reason is that the user must first have the domain verified before we can use the domain as the sender
-          sentFrom = new Sender('info@flowclass.ai', institutionName)
+          const institution = await this.institutionsRepository.findOneById(institutionId)
+          if (institution?.email) {
+            sentFrom = new Sender(institution.email, institution.name ?? institutionName)
+          } else {
+            sentFrom = new Sender(this.defaultSentFrom.email, institutionName)
+          }
         }
       } catch (e) {
         if (e instanceof NotFoundException) {
@@ -2862,10 +2847,11 @@ export class EmailService {
         ]),
       },
     ]
+    const sentFrom = await this.getSenderForInstitution(institutionId, institutionName)
     const emailParams = new EmailParams()
-      .setFrom(this.defaultSentFrom)
+      .setFrom(sentFrom)
       .setTo(recipients)
-      .setReplyTo(this.defaultSentFrom)
+      .setReplyTo(sentFrom)
       .setSubject(`Institution ${institutionName} request ${aiCreditDeposit} more AI attempts`)
       .setTemplateId('k68zxl2pp6e4j905')
       .setVariables(personalization)
@@ -2926,6 +2912,7 @@ export class EmailService {
     } = payload
     const institution = await this.institutionsRepository.findOneById(institutionId)
     const userAdmin = await this.usersRepository.findOne({ where: { email: institution.email } })
+    const sentFrom = await this.getSenderForInstitution(institutionId, institution.name)
     const recipients = [new Recipient(studentEmail)]
     const personalization = [
       {
@@ -2963,9 +2950,9 @@ export class EmailService {
       },
     ]
     const emailParams = new EmailParams()
-      .setFrom(this.defaultSentFrom)
+      .setFrom(sentFrom)
       .setTo(recipients)
-      .setReplyTo(this.defaultSentFrom)
+      .setReplyTo(sentFrom)
       .setSubject(emailSubject)
       .setTemplateId('jy7zpl9wvj545vx6')
       .setVariables(personalization)
@@ -2974,7 +2961,9 @@ export class EmailService {
   }
 
   async requestTimeChangeEmail(payload: RequestTimeChangeEmailProps) {
-    const { emailSubject, studentEmail, studentName, status } = payload
+    const { emailSubject, studentEmail, studentName, status, institutionId, institutionName } =
+      payload
+    const sentFrom = await this.getSenderForInstitution(institutionId, institutionName)
     const recipients = [new Recipient(studentEmail)]
     const personalization = [
       {
@@ -3026,7 +3015,16 @@ export class EmailService {
   }
 
   async sendClassMaterialsEmail(payload: SendClassMaterialsEmailProps) {
-    const { emailAddress, courseName, className, institutionName, studentName, siteLink } = payload
+    const {
+      emailAddress,
+      courseName,
+      className,
+      institutionId,
+      institutionName,
+      studentName,
+      siteLink,
+    } = payload
+    const sentFrom = await this.getSenderForInstitution(institutionId, institutionName)
     const recipients = [new Recipient(emailAddress)]
     const personalization = [
       {
@@ -3056,9 +3054,9 @@ export class EmailService {
       },
     ]
     const emailParams = new EmailParams()
-      .setFrom(this.defaultSentFrom)
+      .setFrom(sentFrom)
       .setTo(recipients)
-      .setReplyTo(this.defaultSentFrom)
+      .setReplyTo(sentFrom)
       .setSubject(`New materials uploaded to ${courseName}`)
       .setTemplateId('jy7zpl9xxvpl5vx6')
       .setVariables(personalization)

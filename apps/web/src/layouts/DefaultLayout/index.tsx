@@ -1,6 +1,6 @@
-import { TabsProps } from '@/components/Tabs/Tabs'
 import { useSsrComplected } from '@/stores/ssrCompleted'
 import { Course, School, Site } from '@/types'
+import { MenuTabsProps } from '@/types/websiteTemplate'
 
 import Footer from './Footer'
 import Header from './HeaderLogoName'
@@ -24,7 +24,7 @@ const AppLayout = ({
   showHeader?: boolean
   showFooter?: boolean
   showMenu?: boolean
-  menu?: TabsProps
+  menu?: MenuTabsProps
   course?: Course
   className?: string
 }): JSX.Element => {

@@ -23,7 +23,6 @@ import menuItems, {
   FeatureMenu,
   FeatureSiteMap,
 } from './menuBarItems'
-import { siteMenuItems } from './menuBarSiteItems'
 
 const MenuBar: React.FC = () => {
   const { t } = useTranslation()
@@ -50,19 +49,6 @@ const MenuBar: React.FC = () => {
   }, [sitesFeatureEnabled])
 
   const filteredMenuItems = useMemo(() => {
-    if (isSitePage) {
-      return siteMenuItems.filter(
-        item =>
-          item.permissions.length === 0 ||
-          item.permissions.includes(userPermission)
-      )
-    }
-
-    const isSubscribedwhatsAppOfficial =
-      activePlan?.notificationChannels?.TWILIO_WHATSAPP
-    const isSubscribedwhatsAppUnOfficial =
-      activePlan?.notificationChannels?.UNOFFICIAL_WHATSAPP
-
     return buildMenuItems(featureSitesMap).filter(item => {
       const limitedFeatures = Object.values(FeatureMenu)
       if (userPermission === UserRole.MasterAdmin) {
@@ -132,10 +118,12 @@ const MenuBar: React.FC = () => {
     <nav className="w-[15.5rem] bg-background-layer-2 border-r-2 border-background-layer-3 h-full overflow-y-auto pl-2 pr-2 pb-4 flex flex-col items-center justify-start sm:w-full sm:h-screen sm:pb-16">
       {isMobile && (
         <div
+          role="group"
           className="flex items-center mt-3 w-[90%] p-2 cursor-pointer text-center whitespace-nowrap rounded-lg text-sm md:w-[95%] flex-col gap-2"
           onClick={e => e.stopPropagation()}
+          onKeyDown={e => e.stopPropagation()}
         >
-          <SchoolSelector triggerVariant="fullWidth" />
+          <SchoolSelector />
           <ViewSiteButton />
         </div>
       )}

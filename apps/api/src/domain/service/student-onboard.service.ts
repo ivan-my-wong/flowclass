@@ -94,8 +94,6 @@ import { SitesRepository } from '@/models/sites.repository'
 import { StudentForm, StudentFormMetadata } from '@/models/student-form.entity'
 import { StudentLesson } from '@/models/student-lesson.entity'
 import { StudentLessonRepository } from '@/models/student-lesson.repository'
-import { StudentMemo } from '@/models/student-memo.entity'
-import { StudentMemoRepository } from '@/models/student-memo.repository'
 import { StudentSchedule, StudentScheduleType } from '@/models/student-schedule.entity'
 import { StudentScheduleRepository } from '@/models/student-schedule.repository'
 import { UserRolesRepository } from '@/models/user-roles.repository'
@@ -223,7 +221,6 @@ export class StudentOnbService {
     private readonly jwtService: JwtService,
     private readonly invoiceRepository: InvoiceRepository,
     private readonly sitesRepository: SitesRepository,
-    private readonly studentMemoRepository: StudentMemoRepository,
     private readonly coursesService: CoursesService,
     private readonly enrollmentFormService: EnrollmentFormService,
     private readonly paymentEvidenceRepository: PaymentEvidenceRepository,
@@ -290,7 +287,6 @@ export class StudentOnbService {
       where: whereClause,
       relations: {
         user: true,
-        studentMemos: true,
         enrollCourses: {
           studentSchedule: {
             class: true,
@@ -865,21 +861,13 @@ export class StudentOnbService {
 
     if (!userAlias) throw new ApiError(ErrorCode.STUDENT_NOT_FOUND)
 
-    let studentInfo = await this.studentMemoRepository.findOne({
-      where: { userAliasId: userAlias.id, institutionId: params.institutionId },
-      relations: {
-        userAlias: true,
-      },
-    })
-
-    if (userAlias.user && !studentInfo) {
-      studentInfo = await this.studentMemoRepository.findOne({
-        where: { userId: userAlias.user.id, institutionId: params.institutionId },
-        relations: {
-          userAlias: true,
-        },
-      })
-    }
+    // studentInfo is now the userAlias itself (memo fields are on UserAlias)
+    const studentInfo: UserAlias | null = userAlias.institutionId === params.institutionId
+      ? userAlias
+      : await this.userAliasesRepository.findFirstByUserIdAndInstitution(
+          params.institutionId,
+          userAlias.userId
+        )
 
     const { password, permissions, userRoles, enrollCourses, ...user } = userAlias.user
 
@@ -894,11 +882,6 @@ export class StudentOnbService {
         studentInfo: null,
         isOnlyUserAlias,
       }
-    }
-
-    if (!studentInfo.userAlias) {
-      studentInfo.userAlias = userAlias
-      studentInfo.userAliasId = userAlias.id
     }
     // eslint-disable-next-line unused-imports/no-unused-vars
 
@@ -969,17 +952,6 @@ export class StudentOnbService {
         if (userRole) {
           await this.userRoleRepository.softRemove(userRole)
         }
-      }
-
-      const studentMemo = await this.studentMemoRepository.find({
-        where: {
-          userAliasId: singleUserAlias.id,
-          institutionId: params.institutionId,
-        },
-      })
-
-      if (studentMemo) {
-        await this.studentMemoRepository.softRemove(studentMemo)
       }
 
       const studentForm = await this.studentFormRepository.find({
@@ -1868,36 +1840,19 @@ export class StudentOnbService {
 
   async addStudentMemo(
     createAndUpdateStudentMemoDto: CreateAndUpdateStudentMemoDto
-  ): Promise<StudentMemo> {
-    const memo = await this.studentMemoRepository.findOne({
-      where: {
-        userId: createAndUpdateStudentMemoDto.userId,
-        institutionId: createAndUpdateStudentMemoDto.institutionId,
-      },
+  ): Promise<UserAlias> {
+    const user = await this.userRepository.findOneBy({
+      id: createAndUpdateStudentMemoDto.userId,
     })
-    if (!memo) {
-      const newMemo = this.studentMemoRepository.create({
-        userId: createAndUpdateStudentMemoDto.userId,
-        institutionId: createAndUpdateStudentMemoDto.institutionId,
-        memo: createAndUpdateStudentMemoDto.memo,
-      })
-      return await this.studentMemoRepository.save(newMemo)
-    } else {
-      await this.studentMemoRepository.update(
-        {
-          userId: createAndUpdateStudentMemoDto.userId,
-          institutionId: createAndUpdateStudentMemoDto.institutionId,
-        },
-        { memo: createAndUpdateStudentMemoDto.memo }
-      )
+    const defaultName = user?.firstName || 'Student'
 
-      return await this.studentMemoRepository.findOne({
-        where: {
-          userId: createAndUpdateStudentMemoDto.userId,
-          institutionId: createAndUpdateStudentMemoDto.institutionId,
-        },
-      })
-    }
+    const userAlias = await this.userAliasesRepository.findOrCreateByUserIdAndInstitution(
+      createAndUpdateStudentMemoDto.institutionId,
+      createAndUpdateStudentMemoDto.userId,
+      defaultName
+    )
+    userAlias.memo = createAndUpdateStudentMemoDto.memo
+    return await this.userAliasesRepository.save(userAlias)
   }
 
   async editStudentContactInfo(params: CreateAndUpdateStudentContactInfoDto) {
@@ -1910,11 +1865,6 @@ export class StudentOnbService {
       throw new NotFoundException(UserErrorMessage.USER_NOT_FOUND)
     }
 
-    const existingStudentMemo = await this.studentMemoRepository.findOneBy({
-      userId: params.userId,
-      institutionId: params.institutionId,
-    })
-
     params.contactEmail = transformEmail(params.contactEmail)
     params.contactPhone = transformPhone(params.contactPhone)
 
@@ -1924,18 +1874,7 @@ export class StudentOnbService {
       alias: params.contactName,
       phone: params.contactPhone,
     })
-    if (!existingStudentMemo) {
-      const newStudentMemo = await this.studentMemoRepository.create({
-        userId: params.userId,
-        institutionId: params.institutionId,
-        userAliasId: userAlias.id,
-      })
-
-      return await this.studentMemoRepository.save(newStudentMemo)
-    } else {
-      existingStudentMemo.userAliasId = userAlias.id
-      return await this.studentMemoRepository.save(existingStudentMemo)
-    }
+    return userAlias
   }
 
   async updateContactInfoV2(params: CreateOrUpdateStudentContactInfoV2Dto) {
@@ -1995,28 +1934,7 @@ export class StudentOnbService {
       }
     }
 
-    let studentMemo = await this.studentMemoRepository.findOneBy({
-      userId: params.userId,
-      institutionId: params.institutionId,
-      userAliasId: userAlias.id,
-    })
-
-    if (!studentMemo) {
-      studentMemo = this.studentMemoRepository.create({
-        userId: params.userId,
-        institutionId: params.institutionId,
-        userAliasId: userAlias.id,
-      })
-      return await this.studentMemoRepository.save(studentMemo)
-    } else {
-      studentMemo.userAliasId = userAlias.id
-
-      if (studentMemo.userAliasId !== userAlias.id && studentMemo.userAliasId !== null) {
-        studentMemo.userAliasId = userAlias.id
-      }
-
-      return await this.studentMemoRepository.save(studentMemo)
-    }
+    return userAlias
   }
 
   async updateLesson(params: ChangeStudentLessonDto) {
@@ -3238,36 +3156,34 @@ export class StudentOnbService {
       throw new ApiError(ErrorCode.LESSON_UPDATE_NOT_AVAILABLE)
     }
 
-    let studentMemo = await this.studentMemoRepository.findOneBy({
-      userId: studentLesson.userId,
-      institutionId: studentLesson.institutionId,
-    })
+    let userAlias = await this.userAliasesRepository.findFirstByUserIdAndInstitution(
+      studentLesson.institutionId,
+      studentLesson.userId
+    )
     if (
       studentLesson.attendance !== AttendanceStatus.NOT_ATTENDED &&
       updateLessonAttendanceDto.attendance === AttendanceStatus.NOT_ATTENDED
     ) {
-      if (studentMemo) {
-        // Increment the assignableLessonCount
-        studentMemo.assignableLessonCount += 1
-
-        await this.studentMemoRepository.save(studentMemo)
+      if (userAlias) {
+        userAlias.assignableLessonCount = (userAlias.assignableLessonCount ?? 0) + 1
+        await this.userAliasesRepository.save(userAlias)
       } else {
-        studentMemo = await this.studentMemoRepository.create({
-          userId: studentLesson.userId,
-          institutionId: studentLesson.institutionId,
-          assignableLessonCount: 1,
-        })
-        await this.studentMemoRepository.save(studentMemo)
+        const user = await this.userRepository.findOneBy({ id: studentLesson.userId })
+        userAlias = await this.userAliasesRepository.findOrCreateByUserIdAndInstitution(
+          studentLesson.institutionId,
+          studentLesson.userId,
+          user?.firstName || 'Student'
+        )
+        userAlias.assignableLessonCount = 1
+        await this.userAliasesRepository.save(userAlias)
       }
     } else if (
       studentLesson.attendance === AttendanceStatus.NOT_ATTENDED &&
       updateLessonAttendanceDto.attendance !== AttendanceStatus.NOT_ATTENDED
     ) {
-      if (studentMemo) {
-        // Increment the assignableLessonCount
-        studentMemo.assignableLessonCount -= 1
-
-        await this.studentMemoRepository.save(studentMemo)
+      if (userAlias) {
+        userAlias.assignableLessonCount = Math.max(0, (userAlias.assignableLessonCount ?? 0) - 1)
+        await this.userAliasesRepository.save(userAlias)
       }
     } else if (updateLessonAttendanceDto.attendance === AttendanceStatus.POSTPONE) {
       const { class: classEntity, course, user } = studentLesson
@@ -4107,7 +4023,7 @@ export class StudentOnbService {
       phone: user.phone,
     }
     res.userAlias = userAlias
-    // res.studentMemo = userMemo
+    res.studentMemo = userAlias
     const { StudentName, StudentEmail, StudentPhone, ...customFields } = item
 
     // This part is JUST for the default fields on the database

@@ -28,14 +28,15 @@ const SiteSetting = (): JSX.Element => {
         </div>
 
         {t('setting:freeAlert')}
-        <div
-          className="ml-auto float-right text-primary-subtle cursor-pointer"
+        <button
+          type="button"
+          className="ml-auto float-right text-primary-subtle cursor-pointer bg-transparent border-0 p-0 font-inherit"
           onClick={() => {
             navigate('/subscription')
           }}
         >
           {t('setting:upgrade')}
-        </div>
+        </button>
       </div>
 
       <ActionCard items={items} />

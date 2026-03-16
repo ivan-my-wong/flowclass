@@ -57,7 +57,7 @@ const Switch = forwardRef<HTMLDivElement, ThisSwitchProps>(
           data-testid={dataTestId}
           onCheckedChange={onCheckedChange}
           className={cn(
-            '[all:unset] w-[42px] h-[25px] bg-background-layer-3',
+            'w-[42px] h-[25px] bg-background-layer-3',
             'border-2 border-background rounded-full relative shadow-md',
             '[-webkit-tap-highlight-color:rgba(0,0,0,0)]',
             'focus:outline-none focus:ring-2 focus:ring-primary',

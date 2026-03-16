@@ -197,8 +197,8 @@ const StudentSelectionDialog: React.FC<Props> = ({
           }
 
           if (student.studentMemo) {
-            if (student.studentMemo.userAlias?.name) {
-              currentName = student.studentMemo.userAlias.name
+            if (student.studentMemo.name) {
+              currentName = student.studentMemo.name
             }
           }
 

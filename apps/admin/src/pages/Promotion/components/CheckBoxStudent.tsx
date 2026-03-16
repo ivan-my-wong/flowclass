@@ -25,7 +25,7 @@ const CheckboxStudent: React.FC<CheckboxStudentProps> = ({
     <Box className="flex gap-6 w-full flex-wrap">
       {items.map(item => (
         <Box key={item.id} direction="column" className="mt-4">
-          <Box className="[all:unset] w-full h-full flex items-center">
+          <Box className="w-full h-full flex items-center">
             <Box gap="large" justify="flex-start">
               <Checkbox
                 name="test"

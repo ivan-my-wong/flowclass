@@ -15,6 +15,8 @@ import {
   TemplateFieldData,
 } from '@/models/document-template.entity'
 import { DocumentTemplateRepository } from '@/models/document-template.repository'
+import { Institution } from '@/models/institutions.entity'
+import { InstitutionsRepository } from '@/models/institutions.repository'
 import { UserAlias } from '@/models/user-aliases.entity'
 import { UserAliasesRepository } from '@/models/user-aliases.repository'
 import { User } from '@/models/user.entity'
@@ -32,7 +34,7 @@ import {
 export class TemplateManagementService {
   private readonly logger = new Logger(TemplateManagementService.name)
   private readonly emailTransport: NodemailerEmailTransport
-  private defaultSentFrom = new Sender('info@flowclass.ai', 'Flowclass')
+  private readonly defaultSentFrom = new Sender('info@flowclass.ai', 'Flowclass')
 
   constructor(
     private readonly documentTemplatetRepository: DocumentTemplateRepository,
@@ -41,6 +43,7 @@ export class TemplateManagementService {
     private readonly coursesRepository: CoursesRepository,
     private readonly classRepository: ClassRepository,
     private readonly userAliasesRepository: UserAliasesRepository,
+    private readonly institutionsRepository: InstitutionsRepository,
     private readonly objectStorageProvider: ObjectStorageProvider
   ) {
     this.emailTransport = new NodemailerEmailTransport()
@@ -237,6 +240,11 @@ export class TemplateManagementService {
     })
   }
 
+  private getSenderFromInstitution(institution: Institution | null): Sender {
+    if (!institution?.email) return this.defaultSentFrom
+    return new Sender(institution.email, institution.name ?? 'Institution')
+  }
+
   private async getBufferFromUrl(url: string): Promise<Buffer> {
     const response = await fetch(url)
 
@@ -256,10 +264,15 @@ export class TemplateManagementService {
   ) {
     const result = { student, error: null }
 
+    const institution = await this.institutionsRepository.findOne({
+      where: { id: campaign.institutionId },
+    })
+    const sender = this.getSenderFromInstitution(institution)
+
     const emailParams = new EmailParams()
-      .setFrom(this.defaultSentFrom)
+      .setFrom(sender)
       .setTo([new Recipient(student.user.email, student.name)])
-      .setReplyTo(this.defaultSentFrom)
+      .setReplyTo(sender)
       .setSubject(campaign.emailSubject)
       .setHtml(campaign.emailBody)
       .setAttachments([

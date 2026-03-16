@@ -6,6 +6,12 @@ import { lightThemeColors } from './colorTheme'
  */
 export const theme = {
   colors: lightThemeColors,
+  zIndices: {
+    tooltip: 1070,
+    popover: 1060,
+    modal: 1050,
+    dropdown: 1000,
+  },
 }
 
 /**

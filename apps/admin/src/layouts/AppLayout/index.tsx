@@ -11,7 +11,7 @@ const AppLayout = ({ children }: { children?: React.ReactNode }) => {
         <AppHeader />
       </div>
       <div className="flex max-h-[calc(100vh-3rem)] flex-1 sm:max-h-none">
-        <aside className="sm:hidden">
+        <aside className="hidden sm:block shrink-0">
           <MenuBar />
         </aside>
         <main className="flex-1 overflow-y-auto">

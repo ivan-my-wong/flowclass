@@ -5,7 +5,6 @@ export const ATOM_KEY = {
   LoggedInState: 'loggedIn',
   UserPermissionState: 'userPermissionState',
   SchoolSubscriptionState: 'schoolSubscriptionState',
-  SubscriptionDialogOpenState: 'schoolSubscriptionDialogOpenStat',
   UserState: 'userState',
   SchoolState: 'schoolState',
   SiteState: 'siteState',

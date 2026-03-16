@@ -32,7 +32,7 @@ import { DocumentTemplateType } from '@/models/document-template.entity'
 import { UserAlias } from '@/models/user-aliases.entity'
 import * as dayjs from 'dayjs'
 import 'dayjs/plugin/timezone'
-import { NodemailerEmailTransport, Sender } from '@/domain/external/email-transport.provider'
+import { NodemailerEmailTransport } from '@/domain/external/email-transport.provider'
 
 import {
   MetaRef,
@@ -82,7 +82,7 @@ import { PaymentEvidenceService } from './payment-evidence.service'
 import { UsersService } from './users.service'
 import { WhatsappWebService } from './whatsapp-web.service'
 import { SitesRepository } from '@/models/sites.repository'
-import { parsePhoneNumber } from 'libphonenumber-js'
+import parsePhoneNumberFromString from 'libphonenumber-js'
 
 export type InvoiceCampaign = DocumentCampaign & { invoices: Invoice[] }
 export const SupportedVariables = [
@@ -183,7 +183,7 @@ const SELECT_INVOICE_FIELDS = {
 export class InvoiceCampaignService {
   private readonly logger = new Logger(InvoiceCampaignService.name)
   private readonly emailTransport: NodemailerEmailTransport
-  private defaultSentFrom = new Sender('info@flowclass.ai', 'Flowclass')
+
   private readonly jwtOption: JwtSignOptions = {}
   constructor(
     private readonly institutionRepository: InstitutionsRepository,
@@ -1861,7 +1861,11 @@ export class InvoiceCampaignService {
           .text(invoice.institution?.address?.state, 40, 260)
           .text(invoice.institution?.address?.country, 40, 275)
           .text(
-            parsePhoneNumber(`+${invoice.institution?.phone}`)?.formatInternational() ?? '',
+            (() => {
+              const phone = invoice.institution?.phone
+              if (!phone || typeof phone !== 'string') return ''
+              return parsePhoneNumberFromString(`+${phone}`)?.formatInternational() ?? ''
+            })(),
             40,
             290
           )

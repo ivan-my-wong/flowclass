@@ -48,11 +48,7 @@ export const filterNotifications = (
               status => status.value === item.notificationStatus
             )
           : true
-      return (
-        isWhatsappTemplateMatches &&
-        isTypeMatches &&
-        isStatusMatches
-      )
+      return isWhatsappTemplateMatches && isTypeMatches && isStatusMatches
     })
     .sort((a, b) => {
       const dateA = dayjs(a.createdAt)
