@@ -278,6 +278,10 @@ const TeachingServiceItem = ({
       text: t('student:statusPaid'),
       color: 'text-success border-success',
     },
+    [PaymentState.PARTIALLY_PAID]: {
+      text: t('student:statusPartiallyPaid'),
+      color: 'text-orange-500 border-orange-500',
+    },
     [PaymentState.PENDING]: {
       text: t('student:statusUnPaid'),
       color: 'text-primary border-primary',
@@ -333,6 +337,14 @@ const TeachingServiceItem = ({
         ...renderMenuItem(paymentStatusMapping[PaymentState.PAID].text, () => {
           handlePaymentStatus(invoice.invoiceId, PaymentState.PAID)
         }),
+      },
+      {
+        ...renderMenuItem(
+          paymentStatusMapping[PaymentState.PARTIALLY_PAID].text,
+          () => {
+            handlePaymentStatus(invoice.invoiceId, PaymentState.PARTIALLY_PAID)
+          }
+        ),
       },
       {
         ...renderMenuItem(

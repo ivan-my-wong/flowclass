@@ -17,6 +17,7 @@ export type CustomMessage = {
   id?: number
   name: string
   content: string
+  repeaterFormat?: string
   type: SupportedType
   variables?: Record<string, any>
   emailNotification?: boolean

@@ -16,15 +16,12 @@ import {
 import ModalDialog from '@/components/ui/ModalDialog'
 import TextArea from '@/components/ui/TextArea'
 import usePaymentEvidenceData from '@/hooks/usePaymentEvidenceData'
-import { useWhatsappWeb } from '@/hooks/useWhatsappWeb'
 import {
   PaymentProofTableItem,
   SendCustomMessage,
   StudentWithEnrollInfo,
 } from '@/types/enrollCourse'
 import { CustomMessageType } from '@/types/whatsappTemplate'
-
-import WhatsappConnection from '../CustomMessages/components/WhatsappConnection'
 
 import ListStudentWithCourse from './components/ListStudentWithCourse'
 
@@ -54,12 +51,6 @@ const SendCustomMessages = ({
     isSuccess,
   } = useSendInvoiceCustomMessage()
 
-  const { useGetSessionStatus } = useWhatsappWeb()
-  const {
-    data: whatsappSessionStatus,
-    isLoading: isWhatsappSessionStatusLoading,
-    refetch: refetchSessionStatus,
-  } = useGetSessionStatus()
   const formData = useForm<SendCustomMessage>({
     defaultValues: {
       invoiceIds: [],
@@ -243,11 +234,6 @@ const SendCustomMessages = ({
       }
     >
       <div className="flex flex-col gap-2 mt-4">
-        <WhatsappConnection
-          whatsappSessionStatus={whatsappSessionStatus}
-          refetchSessionStatus={refetchSessionStatus}
-          isWhatsappSessionStatusLoading={isWhatsappSessionStatusLoading}
-        />
         <h3 className="text-sm text-gray-500 h-fit font-bold">List student</h3>
         <ListStudentWithCourse students={users} />
         <FormField

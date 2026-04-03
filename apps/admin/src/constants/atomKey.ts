@@ -36,6 +36,7 @@ export const ATOM_KEY = {
   InvoiceClassesByTypeSelector: 'invoiceClassesByTypeSelector',
   IsInvoiceExistOnCampaign: 'isInvoiceExistOnCampaignSelector',
   InvoiceSessionState: 'invoiceSessionState',
+  AvailableLessonsByClassState: 'availableLessonsByClassState',
   InvoiceSessionsSelector: 'invoiceSessionsSelector',
   InvoiceSessionSelectByIdSelector: 'invoiceSessionSelectByIdSelector',
   InvoiceConfigurationState: 'invoiceConfigurationState',

@@ -14,6 +14,7 @@ import {
   LuMegaphone,
   LuMessageCircle,
   LuMessageSquare,
+  LuMessageSquareDashed,
   LuRocket,
   LuScrollText,
   LuTable,
@@ -378,9 +379,19 @@ const menuItems: MenuItem[] = [
   // },
 
   {
-    label: 'integrations',
-    icon: LuLink,
-    path: '/integrations',
+    label: 'whatsappTemplate',
+    icon: LuMessageSquareDashed,
+    path: '/custom-messages',
+    permissions: [
+      UserRole.MasterAdmin,
+      UserRole.SiteAdmin,
+      UserRole.SchoolAdmin,
+    ],
+  },
+  {
+    label: 'notificationLog',
+    icon: LuScrollText,
+    path: '/notification-log',
     permissions: [
       UserRole.MasterAdmin,
       UserRole.SiteAdmin,

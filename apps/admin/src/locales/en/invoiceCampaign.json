@@ -158,6 +158,9 @@
       "priceOptions": "Price Options"
     },
     "noCoursesAssigned": "No courses assigned yet",
+    "paymentDate": "Payment Date",
+    "selectPaymentDate": "Select payment date",
+    "applyToAll": "Apply to All",
     "noInstructor": "No instructor",
     "noSessionsSelected": "No lessons selected",
     "noStudentSelected": "No student selected",

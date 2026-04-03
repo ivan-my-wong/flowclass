@@ -92,6 +92,9 @@ export const QUERY_KEY = {
     getAllAdditionalFeeKey: 'getAllAdditionalFeeKey',
     bundleDiscountDetailKey: 'bundleDiscountDetail',
     bundleDiscountStatsKey: 'bundleDiscountStats',
+    packageDiscountsListKey: 'packageDiscountsListKey',
+    packageDiscountDetailKey: 'packageDiscountDetail',
+    packageDiscountsForClassKey: 'packageDiscountsForClass',
   },
   stripe: {
     connectStripeKey: 'connectStripeKey',
@@ -183,12 +186,6 @@ export const QUERY_KEY = {
     driveQuotaKey: ['googleIntegration', 'drive', 'quota'],
     getAuthUrlKey: 'getAuthUrlKey',
     disconnectIntegrationKey: 'disconnectIntegrationKey',
-  },
-  whatsappWeb: {
-    initializeWhatsappWebKey: 'initializeWhatsappWebKey',
-    generateQrCodeKey: 'generateQrCodeKey',
-    getSessionStatusKey: 'getSessionStatusKey',
-    getSessionKey: 'getSessionKey',
   },
   customMessage: {
     customMessageDataKey: 'customMessageDataKey',

@@ -17,6 +17,7 @@
     "promotion": "Promotion",
     "coupon": "Coupon",
     "bundleDiscount": "Bundles",
+    "packageDiscount": "Package Discounts",
     "recurrDiscount": "Recurring",
     "directDiscount": "Direct Discount",
     "trial": "Trial Lesson"
@@ -141,6 +142,49 @@
       "tier": "tier",
       "tiers": "tiers",
       "off": "off"
+    }
+  },
+  "packageDiscount": {
+    "createSuccess": "Package discount created successfully",
+    "updateSuccess": "Package discount updated successfully",
+    "deleteSuccess": "Package discount deleted successfully",
+    "activateSuccess": "Package discount activated successfully",
+    "deactivateSuccess": "Package discount deactivated successfully",
+    "noPackageDiscounts": "No package discounts yet. Create one to offer per-lesson discounts when students select all lessons in a month.",
+    "perLesson": "per lesson discount",
+    "perLessonDiscount": "{{amount}} off per lesson",
+    "applicableTo": "Applicable to",
+    "allClasses": "All classes",
+    "classes": "classes",
+    "activeCount": "Active Package Discounts ({{count}})",
+    "inactiveCount": "Inactive Package Discounts ({{count}})",
+    "badge": "Package Discount",
+    "autoApplied": "Package discount automatically applied",
+    "editTitle": "Edit Package Discount",
+    "detailTitle": "Package Discount Detail",
+    "notFound": "Package discount not found.",
+    "confirmCreate": "Are you sure you want to create this package discount?",
+    "confirmCreateTitle": "Create Package Discount",
+    "confirmUpdate": "Are you sure you want to update this package discount?",
+    "confirmUpdateTitle": "Update Package Discount",
+    "deleteAction": {
+      "title": "Delete Package Discount",
+      "description": "Are you sure you want to delete '{{name}}'? This action cannot be undone."
+    },
+    "errors": {
+      "amountRequired": "Discount amount per lesson must be greater than 0"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "e.g. Monthly Full Package",
+      "amountPerLesson": "Discount per Lesson",
+      "amountPerLessonHint": "Absolute amount deducted from each lesson when all lessons in a month are selected",
+      "applyToAllClasses": "Apply to All Classes",
+      "applyToAllClassesHint": "When enabled, this discount applies to every class",
+      "selectClasses": "Select Classes",
+      "noClassesAvailable": "No classes available",
+      "startDate": "Start Date",
+      "endDate": "End Date"
     }
   },
   "trialLesson": {

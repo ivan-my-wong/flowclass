@@ -847,6 +847,19 @@ export const updatePaymentAmount = async (
   return res.data.data
 }
 
+export const updateAmountPaid = async (
+  institutionId: number,
+  payload: { invoiceId: number; amountPaid: number }
+): Promise<void> => {
+  const res = await apiClient.post({
+    needAuth: true,
+    url: '/admin/invoices/update-amount-paid',
+    params: { institutionId },
+    data: payload,
+  })
+  return res.data.data
+}
+
 export const updatePayLaterMethod = async (
   institutionId: number,
   payload: { invoiceId: number; payLaterMethod?: PayLaterMethod }

@@ -6,6 +6,7 @@ export type WhatsAppTemplate = {
   id: string
   label: string
   build: (vars: WhatsAppTemplateVars) => string
+  defaultRepeaterFormat?: string
 }
 
 // ---------------------------------------------------------------------------
@@ -15,16 +16,41 @@ export type WhatsAppTemplate = {
 
 export const WHATSAPP_TEMPLATES: WhatsAppTemplate[] = [
   {
-    id: 'payment_reminder',
-    label: 'Payment Reminder',
-    build: ({ studentName }) =>
-      `Hi ${studentName}, this is a friendly reminder that your payment is due. Please let us know if you have any questions. Thank you!`,
+    id: 'invoice_sending',
+    label: 'Invoice Sending / 學費單',
+    build: () =>
+      `{{schoolName}} {{period}} {{className}} 學費單
+
+學費總計：
+👉 HK$ {{payAmount}}
+
+課堂安排 細項：
+------ ------
+{{courseItems}}
+
+付款連結: {{uploadPaymentUrl}}`,
+    defaultRepeaterFormat: `課程 {{courseIndex}}) {{courseName}}
+  {{schedule}} / {{lessonCount}}堂 / {{teacherName}}
+  {{lessonDatesLabel}}: {{lessonDates}}
+  HK$ {{coursePrice}}
+------ ------`,
   },
   {
-    id: 'lesson_reminder',
-    label: 'Lesson Reminder',
+    id: 'lesson_list_sending',
+    label: 'Lesson List / 課堂通知',
     build: ({ studentName }) =>
-      `Hi ${studentName}, just a reminder about your upcoming lesson. Please be prepared and feel free to reach out if you need anything!`,
+      `{{schoolName}} 課堂通知
+
+${studentName} 您好！
+
+以下是您的課堂安排：
+{{lessonItems}}
+
+如有任何疑問，請聯絡我們`,
+    defaultRepeaterFormat: `{{lessonIndex}}. {{courseName}}
+  日期: {{lessonDate}}
+  時間: {{lessonTime}}
+  導師: {{teacherName}}`,
   },
 ]
 

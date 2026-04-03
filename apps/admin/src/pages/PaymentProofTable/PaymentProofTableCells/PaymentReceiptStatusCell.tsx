@@ -171,7 +171,8 @@ export const PaymentReceiptStatusCell = ({
 
   if (
     uploadPaymentEvidenceStatus === PaymentEvidenceState.PROCESSING ||
-    paymentState === PaymentState.PENDING
+    paymentState === PaymentState.PENDING ||
+    paymentState === PaymentState.PARTIALLY_PAID
   ) {
     return (
       <Box css={{ paddingTop: '$1' }} justify="flex-start">

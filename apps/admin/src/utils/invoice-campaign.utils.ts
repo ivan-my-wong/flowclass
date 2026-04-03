@@ -126,13 +126,24 @@ export const composeClassesAndSessions = (
   })
   return newInvoiceClasses
 }
-const calculateLessonPrice = (
-  lessonPrice: number,
-  numOfSelectedLessons: number,
-  numberOfLessons: number
-) => {
-  return (lessonPrice * numOfSelectedLessons) / numberOfLessons
+
+export const getEarliestSessionDate = (
+  studentId: number,
+  allSessions: InvoiceSessionType[]
+): Date | null => {
+  const studentSessions = allSessions.filter(
+    s => s.studentItem?.id === studentId
+  )
+  if (studentSessions.length === 0) return null
+
+  const timestamps = studentSessions
+    .map(s => dayjs(s.date || s.startTime).valueOf())
+    .filter(t => !Number.isNaN(t))
+
+  if (timestamps.length === 0) return null
+  return dayjs(Math.min(...timestamps)).toDate()
 }
+
 export const buildInvoiceCampaignData = (
   institutionId: number,
   siteId: number,
@@ -195,6 +206,9 @@ export const buildInvoiceCampaignData = (
       classes: generatedClassAndSessions,
       splitType: invoiceSplitType,
       total: invoiceSubtotal.totalPrice,
+      paymentDate: student.paymentDate
+        ? dayjs(student.paymentDate).format('YYYY-MM-DD')
+        : null,
     }
     if (invoiceSplitType === InvoiceSplitType.CUSTOM_SPLIT) {
       newInvoiceItem.splitItems = invoiceSplitItems
@@ -432,4 +446,64 @@ export const getUniqueCourseIds = (classes: InvoiceClassType[]): number[] => {
     .filter((id): id is number => id !== null && id !== undefined)
 
   return [...new Set(courseIds)]
+}
+
+/**
+ * Check if all available lessons in a calendar month are selected for a given class.
+ * Used for package discount auto-apply qualification.
+ */
+export const isPackageDiscountQualified = (
+  selectedSessions: InvoiceSessionType[],
+  availableLessons: { id: number; date: string }[],
+  classId: number
+): { qualified: boolean; qualifiedMonths: string[]; lessonCount: number } => {
+  // Filter selected sessions for this class
+  const classSelectedSessions = selectedSessions.filter(
+    s => s.classItem?.classId === classId
+  )
+
+  if (classSelectedSessions.length === 0 || availableLessons.length === 0) {
+    return { qualified: false, qualifiedMonths: [], lessonCount: 0 }
+  }
+
+  // Group available lessons by YYYY-MM
+  const availableByMonth: Record<string, Set<number>> = {}
+  availableLessons.forEach(lesson => {
+    const month = lesson.date.substring(0, 7) // YYYY-MM
+    if (!availableByMonth[month]) {
+      availableByMonth[month] = new Set()
+    }
+    availableByMonth[month].add(lesson.id)
+  })
+
+  // Group selected sessions by YYYY-MM
+  const selectedByMonth: Record<string, Set<number>> = {}
+  classSelectedSessions.forEach(session => {
+    const month = session.date.substring(0, 7) // YYYY-MM
+    if (!selectedByMonth[month]) {
+      selectedByMonth[month] = new Set()
+    }
+    selectedByMonth[month].add(session.id)
+  })
+
+  // Check each month: are all available lessons selected?
+  const qualifiedMonths: string[] = []
+  let totalLessonCount = 0
+
+  Object.entries(availableByMonth).forEach(([month, availableIds]) => {
+    const selectedIds = selectedByMonth[month]
+    if (!selectedIds) return
+
+    const allSelected = [...availableIds].every(id => selectedIds.has(id))
+    if (allSelected && availableIds.size > 0) {
+      qualifiedMonths.push(month)
+      totalLessonCount += availableIds.size
+    }
+  })
+
+  return {
+    qualified: qualifiedMonths.length > 0,
+    qualifiedMonths,
+    lessonCount: totalLessonCount,
+  }
 }

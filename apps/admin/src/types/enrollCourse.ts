@@ -105,6 +105,7 @@ export type Invoice = {
   numOfLesson: number
   originalFee: number
   payAmount: number
+  amountPaid: number
   currency: string
   course: Course
   payBy: string

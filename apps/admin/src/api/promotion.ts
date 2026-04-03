@@ -3,6 +3,11 @@ import {
   CreateBundleDiscountDto,
 } from '@/types/bundleDiscounts'
 import {
+  CreatePackageDiscountDto,
+  PackageDiscount,
+  UpdatePackageDiscountDto,
+} from '@/types/packageDiscounts'
+import {
   BundleDiscountAvailabilityResponse,
   BundleDiscountDto,
   PossiblePromotionsType,
@@ -317,5 +322,86 @@ export const getBundleDiscountStats = async (
     needAuth: true,
   })
 
+  return res.data.data
+}
+
+// ── Package Discounts ──
+
+export const getAllPackageDiscounts = async (
+  siteId: string,
+  institutionId: string
+): Promise<PackageDiscount[]> => {
+  const res = await apiClient.get({
+    url: '/admin/package-discounts',
+    needAuth: true,
+    params: { siteId, institutionId },
+  })
+  return res.data.data.content
+}
+
+export const getPackageDiscountById = async (
+  id: number
+): Promise<PackageDiscount> => {
+  const res = await apiClient.get({
+    url: `/admin/package-discounts/${id}`,
+    needAuth: true,
+  })
+  return res.data.data
+}
+
+export const createPackageDiscount = async (
+  dto: CreatePackageDiscountDto
+): Promise<PackageDiscount> => {
+  const res = await apiClient.post({
+    url: '/admin/package-discounts/create',
+    needAuth: true,
+    data: { ...dto },
+  })
+  return res.data.data
+}
+
+export const updatePackageDiscount = async (
+  payload: UpdatePackageDiscountDto
+): Promise<PackageDiscount> => {
+  const res = await apiClient.patch({
+    url: `/admin/package-discounts/update?packageDiscountId=${payload.packageDiscountId}`,
+    needAuth: true,
+    data: payload.patch,
+  })
+  return res.data.data
+}
+
+export const deletePackageDiscount = async (
+  id: number,
+  institutionId: string
+): Promise<PackageDiscount> => {
+  const res = await apiClient.delete({
+    url: '/admin/package-discounts/delete',
+    needAuth: true,
+    params: { packageDiscountId: id, institutionId },
+  })
+  return res.data.data
+}
+
+export const togglePackageDiscountStatus = async (
+  id: number
+): Promise<PackageDiscount> => {
+  const res = await apiClient.patch({
+    url: `/admin/package-discounts/${id}/toggle-status`,
+    needAuth: true,
+  })
+  return res.data.data
+}
+
+export const getPackageDiscountsForClass = async (
+  classId: number,
+  siteId: string,
+  institutionId: string
+): Promise<PackageDiscount[]> => {
+  const res = await apiClient.get({
+    url: `/admin/package-discounts/by-class/${classId}`,
+    needAuth: true,
+    params: { siteId, institutionId },
+  })
   return res.data.data
 }

@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
 
+import DatePicker from 'react-datepicker'
 import { useTranslation } from 'react-i18next'
 import { FiUser } from 'react-icons/fi'
 import { IoBook, IoDocumentTextOutline } from 'react-icons/io5'
-import { LuPhoneCall, LuUser } from 'react-icons/lu'
+import { LuCalendar, LuCopy, LuPhoneCall, LuUser } from 'react-icons/lu'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 
 import { Button } from '@/components/ui/Button'
@@ -13,6 +14,7 @@ import {
   invoiceCampaignState,
   invoiceClassesState,
   invoiceSessionState,
+  invoiceStudentState,
   isInvoiceExistOnCampaignSelector,
   studentListState,
 } from '@/stores/studentInvoice.store'
@@ -33,6 +35,8 @@ const InvoiceContainer = (): JSX.Element => {
   const currentActiveParent = useRecoilValue(currentActiveParentState)
   const invoiceCampaign = useRecoilValue(invoiceCampaignState)
   const allStudents = useRecoilValue(studentListState)
+  const [invoiceStudents, setInvoiceStudents] =
+    useRecoilState(invoiceStudentState)
   const [allClasses, setAllClasses] = useRecoilState(invoiceClassesState)
   const setAllSessions = useSetRecoilState(invoiceSessionState)
   const currentClasses = useMemo(() => {
@@ -97,6 +101,30 @@ const InvoiceContainer = (): JSX.Element => {
       d => d.id === currentActiveStudent?.childOfUserAliasId
     )
   }, [allStudents, currentActiveStudent])
+
+  const currentStudentPaymentDate = useMemo(() => {
+    if (!currentActiveStudent) return null
+    const student = invoiceStudents.find(s => s.id === currentActiveStudent.id)
+    return student?.paymentDate ? new Date(student.paymentDate) : null
+  }, [invoiceStudents, currentActiveStudent])
+
+  const handlePaymentDateChange = (date: Date | null) => {
+    if (!currentActiveStudent) return
+    setInvoiceStudents(prev =>
+      prev.map(s =>
+        s.id === currentActiveStudent.id ? { ...s, paymentDate: date } : s
+      )
+    )
+  }
+
+  const applyPaymentDateToAll = () => {
+    if (!currentActiveStudent) return
+    const currentDate = currentStudentPaymentDate
+    setInvoiceStudents(prev =>
+      prev.map(s => ({ ...s, paymentDate: currentDate }))
+    )
+  }
+
   const renderCourses = () => {
     if (currentClasses.length === 0)
       return (
@@ -114,6 +142,33 @@ const InvoiceContainer = (): JSX.Element => {
       )
     return (
       <>
+        <div className="p-3 border-b border-gray-200 flex items-center gap-2">
+          <LuCalendar className="text-gray-500 shrink-0" size={16} />
+          <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
+            {t('editor.paymentDate')}
+          </label>
+          <DatePicker
+            selected={currentStudentPaymentDate}
+            dateFormat="MMMM d, yyyy"
+            className="h-9 rounded-md border text-sm border-gray-300 px-3 w-full"
+            onChange={handlePaymentDateChange}
+            isClearable
+            placeholderText={
+              t('editor.selectPaymentDate') as string
+            }
+          />
+          {invoiceStudents.length > 1 && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="shrink-0"
+              onClick={applyPaymentDateToAll}
+              iconBefore={<LuCopy size={14} />}
+            >
+              {t('editor.applyToAll')}
+            </Button>
+          )}
+        </div>
         <div
           className="p-4 space-y-3 border-b border-gray-200 max-h-[60vh] pt-2 overflow-y-auto"
           role="list"

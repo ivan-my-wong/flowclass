@@ -171,6 +171,9 @@
       "priceOptions": "價格選項"
     },
     "noCoursesAssigned": "尚未分配課程",
+    "paymentDate": "付款日期",
+    "selectPaymentDate": "選擇付款日期",
+    "applyToAll": "應用到全部",
     "noInstructor": "無導師",
     "noSessionsSelected": "未選擇課時",
     "noStudentSelected": "未選擇學生",

@@ -57,6 +57,7 @@ import dayjs from '@/utils/dayjs'
 import {
   buildInvoiceCampaignData,
   createSessionId,
+  getEarliestSessionDate,
 } from '@/utils/invoice-campaign.utils'
 
 import CourseAssignment from './CourseAssignment'
@@ -197,6 +198,9 @@ const InvoiceEditor = (): JSX.Element => {
             childOfUserAliasId: invoice?.childOfUserAliasId ?? null,
             isStudentParent: studentData?.isStudentParent ?? false,
             isSendToParent,
+            paymentDate: invoice.paymentDate
+              ? new Date(invoice.paymentDate)
+              : null,
           } as InvoiceStudent
         })
         setAllStudents(students)
@@ -411,6 +415,7 @@ const InvoiceEditor = (): JSX.Element => {
             usedBalance: studentItem.usedBalance ?? 0,
             isSendToParent,
             total: 0,
+            paymentDate: null,
             ...defaultStudentInvoiceConfig,
           }
           return newInvoiceStudentItem
@@ -461,6 +466,30 @@ const InvoiceEditor = (): JSX.Element => {
       }
     })
   }, [isOneSingleParent, setInvoiceCampaign])
+
+  useEffect(() => {
+    if (allStudents.length === 0 || allSessions.length === 0) return
+
+    const updated = allStudents.map(student => {
+      // Only auto-set if no paymentDate exists yet; respect manually-set dates
+      if (student.paymentDate) return student
+      const earliest = getEarliestSessionDate(student.id, allSessions)
+      if (!earliest) return student
+      return { ...student, paymentDate: earliest }
+    })
+
+    const hasChanges = updated.some((s, i) => {
+      return (
+        s.paymentDate?.toString() !==
+        allStudents[i].paymentDate?.toString()
+      )
+    })
+    if (hasChanges) {
+      setAllStudents(updated)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allSessions])
+
   const onChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = event.target.value
       .replace(/\s{2,}/g, ' ')

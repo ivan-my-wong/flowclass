@@ -3,10 +3,8 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 
 import * as _ from 'lodash'
 import { useTranslation } from 'react-i18next'
-import { LuFileWarning, LuInfo } from 'react-icons/lu'
+import { LuInfo } from 'react-icons/lu'
 
-import { WhatsAppConnectionStatus } from '@/api/whatsappWeb'
-import AlertBox from '@/components/Boxes/AlertBox'
 import SkeletonLoader from '@/components/Loaders/SkeletonLoader'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert'
 import { Badge } from '@/components/ui/Badge'
@@ -16,7 +14,7 @@ import { Switch } from '@/components/ui/Switch'
 import { MAX_LIMIT_REMIND_STUDENT } from '@/constants/payment'
 import usePaymentEvidenceData from '@/hooks/usePaymentEvidenceData'
 import useStudentInvoice from '@/hooks/useStudentInvoice'
-import { useWhatsappWeb } from '@/hooks/useWhatsappWeb'
+import usePlanData from '@/hooks/useSubscriptionPlanData'
 import { PaymentProofTableItem } from '@/types/enrollCourse'
 // import { Course } from '@/types/course'
 // import { EnrollCourseInstance } from '@/types/enrollCourse'
@@ -94,8 +92,8 @@ const ConfirmSendPaymentProof = ({
   const { useSendReminderPayment } = usePaymentEvidenceData()
   const { mutateAsync, isLoading } = useSendReminderPayment()
 
-  const { useGetSessionStatus } = useWhatsappWeb()
-  const { data: whatsappStatus } = useGetSessionStatus()
+  const { schoolSubscription } = usePlanData()
+  const { planQuotas } = schoolSubscription
 
   const isWhatsappReminder = useMemo(() => {
     return (
@@ -273,36 +271,72 @@ const ConfirmSendPaymentProof = ({
     }
   }, [propIsOpen])
 
-  if (
-    isWhatsappReminder &&
-    whatsappStatus?.data.status !== WhatsAppConnectionStatus.READY
-  ) {
-    return (
-      <ModalDialog
-        open
-        onOpenChange={onBack}
-        title={
-          t('customMessage:whatsappWeb.notConnected') ||
-          'WhatsApp is not yet connected'
-        }
-        footer={<></>}
-      >
-        <AlertBox
-          content={t('customMessage:whatsappWeb.notYetConnected')}
-          icon={<LuFileWarning className="text-warn" />}
-          status="warning"
-          actionLink={
-            <Button
-              variant="outline"
-              onClick={() => navigate('/custom-messages')}
-            >
-              {t('customMessage:whatsappWeb.connectWhatsapp')}
-            </Button>
-          }
-        />
-      </ModalDialog>
-    )
-  }
+  // const renderEmailSelector = (studentItem: {
+  //   email: string
+  //   userAliasEmail: string
+  //   userAliasName: string
+  //   name: string
+  //   phone: string
+  // }): string | JSX.Element => {
+  //   if (studentItem.userAliasEmail === studentItem.email) {
+  //     return studentItem.email
+  //   }
+
+  //   if (!studentItem.email) {
+  //     return studentItem.userAliasEmail
+  //   }
+
+  //   if (!studentItem.userAliasEmail) {
+  //     return studentItem.email
+  //   }
+
+  //   // TODO: Currently, we prioritize the user alias email to send the reminder because this can be changed
+  //   return (
+  //     <div>
+  //       <p>
+  //         {t('student:paymentProof.confirmReminder.userEmail')}:{' '}
+  //         {studentItem.userAliasEmail}
+  //       </p>
+  //       <p className="text-sm text-gray-500">
+  //         {t('student:paymentProof.confirmReminder.originalEmailInApplication')}
+  //         : {studentItem.email}
+  //       </p>
+  //     </div>
+  //   )
+  // }
+
+  // const invoices = useMemo(() => {
+  //   if (!state) {
+  //     try {
+  //       const savedRows = sessionStorage.getItem('paymentProofSelectedRows')
+  //       if (savedRows) {
+  //         return JSON.parse(savedRows) as LocationState[]
+  //       }
+  //     } catch (error) {
+  //       console.error('Error parsing saved selected rows:', error)
+  //     }
+  //     return []
+  //   }
+  //   return (state as LocationState[]).filter(d => d.course)
+  // }, [state])
+
+  // const listStudents = useMemo(() => {
+  //   return invoices.map(d => ({
+  //     ...d.sendWhatsapp,
+  //     email: d?.enrollCourse?.email ?? '',
+  //     userAliasEmail: d?.userAlias?.email ?? '',
+  //     userAliasName: d?.userAlias?.name ?? '',
+  //     name: d?.enrollCourse?.name ?? '',
+  //   }))
+  // }, [invoices])
+
+  // const groupedListStudent = useMemo(() => {
+  //   const groupedList = _.groupBy(
+  //     listStudents,
+  //     isWhatsappReminder ? 'phone' : 'email'
+  //   )
+  //   return Object.keys(groupedList).map(key => groupedList[key][0])
+  // }, [listStudents, isWhatsappReminder])
 
   return (
     <ModalDialog

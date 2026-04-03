@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next'
 import { FaWhatsapp } from 'react-icons/fa'
 import { LuMail } from 'react-icons/lu'
 
-import { WhatsAppConnectionStatus } from '@/api/whatsappWeb'
 import {
   Card,
   CardDescription,
@@ -25,8 +24,6 @@ import { Switch } from '@/components/ui/Switch'
 import TextArea from '@/components/ui/TextAreaBase'
 import useCustomMessageData from '@/hooks/useCustomMessageData'
 import useSchoolData from '@/hooks/useSchoolData'
-import { useWhatsappWeb } from '@/hooks/useWhatsappWeb'
-import WhatsappConnection from '@/pages/CustomMessages/components/WhatsappConnection'
 import { SupportedType } from '@/types/customMessage'
 import { StudentPrimaryIdentifier } from '@/types/school'
 import { NotificationChannel, VariableItem } from '@/types/studentInvoice.type'
@@ -115,13 +112,6 @@ const CardDeliveryMethod: FC<Props> = ({
     return t('editor.send.contentPlaceholder') as string
   }, [module, t])
 
-  const { useGetSessionStatus } = useWhatsappWeb()
-  const {
-    data: whatsappSessionStatus,
-    isLoading: isWhatsappSessionStatusLoading,
-    refetch: refetchSessionStatus,
-  } = useGetSessionStatus()
-
   const { currentSchool } = useSchoolData()
   const { useFetchCustomMessageData } = useCustomMessageData()
   const { data: customMessagesData } = useFetchCustomMessageData()
@@ -135,19 +125,11 @@ const CardDeliveryMethod: FC<Props> = ({
     return enrollmentMessage?.content || null
   }, [customMessagesData?.data])
 
-  // Check if WhatsApp is ready/connected
-  const isWhatsAppReady = useMemo(() => {
-    return (
-      whatsappSessionStatus?.data?.status === WhatsAppConnectionStatus.READY
-    )
-  }, [whatsappSessionStatus?.data?.status])
-
-  // Set default values based on school settings and WhatsApp status
+  // Set default values based on school settings
   useEffect(() => {
     if (!switchName) return
 
     if (isEmail) {
-      // Email: default ON if primary identifier is EMAIL
       const shouldEnableEmail =
         currentSchool?.studentPrimaryIdentifier ===
         StudentPrimaryIdentifier.EMAIL
@@ -155,12 +137,7 @@ const CardDeliveryMethod: FC<Props> = ({
         form.setValue(switchName, true, { shouldDirty: false })
       }
     }
-
-    if (isWhatsAppReady) {
-      // WhatsApp: default ON only if WhatsApp is ready/connected
-      form.setValue(switchName, true, { shouldDirty: false })
-    }
-  }, [currentSchool?.studentPrimaryIdentifier, isWhatsAppReady])
+  }, [currentSchool?.studentPrimaryIdentifier])
 
   // Set default WhatsApp message content from custom message template
   useEffect(() => {
@@ -204,15 +181,6 @@ const CardDeliveryMethod: FC<Props> = ({
         </CardTitle>
       </CardHeader>
       <CardDescription className={cn(withSwitch && !isEnabled && 'hidden')}>
-        {!isEmail && (
-          <div className="p-4">
-            <WhatsappConnection
-              whatsappSessionStatus={whatsappSessionStatus}
-              refetchSessionStatus={refetchSessionStatus}
-              isWhatsappSessionStatusLoading={isWhatsappSessionStatusLoading}
-            />
-          </div>
-        )}
         {/* {isEmail && subjectName && (
           <FormField
             control={form.control}

@@ -112,6 +112,26 @@ const AppliedDiscount = (): JSX.Element => {
                             </div>
                           </>
                         )}
+                      {promo.type === PromotionTypeItem.PACKAGE && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-purple-100 text-purple-800">
+                            {t(
+                              'promotion:packageDiscount.badge'
+                            )}
+                          </span>
+                          {promo.packageDiscountPerLesson && (
+                            <span className="text-sm text-gray-600">
+                              {t(
+                                'promotion:packageDiscount.perLessonDiscount',
+                                {
+                                  amount:
+                                    promo.packageDiscountPerLesson,
+                                }
+                              )}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
 

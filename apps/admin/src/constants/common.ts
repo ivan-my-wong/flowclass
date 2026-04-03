@@ -38,6 +38,23 @@ export enum CustomMessageVariable {
   CLASS_LESSON_DATE = '{{classLessonDate}}',
   NEW_CLASS_LESSON_DATE = '{{newClassLessonDate}}',
   PAYMENT_LINK = '{{paymentLink}}',
+  PERIOD = '{{period}}',
+  PAY_AMOUNT = '{{payAmount}}',
+  UPLOAD_PAYMENT_URL = '{{uploadPaymentUrl}}',
+  COURSE_ITEMS = '{{courseItems}}',
+  LESSON_ITEMS = '{{lessonItems}}',
+  // Repeater item variables (for courseItems)
+  COURSE_INDEX = '{{courseIndex}}',
+  COURSE_SCHEDULE = '{{schedule}}',
+  LESSON_COUNT = '{{lessonCount}}',
+  TEACHER_NAME = '{{teacherName}}',
+  LESSON_DATES_LABEL = '{{lessonDatesLabel}}',
+  LESSON_DATES = '{{lessonDates}}',
+  COURSE_PRICE = '{{coursePrice}}',
+  // Repeater item variables (for lessonItems)
+  LESSON_INDEX = '{{lessonIndex}}',
+  LESSON_DATE = '{{lessonDate}}',
+  LESSON_TIME = '{{lessonTime}}',
 }
 
 export enum ImportRequiredFieldsV2 {

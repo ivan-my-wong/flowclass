@@ -9,6 +9,7 @@ import dayjs from '@/utils/dayjs'
 
 import PaymentReceiptStatusCell from '../../PaymentProofTableCells/PaymentReceiptStatusCell'
 
+import UpdateAmountPaid from './UpdateAmountPaid'
 import UpdateInvoiceDateField from './UpdateInvoiceDateField'
 import UpdatePayAmount from './UpdatePayAmount'
 import UpdatePayLeterMethod from './UpdatePayLeterMethod'
@@ -38,6 +39,10 @@ const PaymentStatus: FC<Props> = ({ invoiceData, refetch }): JSX.Element => {
         <div className="flex items-center justify-between font-medium">
           <div className="text-sm">{t('student:paymentProof.totalAmount')}</div>
           <UpdatePayAmount data={invoiceData} refetch={refetch} />
+        </div>
+        <div className="flex items-center justify-between font-medium">
+          <div className="text-sm">{t('student:paymentProof.amountPaid')}</div>
+          <UpdateAmountPaid data={invoiceData} refetch={refetch} />
         </div>
         <div className="flex items-center justify-between font-medium">
           <div className="text-sm">{t('student:paymentProof.status')}</div>
