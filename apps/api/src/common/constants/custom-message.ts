@@ -99,6 +99,5 @@ export const INVOICE_DETAILS_VAR: IMessageVariable = {
 export const DEFAULT_CUSTOM_MESSAGES: IMessageTemplates = {
   student_lesson_reminder:
     '📚 Attendance Reminder – [institutionName]\n\nDear [studentName],\n\nThis is a friendly reminder of your upcoming “[className]”.\n\n📅 Date: [classLessonDate]\n📍 Location: [location]\n🧑‍🏫 Instructor: [instructor]\n\nWe look forward to seeing you soon.',
-  create_invoice:
-    '[invoiceDetails]\n\n付款連結: [uploadPaymentUrl]',
+  create_invoice: '[invoiceDetails]\n\n付款連結: [uploadPaymentUrl]',
 }

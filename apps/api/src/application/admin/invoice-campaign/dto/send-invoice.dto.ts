@@ -107,6 +107,7 @@ export enum PromotionType {
   COUPON = 'coupon',
   MANUAL = 'manual',
   REFERRAL = 'referral',
+  PACKAGE = 'package',
 }
 export enum DiscountAmountType {
   FIXED = 'fixedAmount',
@@ -118,7 +119,9 @@ export class DiscountInvoices {
     example: 1,
     required: false,
   })
-  @ValidateIf((o) => ![PromotionType.REFERRAL, PromotionType.MANUAL].includes(o.type))
+  @ValidateIf(
+    (o) => ![PromotionType.REFERRAL, PromotionType.MANUAL, PromotionType.PACKAGE].includes(o.type)
+  )
   @IsNumber()
   id?: number
 

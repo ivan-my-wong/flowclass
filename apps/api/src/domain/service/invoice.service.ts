@@ -809,6 +809,7 @@ export class InvoiceService {
         },
       },
       remark: true,
+      documentCampaignId: true,
     }
     // If current request is initial request and there is no data, we will delete the createdAt filter
     // This is to avoid the case that the user not show the data when there is no data at the first time

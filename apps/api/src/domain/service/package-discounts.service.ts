@@ -37,7 +37,12 @@ export class PackageDiscountsService extends BaseService<PackageDiscount> {
     }
 
     try {
-      return await this.packageDiscountsRepository.pagination(dto, whereCondition, orderOption, null)
+      return await this.packageDiscountsRepository.pagination(
+        dto,
+        whereCondition,
+        orderOption,
+        null
+      )
     } catch (error) {
       if (error instanceof QueryFailedError) {
         throw new BadRequestException(`Invalid orderBy field or query error: ${error.message}`)
@@ -55,13 +60,19 @@ export class PackageDiscountsService extends BaseService<PackageDiscount> {
       return packageDiscount
     } catch (error) {
       if (error instanceof QueryFailedError) {
-        throw new BadRequestException(`Invalid package discount ID or query error: ${error.message}`)
+        throw new BadRequestException(
+          `Invalid package discount ID or query error: ${error.message}`
+        )
       }
       throw error
     }
   }
 
-  async findByClassId(classId: number, siteId: number, institutionId: number): Promise<PackageDiscount[]> {
+  async findByClassId(
+    classId: number,
+    siteId: number,
+    institutionId: number
+  ): Promise<PackageDiscount[]> {
     const all = await this.packageDiscountsRepository.find({
       where: { isActive: true, siteId, institutionId },
     })

@@ -12,10 +12,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common'
 import {
-  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
-  ApiOkResponse,
   ApiOperation,
   ApiQuery,
   ApiResponse,
@@ -141,10 +139,7 @@ export class PackageDiscountsController {
   @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER, Role.INSTRUCTOR)
   @UseGuards(RolesGuard)
   @ApiQuery({ name: 'packageDiscountId', required: true, type: Number })
-  update(
-    @Query('packageDiscountId') id: string,
-    @Body() dto: UpdatePackageDiscountDto
-  ) {
+  update(@Query('packageDiscountId') id: string, @Body() dto: UpdatePackageDiscountDto) {
     return this.packageDiscountsService.update(+id, dto)
   }
 
@@ -164,5 +159,4 @@ export class PackageDiscountsController {
   toggleStatus(@Param('id') id: number) {
     return this.packageDiscountsService.toggleStatus(id)
   }
-
 }

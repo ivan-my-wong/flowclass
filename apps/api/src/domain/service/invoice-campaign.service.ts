@@ -1415,7 +1415,8 @@ export class InvoiceCampaignService {
         })
         invoice.creditTransactionsId = creditTransaction.id
         invoice.payAmount = Math.max(0, invoice.payAmount - invoice.usedBalance)
-        invoice.paymentState = invoice.payAmount <= 0 ? PaymentStatus.PAID : PaymentStatus.PARTIALLY_PAID
+        invoice.paymentState =
+          invoice.payAmount <= 0 ? PaymentStatus.PAID : PaymentStatus.PARTIALLY_PAID
         invoice.amountPaid = invoice.payAmount ?? 0
       } catch (error) {
         this.logger.error('Error deducting credit:', error)
