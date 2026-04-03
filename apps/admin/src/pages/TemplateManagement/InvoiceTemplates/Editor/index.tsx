@@ -425,9 +425,16 @@ const InvoiceEditor = (): JSX.Element => {
       setAllStudents(studentsToAssign)
       if (studentsToAssign.length > 0) {
         setCurrentActiveStudent(studentsToAssign[0])
+        // Auto-set title to first student's name if title is still default
+        const defaultTitle = t('invoiceCampaign:invoiceItem.title')
+        setInvoiceCampaign(prev => {
+          if (!prev) return prev
+          if (prev.title && prev.title !== defaultTitle) return prev
+          return { ...prev, title: studentsToAssign[0].name }
+        })
       }
     }
-  }, [setAllStudents, setCurrentActiveStudent, studentIdsToAssign, studentList])
+  }, [setAllStudents, setCurrentActiveStudent, studentIdsToAssign, studentList, t, setInvoiceCampaign])
 
   const isDisabledActions = useMemo(() => {
     return isCreating || isUpdating

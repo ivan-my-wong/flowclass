@@ -296,6 +296,15 @@ export const calculateTotalDiscount = (
         (retroactiveDiscount !== undefined && retroactiveDiscount > 0
           ? retroactiveDiscount
           : 0)
+    } else if (type === PromotionTypeItem.PACKAGE) {
+      // Package discount: compute from per-lesson amount × qualified lesson count
+      const perLesson =
+        parseFloat(String(item.packageDiscountPerLesson)) || 0
+      const lessonCount = item.qualifiedLessonCount ?? 0
+      discountValue =
+        perLesson > 0 && lessonCount > 0
+          ? perLesson * lessonCount
+          : parseFloat(String(amount)) || 0
     } else {
       // For other discounts, calculate based on discount type
       discountValue =

@@ -79,6 +79,8 @@
     "packageDiscount": {
       "perLesson": "{{amount}} / lesson",
       "autoApplied": "Auto-applied",
+      "applied": "Applied",
+      "notApplicable": "Not Applicable",
       "autoLabel": "Auto",
       "selectAllLessons": "Select all lessons in a month to activate"
     },

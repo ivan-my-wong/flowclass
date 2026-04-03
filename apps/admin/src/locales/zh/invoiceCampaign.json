@@ -77,6 +77,8 @@
     "packageDiscount": {
       "perLesson": "{{amount}} / 每課",
       "autoApplied": "已自動套用",
+      "applied": "已套用",
+      "notApplicable": "不適用",
       "autoLabel": "自動",
       "selectAllLessons": "選擇當月所有課堂即可啟用"
     },

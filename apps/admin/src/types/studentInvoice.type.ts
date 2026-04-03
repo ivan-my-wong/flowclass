@@ -140,6 +140,7 @@ export type AppliedPromotion = {
   // Package discount specific fields
   packageDiscountPerLesson?: number // Per-lesson discount amount
   classId?: number // Class this package discount applies to
+  qualifiedLessonCount?: number // Number of lessons that qualified for package discount
 }
 
 export type AllPromotionsType = PossiblePromotionsType

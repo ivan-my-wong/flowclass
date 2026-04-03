@@ -1,11 +1,12 @@
 import { useMemo } from 'react'
 
 import { useTranslation } from 'react-i18next'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 
 import { Button } from '@/components/ui/Button'
 import useInvoiceSummary from '@/hooks/useInvoiceSummary'
 import {
+  availableLessonsByClassState,
   currentActiveStudentState,
   invoiceClassesState,
   invoiceSessionState,
@@ -33,6 +34,7 @@ const EditorAction = (): JSX.Element => {
     setSelectedSessions,
     setShowAllClassesInCourse,
     setAllClassesLessonsData,
+    regularV2Lessons,
   } = useInvoiceEditorContext()
   const {
     totalPrice,
@@ -48,6 +50,19 @@ const EditorAction = (): JSX.Element => {
   const [allClasses, setAllClasses] = useRecoilState(invoiceClassesState)
   const [allSessions, setAllSessions] = useRecoilState(invoiceSessionState)
   const allStudents = useRecoilValue(invoiceStudentState)
+  const setAvailableLessonsByClass = useSetRecoilState(
+    availableLessonsByClassState
+  )
+
+  // Populate available lessons for package discount auto-apply
+  const populateAvailableLessons = (classId: number) => {
+    if (regularV2Lessons && regularV2Lessons.length > 0) {
+      setAvailableLessonsByClass(prev => ({
+        ...prev,
+        [classId]: regularV2Lessons.map(l => ({ id: l.id, date: l.date })),
+      }))
+    }
+  }
 
   const extractPriceOptionData = useMemo(() => {
     let calculatedPrice = 0
@@ -201,6 +216,20 @@ const EditorAction = (): JSX.Element => {
 
         setAllClasses(newClassItems)
         setAllSessions(newSessionItems)
+        // Populate available lessons for each class in multi-class mode
+        if (allClassesLessonsData) {
+          allClassesLessonsData.classes.forEach((cls: any) => {
+            if (cls.lessons) {
+              setAvailableLessonsByClass(prev => ({
+                ...prev,
+                [cls.classId]: cls.lessons.map((l: any) => ({
+                  id: l.id,
+                  date: l.date,
+                })),
+              }))
+            }
+          })
+        }
         closeAndResetDialog()
         return
       }
@@ -307,6 +336,7 @@ const EditorAction = (): JSX.Element => {
           setAllSessions(updatedSessions)
         }
       }
+      if (currentClass) populateAvailableLessons(currentClass.id)
       closeAndResetDialog()
     } else {
       // Append sessions to the existing class for this student
@@ -462,6 +492,7 @@ const EditorAction = (): JSX.Element => {
 
         setAllClasses(newClassItems)
         setAllSessions(newSessionItems)
+        if (currentClass) populateAvailableLessons(currentClass.id)
         closeAndResetDialog()
         return
       }
@@ -507,6 +538,7 @@ const EditorAction = (): JSX.Element => {
 
       setAllClasses(newClassItems)
       setAllSessions(newSessionItems)
+      if (currentClass) populateAvailableLessons(currentClass.id)
       closeAndResetDialog()
     }
   }

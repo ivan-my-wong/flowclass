@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/Select'
 import { Separator } from '@/components/ui/Separator'
+import { FEATURE_FLAG } from '@/constants/featureFlags'
 import { invoiceClassesState } from '@/stores/studentInvoice.store'
 import { PromotionTypeItem } from '@/types/studentInvoice.type'
 
@@ -168,7 +169,7 @@ const InvoiceDiscount = (): JSX.Element => {
         </div>
       </div>
       <ManualDiscountForm />
-      <ReferralDiscount />
+      {FEATURE_FLAG.REFERRAL_DISCOUNT && <ReferralDiscount />}
       <AppliedDiscount />
       <div className="border-t border-gray-200 px-4 pt-4">
         <div className="flex items-center justify-between text-sm mb-2">

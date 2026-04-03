@@ -1,12 +1,14 @@
 import { useEffect, useRef } from 'react'
 
 import { useTranslation } from 'react-i18next'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import { toast } from 'sonner'
 
 import useStudentInvoice from '@/hooks/useStudentInvoice'
 import {
+  appliedPromotionsState,
   availableLessonsByClassState,
+  currentActiveStudentState,
   invoiceClassesState,
   invoiceSessionState,
   invoiceStudentState,
@@ -24,6 +26,7 @@ import { isPackageDiscountQualified } from '@/utils/invoice-campaign.utils'
  * Checks all students × all classes × all package discounts,
  * and writes qualified package discounts directly into each
  * student's appliedPromotions in invoiceStudentState.
+ * Also syncs currentActiveStudentState and appliedPromotionsState.
  */
 const PackageDiscountAutoApplyAll = (): null => {
   const { t } = useTranslation()
@@ -33,6 +36,10 @@ const PackageDiscountAutoApplyAll = (): null => {
   const allSessions = useRecoilValue(invoiceSessionState)
   const availableLessonsByClass = useRecoilValue(availableLessonsByClassState)
   const [allStudents, setAllStudents] = useRecoilState(invoiceStudentState)
+  const [currentActiveStudent, setCurrentActiveStudent] = useRecoilState(
+    currentActiveStudentState
+  )
+  const setAppliedPromotions = useSetRecoilState(appliedPromotionsState)
   const hasToastedRef = useRef(false)
 
   useEffect(() => {
@@ -40,7 +47,7 @@ const PackageDiscountAutoApplyAll = (): null => {
       (promo: any) =>
         'promotionType' in promo &&
         promo.promotionType === PromotionTypeItem.PACKAGE
-    ) as PackageDiscount[]
+    ) as unknown as PackageDiscount[]
 
     if (
       packagePromotions.length === 0 ||
@@ -53,13 +60,11 @@ const PackageDiscountAutoApplyAll = (): null => {
     let hasAnyNewDiscount = false
 
     const updatedStudents = allStudents.map(student => {
-      // Get classes for this student
       const studentClasses = allClasses.filter(
         c => c.studentItem.id === student.id
       )
       if (studentClasses.length === 0) return student
 
-      // Build new package discounts for this student
       const newPackageDiscounts: AppliedPromotion[] = []
 
       studentClasses.forEach(invoiceClass => {
@@ -80,16 +85,18 @@ const PackageDiscountAutoApplyAll = (): null => {
           )
 
           if (result.qualified) {
+            const perLesson = parseFloat(String(pd.amountPerLesson)) || 0
             newPackageDiscounts.push({
               id: `package-${pd.id}-${classId}`,
               name: pd.name,
               type: PromotionTypeItem.PACKAGE,
               discountType: 'fixedAmount' as DiscountType,
-              amount: pd.amountPerLesson * result.lessonCount,
+              amount: perLesson * result.lessonCount,
               order: 0,
               isApplicable: true,
               feeType: 'deduct',
-              packageDiscountPerLesson: pd.amountPerLesson,
+              packageDiscountPerLesson: perLesson,
+              qualifiedLessonCount: result.lessonCount,
               classId,
               studentId: student.id,
               parentId: null,
@@ -102,23 +109,32 @@ const PackageDiscountAutoApplyAll = (): null => {
       const existingNonPackage = (student.appliedPromotions ?? []).filter(
         p => p.type !== PromotionTypeItem.PACKAGE
       )
-      const existingPackageIds = new Set(
+      // Compare by ID + amount to detect both additions and value changes
+      const existingPackageKey = (student.appliedPromotions ?? [])
+        .filter(p => p.type === PromotionTypeItem.PACKAGE)
+        .map(p => `${p.id}:${p.amount}`)
+        .sort()
+        .join(',')
+
+      const newKey = newPackageDiscounts
+        .map(p => `${p.id}:${p.amount}`)
+        .sort()
+        .join(',')
+
+      const isSame = existingPackageKey === newKey
+
+      if (isSame) return student
+
+      // Detect if there are genuinely new discounts (not just amount corrections)
+      const existingIds = new Set(
         (student.appliedPromotions ?? [])
           .filter(p => p.type === PromotionTypeItem.PACKAGE)
           .map(p => `${p.id}`)
       )
-
-      // Check if anything actually changed
-      const newIds = new Set(newPackageDiscounts.map(p => `${p.id}`))
-      const isSame =
-        existingPackageIds.size === newIds.size &&
-        [...existingPackageIds].every(id => newIds.has(id))
-
-      if (isSame) return student
-
-      // Detect truly new discounts for toast
-      const trulyNew = [...newIds].filter(id => !existingPackageIds.has(id))
-      if (trulyNew.length > 0) hasAnyNewDiscount = true
+      const hasNewIds = newPackageDiscounts.some(
+        p => !existingIds.has(`${p.id}`)
+      )
+      if (hasNewIds) hasAnyNewDiscount = true
 
       const lastOrder =
         existingNonPackage
@@ -137,13 +153,23 @@ const PackageDiscountAutoApplyAll = (): null => {
       }
     })
 
-    // Only update if something changed
-    const hasChanges = updatedStudents.some(
-      (s, i) => s !== allStudents[i]
-    )
+    const hasChanges = updatedStudents.some((s, i) => s !== allStudents[i])
 
     if (hasChanges) {
       setAllStudents(updatedStudents)
+
+      // Sync currentActiveStudentState so EditInvoiceContext picks up the change
+      if (currentActiveStudent) {
+        const updatedActive = updatedStudents.find(
+          s => s.id === currentActiveStudent.id
+        )
+        if (updatedActive && updatedActive !== currentActiveStudent) {
+          setCurrentActiveStudent(updatedActive)
+          // Also sync the global appliedPromotionsState used by the discount UI
+          setAppliedPromotions(updatedActive.appliedPromotions)
+        }
+      }
+
       if (hasAnyNewDiscount && !hasToastedRef.current) {
         hasToastedRef.current = true
         toast.success(t('promotion:packageDiscount.autoApplied'))
@@ -155,7 +181,9 @@ const PackageDiscountAutoApplyAll = (): null => {
     allClasses,
     allSessions,
     availableLessonsByClass,
-    allStudents.length,
+    // Use length + a hash of student IDs to avoid running on every appliedPromotions change
+    // (which would cause infinite loops) but still re-run when students are added/removed
+    allStudents.map(s => s.id).join(','),
   ])
 
   return null

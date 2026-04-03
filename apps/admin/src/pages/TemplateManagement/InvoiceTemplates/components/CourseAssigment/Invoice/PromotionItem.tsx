@@ -323,7 +323,7 @@ const PromotionItem: React.FC<Props> = ({ promo, isApplied }): JSX.Element => {
         )}
       </div>
       <div className="flex items-center gap-3 text-right">
-        <div className="text-sm font-semibold text-gray-800">{amountLabel}</div>
+        <div className="text-sm font-semibold text-gray-800 whitespace-nowrap">{amountLabel}</div>
         {promo.promotionType === PromotionTypeItem.BUNDLE && promo.id ? (
           <BundleDiscountStatus
             bundleId={promo.id}
@@ -341,17 +341,30 @@ const PromotionItem: React.FC<Props> = ({ promo, isApplied }): JSX.Element => {
             priceAfterDiscount={calculatedDiscount?.priceAfterDiscount}
           />
         ) : promo.promotionType === PromotionTypeItem.PACKAGE ? (
-          <div className="text-xs font-medium min-w-24 text-center">
-            {isPackageAlreadyApplied ? (
-              <span className="text-green-600">
-                {t('invoiceCampaign:editor.packageDiscount.autoApplied')}
-              </span>
-            ) : (
-              <span className="text-gray-400">
-                {t('invoiceCampaign:editor.packageDiscount.autoLabel')}
-              </span>
-            )}
-          </div>
+          <Button
+            type="button"
+            className="h-8 min-w-24 w-32 ml-auto"
+            variant={
+              isPackageAlreadyApplied
+                ? 'default'
+                : 'primary-outline'
+            }
+            disabled={!isPackageQualified && !isPackageAlreadyApplied}
+            iconBefore={
+              isPackageAlreadyApplied ? (
+                <LuCheck aria-hidden="true" />
+              ) : (
+                <LuPlus aria-hidden="true" />
+              )
+            }
+            onClick={() => {
+              // Package discounts are auto-managed — no manual action needed
+            }}
+          >
+            {isPackageAlreadyApplied
+              ? t('invoiceCampaign:editor.packageDiscount.applied')
+              : t('invoice.discount.bundleNotApplicable')}
+          </Button>
         ) : (
           <Button
             type="button"

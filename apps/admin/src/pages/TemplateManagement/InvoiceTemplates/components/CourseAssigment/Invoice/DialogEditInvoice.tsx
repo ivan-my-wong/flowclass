@@ -160,9 +160,7 @@ const DialogEditInvoice: React.FC<Props> = ({
                 )
               }}
               isClearable
-              placeholderText={
-                t('editor.selectPaymentDate') as string
-              }
+              placeholderText={t('editor.selectPaymentDate') as string}
             />
           </div>
           <Card className="p-4 shadow-none border-gray-300 mb-6">
