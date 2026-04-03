@@ -34,7 +34,6 @@ const EmailSetting = ({ tabName }: { tabName?: string }) => {
   const { isMobile } = useResponsive()
 
   const [hasSetting, setHasSetting] = useState(false)
-
   const isOwnBrandingEnabled = true
 
   const [schoolSetting, setSchoolSetting] =

@@ -453,7 +453,7 @@ const NotificationLog = (): JSX.Element => {
               isLoading={isLoadingNotificationList}
               handleReset={handleReset}
               hasFilterSelection
-              filterSelector={
+              filterSelector={({ handleReset: reset }) => (
                 <>
                   <Box className="flex flex-col md:flex-row gap-2">
                     {/* <LabelSelector
@@ -511,13 +511,13 @@ const NotificationLog = (): JSX.Element => {
                     <Button
                       className="w-full md:w-[80px]"
                       variant="outline"
-                      onClick={handleReset}
+                      onClick={reset}
                     >
                       {t('recordLogs:notificationLogs.selectLabels.reset')}
                     </Button>
                   </Box>
                 </>
-              }
+              )}
             />
           )}
         </Box>

@@ -249,7 +249,7 @@ const LocationsPage = () => {
               'location:locations.searchByLocationName'
             ).toString()}
             handleReset={handleReset}
-            filterSelector={
+            filterSelector={({ handleReset: reset }) => (
               <div className="box-responsive-full">
                 <div className="box-row-full">
                   <LabelSelector
@@ -288,16 +288,12 @@ const LocationsPage = () => {
                     selectStyles={selectorStyles()}
                   />
 
-                  <Button
-                    className="w-[20%]"
-                    variant="outline"
-                    onClick={handleReset}
-                  >
+                  <Button className="w-[20%]" variant="outline" onClick={reset}>
                     {t('recordLogs:notificationLogs.selectLabels.reset')}
                   </Button>
                 </div>
               </div>
-            }
+            )}
           />
         </div>
       </div>

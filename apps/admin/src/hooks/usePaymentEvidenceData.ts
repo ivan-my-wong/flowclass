@@ -585,8 +585,12 @@ const usePaymentEvidenceData = () => {
 
   const usePaymentDateUpdate = () => {
     return useMutation({
-      mutationFn: (payload: { invoiceId: number; paymentDate: string }) =>
-        updatePaymentDate(currentSchoolId, payload),
+      mutationFn: (payload: {
+        invoiceId: number
+        paymentDate?: string
+        createdAt?: string
+        updatedAt?: string
+      }) => updatePaymentDate(currentSchoolId, payload),
       onSuccess: () => {
         toast.success(t('student:paymentProof.updatePaymentDateSuccess'))
       },

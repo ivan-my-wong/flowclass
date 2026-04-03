@@ -217,6 +217,7 @@ const StudentDatabase = (): JSX.Element => {
   const [selectedMatchMode, setSelectedMatchMode] = useState<FilterMatchMode>(
     FilterMatchMode.Any
   )
+  const [resetSearchTrigger, setResetSearchTrigger] = useState(0)
 
   const { isLoadingPermissionAndQuota } = useCheckPermissionAndQuota()
 
@@ -303,7 +304,6 @@ const StudentDatabase = (): JSX.Element => {
     persistCustomFieldColumnIds(val)
     // When custom columns change, also persist the new order
     // We'll persist the order of the current table columns (base + custom)
-    // But since tableColumns is a useMemo, we need to persist after render, so do it in useEffect below
   }
 
   // On fieldsCustom load, initialize customFieldColumns from cookie
@@ -968,14 +968,14 @@ const StudentDatabase = (): JSX.Element => {
         daysBeforeEnd: 0,
       })
     )
-    setSearchParams(
-      new URLSearchParams({
-        ...Object.fromEntries(searchParams),
-        startDate: '',
-        endDate: '',
-        search: '',
-      }).toString()
-    )
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev)
+      next.delete('search')
+      next.delete('startDate')
+      next.delete('endDate')
+      return next
+    })
+    setResetSearchTrigger(prev => prev + 1)
 
     gridRef?.current?.api.setFilterModel(null)
     setCustomFieldFilterList([])

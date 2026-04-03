@@ -396,7 +396,7 @@ const StudentSelectionDialog: React.FC<Props> = ({
             columns={tableColumns}
             handleReset={handleReset}
             hasFilterSelection
-            filterSelector={
+            filterSelector={({ handleReset: reset }) => (
               <>
                 <Box direction="col">
                   <Box className="box-row-full grid grid-cols-1 md:grid-cols-10 md:gap-2">
@@ -476,7 +476,7 @@ const StudentSelectionDialog: React.FC<Props> = ({
                       <Button
                         variant="outline"
                         className="w-full"
-                        onClick={handleReset}
+                        onClick={reset}
                       >
                         {t('recordLogs:notificationLogs.selectLabels.reset')}
                       </Button>
@@ -484,7 +484,7 @@ const StudentSelectionDialog: React.FC<Props> = ({
                   </Box>
                 </Box>
               </>
-            }
+            )}
           />
         </DialogBody>
       </DialogContent>

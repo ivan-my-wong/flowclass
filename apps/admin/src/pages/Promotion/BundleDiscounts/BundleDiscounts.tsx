@@ -17,7 +17,6 @@ import ContentLayout from '@/layouts/ContentLayout'
 import { AlertTypes } from '@/reducers/confirm.reducers'
 import { promotionState } from '@/stores/promotionData'
 import { BundleDiscount } from '@/types/bundleDiscounts'
-import { PromotionType } from '@/types/coupon'
 
 import BundleCardComponent from '../components/BundleCard'
 

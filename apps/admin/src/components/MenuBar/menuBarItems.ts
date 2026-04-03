@@ -156,7 +156,6 @@ const menuItems: MenuItem[] = [
       UserRole.SiteAdmin,
       UserRole.SchoolAdmin,
     ],
-    availableSites: [],
   },
   {
     label: 'rescheduleApproval',

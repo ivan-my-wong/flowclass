@@ -18,7 +18,7 @@ import CreateCouponCode from '@/pages/Promotion/Coupons/CreateCouponCode'
 import WhatsappButton from '@/pages/StudentCRM/components/WhatsappButton'
 import { promotionState } from '@/stores/promotionData'
 import { requiredParamsState } from '@/stores/requiredParamsData'
-import { Coupon, CouponStatusEnum, PromotionType } from '@/types/coupon'
+import { Coupon, CouponStatusEnum } from '@/types/coupon'
 import { StudentUser } from '@/types/user'
 import { formatTs } from '@/utils/timeFormat'
 
@@ -90,7 +90,7 @@ const Promotion = ({ personalInfo, tabName }: Props): React.ReactElement => {
         <Heading size="smallMedium">{t('student:coupon.title')}</Heading>
         <Button
           disabled={personalInfo.isDeleted ?? false}
-          onClick={() => handleCreateCoupon()}
+          onClick={handleCreateCoupon}
         >
           {t('student:coupon.add')}
         </Button>

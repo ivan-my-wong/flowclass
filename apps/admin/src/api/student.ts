@@ -978,7 +978,12 @@ export const getStudentsByPhone = async (
 
 export const updatePaymentDate = async (
   institutionId: number,
-  payload: { invoiceId: number; paymentDate: string }
+  payload: {
+    invoiceId: number
+    paymentDate?: string
+    createdAt?: string
+    updatedAt?: string
+  }
 ): Promise<void> => {
   const res = await apiClient.post({
     needAuth: true,
