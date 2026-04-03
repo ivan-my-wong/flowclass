@@ -61,7 +61,6 @@ import { RemoveFromParentGroupDto } from './dtos/remove-from-parent-group.dto'
 import { SetParentAccountDto } from './dtos/set-parent-account.dto'
 import {
   CreateAndUpdateStudentContactInfoDto,
-  CreateAndUpdateStudentMemoDto,
   CreateOrUpdateStudentContactInfoV2Dto,
   StudentNotificationSettings,
 } from './dtos/student-memo.dto'
@@ -581,21 +580,12 @@ export class StudentOnbController {
     return this.studentOnboardService.addExtraLesson(params)
   }
 
-  @Post('/add-memo')
-  @ApiOperation({
-    summary: 'This api for add student memo.',
-  })
-  @ApiOkResponse({
-    type: ApiResult,
-  })
-  @ApiBadRequestResponse({
-    description: 'This response may be when add student memo',
-  })
+  @Patch('/update-remarks')
+  @ApiOperation({ summary: 'Update remarks for a student alias.' })
+  @ApiOkResponse({ type: ApiResult })
   @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER, Role.INSTRUCTOR)
-  // @UseGuards(RolesGuard)
-  async addStudentMemo(@Body() params: CreateAndUpdateStudentMemoDto) {
-    const result = await this.studentOnboardService.addStudentMemo(params)
-    return result
+  async updateRemarks(@Body() params: { userAliasId: number; remarks: string | null }) {
+    return this.studentOnboardService.updateRemarks(params.userAliasId, params.remarks)
   }
 
   @Post('/update-contact-info')

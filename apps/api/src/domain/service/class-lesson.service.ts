@@ -658,6 +658,7 @@ export class ClassLessonService {
             createdAt: payments?.createdAt,
             paymentState: payments?.paymentState,
           },
+          hasSharedVideo: student.hasSharedVideo,
         }
 
         const check = listStudents.some((o) => {

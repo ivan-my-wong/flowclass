@@ -3,7 +3,7 @@ import { IsArray, IsEnum, IsNotEmpty, IsOptional } from 'class-validator'
 
 import { SupportedType } from '../../custom-messages/dto/custom-message.dto'
 
-export class CreateOrUpdateStudentMemoBaseDto {
+class StudentMemoBaseDto {
   @ApiProperty({ example: 75 })
   @IsNotEmpty()
   userId: number
@@ -13,14 +13,7 @@ export class CreateOrUpdateStudentMemoBaseDto {
   institutionId: number
 }
 
-export class CreateAndUpdateStudentMemoDto extends CreateOrUpdateStudentMemoBaseDto {
-  @ApiProperty({ example: 'Message' })
-  // @IsNotEmpty()
-  @IsOptional()
-  memo: string
-}
-
-export class CreateAndUpdateStudentContactInfoDto extends CreateOrUpdateStudentMemoBaseDto {
+export class CreateAndUpdateStudentContactInfoDto extends StudentMemoBaseDto {
   @ApiProperty({ example: 'example@gmail.com' })
   @IsOptional()
   contactEmail: string

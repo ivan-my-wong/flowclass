@@ -2,7 +2,6 @@
 // eslint-disable-next-line simple-import-sort/imports
 import {
   CreateAndUpdateStudentContactInfoDto,
-  CreateAndUpdateStudentMemoDto,
   CreateOrUpdateStudentContactInfoV2Dto,
   StudentNotificationSettings,
 } from '@/application/admin/student-onboard/dtos/student-memo.dto'
@@ -359,6 +358,7 @@ export class StudentOnbService {
         'userAlias.email',
         'userAlias.isStudentParent',
         'userAlias.childOfUserAliasId',
+        'userAlias.remarks',
 
         'studentForms.formFieldId',
         'studentForms.formFieldType',
@@ -477,6 +477,7 @@ export class StudentOnbService {
         // 'userAlias.phone',
         'userAlias.name',
         'userAlias.email',
+        'userAlias.remarks',
 
         'user.firstName',
         'user.phone',
@@ -1838,21 +1839,12 @@ export class StudentOnbService {
     }
   }
 
-  async addStudentMemo(
-    createAndUpdateStudentMemoDto: CreateAndUpdateStudentMemoDto
-  ): Promise<UserAlias> {
-    const user = await this.userRepository.findOneBy({
-      id: createAndUpdateStudentMemoDto.userId,
-    })
-    const defaultName = user?.firstName || 'Student'
-
-    const userAlias = await this.userAliasesRepository.findOrCreateByUserIdAndInstitution(
-      createAndUpdateStudentMemoDto.institutionId,
-      createAndUpdateStudentMemoDto.userId,
-      defaultName
-    )
-    userAlias.memo = createAndUpdateStudentMemoDto.memo
-    return await this.userAliasesRepository.save(userAlias)
+  async updateRemarks(userAliasId: number, remarks: string | null): Promise<{ id: number; remarks: string | null }> {
+    const userAlias = await this.userAliasesRepository.findOneBy({ id: userAliasId })
+    if (!userAlias) throw new ApiError(ErrorCode.USERID_NOT_FOUND)
+    userAlias.remarks = remarks ?? null
+    await this.userAliasesRepository.save(userAlias)
+    return { id: userAlias.id, remarks: userAlias.remarks }
   }
 
   async editStudentContactInfo(params: CreateAndUpdateStudentContactInfoDto) {

@@ -48,6 +48,9 @@ export class UserAlias extends BaseEntity {
   @Column({ name: 'alias_password', nullable: true, select: false })
   aliasPassword?: string
 
+  @Column({ name: 'remarks', nullable: true, type: 'text' })
+  remarks?: string | null
+
   @ManyToOne(() => User, (user) => user.aliases)
   @JoinColumn({ name: 'user_id' })
   user: User
