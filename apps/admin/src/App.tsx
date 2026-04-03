@@ -881,10 +881,7 @@ const App = (): JSX.Element => {
                   path=":classId/add-subscription-class"
                   element={<ModalAddSubscriptionClass />}
                 />
-                <Route
-                  path="send-multiple"
-                  element={<DialogSendInvoice />}
-                />
+                <Route path="send-multiple" element={<DialogSendInvoice />} />
                 <Route path="send" element={<DialogSendInvoice />} />
                 <Route
                   path="sending-progress"

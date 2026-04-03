@@ -1,8 +1,4 @@
-import {
-  EyeOpenIcon,
-  Pencil1Icon,
-  TrashIcon,
-} from '@radix-ui/react-icons'
+import { EyeOpenIcon, Pencil1Icon, TrashIcon } from '@radix-ui/react-icons'
 import clsx from 'clsx'
 import { useTranslation } from 'react-i18next'
 
@@ -70,7 +66,9 @@ const PackageDiscountCard = ({
           <span className="ml-1 font-medium">
             {packageDiscount.isAllClasses
               ? t('promotion:packageDiscount.allClasses')
-              : `${packageDiscount.applicableClassIds?.length ?? 0} ${t('promotion:packageDiscount.classes')}`}
+              : `${packageDiscount.applicableClassIds?.length ?? 0} ${t(
+                  'promotion:packageDiscount.classes'
+                )}`}
           </span>
         </div>
       </div>

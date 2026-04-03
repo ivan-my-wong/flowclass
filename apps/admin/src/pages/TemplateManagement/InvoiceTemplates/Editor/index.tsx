@@ -54,8 +54,6 @@ import {
 } from '@/types/studentInvoice.type'
 import type { InvoiceCampaign } from '@/types/templateManagement'
 import dayjs from '@/utils/dayjs'
-
-import PackageDiscountAutoApplyAll from './PackageDiscountAutoApplyAll'
 import {
   buildInvoiceCampaignData,
   createSessionId,
@@ -64,6 +62,7 @@ import {
 
 import CourseAssignment from './CourseAssignment'
 import { InvoiceEditorProvider } from './InvoiceEditorContext'
+import PackageDiscountAutoApplyAll from './PackageDiscountAutoApplyAll'
 
 const InvoiceEditor = (): JSX.Element => {
   const { t } = useTranslation()
@@ -434,7 +433,14 @@ const InvoiceEditor = (): JSX.Element => {
         })
       }
     }
-  }, [setAllStudents, setCurrentActiveStudent, studentIdsToAssign, studentList, t, setInvoiceCampaign])
+  }, [
+    setAllStudents,
+    setCurrentActiveStudent,
+    studentIdsToAssign,
+    studentList,
+    t,
+    setInvoiceCampaign,
+  ])
 
   const isDisabledActions = useMemo(() => {
     return isCreating || isUpdating
@@ -489,8 +495,7 @@ const InvoiceEditor = (): JSX.Element => {
 
     const hasChanges = updated.some((s, i) => {
       return (
-        s.paymentDate?.toString() !==
-        allStudents[i].paymentDate?.toString()
+        s.paymentDate?.toString() !== allStudents[i].paymentDate?.toString()
       )
     })
     if (hasChanges) {

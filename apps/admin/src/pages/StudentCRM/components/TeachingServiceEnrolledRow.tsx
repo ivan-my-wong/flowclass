@@ -23,9 +23,7 @@ export const handleStatusPayment = (status: string, t: TFunction) => {
       return <Badge variant="success">{t('student:statusPaid')}</Badge>
     case PaymentState.PARTIALLY_PAID:
       return (
-        <Badge variant="secondary">
-          {t('student:statusPartiallyPaid')}
-        </Badge>
+        <Badge variant="secondary">{t('student:statusPartiallyPaid')}</Badge>
       )
     case PaymentState.UNPAID:
       return <Badge variant="light">{t('student:statusUnPaid')}</Badge>

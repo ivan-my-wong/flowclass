@@ -12,8 +12,6 @@ import { useRecoilState, useRecoilValue } from 'recoil'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import ModalDialog from '@/components/ui/ModalDialog'
-
-import 'react-datepicker/dist/react-datepicker.css'
 import { FEATURE_FLAG } from '@/constants/featureFlags'
 import { DEFAULT_CURRENCY } from '@/constants/invoices'
 import useInvoiceCampaignData from '@/hooks/useInvoiceCampaignData'
@@ -50,10 +48,12 @@ import ApplyCreditBalance from '../components/CourseAssigment/Invoice/ApplyCredi
 import { InvoiceEditDialogProvider } from '../components/CourseAssigment/Invoice/EditInvoiceContext'
 import InvoiceDiscount from '../components/CourseAssigment/Invoice/InvoiceDiscount'
 import InvoiceRemark from '../components/CourseAssigment/Invoice/InvoiceRemark'
-import SplitInvoice from '../components/CourseAssigment/Invoice/SplitInvoice'
 import SelectedCourseTable from '../components/CourseAssigment/Invoice/SelectedCourseTable'
+import SplitInvoice from '../components/CourseAssigment/Invoice/SplitInvoice'
 import InvoiceDeliveryMethods from '../components/SendInvoice/InvoiceDeliveryMethods'
 import InvoiceRecipients from '../components/SendInvoice/InvoiceRecipients'
+
+import 'react-datepicker/dist/react-datepicker.css'
 
 const PaymentDateAndCourses = () => {
   const { t } = useTranslation(['invoiceCampaign'])

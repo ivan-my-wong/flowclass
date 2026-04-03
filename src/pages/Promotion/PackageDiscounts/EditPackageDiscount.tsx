@@ -4,12 +4,12 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
+import Button from '@/components/Buttons/Button'
 import Box from '@/components/Containers/Box'
 import FullScreenLoading from '@/components/FullScreen/FullScreenLoading'
 import CustomedAlertDialog from '@/components/Popups/AlertDialog'
 import { CourseSelectorItem } from '@/components/Selector/CourseSelector'
 import { HeaderBackButtonStatus } from '@/components/TabWithListAndButton/HeaderBackButton'
-import Button from '@/components/Buttons/Button'
 import useCourseData from '@/hooks/useCourseData'
 import usePromotionData from '@/hooks/usePromotionData'
 import useSchoolData from '@/hooks/useSchoolData'
@@ -81,8 +81,7 @@ const EditPackageDiscount = (): JSX.Element => {
     setFormData({
       name: data.name,
       amountPerLesson: data.amountPerLesson,
-      selectedClassIds:
-        data.applicableClassIds?.map(id => id.toString()) ?? [],
+      selectedClassIds: data.applicableClassIds?.map(id => id.toString()) ?? [],
     })
   })
 

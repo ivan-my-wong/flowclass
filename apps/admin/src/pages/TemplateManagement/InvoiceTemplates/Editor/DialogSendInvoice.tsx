@@ -345,9 +345,7 @@ const DialogSendInvoice = () => {
       ) || 0
     return (
       totalPercentage === 100 &&
-      invoice.splitItems?.every(
-        item => item.percentage && item.percentage > 0
-      )
+      invoice.splitItems?.every(item => item.percentage && item.percentage > 0)
     )
   }, [isCombined, combinedInvoice, invoices])
 
@@ -373,10 +371,14 @@ const DialogSendInvoice = () => {
     if (isCombined) {
       const inv = form.getValues('combinedInvoice')
       if (!inv) return
-      form.setValue('combinedInvoice' as any, { ...inv, splitType: type }, {
-        shouldDirty: true,
-        shouldTouch: true,
-      })
+      form.setValue(
+        'combinedInvoice' as any,
+        { ...inv, splitType: type },
+        {
+          shouldDirty: true,
+          shouldTouch: true,
+        }
+      )
     } else {
       const inv = form.getValues('invoices')?.at(0)
       if (!inv) return

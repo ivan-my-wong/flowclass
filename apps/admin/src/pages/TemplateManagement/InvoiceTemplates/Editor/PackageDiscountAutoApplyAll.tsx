@@ -68,7 +68,7 @@ const PackageDiscountAutoApplyAll = (): null => {
       const newPackageDiscounts: AppliedPromotion[] = []
 
       studentClasses.forEach(invoiceClass => {
-        const classId = invoiceClass.classId
+        const { classId } = invoiceClass
         const availableLessons = availableLessonsByClass[classId]
         if (!availableLessons?.length) return
 
@@ -87,7 +87,7 @@ const PackageDiscountAutoApplyAll = (): null => {
           if (result.qualified) {
             const perLesson = parseFloat(String(pd.amountPerLesson)) || 0
             newPackageDiscounts.push({
-              id: `package-${pd.id}-${classId}`,
+              id: pd.id,
               name: pd.name,
               type: PromotionTypeItem.PACKAGE,
               discountType: 'fixedAmount' as DiscountType,
@@ -112,12 +112,12 @@ const PackageDiscountAutoApplyAll = (): null => {
       // Compare by ID + amount to detect both additions and value changes
       const existingPackageKey = (student.appliedPromotions ?? [])
         .filter(p => p.type === PromotionTypeItem.PACKAGE)
-        .map(p => `${p.id}:${p.amount}`)
+        .map(p => `${p.id}:${p.classId}:${p.amount}`)
         .sort()
         .join(',')
 
       const newKey = newPackageDiscounts
-        .map(p => `${p.id}:${p.amount}`)
+        .map(p => `${p.id}:${p.classId}:${p.amount}`)
         .sort()
         .join(',')
 
@@ -129,10 +129,10 @@ const PackageDiscountAutoApplyAll = (): null => {
       const existingIds = new Set(
         (student.appliedPromotions ?? [])
           .filter(p => p.type === PromotionTypeItem.PACKAGE)
-          .map(p => `${p.id}`)
+          .map(p => `${p.id}:${p.classId}`)
       )
       const hasNewIds = newPackageDiscounts.some(
-        p => !existingIds.has(`${p.id}`)
+        p => !existingIds.has(`${p.id}:${p.classId}`)
       )
       if (hasNewIds) hasAnyNewDiscount = true
 

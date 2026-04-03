@@ -44,9 +44,7 @@ const PackageDiscountDetail = (): JSX.Element => {
 
   const handleDelete = async () => {
     try {
-      await deleteMutation.mutateAsync(
-        parseInt(packageDiscountId || '0', 10)
-      )
+      await deleteMutation.mutateAsync(parseInt(packageDiscountId || '0', 10))
       navigate('/promotion/package-discounts')
     } catch (error) {
       console.error('Error deleting package discount:', error)
@@ -82,9 +80,7 @@ const PackageDiscountDetail = (): JSX.Element => {
       </Button>
       <Button
         onClick={() =>
-          navigate(
-            `/promotion/package-discounts/edit/${packageDiscountId}`
-          )
+          navigate(`/promotion/package-discounts/edit/${packageDiscountId}`)
         }
       >
         {t('common:action.edit')}
@@ -100,9 +96,7 @@ const PackageDiscountDetail = (): JSX.Element => {
   if (isError || !packageData) {
     return (
       <ContentLayout headerBackButton={headerBackButton}>
-        <FullScreenAlertBox
-          text={t('promotion:packageDiscount.notFound')}
-        />
+        <FullScreenAlertBox text={t('promotion:packageDiscount.notFound')} />
       </ContentLayout>
     )
   }
@@ -151,7 +145,9 @@ const PackageDiscountDetail = (): JSX.Element => {
                 <p className="font-semibold">
                   {packageData.isAllClasses
                     ? t('promotion:packageDiscount.allClasses')
-                    : `${packageData.applicableClassIds?.length ?? 0} ${t('promotion:packageDiscount.classes')}`}
+                    : `${packageData.applicableClassIds?.length ?? 0} ${t(
+                        'promotion:packageDiscount.classes'
+                      )}`}
                 </p>
               </div>
             </div>

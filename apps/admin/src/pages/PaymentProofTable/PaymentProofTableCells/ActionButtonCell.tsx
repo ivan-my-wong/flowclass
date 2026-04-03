@@ -15,8 +15,6 @@ import { toast } from 'sonner'
 
 import { fetchInvoicePdf } from '@/api/invoiceCampaign'
 import { Button } from '@/components/ui/Button'
-import useCustomMessageData from '@/hooks/useCustomMessageData'
-import { SupportedType } from '@/types/customMessage'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,11 +28,13 @@ import {
   TooltipTrigger,
 } from '@/components/ui/Tooltip'
 import { studentLinksBaseUrl } from '@/constants/enrollmentFormFieldNames'
+import useCustomMessageData from '@/hooks/useCustomMessageData'
 import useSchoolData from '@/hooks/useSchoolData'
 import { WHATSAPP_API_URL } from '@/pages/StudentCRM/components/WhatsappButton'
+import { SupportedType } from '@/types/customMessage'
 import { PaymentEvidence, PaymentProofTableItem } from '@/types/enrollCourse'
-import { getCmsOrigin } from '@/utils/generate-link.utils'
 import dayjs from '@/utils/dayjs'
+import { getCmsOrigin } from '@/utils/generate-link.utils'
 
 import InvoiceBreakdown from './InvoiceBreakdown'
 
@@ -103,10 +103,7 @@ const ActionButtonCell = ({
       .flatMap(ec => ec.enrollInto.map(ei => ei.secondLevelName))
       .join(', ')
 
-    const lines: string[] = [
-      `${schoolName} ${period} ${classNames} 學費單`,
-      '',
-    ]
+    const lines: string[] = [`${schoolName} ${period} ${classNames} 學費單`, '']
 
     const discountAmt = parseFloat(studentInfo.discountAmount || '0')
     if (discountAmt > 0) {
@@ -142,9 +139,7 @@ const ActionButtonCell = ({
 
         if (lessons.length > 0) {
           const dateStr = lessons.map(d => d.format('D')).join(', ')
-          lines.push(
-            `  日期: ${dateStr} / ${lessons[0].format('M')}`
-          )
+          lines.push(`  日期: ${dateStr} / ${lessons[0].format('M')}`)
         }
 
         const amt = ec.paymentAmount?.toLocaleString() ?? ''

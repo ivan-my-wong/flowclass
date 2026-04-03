@@ -96,7 +96,9 @@ const CreatePackageDiscount = (): JSX.Element => {
         name: formData.name,
         amountPerLesson: formData.amountPerLesson,
         isAllClasses: false,
-        applicableClassIds: formData.selectedClassIds.map(id => parseInt(id, 10)),
+        applicableClassIds: formData.selectedClassIds.map(id =>
+          parseInt(id, 10)
+        ),
       })
 
       navigate('/promotion/package-discounts')

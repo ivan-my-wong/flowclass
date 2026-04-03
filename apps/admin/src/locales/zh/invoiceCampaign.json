@@ -164,7 +164,9 @@
       "parentBadge": "家長",
       "parentName": "家長姓名",
       "phone": "電話",
+      "send": "發送",
       "sendToParent": "發送到家長：",
+      "sendToStudent": "發送到學生：",
       "studentBadge": "學生"
     },
     "invoiceType": "發票類型",

@@ -43,11 +43,6 @@ import {
   CreateBundleDiscountDto,
 } from '../types/bundleDiscounts'
 import {
-  CreatePackageDiscountDto,
-  PackageDiscount,
-  UpdatePackageDiscountDto,
-} from '../types/packageDiscounts'
-import {
   Coupon,
   CouponStatusEnum,
   CourseAndStudentProps,
@@ -56,6 +51,11 @@ import {
   HistoryCouponProps,
   StudentProps,
 } from '../types/coupon'
+import {
+  CreatePackageDiscountDto,
+  PackageDiscount,
+  UpdatePackageDiscountDto,
+} from '../types/packageDiscounts'
 
 import useSchoolData from './useSchoolData'
 

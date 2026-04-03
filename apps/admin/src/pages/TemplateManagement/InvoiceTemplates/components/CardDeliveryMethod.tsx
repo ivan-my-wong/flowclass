@@ -100,18 +100,6 @@ const CardDeliveryMethod: FC<Props> = ({
       }, 0)
     }
   }
-  const whatsappPlaceholder = useMemo(() => {
-    if (module === 'material') {
-      return t('setting:whatsappSetting.sendMaterialPlaceholder') as string
-    }
-    if (module === 'studentSubmission') {
-      return t(
-        'setting:whatsappSetting.sendStudentSubmissionPlaceholder'
-      ) as string
-    }
-    return t('editor.send.contentPlaceholder') as string
-  }, [module, t])
-
   const { currentSchool } = useSchoolData()
   const { useFetchCustomMessageData } = useCustomMessageData()
   const { data: customMessagesData } = useFetchCustomMessageData()
@@ -124,6 +112,18 @@ const CardDeliveryMethod: FC<Props> = ({
     )
     return invoiceMessage?.content || null
   }, [customMessagesData?.data])
+
+  const whatsappPlaceholder = useMemo(() => {
+    if (module === 'material') {
+      return t('setting:whatsappSetting.sendMaterialPlaceholder') as string
+    }
+    if (module === 'studentSubmission') {
+      return t(
+        'setting:whatsappSetting.sendStudentSubmissionPlaceholder'
+      ) as string
+    }
+    return defaultWhatsAppMessage ?? (t('editor.send.contentPlaceholder') as string)
+  }, [module, t, defaultWhatsAppMessage])
 
   // Set default values based on school settings
   useEffect(() => {

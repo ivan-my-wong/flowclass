@@ -79,6 +79,7 @@ export type SingleStudentCrmRecordEnrolledClassesInvoice = {
   usedBalance: number
   proofToken?: string
   remark?: string | null
+  documentCampaignId?: number | null
 }
 
 export type SingleStudentCrmRecordEnrolledClassesStudentSchedule = {

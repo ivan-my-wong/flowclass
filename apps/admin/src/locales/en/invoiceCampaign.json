@@ -152,7 +152,9 @@
       "parentBadge": "Parent",
       "parentName": "Parent Name",
       "phone": "Phone",
+      "send": "Send",
       "sendToParent": "Send to parent:",
+      "sendToStudent": "Send to student:",
       "studentBadge": "Student"
     },
     "invoiceType": "Invoice Type",

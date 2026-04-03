@@ -15,7 +15,6 @@ import {
   invoiceClassesState,
   invoiceSessionState,
 } from '@/stores/studentInvoice.store'
-import { isPackageDiscountQualified } from '@/utils/invoice-campaign.utils'
 import {
   AllPromotionsType,
   AppliedPromotion,
@@ -25,6 +24,7 @@ import {
 } from '@/types/studentInvoice.type'
 import { cn } from '@/utils/cn'
 import { formatCurrency } from '@/utils/currency'
+import { isPackageDiscountQualified } from '@/utils/invoice-campaign.utils'
 
 import BundleDiscountStatus from './BundleDiscountStatus'
 import { useContextInvoiceEditDialog } from './EditInvoiceContext'
@@ -68,17 +68,13 @@ const PromotionItem: React.FC<Props> = ({ promo, isApplied }): JSX.Element => {
     const pd = promo as any
     // Check each class in the invoice for qualification
     for (const invoiceClass of currentClasses) {
-      const classId = invoiceClass.classId
+      const { classId } = invoiceClass
       const isApplicable =
         pd.isAllClasses || pd.applicableClassIds?.includes(classId)
       if (!isApplicable) continue
       const available = availableLessonsByClass[classId]
       if (!available?.length) continue
-      const result = isPackageDiscountQualified(
-        allSessions,
-        available,
-        classId
-      )
+      const result = isPackageDiscountQualified(allSessions, available, classId)
       if (result.qualified) return true
     }
     return false
@@ -284,9 +280,7 @@ const PromotionItem: React.FC<Props> = ({ promo, isApplied }): JSX.Element => {
                 </span>
               ) : (
                 <span className="text-gray-500">
-                  {t(
-                    'invoiceCampaign:editor.packageDiscount.selectAllLessons'
-                  )}
+                  {t('invoiceCampaign:editor.packageDiscount.selectAllLessons')}
                 </span>
               )}
             </div>
@@ -323,7 +317,9 @@ const PromotionItem: React.FC<Props> = ({ promo, isApplied }): JSX.Element => {
         )}
       </div>
       <div className="flex items-center gap-3 text-right">
-        <div className="text-sm font-semibold text-gray-800 whitespace-nowrap">{amountLabel}</div>
+        <div className="text-sm font-semibold text-gray-800 whitespace-nowrap">
+          {amountLabel}
+        </div>
         {promo.promotionType === PromotionTypeItem.BUNDLE && promo.id ? (
           <BundleDiscountStatus
             bundleId={promo.id}
@@ -344,11 +340,7 @@ const PromotionItem: React.FC<Props> = ({ promo, isApplied }): JSX.Element => {
           <Button
             type="button"
             className="h-8 min-w-24 w-32 ml-auto"
-            variant={
-              isPackageAlreadyApplied
-                ? 'default'
-                : 'primary-outline'
-            }
+            variant={isPackageAlreadyApplied ? 'default' : 'primary-outline'}
             disabled={!isPackageQualified && !isPackageAlreadyApplied}
             iconBefore={
               isPackageAlreadyApplied ? (

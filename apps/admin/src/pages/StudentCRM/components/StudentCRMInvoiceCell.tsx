@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
 import { HiOutlinePencilSquare } from 'react-icons/hi2'
+import { LuExternalLink } from 'react-icons/lu'
 import { MdOutlineDelete, MdSave } from 'react-icons/md'
 import { useMutation } from 'react-query'
 import { toast } from 'sonner'

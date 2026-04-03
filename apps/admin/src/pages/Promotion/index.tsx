@@ -85,7 +85,7 @@ const Promotion = (): JSX.Element => {
             icon={BundleDiscountIcon}
             title={t('promotion:titles.packageDiscount')}
             numOfPromotion={packageDiscountData?.length || 0}
-            haveAccess={true}
+            haveAccess
             url="/promotion/package-discounts"
           />
         )}

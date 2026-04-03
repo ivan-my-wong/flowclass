@@ -63,7 +63,11 @@ const CreatePackageDiscountForm = ({
   return (
     <Box direction="column" css={{ width: '100%', gap: '24px' }}>
       {/* Name */}
-      <Box direction="column" align="flex-start" css={{ width: '100%', gap: '8px' }}>
+      <Box
+        direction="column"
+        align="flex-start"
+        css={{ width: '100%', gap: '8px' }}
+      >
         <Label css={{ width: '100%', textAlign: 'left', fontWeight: 500 }}>
           {t('promotion:packageDiscount.form.name')}
         </Label>
@@ -77,7 +81,11 @@ const CreatePackageDiscountForm = ({
       </Box>
 
       {/* Amount Per Lesson */}
-      <Box direction="column" align="flex-start" css={{ width: '100%', gap: '8px' }}>
+      <Box
+        direction="column"
+        align="flex-start"
+        css={{ width: '100%', gap: '8px' }}
+      >
         <Label css={{ width: '100%', textAlign: 'left', fontWeight: 500 }}>
           {t('promotion:packageDiscount.form.amountPerLesson')}
         </Label>
@@ -102,8 +110,11 @@ const CreatePackageDiscountForm = ({
         <Label css={{ width: '100%', textAlign: 'left', fontWeight: 500 }}>
           {t('promotion:packageDiscount.form.selectClasses')}
           {formData.selectedClassIds.length > 0 && (
-            <span style={{ fontWeight: 400, color: '#6b7280', marginLeft: '8px' }}>
-              ({formData.selectedClassIds.length} {t('promotion:packageDiscount.form.selected')})
+            <span
+              style={{ fontWeight: 400, color: '#6b7280', marginLeft: '8px' }}
+            >
+              ({formData.selectedClassIds.length}{' '}
+              {t('promotion:packageDiscount.form.selected')})
             </span>
           )}
         </Label>
@@ -151,7 +162,9 @@ const CreatePackageDiscountForm = ({
                 onChange={e => {
                   const newList = e.target.checked
                     ? [...formData.selectedClassIds, classItem.value]
-                    : formData.selectedClassIds.filter(i => i !== classItem.value)
+                    : formData.selectedClassIds.filter(
+                        i => i !== classItem.value
+                      )
                   updateFormData({ selectedClassIds: newList })
                 }}
               />
@@ -172,9 +185,7 @@ const CreatePackageDiscountForm = ({
       <Box justify="flex-end" css={{ width: '100%', marginTop: '8px' }}>
         <Button onClick={onSubmit}>
           {submitButtonText ??
-            (isEditing
-              ? t('common:action.update')
-              : t('common:action.create'))}
+            (isEditing ? t('common:action.update') : t('common:action.create'))}
         </Button>
       </Box>
     </Box>
