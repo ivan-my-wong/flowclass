@@ -3,7 +3,6 @@ import { Expose, Type } from 'class-transformer'
 import {
   IsArray,
   IsBoolean,
-  IsDateString,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -71,16 +70,6 @@ export class CreatePackageDiscountDto {
   @IsArray()
   @Type(() => Number)
   applicableClassIds?: number[]
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsDateString()
-  startDate?: string
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsDateString()
-  endDate?: string
 }
 
 export class UpdatePackageDiscountDto {
@@ -104,14 +93,4 @@ export class UpdatePackageDiscountDto {
   @IsArray()
   @Type(() => Number)
   applicableClassIds?: number[]
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsDateString()
-  startDate?: string
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsDateString()
-  endDate?: string
 }

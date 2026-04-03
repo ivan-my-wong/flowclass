@@ -1,8 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { IsArray, IsEnum, IsNotEmpty, IsOptional } from 'class-validator'
 
-import { SupportedType } from '../../custom-messages/dto/custom-message.dto'
-
 class StudentMemoBaseDto {
   @ApiProperty({ example: 75 })
   @IsNotEmpty()
@@ -60,10 +58,10 @@ export class StudentNotificationSettings {
   @IsNotEmpty()
   id: number
 
-  @ApiProperty({ example: SupportedType.ADMIN_NOTIF_AFTER_ENROLLMENT_SUBMITTED })
+  @ApiProperty({ example: StudentNotificationType.PAYMENT_REMINDER })
   @IsEnum(StudentNotificationType)
   @IsNotEmpty()
-  notificationType: SupportedType
+  notificationType: StudentNotificationType
 
   @ApiProperty({ example: true })
   @IsNotEmpty()

@@ -23,12 +23,6 @@ export class PackageDiscount extends BaseEntity {
   @Column('int', { array: true, name: 'applicable_class_ids', nullable: true })
   applicableClassIds?: number[] // required if isAllClasses = false
 
-  @Column({ name: 'start_date', type: 'timestamp', nullable: true })
-  startDate?: Date
-
-  @Column({ name: 'end_date', type: 'timestamp', nullable: true })
-  endDate?: Date
-
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive: boolean
 }
