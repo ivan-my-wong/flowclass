@@ -196,19 +196,11 @@ const StudentSelectionDialog: React.FC<Props> = ({
             }
           }
 
-          if (student.studentMemo) {
-            if (student.studentMemo.name) {
-              currentName = student.studentMemo.name
-            }
-          }
-
           return {
             ...student,
             name: currentName,
             email: currentEmail,
             phone: currentPhone,
-            updatedAt: student?.studentMemo?.updatedAt ?? new Date(),
-            createdAt: student?.studentMemo?.createdAt ?? new Date(),
           }
         })
         .filter(({ enrollCourses }) => {

@@ -21,11 +21,7 @@ import {
   StudentSubmissionType,
   TeacherFeedbackType,
 } from './student-submission'
-import {
-  GetStudentMemoOnlyContactResponseDto,
-  StudentInfoResponse,
-  UserAlias,
-} from './studentMemo'
+import { UserAlias } from './studentMemo'
 
 export type EnrolInto = {
   type: ClassTypeEnum
@@ -126,10 +122,8 @@ export type StudentEnrolmentRecord = {
   // fullName?: string
   user: SingleStudentCrmRecord
   enrollCourses?: SingleStudentCrmRecordEnrollCourse[]
-  /** Deprecated  @deprecated */
-  studentMemo?: GetStudentMemoOnlyContactResponseDto
+  remarks?: string | null
   studentForms: StudentFormListResponse[]
-  // studentMemos?: GetStudentMemoOnlyContactResponseDto[]
   isStudentParent?: boolean
   childOfUserAliasId?: number
   usedBalance?: number
@@ -593,8 +587,6 @@ export type ImportStudentResponse = {
   }
 
   userAlias: UserAlias
-
-  studentMemo: StudentInfoResponse
 
   customFields: StudentFormResponse[]
 }

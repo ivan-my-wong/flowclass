@@ -22,8 +22,6 @@ export const ATOM_KEY = {
   InformationFieldState: 'InformationFieldState',
   ApplicationFormState: 'ApplicationFormState',
   AiState: 'aiState',
-  RemarkState: 'RemarkState',
-  WhatsappTemplate: 'WhatsappTemplate',
   NotificationSettingState: 'NotificationSettingState',
   RequiredParamsState: 'RequiredParamsState',
   ClassEditState: 'ClassEditState',

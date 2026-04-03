@@ -47,7 +47,6 @@ import {
   StudentUpdateTeachingServiceRequestDto,
 } from '@/types/studentAddTeachingService'
 import {
-  AddStudentMemoRequestDto,
   EditStudentContactInfoRequestDto,
   EditStudentContactInfoV2RequestDto,
   StudentInfoResponse,
@@ -709,17 +708,14 @@ export const sendAddLessonNotiReq = async (
   return res.data.data
 }
 
-export const addMemo = async (
-  params: AddStudentMemoRequestDto
-): Promise<StudentInfoResponse> => {
-  const res = await apiClient.post({
+export const updateRemarks = async (params: {
+  userAliasId: number
+  remarks: string | null
+}): Promise<{ id: number; remarks: string | null }> => {
+  const res = await apiClient.patch({
     needAuth: true,
-    url: '/admin/student-onboard/add-memo',
-    data: {
-      userId: params.userId,
-      institutionId: params.institutionId,
-      memo: params.memo,
-    },
+    url: '/admin/student-onboard/update-remarks',
+    data: params,
   })
   return res.data.data
 }

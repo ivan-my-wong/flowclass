@@ -1,7 +1,7 @@
 import { QRCodeAttendanceDto } from '@/pages/StudentCRM/QRCode/QRCodeScan'
 import { ClassTypeEnum, Course } from '@/types/course'
 import { IPaginatedData, PaginateOptionParams } from '@/types/pagination'
-import { StudentInfoResponse, UserAlias } from '@/types/studentMemo'
+import { UserAlias } from '@/types/studentMemo'
 
 import { MediaMaterialsType } from './class-material'
 import { Classes } from './classes'
@@ -32,8 +32,6 @@ export type StudentType = {
 
   lessons?: number
   completedLessons?: number
-  userMemo?: StudentInfoResponse
-
   classLessonId?: number
   enrollCourse?: EnrollCourseInstance
 

@@ -321,7 +321,6 @@ const StudentDetail = (): React.ReactElement => {
                 disabled={isDisabled}
                 enrollmentForm={enrollmentForm}
                 studentEnrollment={studentEnrollment}
-                studentMemo={personalInfo?.studentMemo}
               />
             )}
           </Box>
