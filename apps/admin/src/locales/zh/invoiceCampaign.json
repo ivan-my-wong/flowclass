@@ -74,6 +74,12 @@
       "label": "付款開始日期",
       "placeholder": "輸入帳單開始日期"
     },
+    "packageDiscount": {
+      "perLesson": "{{amount}} / 每課",
+      "autoApplied": "已自動套用",
+      "autoLabel": "自動",
+      "selectAllLessons": "選擇當月所有課堂即可啟用"
+    },
     "bundleDiscount": {
       "alert": "再添加 {{qty}} 門課程即可享受此折扣。此折扣不會顯示在您的發票上",
       "current": "當前",
@@ -211,7 +217,6 @@
       "sendProgress": "正在創建發票...",
       "sentInvoices": "已創建發票",
       "subject": "郵件主題",
-      "subjectPlaceholder": "{{studentName}} 的發票",
       "subjectRequired": "郵件主題必填",
       "subtitle": "請在發送之前檢查發票詳情。",
       "title": "創建發票文檔",
@@ -315,6 +320,7 @@
       "availableDiscounts": "可用折扣",
       "bundle": "套餐",
       "coupon": "優惠券",
+      "package": "全月折扣",
       "discountNamePlaceholder": "折扣名稱",
       "noCouponAvailable": "沒有可用的優惠券",
       "noDiscountSelected": "未選擇折扣",

@@ -573,6 +573,7 @@
     "sendCustomMessages": "發送自定義訊息",
     "sendCustomMessagesSuccess": "發送自定義訊息成功",
     "sendNotifications": "發送通知",
+    "sendInvoice": "發送學費單",
     "sendPaymentReminder": "重新發送上傳付款記錄通知",
     "sendPaymentSuccess": "重新發送成功付款收據",
     "sendQrCode": "重新發送二維碼",

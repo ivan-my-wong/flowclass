@@ -11,9 +11,7 @@ import {
   useState,
 } from 'react'
 
-import { useTranslation } from 'react-i18next'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { toast } from 'sonner'
 
 import { DEFAULT_CURRENCY } from '@/constants/invoices'
 import useSchoolData from '@/hooks/useSchoolData'
@@ -21,7 +19,6 @@ import useSiteData from '@/hooks/useSiteData'
 import useStudentInvoice from '@/hooks/useStudentInvoice'
 import {
   appliedPromotionsState,
-  availableLessonsByClassState,
   currentActiveParentState,
   currentActiveStudentState,
   invoiceCampaignState,
@@ -43,13 +40,11 @@ import {
   PromotionTypeItem,
 } from '@/types/studentInvoice.type'
 import { formatCurrency } from '@/utils/currency'
-import { PackageDiscount } from '@/types/packageDiscounts'
 import {
   calculateTotalDiscount,
   composeClassesAndSessions,
   formatTotalPriceInvoice,
   getUniqueCourseIds,
-  isPackageDiscountQualified,
 } from '@/utils/invoice-campaign.utils'
 
 export const generateDefaultInvoiceInstallment = (): InvoiceSplit => {
@@ -144,141 +139,6 @@ const InvoiceEditDialogContext = createContext<
   InvoiceEditDialogContextType | undefined
 >(undefined)
 
-/**
- * Component that auto-applies/removes package discounts based on session selection.
- * When all lessons in a calendar month for an applicable class are selected, the discount is applied.
- */
-const PackageDiscountAutoApply = ({
-  allPromotions,
-  currentClasses,
-  allSessions,
-  availableLessonsByClass,
-  appliedPromotions,
-  setAppliedPromotions,
-  currentActiveStudent,
-  currentActiveParent,
-  isCombined,
-}: {
-  allPromotions: AllPromotionsType[]
-  currentClasses: any[]
-  allSessions: any[]
-  availableLessonsByClass: Record<number, { id: number; date: string }[]>
-  appliedPromotions: AppliedPromotion[]
-  setAppliedPromotions: Dispatch<SetStateAction<AppliedPromotion[]>>
-  currentActiveStudent: any
-  currentActiveParent: any
-  isCombined: boolean
-}): null => {
-  const { t } = useTranslation()
-  const prevAppliedRef = useRef<Set<string>>(new Set())
-
-  useEffect(() => {
-    // Get package discount promotions
-    const packagePromotions = (allPromotions ?? []).filter(
-      (promo: any) =>
-        'promotionType' in promo &&
-        promo.promotionType === PromotionTypeItem.PACKAGE
-    ) as PackageDiscount[]
-
-    if (packagePromotions.length === 0 || currentClasses.length === 0) return
-
-    const newPackageApplied: AppliedPromotion[] = []
-    const appliedKeys = new Set<string>()
-
-    // For each class in the current invoice, check each package discount
-    currentClasses.forEach(invoiceClass => {
-      const classId = invoiceClass.classId
-      const availableLessons = availableLessonsByClass[classId]
-      if (!availableLessons || availableLessons.length === 0) return
-
-      packagePromotions.forEach(pd => {
-        // Check if this package discount applies to this class
-        const isApplicable =
-          pd.isAllClasses ||
-          (pd.applicableClassIds?.includes(classId) ?? false)
-        if (!isApplicable || !pd.isActive) return
-
-        // Check if all lessons in a calendar month are selected
-        const result = isPackageDiscountQualified(
-          allSessions,
-          availableLessons,
-          classId
-        )
-
-        if (result.qualified) {
-          const key = `package-${pd.id}-${classId}`
-          appliedKeys.add(key)
-
-          newPackageApplied.push({
-            id: `package-${pd.id}-${classId}`,
-            name: pd.name,
-            type: PromotionTypeItem.PACKAGE,
-            discountType: 'fixedAmount' as DiscountType,
-            amount: pd.amountPerLesson * result.lessonCount,
-            order: 0, // Will be set below
-            isApplicable: true,
-            feeType: 'deduct',
-            packageDiscountPerLesson: pd.amountPerLesson,
-            classId,
-            studentId: isCombined
-              ? null
-              : currentActiveStudent?.id ?? null,
-            parentId: isCombined
-              ? currentActiveParent?.id ?? null
-              : null,
-          })
-        }
-      })
-    })
-
-    // Update applied promotions: remove old package discounts, add new qualified ones
-    setAppliedPromotions(prev => {
-      const nonPackage = prev.filter(
-        p => p.type !== PromotionTypeItem.PACKAGE
-      )
-      // Keep package discounts for OTHER students (not current)
-      const otherStudentPackage = prev.filter(p => {
-        if (p.type !== PromotionTypeItem.PACKAGE) return false
-        if (isCombined) {
-          return p.parentId !== (currentActiveParent?.id ?? null)
-        }
-        return p.studentId !== (currentActiveStudent?.id ?? null)
-      })
-
-      const lastOrder = [...nonPackage, ...otherStudentPackage]
-        .sort((a, b) => b.order - a.order)
-        .at(0)?.order ?? 0
-
-      const withOrders = newPackageApplied.map((p, idx) => ({
-        ...p,
-        order: lastOrder + idx + 1,
-      }))
-
-      // Show toast when new package discounts are applied
-      const newKeys = new Set(withOrders.map(p => `${p.id}`))
-      const prevKeys = prevAppliedRef.current
-      const trulyNew = [...newKeys].filter(k => !prevKeys.has(k))
-      if (trulyNew.length > 0) {
-        toast.success(t('promotion:packageDiscount.autoApplied'))
-      }
-      prevAppliedRef.current = newKeys
-
-      return [...nonPackage, ...otherStudentPackage, ...withOrders]
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    allPromotions,
-    currentClasses,
-    allSessions,
-    availableLessonsByClass,
-    currentActiveStudent?.id,
-    currentActiveParent?.id,
-    isCombined,
-  ])
-
-  return null
-}
-
 export const InvoiceEditDialogProvider = ({
   children,
 }: {
@@ -314,11 +174,9 @@ export const InvoiceEditDialogProvider = ({
   >({})
   const listStudents = useRecoilValue(studentListState)
   const listInvoiceStudents = useRecoilValue(invoiceStudentState)
-  const availableLessonsByClass = useRecoilValue(availableLessonsByClassState)
   const [appliedPromotions, setAppliedPromotions] = useRecoilState(
     appliedPromotionsState
   )
-  const { t } = useTranslation()
   const [isPayByCredit, setPayByCredit] = useState<boolean>(true)
   const [creditBalance, setCreditBalance] = useState<number>(0)
   const [totalPrice, setTotalPrice] = useState<InvoiceTotalPrice | null>(null)
@@ -961,18 +819,6 @@ export const InvoiceEditDialogProvider = ({
   }, [isPayByCredit, setInvoiceCampaign])
 
   return (
-    <>
-    <PackageDiscountAutoApply
-      allPromotions={allPromotions ?? []}
-      currentClasses={currentClasses}
-      allSessions={allSessions}
-      availableLessonsByClass={availableLessonsByClass}
-      appliedPromotions={appliedPromotions}
-      setAppliedPromotions={setAppliedPromotions}
-      currentActiveStudent={currentActiveStudent}
-      currentActiveParent={currentActiveParent}
-      isCombined={invoiceCampaign?.isCombined ?? false}
-    />
     <InvoiceEditDialogContext.Provider
       value={{
         isInvoiceSplitValid,
@@ -1005,7 +851,6 @@ export const InvoiceEditDialogProvider = ({
     >
       {children}
     </InvoiceEditDialogContext.Provider>
-    </>
   )
 }
 

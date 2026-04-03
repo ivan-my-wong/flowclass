@@ -11,7 +11,7 @@ export const defaultWhatsappTemplate: CustomMessage = {
   name: '',
   content: '',
   repeaterFormat: '',
-  type: SupportedType.STUDENT_NOTIF_AFTER_ENROLLMENT_SUBMITTED,
+  type: SupportedType.CREATE_INVOICE,
 }
 
 export const customMessageOptions: CustomMessageType[] = [

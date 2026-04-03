@@ -54,6 +54,8 @@ import {
 } from '@/types/studentInvoice.type'
 import type { InvoiceCampaign } from '@/types/templateManagement'
 import dayjs from '@/utils/dayjs'
+
+import PackageDiscountAutoApplyAll from './PackageDiscountAutoApplyAll'
 import {
   buildInvoiceCampaignData,
   createSessionId,
@@ -533,6 +535,7 @@ const InvoiceEditor = (): JSX.Element => {
 
   return (
     <InvoiceEditorProvider>
+      <PackageDiscountAutoApplyAll />
       <ContentLayout
         headerBackButton={{
           mode: 'back',

@@ -1,5 +1,4 @@
 import {
-  CalendarIcon,
   EyeOpenIcon,
   Pencil1Icon,
   TrashIcon,
@@ -33,11 +32,6 @@ const PackageDiscountCard = ({
   onDetail?: () => void
 }): JSX.Element => {
   const { t } = useTranslation()
-
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return '-'
-    return new Date(dateStr).toLocaleDateString()
-  }
 
   return (
     <div className="w-full">
@@ -80,16 +74,6 @@ const PackageDiscountCard = ({
           </span>
         </div>
       </div>
-
-      {(packageDiscount.startDate || packageDiscount.endDate) && (
-        <div className="flex items-center gap-1 text-sm text-gray-500 mb-3">
-          <CalendarIcon className="w-4 h-4" />
-          <span>
-            {formatDate(packageDiscount.startDate)} -{' '}
-            {formatDate(packageDiscount.endDate)}
-          </span>
-        </div>
-      )}
 
       <div className="flex gap-2 justify-end">
         {onDetail && (

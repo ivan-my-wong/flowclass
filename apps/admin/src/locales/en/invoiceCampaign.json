@@ -76,6 +76,12 @@
       "label": "Payment Start Date",
       "placeholder": "Enter billing start date"
     },
+    "packageDiscount": {
+      "perLesson": "{{amount}} / lesson",
+      "autoApplied": "Auto-applied",
+      "autoLabel": "Auto",
+      "selectAllLessons": "Select all lessons in a month to activate"
+    },
     "bundleDiscount": {
       "alert": "Add {{qty}} more classes to qualify for this discount. This discount will not appear on your invoices",
       "current": "Current",
@@ -200,7 +206,6 @@
       "sendSingleButton": "Send Invoice",
       "sentInvoices": "Sent Invoices",
       "subject": "Email Subject",
-      "subjectPlaceholder": "Invoice for {{studentName}}",
       "subjectRequired": "Email subject is required",
       "subtitle": "Please review the invoice details before sending.",
       "title": "Send Invoice Documents",
@@ -304,10 +309,11 @@
       "availableDiscounts": "Available Discounts",
       "bundle": "Bundle",
       "coupon": "Coupon",
+      "package": "Package",
       "discountNamePlaceholder": "Discount name",
       "noCouponAvailable": "No coupon available",
       "noDiscountSelected": "No discount selected",
-      "notApplicable": "This promotion is inactive or has expired",
+      "notApplicable": "Not Applicable",
       "bundleNotApplicable": "Not Applicable",
       "offAmount": "{{discountAmount}} off",
       "quotaUnlimited": "Unlimited",

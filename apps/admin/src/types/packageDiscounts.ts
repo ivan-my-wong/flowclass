@@ -10,8 +10,6 @@ export type PackageDiscount = {
   amountPerLesson: number
   isAllClasses: boolean
   applicableClassIds: number[] | null
-  startDate: string // ISO string from API
-  endDate: string // ISO string from API
   isActive: boolean
 }
 
@@ -22,8 +20,6 @@ export type CreatePackageDiscountDto = {
   amountPerLesson: number
   isAllClasses: boolean
   applicableClassIds: number[] | null
-  startDate: Date
-  endDate: Date
 }
 
 export type UpdatePackageDiscountDto = {

@@ -82,47 +82,47 @@ const PreviewInvoiceContent = () => {
       : currentActiveStudent?.phone ?? ''
   }, [isCombined, currentActiveParent, currentActiveStudent])
 
+  const paymentDate = useMemo(() => {
+    if (!currentActiveStudent) return null
+    return currentActiveStudent.paymentDate
+      ? new Date(currentActiveStudent.paymentDate)
+      : null
+  }, [currentActiveStudent])
+
   return (
     <div className="p-8">
-      {/* Invoice For Section */}
-      <div className="mb-8 p-4 bg-blue-50 rounded-lg">
-        <h3 className="text-lg font-semibold text-blue-900 mb-2">
-          {t('editor.invoicePreview.invoiceFor', {
-            studentName,
-          })}
-        </h3>
-        <p className="text-blue-700">
-          {[studentEmail, studentPhone].filter(Boolean).join(' • ')}
-        </p>
-      </div>
-
       {/* Invoice Header */}
-      <div className="flex justify-between items-start mb-12">
+      <div className="flex justify-between items-start mb-8">
         <div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4 uppercase">
-            {t('editor.invoicePreview.invoice')}
-          </h1>
-          <div className="text-gray-600 space-y-1">
-            {/* <p className="font-semibold">{currentInvoice?.invoiceNumber}</p> */}
-            {/* <p>Date: {currentInvoice?.}</p> */}
-            {/* <p>{currentInvoice.phone}</p> */}
-          </div>
+          <h3 className="text-lg font-semibold text-gray-900">
+            {studentName}
+          </h3>
+          <p className="text-sm text-gray-500">
+            {[studentEmail, studentPhone].filter(Boolean).join(' • ')}
+          </p>
         </div>
         <div className="text-right text-gray-600">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-xl font-bold text-gray-900 mb-1">
             {currentSchool?.name}
           </h2>
-          <div className="space-y-1">
-            {currentSchool?.address?.addressLine1 && (
-              <p>{currentSchool.address.addressLine1}</p>
-            )}
-            {currentSchool?.address?.city && (
-              <p>{currentSchool.address.city}</p>
-            )}
-            {currentSchool?.email && <p>{currentSchool.email}</p>}
-          </div>
         </div>
       </div>
+
+      {/* Payment Date */}
+      {paymentDate && (
+        <div className="mb-4 flex items-center gap-2 text-sm text-gray-600">
+          <span className="font-medium">
+            {t('editor.paymentDate')}:
+          </span>
+          <span>
+            {paymentDate.toLocaleDateString(undefined, {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </span>
+        </div>
+      )}
 
       {/* Invoice Table */}
       <div className="mb-8">

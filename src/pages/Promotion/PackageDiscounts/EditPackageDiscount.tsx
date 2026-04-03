@@ -70,10 +70,7 @@ const EditPackageDiscount = (): JSX.Element => {
   const [formData, setFormData] = useState<PackageFormData>({
     name: '',
     amountPerLesson: 0,
-    applyToAllClasses: true,
     selectedClassIds: [],
-    startDate: null,
-    endDate: null,
   })
 
   const {
@@ -84,11 +81,8 @@ const EditPackageDiscount = (): JSX.Element => {
     setFormData({
       name: data.name,
       amountPerLesson: data.amountPerLesson,
-      applyToAllClasses: data.isAllClasses,
       selectedClassIds:
         data.applicableClassIds?.map(id => id.toString()) ?? [],
-      startDate: new Date(data.startDate),
-      endDate: new Date(data.endDate),
     })
   })
 
@@ -110,23 +104,16 @@ const EditPackageDiscount = (): JSX.Element => {
       toast.error(t('promotion:packageDiscount.errors.amountRequired'))
       return
     }
-    if (!formData.startDate || !formData.endDate) {
-      toast.error(t('promotion:errors.datesRequired'))
-      return
-    }
-
     try {
       await updateMutation.mutateAsync({
         packageDiscountId: parsedId,
         patch: {
           name: formData.name,
           amountPerLesson: formData.amountPerLesson,
-          isAllClasses: formData.applyToAllClasses,
-          applicableClassIds: formData.applyToAllClasses
-            ? null
-            : formData.selectedClassIds.map(id => parseInt(id, 10)),
-          startDate: formData.startDate,
-          endDate: formData.endDate,
+          isAllClasses: false,
+          applicableClassIds: formData.selectedClassIds.map(id =>
+            parseInt(id, 10)
+          ),
         },
       })
 

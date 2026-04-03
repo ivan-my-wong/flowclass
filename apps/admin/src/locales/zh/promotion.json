@@ -186,6 +186,10 @@
       "applyToAllClassesHint": "啟用後，此折扣適用於所有班級",
       "selectClasses": "選擇班級",
       "noClassesAvailable": "沒有可用班級",
+      "noMatchingClasses": "沒有符合搜尋的班級",
+      "searchClasses": "搜尋班級...",
+      "selected": "已選擇",
+      "selectAllVisible": "全選 ({{count}})",
       "startDate": "開始日期",
       "endDate": "結束日期"
     }

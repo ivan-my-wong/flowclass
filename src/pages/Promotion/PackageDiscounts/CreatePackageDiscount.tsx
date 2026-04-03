@@ -20,10 +20,7 @@ import CreatePackageDiscountForm from './CreatePackageDiscountForm'
 export interface PackageFormData {
   name: string
   amountPerLesson: number
-  applyToAllClasses: boolean
   selectedClassIds: string[]
-  startDate: Date | null
-  endDate: Date | null
 }
 
 const classesToSelectorItems = (
@@ -67,10 +64,7 @@ const CreatePackageDiscount = (): JSX.Element => {
   const [formData, setFormData] = useState<PackageFormData>({
     name: '',
     amountPerLesson: 0,
-    applyToAllClasses: true,
     selectedClassIds: [],
-    startDate: null,
-    endDate: null,
   })
 
   const currentInstitutionId = schoolData.currentSchool?.id || 0
@@ -91,30 +85,18 @@ const CreatePackageDiscount = (): JSX.Element => {
       toast.error(t('promotion:packageDiscount.errors.amountRequired'))
       return
     }
-    if (
-      !formData.applyToAllClasses &&
-      formData.selectedClassIds.length === 0
-    ) {
+    if (formData.selectedClassIds.length === 0) {
       toast.error(t('promotion:errors.classRequired'))
       return
     }
-    if (!formData.startDate || !formData.endDate) {
-      toast.error(t('promotion:errors.datesRequired'))
-      return
-    }
-
     try {
       await createMutation.mutateAsync({
         siteId: currentSiteId,
         institutionId: currentInstitutionId,
         name: formData.name,
         amountPerLesson: formData.amountPerLesson,
-        isAllClasses: formData.applyToAllClasses,
-        applicableClassIds: formData.applyToAllClasses
-          ? null
-          : formData.selectedClassIds.map(id => parseInt(id, 10)),
-        startDate: formData.startDate,
-        endDate: formData.endDate,
+        isAllClasses: false,
+        applicableClassIds: formData.selectedClassIds.map(id => parseInt(id, 10)),
       })
 
       navigate('/promotion/package-discounts')

@@ -1,17 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import { useTranslation } from 'react-i18next'
-import { LuPlus } from 'react-icons/lu'
+import { LuCheck, LuPlus } from 'react-icons/lu'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/Button'
 import useSiteData from '@/hooks/useSiteData'
 import {
+  availableLessonsByClassState,
   currentActiveParentState,
   currentActiveStudentState,
   invoiceCampaignState,
+  invoiceClassesState,
+  invoiceSessionState,
 } from '@/stores/studentInvoice.store'
+import { isPackageDiscountQualified } from '@/utils/invoice-campaign.utils'
 import {
   AllPromotionsType,
   AppliedPromotion,
@@ -54,18 +58,68 @@ const PromotionItem: React.FC<Props> = ({ promo, isApplied }): JSX.Element => {
     [invoiceCampaign?.isCombined]
   )
 
+  // Package discount qualification check
+  const availableLessonsByClass = useRecoilValue(availableLessonsByClassState)
+  const allSessions = useRecoilValue(invoiceSessionState)
+  const currentClasses = useRecoilValue(invoiceClassesState)
+
+  const isPackageQualified = useMemo(() => {
+    if (promo.promotionType !== PromotionTypeItem.PACKAGE) return false
+    const pd = promo as any
+    // Check each class in the invoice for qualification
+    for (const invoiceClass of currentClasses) {
+      const classId = invoiceClass.classId
+      const isApplicable =
+        pd.isAllClasses || pd.applicableClassIds?.includes(classId)
+      if (!isApplicable) continue
+      const available = availableLessonsByClass[classId]
+      if (!available?.length) continue
+      const result = isPackageDiscountQualified(
+        allSessions,
+        available,
+        classId
+      )
+      if (result.qualified) return true
+    }
+    return false
+  }, [promo, currentClasses, allSessions, availableLessonsByClass])
+
+  const isPackageAlreadyApplied = useMemo(() => {
+    if (promo.promotionType !== PromotionTypeItem.PACKAGE) return false
+    return (appliedPromotions ?? []).some(
+      p =>
+        p.type === PromotionTypeItem.PACKAGE &&
+        typeof p.id === 'string' &&
+        p.id.startsWith(`package-${promo.id}-`)
+    )
+  }, [promo, appliedPromotions])
+
   const amountLabel = useMemo(() => {
+    if (
+      promo.promotionType === PromotionTypeItem.PACKAGE &&
+      'amountPerLesson' in promo
+    ) {
+      return t('invoiceCampaign:editor.packageDiscount.perLesson', {
+        amount: formatCurrency(
+          (promo as any).amountPerLesson,
+          siteData.currency
+        ),
+      })
+    }
     if (promo.discountType === 'percentage') {
       return `${promo.amount}%`
     }
     return formatCurrency(promo.amount, siteData.currency)
-  }, [promo.amount, promo.discountType, siteData.currency])
+  }, [promo, siteData.currency, t])
 
   const promotionTypeLabel: string = useMemo(() => {
     if (promo.promotionType === PromotionTypeItem.COUPON && 'code' in promo) {
       return promo.code ?? ''
     }
     if (promo.promotionType === PromotionTypeItem.BUNDLE && 'name' in promo) {
+      return promo.name
+    }
+    if (promo.promotionType === PromotionTypeItem.PACKAGE && 'name' in promo) {
       return promo.name
     }
     return ''
@@ -203,7 +257,9 @@ const PromotionItem: React.FC<Props> = ({ promo, isApplied }): JSX.Element => {
             className={cn(
               'px-2 bg-green-50 text-green-500 border border-green-300 rounded-full text-xs capitalize',
               promo.promotionType === 'coupon' &&
-                'bg-blue-50 text-blue-500 border border-blue-300'
+                'bg-blue-50 text-blue-500 border border-blue-300',
+              promo.promotionType === PromotionTypeItem.PACKAGE &&
+                'bg-purple-50 text-purple-500 border border-purple-300'
             )}
           >
             {promo.promotionType}
@@ -219,6 +275,22 @@ const PromotionItem: React.FC<Props> = ({ promo, isApplied }): JSX.Element => {
                 })}
               </div>
             )}
+          {promo.promotionType === PromotionTypeItem.PACKAGE && (
+            <div className="text-sm text-gray-600">
+              {isPackageQualified || isPackageAlreadyApplied ? (
+                <span className="text-green-600 flex items-center gap-1">
+                  <LuCheck className="w-4 h-4" />
+                  {t('invoiceCampaign:editor.packageDiscount.autoApplied')}
+                </span>
+              ) : (
+                <span className="text-gray-500">
+                  {t(
+                    'invoiceCampaign:editor.packageDiscount.selectAllLessons'
+                  )}
+                </span>
+              )}
+            </div>
+          )}
         </div>
         {promo.promotionType === PromotionTypeItem.BUNDLE && promo.id && (
           <BundleDiscountStatus
@@ -268,6 +340,18 @@ const PromotionItem: React.FC<Props> = ({ promo, isApplied }): JSX.Element => {
             showButtonOnly
             priceAfterDiscount={calculatedDiscount?.priceAfterDiscount}
           />
+        ) : promo.promotionType === PromotionTypeItem.PACKAGE ? (
+          <div className="text-xs font-medium min-w-24 text-center">
+            {isPackageAlreadyApplied ? (
+              <span className="text-green-600">
+                {t('invoiceCampaign:editor.packageDiscount.autoApplied')}
+              </span>
+            ) : (
+              <span className="text-gray-400">
+                {t('invoiceCampaign:editor.packageDiscount.autoLabel')}
+              </span>
+            )}
+          </div>
         ) : (
           <Button
             type="button"

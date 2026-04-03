@@ -183,6 +183,10 @@
       "applyToAllClassesHint": "When enabled, this discount applies to every class",
       "selectClasses": "Select Classes",
       "noClassesAvailable": "No classes available",
+      "noMatchingClasses": "No classes match your search",
+      "searchClasses": "Search classes...",
+      "selected": "selected",
+      "selectAllVisible": "Select all ({{count}})",
       "startDate": "Start Date",
       "endDate": "End Date"
     }

@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next'
 import { IoMdAdd } from 'react-icons/io'
 import { useNavigate } from 'react-router'
 
-import AlertBox from '@/components/Boxes/AlertBox'
 import { Button } from '@/components/ui/Button'
 import ContentLayout from '@/layouts/ContentLayout'
 import { InvoiceCampaign } from '@/types/templateManagement'

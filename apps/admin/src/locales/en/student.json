@@ -602,6 +602,7 @@
     "sendCustomMessages": "Send Custom Messages",
     "sendCustomMessagesSuccess": "Send custom messages successfully",
     "sendNotifications": "Send Notifications",
+    "sendInvoice": "Send Invoice",
     "sendPaymentReminder": "Resend Upload Payment Record Notification",
     "sendPaymentSuccess": "Resend Success Payment Receipt",
     "sendQrCode": "Resend Qr-Code",

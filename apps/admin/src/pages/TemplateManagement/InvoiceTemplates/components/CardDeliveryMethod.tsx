@@ -119,10 +119,10 @@ const CardDeliveryMethod: FC<Props> = ({
   // Get the default WhatsApp message from custom messages
   const defaultWhatsAppMessage = useMemo(() => {
     if (!customMessagesData?.data) return null
-    const enrollmentMessage = customMessagesData.data.find(
-      msg => msg.type === SupportedType.STUDENT_NOTIF_AFTER_ENROLLMENT_SUBMITTED
+    const invoiceMessage = customMessagesData.data.find(
+      msg => msg.type === SupportedType.CREATE_INVOICE
     )
-    return enrollmentMessage?.content || null
+    return invoiceMessage?.content || null
   }, [customMessagesData?.data])
 
   // Set default values based on school settings
@@ -181,44 +181,6 @@ const CardDeliveryMethod: FC<Props> = ({
         </CardTitle>
       </CardHeader>
       <CardDescription className={cn(withSwitch && !isEnabled && 'hidden')}>
-        {/* {isEmail && subjectName && (
-          <FormField
-            control={form.control}
-            rules={{
-              required:
-                isRequired ?? isEnabled
-                  ? (t('editor.send.subjectRequired') as string)
-                  : false,
-            }}
-            name={subjectName}
-            render={({ field }) => (
-              <FormItem className="p-4 pt-0">
-                <div className="flex flex-col gap-2">
-                  <FormLabel
-                    required={Boolean(isRequired ?? isEnabled)}
-                    className="w-full"
-                  >
-                    {t('editor.send.subject')}
-                  </FormLabel>
-                  {isEmail && (
-                    <TemplateOptions onSelectMessage={onSelectMessage} />
-                  )}
-                </div>
-                <FormControl>
-                  <Input
-                    {...field}
-                    ref={el => {
-                      messageInputRef.current = el
-                      field.ref(el)
-                    }}
-                    placeholder={t('editor.send.subjectPlaceholder') as string}
-                  />
-                </FormControl>
-                <FormMessage className="text-warn" />
-              </FormItem>
-            )}
-          />
-        )} */}
         {!isEmail && (
           <FormField
             control={form.control}

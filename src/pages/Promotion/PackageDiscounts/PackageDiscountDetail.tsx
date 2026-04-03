@@ -107,11 +107,6 @@ const PackageDiscountDetail = (): JSX.Element => {
     )
   }
 
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return '-'
-    return new Date(dateStr).toLocaleDateString()
-  }
-
   return (
     <ContentLayout
       headerBackButton={headerBackButton}
@@ -157,22 +152,6 @@ const PackageDiscountDetail = (): JSX.Element => {
                   {packageData.isAllClasses
                     ? t('promotion:packageDiscount.allClasses')
                     : `${packageData.applicableClassIds?.length ?? 0} ${t('promotion:packageDiscount.classes')}`}
-                </p>
-              </div>
-              <div>
-                <span className="text-gray-500">
-                  {t('promotion:packageDiscount.form.startDate')}
-                </span>
-                <p className="font-semibold">
-                  {formatDate(packageData.startDate)}
-                </p>
-              </div>
-              <div>
-                <span className="text-gray-500">
-                  {t('promotion:packageDiscount.form.endDate')}
-                </span>
-                <p className="font-semibold">
-                  {formatDate(packageData.endDate)}
                 </p>
               </div>
             </div>

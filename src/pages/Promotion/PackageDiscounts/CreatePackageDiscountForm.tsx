@@ -1,11 +1,13 @@
+import { useMemo, useState } from 'react'
+
 import { useTranslation } from 'react-i18next'
 
+import Box from '@/components/Containers/Box'
+import Label from '@/components/Inputs/Label'
 import { CourseSelectorItem } from '@/components/Selector/CourseSelector'
+import Text from '@/components/Texts/Text'
 import { Button } from '@/components/ui/Button'
-import DatePicker from '@/components/ui/DatePicker'
-import { Input } from '@/components/ui/Input'
-import { Label } from '@/components/ui/Label'
-import { Switch } from '@/components/ui/Switch'
+import { Input } from '@/components/ui/Inputs/Input'
 
 import { PackageFormData } from './CreatePackageDiscount'
 
@@ -25,129 +27,157 @@ const CreatePackageDiscountForm = ({
   submitButtonText?: string
 }): JSX.Element => {
   const { t } = useTranslation()
+  const [classSearch, setClassSearch] = useState('')
 
-  const handleClassToggle = (classId: string) => {
-    setFormData(prev => ({
-      ...prev,
-      selectedClassIds: prev.selectedClassIds.includes(classId)
-        ? prev.selectedClassIds.filter(id => id !== classId)
-        : [...prev.selectedClassIds, classId],
-    }))
+  const updateFormData = (updates: Partial<PackageFormData>) => {
+    setFormData(prev => ({ ...prev, ...updates }))
+  }
+
+  const filteredClasses = useMemo(() => {
+    if (!classSearch.trim()) return classes
+    const query = classSearch.toLowerCase()
+    return classes.filter(c => c.label.toLowerCase().includes(query))
+  }, [classes, classSearch])
+
+  const isAllVisibleSelected =
+    filteredClasses.length > 0 &&
+    filteredClasses.every(c => formData.selectedClassIds.includes(c.value))
+
+  const handleSelectAllVisible = (checked: boolean) => {
+    if (checked) {
+      const visibleValues = filteredClasses.map(c => c.value)
+      const merged = [
+        ...new Set([...formData.selectedClassIds, ...visibleValues]),
+      ]
+      updateFormData({ selectedClassIds: merged })
+    } else {
+      const visibleValues = new Set(filteredClasses.map(c => c.value))
+      updateFormData({
+        selectedClassIds: formData.selectedClassIds.filter(
+          id => !visibleValues.has(id)
+        ),
+      })
+    }
   }
 
   return (
-    <div className="w-full max-w-2xl space-y-6">
+    <Box direction="column" css={{ width: '100%', gap: '24px' }}>
       {/* Name */}
-      <div className="space-y-2">
-        <Label>{t('promotion:packageDiscount.form.name')}</Label>
+      <Box direction="column" align="flex-start" css={{ width: '100%', gap: '8px' }}>
+        <Label css={{ width: '100%', textAlign: 'left', fontWeight: 500 }}>
+          {t('promotion:packageDiscount.form.name')}
+        </Label>
         <Input
+          type="text"
           value={formData.name}
-          onChange={e =>
-            setFormData(prev => ({ ...prev, name: e.target.value }))
-          }
+          onChange={e => updateFormData({ name: e.target.value })}
+          className="w-full"
           placeholder={t('promotion:packageDiscount.form.namePlaceholder')}
         />
-      </div>
+      </Box>
 
       {/* Amount Per Lesson */}
-      <div className="space-y-2">
-        <Label>{t('promotion:packageDiscount.form.amountPerLesson')}</Label>
+      <Box direction="column" align="flex-start" css={{ width: '100%', gap: '8px' }}>
+        <Label css={{ width: '100%', textAlign: 'left', fontWeight: 500 }}>
+          {t('promotion:packageDiscount.form.amountPerLesson')}
+        </Label>
         <Input
           type="number"
-          min={0}
-          step={1}
+          min="0"
+          step="1"
           value={formData.amountPerLesson}
           onChange={e =>
-            setFormData(prev => ({
-              ...prev,
-              amountPerLesson: parseFloat(e.target.value) || 0,
-            }))
+            updateFormData({ amountPerLesson: parseFloat(e.target.value) || 0 })
           }
+          className="w-full"
           placeholder="0"
         />
-        <p className="text-sm text-gray-500">
+        <Text css={{ fontSize: '13px', color: '#6b7280' }}>
           {t('promotion:packageDiscount.form.amountPerLessonHint')}
-        </p>
-      </div>
+        </Text>
+      </Box>
 
-      {/* Apply to all classes toggle */}
-      <div className="flex items-center justify-between">
-        <div>
-          <Label>{t('promotion:packageDiscount.form.applyToAllClasses')}</Label>
-          <p className="text-sm text-gray-500">
-            {t('promotion:packageDiscount.form.applyToAllClassesHint')}
-          </p>
-        </div>
-        <Switch
-          checked={formData.applyToAllClasses}
-          onCheckedChange={checked =>
-            setFormData(prev => ({
-              ...prev,
-              applyToAllClasses: checked,
-              selectedClassIds: checked ? [] : prev.selectedClassIds,
-            }))
-          }
+      {/* Class Selector with search and select-all */}
+      <Box direction="column" css={{ width: '100%', gap: '8px' }}>
+        <Label css={{ width: '100%', textAlign: 'left', fontWeight: 500 }}>
+          {t('promotion:packageDiscount.form.selectClasses')}
+          {formData.selectedClassIds.length > 0 && (
+            <span style={{ fontWeight: 400, color: '#6b7280', marginLeft: '8px' }}>
+              ({formData.selectedClassIds.length} {t('promotion:packageDiscount.form.selected')})
+            </span>
+          )}
+        </Label>
+
+        {/* Search bar */}
+        <Input
+          type="text"
+          value={classSearch}
+          onChange={e => setClassSearch(e.target.value)}
+          className="w-full"
+          placeholder={t('promotion:packageDiscount.form.searchClasses')}
         />
-      </div>
 
-      {/* Class Selector */}
-      {!formData.applyToAllClasses && (
-        <div className="space-y-2">
-          <Label>{t('promotion:packageDiscount.form.selectClasses')}</Label>
-          <div className="max-h-[200px] overflow-y-auto border rounded-md p-2 space-y-1">
-            {classes.map(classItem => (
-              <label
-                key={classItem.value}
-                className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  checked={formData.selectedClassIds.includes(classItem.value)}
-                  onChange={() => handleClassToggle(classItem.value)}
-                  className="rounded border-gray-300"
-                />
-                <span className="text-sm">{classItem.label}</span>
-              </label>
-            ))}
-            {classes.length === 0 && (
-              <p className="text-sm text-gray-400 p-2">
-                {t('promotion:packageDiscount.form.noClassesAvailable')}
-              </p>
-            )}
-          </div>
-        </div>
-      )}
+        {/* Select all visible checkbox */}
+        <label
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '4px 0',
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={isAllVisibleSelected}
+            onChange={e => handleSelectAllVisible(e.target.checked)}
+          />
+          <Text css={{ fontSize: '13px', fontWeight: 500 }}>
+            {t('promotion:packageDiscount.form.selectAllVisible', {
+              count: filteredClasses.length,
+            })}
+          </Text>
+        </label>
 
-      {/* Date Range */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>{t('promotion:packageDiscount.form.startDate')}</Label>
-          <DatePicker
-            date={formData.startDate}
-            onSelect={date =>
-              setFormData(prev => ({ ...prev, startDate: date ?? null }))
-            }
-          />
+        {/* Class list */}
+        <div className="w-full px-4 py-4 space-y-4 border border-gray-300 rounded-md max-h-[200px] overflow-y-auto">
+          {filteredClasses.map(classItem => (
+            <label
+              key={classItem.value}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              <input
+                type="checkbox"
+                checked={formData.selectedClassIds.includes(classItem.value)}
+                onChange={e => {
+                  const newList = e.target.checked
+                    ? [...formData.selectedClassIds, classItem.value]
+                    : formData.selectedClassIds.filter(i => i !== classItem.value)
+                  updateFormData({ selectedClassIds: newList })
+                }}
+              />
+              <Text css={{ fontSize: '13px' }}>{classItem.label}</Text>
+            </label>
+          ))}
+          {filteredClasses.length === 0 && (
+            <Text css={{ fontSize: '13px', color: '#9ca3af' }}>
+              {classes.length === 0
+                ? t('promotion:packageDiscount.form.noClassesAvailable')
+                : t('promotion:packageDiscount.form.noMatchingClasses')}
+            </Text>
+          )}
         </div>
-        <div className="space-y-2">
-          <Label>{t('promotion:packageDiscount.form.endDate')}</Label>
-          <DatePicker
-            date={formData.endDate}
-            onSelect={date =>
-              setFormData(prev => ({ ...prev, endDate: date ?? null }))
-            }
-          />
-        </div>
-      </div>
+      </Box>
 
       {/* Submit */}
-      <Button onClick={onSubmit} className="w-full">
-        {submitButtonText ??
-          (isEditing
-            ? t('common:action.update')
-            : t('common:action.create'))}
-      </Button>
-    </div>
+      <Box justify="flex-end" css={{ width: '100%', marginTop: '8px' }}>
+        <Button onClick={onSubmit}>
+          {submitButtonText ??
+            (isEditing
+              ? t('common:action.update')
+              : t('common:action.create'))}
+        </Button>
+      </Box>
+    </Box>
   )
 }
 

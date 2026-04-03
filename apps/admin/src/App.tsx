@@ -225,16 +225,10 @@ const CampaignRecipientsPage = lazy(
 const InvoiceEditor = lazy(
   () => import('@/pages/TemplateManagement/InvoiceTemplates/Editor')
 )
-const DialogSendMultipleInvoice = lazy(
+const DialogSendInvoice = lazy(
   () =>
     import(
-      '@/pages/TemplateManagement/InvoiceTemplates/Editor/DialogSendMultipleInvoice'
-    )
-)
-const DialogSendSingleInvoice = lazy(
-  () =>
-    import(
-      '@/pages/TemplateManagement/InvoiceTemplates/Editor/DialogSendSingleInvoice'
+      '@/pages/TemplateManagement/InvoiceTemplates/Editor/DialogSendInvoice'
     )
 )
 const SendingProgressPage = lazy(
@@ -889,9 +883,9 @@ const App = (): JSX.Element => {
                 />
                 <Route
                   path="send-multiple"
-                  element={<DialogSendMultipleInvoice />}
+                  element={<DialogSendInvoice />}
                 />
-                <Route path="send" element={<DialogSendSingleInvoice />} />
+                <Route path="send" element={<DialogSendInvoice />} />
                 <Route
                   path="sending-progress"
                   element={<SendingProgressPage />}
