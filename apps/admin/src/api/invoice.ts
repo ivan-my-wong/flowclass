@@ -76,6 +76,17 @@ export const getLessonDetail = async (params: LessonDetailParams) => {
   return res.data
 }
 
+export const updateInvoiceRemark = async (
+  invoiceId: number,
+  remark: string | null
+): Promise<void> => {
+  await apiClient.put({
+    needAuth: true,
+    url: `/admin/invoices/remark/${invoiceId}`,
+    data: { remark },
+  })
+}
+
 /**
  * Fetches student statistics (overview, by-student, etc.)
  */

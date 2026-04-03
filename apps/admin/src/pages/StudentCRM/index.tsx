@@ -550,7 +550,16 @@ const StudentDatabase = (): JSX.Element => {
       {
         field: 'user.email',
         filter: false,
-        valueGetter: (params: ValueGetterParams) => {
+        valueGetter: (params: ValueGetterParams) =>
+          (params.data as TableRowType).student.id,
+        spanRows: true,
+        getQuickFilterText: (params: ICellRendererParams) => {
+          const row = params.data as TableRowType
+          return formatPhoneNumber(
+            row.student.phone || row.student.user?.phone || ''
+          )
+        },
+        cellRenderer: (params: ICellRendererParams) => {
           const row = params.data as TableRowType
           return formatPhoneNumber(
             row.student.phone || row.student.user?.phone || ''
@@ -563,9 +572,30 @@ const StudentDatabase = (): JSX.Element => {
         width: 200,
         minWidth: 180,
         filter: false,
-        valueGetter: (params: ValueGetterParams) => {
+        valueGetter: (params: ValueGetterParams) =>
+          (params.data as TableRowType).student.id,
+        spanRows: true,
+        getQuickFilterText: (params: ICellRendererParams) => {
           const row = params.data as TableRowType
-          return row.student.email || row.student.user?.email || '-'
+          return [
+            row.student.email || row.student.user?.email || '',
+            row.student.secondaryEmail || '',
+          ]
+            .filter(Boolean)
+            .join(' ')
+        },
+        cellRenderer: (params: ICellRendererParams) => {
+          const row = params.data as TableRowType
+          const primary = row.student.email || row.student.user?.email || '-'
+          const secondary = row.student.secondaryEmail
+          return (
+            <div className="flex flex-col gap-0.5">
+              <span>{primary}</span>
+              {secondary && (
+                <span className="text-[11px] text-gray-400">{secondary}</span>
+              )}
+            </div>
+          )
         },
       },
       {
@@ -575,10 +605,13 @@ const StudentDatabase = (): JSX.Element => {
         width: 90,
         minWidth: 80,
         filter: false,
-        valueGetter: (params: ValueGetterParams) => {
+        valueGetter: (params: ValueGetterParams) =>
+          (params.data as TableRowType).student.id,
+        spanRows: true,
+        cellRenderer: (params: ICellRendererParams) => {
           const row = params.data as TableRowType
           const currentMonth = dayjs().format('YYYY-MM')
-          return (
+          const count =
             row.student.enrollCourses?.filter(
               o =>
                 o.course &&
@@ -590,9 +623,8 @@ const StudentDatabase = (): JSX.Element => {
                   )
                 )
             ).length ?? 0
-          )
+          return <span className="tabular-nums">{count}</span>
         },
-        cellClass: 'tabular-nums',
       },
       {
         colId: 'classLabel',

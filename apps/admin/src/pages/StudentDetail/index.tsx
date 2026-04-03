@@ -79,6 +79,7 @@ const StudentDetail = (): React.ReactElement => {
       name: '',
       alias: '',
       email: '',
+      secondaryEmail: '',
       phone: '',
     },
   })

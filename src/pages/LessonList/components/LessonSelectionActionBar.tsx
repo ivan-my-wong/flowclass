@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LuArrowRightLeft, LuMessageCircle } from 'react-icons/lu'
 
+import { Button } from '@/components/ui/Button'
 import { SharedVideoStatus } from '@/constants/course'
 
 const SHARED_VIDEO_OPTIONS: { value: SharedVideoStatus; label: string }[] = [
@@ -45,35 +46,34 @@ const LessonSelectionActionBar = ({
         <span>
           {selectedCount} {t('lessonList:cellsSelected')}
         </span>
-        <button
-          type="button"
+        <Button
+          variant="link"
+          size="xs"
           onClick={onClear}
-          className="text-blue-500 hover:text-blue-700 text-xs underline"
+          className="text-blue-500 hover:text-blue-700 h-auto p-0"
         >
           {t('common:action.cancel')}
-        </button>
+        </Button>
       </div>
 
       <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={onCopyEmails}
-          className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-        >
+        <Button variant="outline" size="sm" onClick={onCopyEmails}>
           {t('lessonList:copyEmails')}
-        </button>
+        </Button>
 
-        <button
-          type="button"
+        <Button
+          variant="outline"
+          size="sm"
           onClick={onSendWhatsApp}
-          className="inline-flex items-center gap-1.5 rounded-md border border-green-200 bg-white px-3 py-1.5 text-xs font-medium text-green-700 hover:bg-green-50"
+          className="border-green-200 text-green-700 hover:bg-green-50"
+          iconBefore={<LuMessageCircle size={13} />}
         >
-          <LuMessageCircle size={13} />
           {t('lessonList:sendWhatsApp')}
-        </button>
+        </Button>
 
-        <button
-          type="button"
+        <Button
+          variant="outline"
+          size="sm"
           disabled={!canReassign}
           onClick={onReassign}
           title={
@@ -81,11 +81,10 @@ const LessonSelectionActionBar = ({
               ? (t('lessonList:reassignSelectOne') as string)
               : undefined
           }
-          className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+          iconBefore={<LuArrowRightLeft size={13} />}
         >
-          <LuArrowRightLeft size={13} />
           {t('lessonList:reassign')}
-        </button>
+        </Button>
 
         <div className="flex items-center gap-1">
           <select
@@ -101,16 +100,14 @@ const LessonSelectionActionBar = ({
               </option>
             ))}
           </select>
-          <button
-            type="button"
-            disabled={isBulkUpdating}
+          <Button
+            size="sm"
+            loading={isBulkUpdating}
             onClick={() => onBulkVideoStatus(pendingStatus)}
-            className="inline-flex items-center gap-1.5 rounded-md border border-blue-300 bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+            className="border-blue-300 bg-blue-600 hover:bg-blue-700 text-white"
           >
-            {isBulkUpdating
-              ? t('common:action.loading')
-              : t('lessonList:setVideoStatus')}
-          </button>
+            {t('lessonList:setVideoStatus')}
+          </Button>
         </div>
       </div>
     </div>

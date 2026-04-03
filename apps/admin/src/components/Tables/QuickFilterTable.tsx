@@ -100,6 +100,7 @@ type TableProps = {
   onColumnMoved?: (event: ColumnMovedEvent) => void
   alwaysMultiSort?: boolean
   getRowHeight?: (params: RowHeightParams) => number
+  checkboxColumnOverrides?: Partial<ColDef>
 } & ComponentPropsWithoutRef<'div'>
 
 const QuickFilterTable: React.FC<TableProps> = ({
@@ -125,6 +126,7 @@ const QuickFilterTable: React.FC<TableProps> = ({
   onColumnMoved,
   alwaysMultiSort = false,
   getRowHeight,
+  checkboxColumnOverrides,
   ...props
 }) => {
   const { t } = useTranslation()
@@ -151,6 +153,11 @@ const QuickFilterTable: React.FC<TableProps> = ({
       minWidth: columnMinWidth,
     }
   }, [columnMinWidth])
+
+  const checkboxColumnDef = useMemo(
+    () => ({ ...createCheckboxColumnDef(), ...checkboxColumnOverrides }),
+    [checkboxColumnOverrides]
+  )
 
   const processedColumns = useMemo(() => {
     return columns.map(column => {

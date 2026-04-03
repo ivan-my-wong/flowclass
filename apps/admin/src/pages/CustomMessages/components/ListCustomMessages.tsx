@@ -1,28 +1,14 @@
 import useCustomMessageData from '@/hooks/useCustomMessageData'
-import { useWhatsappWeb } from '@/hooks/useWhatsappWeb'
 import { SUPPORTED_WHATSAPP_TEMPLATE } from '@/types/customMessage'
 
 import CustomMessageItem from './CustomMessagesItem'
-import WhatsappConnection from './WhatsappConnection'
 
 const ListCustomMessages = (): JSX.Element => {
   const { useFetchCustomMessageData } = useCustomMessageData()
   const { data: customMessages } = useFetchCustomMessageData()
 
-  const { useGetSessionStatus } = useWhatsappWeb()
-  const {
-    data: whatsappSessionStatus,
-    isLoading: isWhatsappSessionStatusLoading,
-    refetch: refetchSessionStatus,
-  } = useGetSessionStatus()
-
   return (
     <div className="box-col p-4">
-      <WhatsappConnection
-        whatsappSessionStatus={whatsappSessionStatus}
-        refetchSessionStatus={refetchSessionStatus}
-        isWhatsappSessionStatusLoading={isWhatsappSessionStatusLoading}
-      />
       <div className="flex flex-col gap-4 justify-start items-start w-full">
         {customMessages?.data &&
           customMessages.data
@@ -37,8 +23,6 @@ const ListCustomMessages = (): JSX.Element => {
               <CustomMessageItem
                 item={item}
                 key={`whatsapp-template-${item.id}`}
-                whatsappSessionStatus={whatsappSessionStatus}
-                isWhatsappSessionStatusLoading={isWhatsappSessionStatusLoading}
               />
             ))}
       </div>

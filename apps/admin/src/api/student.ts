@@ -754,6 +754,7 @@ export const updateStudentContactInfoV2 = async (
       email: params.email,
       phone: params.phone,
       invoiceId: params.invoiceId,
+      secondaryEmail: params.secondaryEmail,
     },
   })
   return res.data.data

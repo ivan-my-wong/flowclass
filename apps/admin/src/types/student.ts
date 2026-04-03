@@ -78,6 +78,7 @@ export type SingleStudentCrmRecordEnrolledClassesInvoice = {
   updatedAt: string
   usedBalance: number
   proofToken?: string
+  remark?: string | null
 }
 
 export type SingleStudentCrmRecordEnrolledClassesStudentSchedule = {
@@ -99,6 +100,7 @@ export type SingleStudentCrmRecordEnrollCourse = {
   invoices?: SingleStudentCrmRecordEnrolledClassesInvoice[]
   course: PickedCourse
   registrationForm: StudentFormResponse[]
+  isPaused?: boolean
 }
 
 export type SingleStudentCrmRecord = {
@@ -116,6 +118,7 @@ export type StudentEnrolmentRecord = {
   id: number // userAliasId
   name: string
   email: string
+  secondaryEmail?: string | null
   phone: string
   // status?: string
   userId: number
@@ -167,6 +170,7 @@ export type TypeUpdateEnrollCourse = {
   siteId: number
   enrollCourseId: number
   confirmState: string
+  isPaused?: boolean
 }
 
 export type UpdateInvoicePaymentStateDto = {
@@ -328,6 +332,12 @@ export type TypeTeachingServiceDetail = {
   invoices?: TeachingServiceSingleInvoice[]
   classType?: ClassTypeEnum
   lessons: StudentLesson[]
+  isPaused?: boolean
+  /** Period identifier for change-lesson init (from lesson matrix). Recurring: recurringScheduleId; Regular v1: periodId; Regular v2: regularScheduleId. */
+  recurringScheduleId?: number
+  regularScheduleId?: number
+  /** Period identifier for regular/workshop (v1) classes. */
+  periodId?: number
 }
 
 export type TypeTeachingServiceEnrollCourse = Omit<

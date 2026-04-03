@@ -75,17 +75,19 @@ const TeachingServiceEnrolledColumn = ({
 
   const allRows = useMemo(() => {
     const studentLessons =
-      enrolledStudent?.enrollCourses?.map(enrollCourse => {
-        // Support both invoice (new) and invoices (old) for backward compatibility
-        const invoices = enrollCourse.invoice
-          ? [enrollCourse.invoice]
-          : enrollCourse.invoices || []
-        return {
-          ...enrollCourse,
-          studentSchedule: enrollCourse.studentSchedule,
-          invoices,
-        }
-      }) || []
+      enrolledStudent?.enrollCourses
+        ?.filter(ec => !ec.isPaused)
+        ?.map(enrollCourse => {
+          // Support both invoice (new) and invoices (old) for backward compatibility
+          const invoices = enrollCourse.invoice
+            ? [enrollCourse.invoice]
+            : enrollCourse.invoices || []
+          return {
+            ...enrollCourse,
+            studentSchedule: enrollCourse.studentSchedule,
+            invoices,
+          }
+        }) || []
 
     // studentLessons grouped by enrollCourseId
     const groupedData = studentLessons.reduce(

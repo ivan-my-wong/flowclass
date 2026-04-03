@@ -233,6 +233,46 @@ const TeachingServiceItem = ({
     setShowConfirmDelete(false)
   }
 
+  const pauseStatusMapping = {
+    active: {
+      text: t('student:teachingService.statusActive'),
+      color: 'text-success border-success',
+    },
+    paused: {
+      text: t('student:teachingService.statusPaused'),
+      color: 'text-warn border-warn',
+    },
+  }
+
+  const getMenuPauseStatus = (
+    enrollCourseId: number
+  ): DropDownMenuItemType[] => [
+    {
+      ...renderMenuItem(pauseStatusMapping.active.text, () => {
+        mutationChangeSttPaymentAndEnroll.mutate({
+          institutionId,
+          siteId,
+          enrollCourseId,
+          confirmState:
+            enrollStatuses.get(enrollCourseId) || EnrollConfirmState.PENDING,
+          isPaused: false,
+        })
+      }),
+    },
+    {
+      ...renderMenuItem(pauseStatusMapping.paused.text, () => {
+        mutationChangeSttPaymentAndEnroll.mutate({
+          institutionId,
+          siteId,
+          enrollCourseId,
+          confirmState:
+            enrollStatuses.get(enrollCourseId) || EnrollConfirmState.PENDING,
+          isPaused: true,
+        })
+      }),
+    },
+  ]
+
   const paymentStatusMapping = {
     [PaymentState.PAID]: {
       text: t('student:statusPaid'),
@@ -484,6 +524,16 @@ const TeachingServiceItem = ({
                   </div>
                 </div>
                 <div className="box-row-full w-fit" data-testid="enroll-status">
+                  <DropdownMenu
+                    menuItems={getMenuPauseStatus(service.enrollCourseId)}
+                    trigger={
+                      <StatusChangeTrigger
+                        status={service.isPaused ? 'paused' : 'active'}
+                        statusMapping={pauseStatusMapping}
+                      />
+                    }
+                    contentProps={{ minWidth: '12rem', zIndex: 999 }}
+                  />
                   <Button
                     variant="outline"
                     onClick={() => {

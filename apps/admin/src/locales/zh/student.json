@@ -1,4 +1,8 @@
 {
+  "invoiceRemark": {
+    "placeholder": "新增備注...",
+    "editTitle": "編輯發票備注"
+  },
   "active": "活躍",
   "activity": {
     "changes": "更改",
@@ -142,6 +146,7 @@
     "createStudentSuccess": "成功創建學生",
     "email": "電郵",
     "emailFormat": "電郵格式無效",
+    "secondaryEmail": "備用電郵",
     "emailNotEditable": "電郵無法更改",
     "emailRequired": "電郵為必填",
     "emailTooltip": "如果學生已在其他機構註冊，則無法更改電郵。請透過WhatsApp聯繫我們獲取協助。",
@@ -797,6 +802,8 @@
     "teachingServiceEnrolled": "已報名教學服務",
     "timeSlots": "時間段",
     "viewRegistrationData": "查看報名數據",
+    "statusActive": "啟用",
+    "statusPaused": "暫停",
     "bulkAssignmentProgress": "批量分配進度",
     "processingStudent": "正在處理：{{name}}",
     "processing": "正在處理...",
