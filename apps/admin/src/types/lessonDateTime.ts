@@ -1,3 +1,4 @@
+import { SharedVideoStatus } from '@/constants/course'
 import { QRCodeAttendanceDto } from '@/pages/StudentCRM/QRCode/QRCodeScan'
 import { ClassTypeEnum, Course } from '@/types/course'
 import { IPaginatedData, PaginateOptionParams } from '@/types/pagination'

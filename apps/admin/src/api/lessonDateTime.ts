@@ -1,3 +1,4 @@
+import { SharedVideoStatus } from '@/constants/course'
 import {
   ClassLessonType,
   CreateLessonProps,
@@ -11,7 +12,6 @@ import {
 import { IPaginatedData } from '@/types/pagination'
 import { ClassLessonMatrix } from '@/types/student'
 import { getCurrentWeek } from '@/utils/timeFormat'
-import { SharedVideoStatus } from '@/constants/course'
 
 import apiClient from './index'
 

@@ -141,7 +141,9 @@ const WhatsAppModal = ({ open, onClose, recipients }: Props): JSX.Element => {
                   className="rounded-md border border-gray-200 p-3 flex items-center justify-between gap-2"
                 >
                   <div>
-                    <span className="font-medium text-sm">{recipient.name}</span>
+                    <span className="font-medium text-sm">
+                      {recipient.name}
+                    </span>
                     <span className="ml-2 text-xs text-gray-400">
                       {recipient.phone}
                     </span>

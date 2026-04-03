@@ -41,10 +41,7 @@ import { PrintLabelModalHandle } from '@/pages/StudentCRM/Label/PrintLabelModal'
 import { AlertTypes } from '@/reducers/confirm.reducers'
 import { schoolState } from '@/stores/schoolData'
 import { siteState } from '@/stores/siteData'
-import {
-  AddTeachingServiceMode,
-  studentState,
-} from '@/stores/studentData'
+import { AddTeachingServiceMode, studentState } from '@/stores/studentData'
 import { userPermissionState, UserRole } from '@/stores/userPermissionData'
 import {
   StudentEnrolmentRecord,
@@ -55,7 +52,6 @@ import { StudentUser } from '@/types/user'
 import { generateDataTestId } from '@/utils/data-testid.utils'
 
 import AddOrDeductCreditModal from './AddOrDeductCreditModal'
-import EditRemarksModal, { EditRemarksModalHandle } from './EditRemarksModal'
 import AddToParentGroupModal, {
   AddToParentGroupModalHandle,
 } from './AddToParentGroupModal'
@@ -65,6 +61,7 @@ import ChangeToNewFamilyGroupModal, {
 import CreditBalanceModal, {
   CreditBalanceModalHandle,
 } from './CreditBalanceModal'
+import EditRemarksModal, { EditRemarksModalHandle } from './EditRemarksModal'
 import RemoveFromCurrentGroupModal, {
   RemoveFromCurrentGroupModalHandle,
 } from './RemoveFromCurrentGroupModal'

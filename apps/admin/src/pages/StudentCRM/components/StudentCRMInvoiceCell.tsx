@@ -72,7 +72,10 @@ const StudentCRMInvoiceCell = ({ invoice, amountText }: Props): JSX.Element => {
                 setIsOpen(true)
               }}
             >
-              <HiOutlinePencilSquare className="text-primary hover:text-blue-600" size={13} />
+              <HiOutlinePencilSquare
+                className="text-primary hover:text-blue-600"
+                size={13}
+              />
             </button>
             {!!remark && (
               <button
@@ -80,7 +83,10 @@ const StudentCRMInvoiceCell = ({ invoice, amountText }: Props): JSX.Element => {
                 className="cursor-pointer shrink-0"
                 onClick={() => deleteRemark()}
               >
-                <MdOutlineDelete className="text-destructive hover:text-red-600" size={13} />
+                <MdOutlineDelete
+                  className="text-destructive hover:text-red-600"
+                  size={13}
+                />
               </button>
             )}
           </>
@@ -95,7 +101,10 @@ const StudentCRMInvoiceCell = ({ invoice, amountText }: Props): JSX.Element => {
           className="max-w-md"
         >
           <div className="mb-4">
-            <TextArea value={remark} onChange={e => setRemark(e.target.value)} />
+            <TextArea
+              value={remark}
+              onChange={e => setRemark(e.target.value)}
+            />
             <Button
               className="mt-4 w-full"
               iconBefore={<MdSave />}

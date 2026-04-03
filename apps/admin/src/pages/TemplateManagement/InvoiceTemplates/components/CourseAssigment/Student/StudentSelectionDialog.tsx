@@ -185,7 +185,7 @@ const StudentSelectionDialog: React.FC<Props> = ({
         .map((student: StudentEnrolmentRecord) => {
           let currentEmail = student.email
           let currentPhone = student.phone
-          let currentName = student.name
+          const currentName = student.name
 
           if (student.user) {
             if (!currentEmail) {

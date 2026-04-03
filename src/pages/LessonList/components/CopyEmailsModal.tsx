@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
-import { FiCheck, FiCopy } from 'react-icons/fi'
 import { useTranslation } from 'react-i18next'
+import { FiCheck, FiCopy } from 'react-icons/fi'
 
 import {
   Dialog,

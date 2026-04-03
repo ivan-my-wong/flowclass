@@ -41,9 +41,13 @@ const EditRemarksModal = forwardRef<EditRemarksModalHandle>((_, ref) => {
   }))
 
   const { mutate, isLoading } = useMutation({
-    mutationFn: () => updateRemarks({ userAliasId, remarks: value.trim() || null }),
+    mutationFn: () =>
+      updateRemarks({ userAliasId, remarks: value.trim() || null }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries([QUERY_KEY.student.studentListNewKey, currentSchoolId])
+      await queryClient.invalidateQueries([
+        QUERY_KEY.student.studentListNewKey,
+        currentSchoolId,
+      ])
       toast.success(t('common:action.savedSuccessfully'))
       setIsOpen(false)
     },
@@ -67,7 +71,11 @@ const EditRemarksModal = forwardRef<EditRemarksModalHandle>((_, ref) => {
           autoFocus
         />
         <DialogFooter>
-          <Button variant="outline" onClick={() => setIsOpen(false)} disabled={isLoading}>
+          <Button
+            variant="outline"
+            onClick={() => setIsOpen(false)}
+            disabled={isLoading}
+          >
             {t('common:action.cancel')}
           </Button>
           <Button onClick={() => mutate()} disabled={isLoading}>

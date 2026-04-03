@@ -24,8 +24,12 @@ import {
   updateLessonLocationRoom,
   updateTimeLesson,
 } from '@/api/lessonDateTime'
+import {
+  deleteSingleStudentLesson,
+  updateAttendance,
+  updateStudentLessonRemarks,
+} from '@/api/student'
 import { SharedVideoStatus } from '@/constants/course'
-import { deleteSingleStudentLesson, updateAttendance, updateStudentLessonRemarks } from '@/api/student'
 import { QUERY_KEY } from '@/constants/queryKey'
 import { lessonDateTimeState } from '@/stores/lessonDateTimeData'
 import {
@@ -465,7 +469,11 @@ const useLessonDateTimeData = () => {
 
   function useBulkUpdateSharedVideo(
     onSuccess?: () => void
-  ): UseMutationResult<void, ApiError, { classLessonIds: number[]; hasSharedVideo: SharedVideoStatus }> {
+  ): UseMutationResult<
+    void,
+    ApiError,
+    { classLessonIds: number[]; hasSharedVideo: SharedVideoStatus }
+  > {
     return useMutation({
       mutationFn: ({ classLessonIds, hasSharedVideo }) =>
         bulkUpdateSharedVideo(classLessonIds, hasSharedVideo),

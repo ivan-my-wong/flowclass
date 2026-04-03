@@ -553,7 +553,7 @@ const StudentDatabase = (): JSX.Element => {
         valueGetter: (params: ValueGetterParams) =>
           (params.data as TableRowType).student.id,
         spanRows: true,
-        getQuickFilterText: (params: ICellRendererParams) => {
+        getQuickFilterText: (params: GetQuickFilterTextParams) => {
           const row = params.data as TableRowType
           return formatPhoneNumber(
             row.student.phone || row.student.user?.phone || ''
@@ -575,7 +575,7 @@ const StudentDatabase = (): JSX.Element => {
         valueGetter: (params: ValueGetterParams) =>
           (params.data as TableRowType).student.id,
         spanRows: true,
-        getQuickFilterText: (params: ICellRendererParams) => {
+        getQuickFilterText: (params: GetQuickFilterTextParams) => {
           const row = params.data as TableRowType
           return [
             row.student.email || row.student.user?.email || '',

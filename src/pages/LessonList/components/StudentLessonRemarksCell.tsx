@@ -28,7 +28,8 @@ const StudentLessonRemarksCell = ({
   const [isOpen, setIsOpen] = useState(false)
 
   const { useUpdateStudentLessonRemarks } = useLessonDateTimeData()
-  const { mutateAsync: saveRemarks, isLoading } = useUpdateStudentLessonRemarks()
+  const { mutateAsync: saveRemarks, isLoading } =
+    useUpdateStudentLessonRemarks()
 
   const openModal = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -66,7 +67,10 @@ const StudentLessonRemarksCell = ({
       </Button>
 
       <Dialog open={isOpen} onOpenChange={v => !v && setIsOpen(false)}>
-        <DialogContent className="max-w-sm p-4" onClick={e => e.stopPropagation()}>
+        <DialogContent
+          className="max-w-sm p-4"
+          onClick={e => e.stopPropagation()}
+        >
           <DialogHeader>
             <DialogTitle>{t('lessonList:remarks.modalTitle')}</DialogTitle>
           </DialogHeader>
