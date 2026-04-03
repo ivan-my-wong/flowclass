@@ -66,6 +66,20 @@ export class PackageDiscountsController {
     return this.packageDiscountsService.findAll(pageOptionsDto)
   }
 
+  @Get('by-class/:classId')
+  @ApiOperation({ summary: 'Get active package discounts applicable to a specific class.' })
+  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER, Role.INSTRUCTOR)
+  @UseGuards(RolesGuard)
+  @RequireParams(RequireParam.INSTITUTION_ID, RequireParam.SITE_ID)
+  @UseGuards(RequireParamsGuard)
+  findByClassId(
+    @Param('classId') classId: number,
+    @Query('siteId') siteId: number,
+    @Query('institutionId') institutionId: number
+  ) {
+    return this.packageDiscountsService.findByClassId(classId, siteId, institutionId)
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a package discount by ID.' })
   @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER, Role.INSTRUCTOR)
@@ -151,17 +165,4 @@ export class PackageDiscountsController {
     return this.packageDiscountsService.toggleStatus(id)
   }
 
-  @Get('by-class/:classId')
-  @ApiOperation({ summary: 'Get active package discounts applicable to a specific class.' })
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER, Role.INSTRUCTOR)
-  @UseGuards(RolesGuard)
-  @RequireParams(RequireParam.INSTITUTION_ID, RequireParam.SITE_ID)
-  @UseGuards(RequireParamsGuard)
-  findByClassId(
-    @Param('classId') classId: number,
-    @Query('siteId') siteId: number,
-    @Query('institutionId') institutionId: number
-  ) {
-    return this.packageDiscountsService.findByClassId(classId, siteId, institutionId)
-  }
 }
