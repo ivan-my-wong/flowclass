@@ -64,23 +64,6 @@ const EditorAction = (): JSX.Element => {
     }
   }
 
-  const extractPriceOptionData = useMemo(() => {
-    let calculatedPrice = 0
-    if (selectedPrice) {
-      const { priceType, amount, numberOfLessons } = selectedPrice
-      if (priceType === PriceType.PER_LESSON) {
-        calculatedPrice = Number(amount)
-      } else {
-        calculatedPrice = Number(amount) / (numberOfLessons || 1)
-      }
-    }
-    return {
-      priceType: selectedPrice?.priceType ?? PriceType.PER_LESSON,
-      price: calculatedPrice,
-      priceOption: selectedPrice ?? undefined,
-    }
-  }, [selectedPrice])
-
   // Helper function to get class info for a session (multi-class support)
   const getClassForSession = (session: any): Classes | undefined => {
     if (showAllClassesInCourse && session.classId && allClassesLessonsData) {
