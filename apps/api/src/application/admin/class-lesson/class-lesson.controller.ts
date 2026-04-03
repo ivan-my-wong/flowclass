@@ -36,7 +36,11 @@ import {
   UpdateLessonInstructorDTO,
   UpdateLessonLocationRoomDTO,
 } from './dto/detail-list-class-lesson.dto'
-import { BulkUpdateSharedVideoDto, ListClassLessonDto, ListStudentsWithPage } from './dto/list-class-lesson.dto'
+import {
+  BulkUpdateSharedVideoDto,
+  ListClassLessonDto,
+  ListStudentsWithPage,
+} from './dto/list-class-lesson.dto'
 
 @Controller('class-lesson')
 @ApiTags('Class Lesson')
@@ -94,7 +98,9 @@ export class ClassLessonController {
   }
 
   @Patch('bulk-update-shared-video')
-  @ApiOperation({ summary: 'Bulk update has_shared_video for all student lessons in given class lessons' })
+  @ApiOperation({
+    summary: 'Bulk update has_shared_video for all student lessons in given class lessons',
+  })
   @ApiOkResponse({ type: ApiResult })
   @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER, Role.INSTRUCTOR)
   @UseGuards(RolesGuard)

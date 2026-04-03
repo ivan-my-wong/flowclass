@@ -11,9 +11,8 @@ import {
   IsString,
 } from 'class-validator'
 
-import { SharedVideoStatus } from '@/models/enums/status'
-
 import { PageOptionsDto } from '@/common/pagination/page-options.dto'
+import { SharedVideoStatus } from '@/models/enums/status'
 
 export class ListClassLessonDto {
   @ApiProperty({ required: false, isArray: true, items: { type: 'number' }, type: Number })
@@ -153,7 +152,6 @@ export class CheckQuotaResponseDto {
   @IsArray()
   conflict?: any[]
 }
-
 
 export class BulkUpdateSharedVideoDto {
   @ApiProperty({ isArray: true, items: { type: 'number' }, type: Number })

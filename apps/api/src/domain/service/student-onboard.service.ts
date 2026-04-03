@@ -1839,7 +1839,10 @@ export class StudentOnbService {
     }
   }
 
-  async updateRemarks(userAliasId: number, remarks: string | null): Promise<{ id: number; remarks: string | null }> {
+  async updateRemarks(
+    userAliasId: number,
+    remarks: string | null
+  ): Promise<{ id: number; remarks: string | null }> {
     const userAlias = await this.userAliasesRepository.findOneBy({ id: userAliasId })
     if (!userAlias) throw new ApiError(ErrorCode.USERID_NOT_FOUND)
     userAlias.remarks = remarks ?? null
