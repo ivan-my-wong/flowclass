@@ -38,6 +38,7 @@ export type StudentType = {
   aliases?: UserAlias
   teacherFeedbacks?: MediaMaterialsType[]
   studentSubmissions?: StudentSubmissionType[]
+  remarks?: string | null
 }
 
 export type ClassLessonType = {

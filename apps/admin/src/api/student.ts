@@ -768,6 +768,18 @@ export const updateAttendance = async (params: any): Promise<any> => {
   return res.data.data
 }
 
+export const updateStudentLessonRemarks = async (params: {
+  studentLessonId: number
+  remarks: string | null
+}): Promise<{ id: number; remarks: string | null }> => {
+  const res = await apiClient.patch({
+    needAuth: true,
+    url: '/admin/student-onboard/update-student-lesson-remarks',
+    data: params,
+  })
+  return res.data.data
+}
+
 export const getStudentFormFieldsValue = async (
   institutionId: number,
   studentId: number

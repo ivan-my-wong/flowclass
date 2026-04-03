@@ -11,6 +11,7 @@ import {
 import { IPaginatedData } from '@/types/pagination'
 import { ClassLessonMatrix } from '@/types/student'
 import { getCurrentWeek } from '@/utils/timeFormat'
+import { SharedVideoStatus } from '@/constants/course'
 
 import apiClient from './index'
 
@@ -284,4 +285,15 @@ export const getListLessonMatrix = async (
   })
 
   return res.data.data
+}
+
+export const bulkUpdateSharedVideo = async (
+  classLessonIds: number[],
+  hasSharedVideo: SharedVideoStatus
+): Promise<void> => {
+  await apiClient.patch({
+    needAuth: true,
+    url: '/admin/class-lesson/bulk-update-shared-video',
+    data: { classLessonIds, hasSharedVideo },
+  })
 }

@@ -22,6 +22,7 @@ import {
   provideGlobalGridOptions,
   QuickFilterModule,
   RowAutoHeightModule,
+  RowHeightParams,
   RowSelectionModule,
   RowSelectionOptions,
   RowStyleModule,
@@ -98,6 +99,7 @@ type TableProps = {
   getRowClass?: (params: any) => string
   onColumnMoved?: (event: ColumnMovedEvent) => void
   alwaysMultiSort?: boolean
+  getRowHeight?: (params: RowHeightParams) => number
 } & ComponentPropsWithoutRef<'div'>
 
 const QuickFilterTable: React.FC<TableProps> = ({
@@ -122,6 +124,7 @@ const QuickFilterTable: React.FC<TableProps> = ({
   showFilterBox = true,
   onColumnMoved,
   alwaysMultiSort = false,
+  getRowHeight,
   ...props
 }) => {
   const { t } = useTranslation()
@@ -294,7 +297,8 @@ const QuickFilterTable: React.FC<TableProps> = ({
         animateRows // Optional - set to 'true' to have rows animate when sorted
         pagination
         headerHeight={HEADER_HEIGHT}
-        rowHeight={ROW_HEIGHT}
+        rowHeight={getRowHeight ? undefined : ROW_HEIGHT}
+        getRowHeight={getRowHeight}
         paginationPageSize={
           gridRef.current?.api?.getGridOption('paginationPageSize') ||
           DEFAULT_ROWS_PER_PAGE
