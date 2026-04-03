@@ -6,8 +6,6 @@ import { useRecoilValue } from 'recoil'
 
 import { useResponsive } from '@/hooks/useResponsive'
 import useSiteData from '@/hooks/useSiteData'
-import useSitesFeatureEnabled from '@/hooks/useSiteFeatureEnableData'
-import { schoolSubscriptionState } from '@/stores/schoolSubscriptionData'
 import { userState } from '@/stores/userData'
 import { userPermissionState, UserRole } from '@/stores/userPermissionData'
 import { cn } from '@/utils/cn'
@@ -18,47 +16,113 @@ import SkeletonLoader from '../Loaders/SkeletonLoader'
 import SchoolSelector from '../Selector/SchoolSelector'
 import Text from '../Texts/Text'
 
-import menuItems, {
-  buildMenuItems,
-  FeatureMenu,
-  FeatureSiteMap,
-} from './menuBarItems'
+import menuItems, { buildMenuItems } from './menuBarItems'
+import { siteMenuItems } from './menuBarSiteItems'
+
+const MenuBarContainer = styled('nav', {
+  width: '15.5rem',
+  backgroundColor: '$backgroundLayer2',
+  borderRight: `2px solid $colors$backgroundLayer3`,
+  height: '100%',
+  overflowY: 'auto',
+  paddingLeft: '$2',
+  paddingRight: '$2',
+  paddingBottom: '$4',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+
+  '@sm': {
+    width: '100%',
+    height: '100vh',
+    paddingBottom: '$16',
+  },
+})
+
+const MenuItem = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  marginTop: '$3',
+  width: '90%',
+
+  padding: '$2',
+  textDecoration: 'none',
+  transition: 'background-color 0.2s ease',
+
+  cursor: 'pointer',
+  textAlign: 'center',
+  whiteSpace: 'nowrap',
+  borderRadius: '0.5rem',
+
+  fontSize: '0.95rem',
+
+  '.menuItemText': {
+    fontSize: '0.95rem',
+    lineHeight: '$4',
+    marginLeft: '$4',
+  },
+
+  '&:hover': {
+    color: '$primary',
+    svg: {
+      stroke: '$primary',
+      color: '$primary',
+    },
+    '#whatsappTemplate svg': {
+      fill: '$primary',
+      stroke: 'none',
+    },
+  },
+
+  '@md': {
+    width: '95%',
+  },
+
+  variants: {
+    active: {
+      true: {
+        backgroundColor: 'white',
+        color: '$primary',
+      },
+    },
+    noHover: {
+      true: {
+        '&:hover': {
+          backgroundColor: 'unset',
+          color: 'unset',
+        },
+      },
+    },
+  },
+})
 
 const MenuBar: React.FC = () => {
   const { t } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
-  const { siteData, useFetchAllSiteData } = useSiteData()
+  const { useFetchAllSiteData } = useSiteData()
   const { isLoading } = useFetchAllSiteData()
   const { isMobile } = useResponsive()
-  const { useFetchSitesFeatureEnabled } = useSitesFeatureEnabled()
-  const { data: sitesFeatureEnabled } = useFetchSitesFeatureEnabled()
   const userPermission = useRecoilValue(userPermissionState)
   const currentUser = useRecoilValue(userState)
-  const { activePlan } = useRecoilValue(schoolSubscriptionState)
 
   const isSitePage = location.pathname.includes('/site')
 
-  const featureSitesMap = useMemo<FeatureSiteMap>(() => {
-    if (!sitesFeatureEnabled) return new Map()
-    const newMap = new Map()
-    sitesFeatureEnabled.forEach(d => {
-      newMap.set(d.feature, d.siteIds)
-    })
-    return newMap
-  }, [sitesFeatureEnabled])
+  // const isSitePage = false
 
   const filteredMenuItems = useMemo(() => {
-    return buildMenuItems(featureSitesMap).filter(item => {
-      const limitedFeatures = Object.values(FeatureMenu)
+    if (isSitePage) {
+      return siteMenuItems.filter(
+        item =>
+          item.permissions.length === 0 ||
+          item.permissions.includes(userPermission)
+      )
+    }
+
+    return buildMenuItems(new Map()).filter(item => {
       if (userPermission === UserRole.MasterAdmin) {
         return true
-      }
-      if (
-        limitedFeatures.includes(item.label as FeatureMenu) &&
-        item.availableSites
-      ) {
-        return item.availableSites.includes(siteData.currentSite?.id ?? 0)
       }
       if (item.path === '#' && item.permissions.length === 0) {
         return true
@@ -68,13 +132,7 @@ const MenuBar: React.FC = () => {
         item.permissions.includes(userPermission)
       )
     })
-  }, [
-    activePlan,
-    isSitePage,
-    siteData.currentSite?.id,
-    userPermission,
-    featureSitesMap,
-  ])
+  }, [isSitePage, userPermission])
 
   const checkIsActive = (path: string) => {
     const localPath = location.pathname
@@ -115,7 +173,7 @@ const MenuBar: React.FC = () => {
     )
 
   return (
-    <nav className="w-[15.5rem] bg-background-layer-2 border-r-2 border-background-layer-3 h-full overflow-y-auto pl-2 pr-2 pb-4 flex flex-col items-center justify-start sm:w-full sm:h-screen sm:pb-16">
+    <MenuBarContainer>
       {isMobile && (
         <div
           role="group"
