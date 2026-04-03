@@ -482,6 +482,23 @@ export class InvoicesController {
     return this.invoiceService.updatePaymentAmount(params.invoiceId, params.paymentAmount)
   }
 
+  @Post('update-amount-paid')
+  @ApiOperation({
+    summary: 'Update amount paid for invoice',
+  })
+  @ApiOkResponse({
+    type: ApiResult,
+  })
+  @ApiBadRequestResponse({
+    description: 'This response may be when update amount paid for invoice',
+  })
+  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER, Role.INSTRUCTOR)
+  @UseGuards(RolesGuard)
+  @RequireParams(RequireParam.INSTITUTION_ID)
+  async updateAmountPaid(@Body() params: { invoiceId: number; amountPaid: number }) {
+    return this.invoiceService.updateAmountPaid(params.invoiceId, params.amountPaid)
+  }
+
   @Put('remark/:invoiceId')
   @ApiOperation({
     summary: 'This api for master admin use to update remark for invoice',

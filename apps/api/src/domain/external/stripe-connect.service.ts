@@ -825,6 +825,7 @@ export class StripeConnectService {
       )
     }
     invoice.paymentState = PaymentStatus.PAID
+    invoice.amountPaid = invoice.payAmount ?? 0
     invoice.paymentMethod = PaymentMethod.PAY_NOW
     invoice.transactionId = transaction.transactionId
     await this.invoiceRepository.save(invoice)

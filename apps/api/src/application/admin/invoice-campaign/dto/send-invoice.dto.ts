@@ -426,6 +426,14 @@ export class InvoiceItem {
   @ValidateNested({ each: true })
   @Type(() => ChildInvoiceItem)
   childs?: ChildInvoiceItem[]
+
+  @ApiPropertyOptional({
+    example: '2026-04-01',
+    description: 'Payment date for this invoice (YYYY-MM-DD)',
+  })
+  @IsOptional()
+  @IsString()
+  paymentDate?: string | null
 }
 
 export class IndividualLesson {

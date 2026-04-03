@@ -196,6 +196,8 @@ export class InvoiceService {
       createInvoiceDTO.payAmount = previousInvoice.payAmount
     }
 
+    createInvoiceDTO.amountPaid = createInvoiceDTO.payAmount ?? 0
+
     const updateInvoice = await this.invoiceRepository.update(
       { id: previousInvoice.id },
       {
@@ -268,6 +270,7 @@ export class InvoiceService {
         originalFee,
         numOfLesson: pricingInfo.numberOfLesson,
         payAmount: hasPresetPayAmount ? previousInvoice.payAmount : pricingInfo.paymentAmount,
+        amountPaid: hasPresetPayAmount ? previousInvoice.payAmount : pricingInfo.paymentAmount,
         discountAmount: pricingInfo.totalDiscount,
         discounts: pricingInfo.discountInfo,
         paymentState: PaymentStatus.PENDING,
@@ -290,6 +293,7 @@ export class InvoiceService {
         ...baseDataMapping,
         feePerLesson: 0,
         payAmount: 0,
+        amountPaid: 0,
         discountAmount: pricingInfo.totalDiscount,
         discounts: pricingInfo.discountInfo,
         paymentState: PaymentStatus.PAID,
@@ -305,6 +309,7 @@ export class InvoiceService {
 
         feePerLesson: 0,
         payAmount: 0,
+        amountPaid: 0,
         discounts: '',
         paymentState: PaymentStatus.PAID,
       }
@@ -662,6 +667,7 @@ export class InvoiceService {
       throw new NotFoundException(InvoiceErrorMessage.INVOICE_NOT_FOUND)
     }
     invoice.paymentState = state
+    invoice.amountPaid = invoice.payAmount ?? 0
     // invoice.approvedBy = approvedBy;
     // invoice.approverId = approverId;
     return await this.invoiceRepository.save(invoice)
@@ -993,10 +999,28 @@ export class InvoiceService {
     return newInvoice
   }
 
-  async updatePaymentDate(invoiceId: number, paymentDate: string): Promise<Invoice> {
-    if (!paymentDate) {
-      throw new BadRequestException('Payment date is required')
+  async updateAmountPaid(invoiceId: number, amountPaid: number): Promise<Invoice> {
+    if (amountPaid < 0 || !Number.isFinite(amountPaid)) {
+      throw new BadRequestException('Amount paid must be a non-negative number')
     }
+
+    const invoice = await this.invoiceRepository.findOneById(invoiceId)
+
+    if (!invoice) {
+      throw new NotFoundException(InvoiceErrorMessage.INVOICE_NOT_FOUND)
+    }
+
+    invoice.amountPaid = amountPaid
+    return await this.invoiceRepository.save(invoice)
+  }
+
+  async updatePaymentDate(
+    invoiceId: number,
+    payload: { paymentDate?: string; createdAt?: string; updatedAt?: string }
+  ): Promise<Invoice> {
+    const hasPaymentDate = payload.paymentDate !== undefined
+    const hasCreatedAt = payload.createdAt != null && payload.createdAt !== ''
+    const hasUpdatedAt = payload.updatedAt != null && payload.updatedAt !== ''
 
     const parsedDate = dayjs(paymentDate)
     if (!parsedDate.isValid()) {
