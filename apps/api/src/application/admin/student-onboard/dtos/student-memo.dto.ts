@@ -27,7 +27,7 @@ export class CreateAndUpdateStudentContactInfoDto extends StudentMemoBaseDto {
   contactName: string
 }
 
-export class CreateOrUpdateStudentContactInfoV2Dto extends CreateOrUpdateStudentMemoBaseDto {
+export class CreateOrUpdateStudentContactInfoV2Dto extends StudentMemoBaseDto {
   @ApiProperty({ example: 1, description: 'User alias id' })
   @IsNotEmpty()
   userAliasId: number

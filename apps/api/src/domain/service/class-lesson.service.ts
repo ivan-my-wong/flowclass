@@ -50,7 +50,7 @@ import { CoursesRepository } from '@/models/courses.repository'
 import { LessonString } from '@/models/custom-types/lesson-string'
 import { StudentLessonWithUserMemo } from '@/models/custom-types/student-lessons'
 import { ClassTypeEnum } from '@/models/enums'
-import { PaymentStatus } from '@/models/enums/status'
+import { PaymentStatus, SharedVideoStatus } from '@/models/enums/status'
 import { Institution } from '@/models/institutions.entity'
 import { InstitutionsRepository } from '@/models/institutions.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
@@ -1529,5 +1529,16 @@ export class ClassLessonService {
     return {
       timeSlotQuota: groupedByTime,
     }
+  }
+
+  async bulkUpdateSharedVideo(
+    classLessonIds: number[],
+    hasSharedVideo: SharedVideoStatus
+  ): Promise<void> {
+    if (!classLessonIds.length) return
+    await this.studentLessonRepository.update(
+      { classLessonId: In(classLessonIds) },
+      { hasSharedVideo }
+    )
   }
 }

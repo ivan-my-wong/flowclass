@@ -165,6 +165,9 @@ export class EnrollCourse extends BaseEntity {
   @Column({ name: 'payment_amount', type: 'numeric', nullable: true })
   paymentAmount: number
 
+  @Column({ name: 'is_paused', default: false })
+  isPaused: boolean
+
   @OneToMany(() => EnrollClassMapping, (mapping) => mapping.enrollCourse)
   multipleClassMapping: EnrollClassMapping[]
 

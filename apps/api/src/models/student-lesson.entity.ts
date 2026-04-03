@@ -135,4 +135,7 @@ export class StudentLesson extends BaseEntity {
     default: () => "NOW() + INTERVAL '30 days'",
   })
   expiryDate: Date
+
+  @Column({ name: 'remarks', type: 'text', nullable: true, default: null })
+  remarks: string | null
 }

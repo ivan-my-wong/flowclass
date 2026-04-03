@@ -592,6 +592,11 @@ export class UpdateEnrollCourseDto extends StudentOnbBaseDto {
   @IsOptional()
   @IsNumber()
   price: number
+
+  @ApiProperty({ example: false })
+  @IsOptional()
+  @IsBoolean()
+  isPaused?: boolean
 }
 
 export class UpdateInvoicePaymentStateDto extends StudentOnbBaseDto {

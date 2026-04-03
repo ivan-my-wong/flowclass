@@ -2197,6 +2197,10 @@ export class StudentOnbService {
       enrollCourse.paymentAmount = params.price
     }
 
+    if (params.isPaused !== undefined) {
+      enrollCourse.isPaused = params.isPaused
+    }
+
     return await this.enrollCourseRepository.save(enrollCourse)
   }
 
@@ -3490,6 +3494,18 @@ export class StudentOnbService {
     }
 
     return await Promise.all(fieldValues)
+  }
+
+  async updateStudentLessonRemarks(
+    studentLessonId: number,
+    remarks: string | null
+  ): Promise<{ id: number; remarks: string | null }> {
+    const studentLesson = await this.studentLessonRepository.findOne({
+      where: { id: studentLessonId },
+    })
+    if (!studentLesson) throw new ApiError(ErrorCode.CLASS_LESSON_NOT_FOUND)
+    await this.studentLessonRepository.update(studentLessonId, { remarks })
+    return { id: studentLessonId, remarks }
   }
 
   async updateStudentForm(params: UpdateStudentFormDto) {

@@ -4,11 +4,14 @@ import {
   IsArray,
   IsBoolean,
   IsDate,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator'
+
+import { SharedVideoStatus } from '@/models/enums/status'
 
 import { PageOptionsDto } from '@/common/pagination/page-options.dto'
 
@@ -149,4 +152,17 @@ export class CheckQuotaResponseDto {
   @IsOptional()
   @IsArray()
   conflict?: any[]
+}
+
+
+export class BulkUpdateSharedVideoDto {
+  @ApiProperty({ isArray: true, items: { type: 'number' }, type: Number })
+  @IsArray()
+  @IsNumber({}, { each: true })
+  classLessonIds: number[]
+
+  @ApiProperty({ enum: SharedVideoStatus })
+  @IsEnum(SharedVideoStatus)
+  @IsNotEmpty()
+  hasSharedVideo: SharedVideoStatus
 }

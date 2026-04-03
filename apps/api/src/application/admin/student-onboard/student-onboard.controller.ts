@@ -781,6 +781,19 @@ export class StudentOnbController {
     return new ApiResult().success(result)
   }
 
+  @Patch('/update-student-lesson-remarks')
+  @ApiOperation({ summary: 'Update remarks for a student lesson.' })
+  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER, Role.INSTRUCTOR)
+  async updateStudentLessonRemarks(
+    @Body() params: { studentLessonId: number; remarks: string | null }
+  ) {
+    const result = await this.studentOnboardService.updateStudentLessonRemarks(
+      params.studentLessonId,
+      params.remarks
+    )
+    return new ApiResult().success(result)
+  }
+
   @Delete('/delete-lesson/:id')
   @ApiOperation({
     summary: 'This api for delete student lesson.',
