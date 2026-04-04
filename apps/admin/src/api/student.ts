@@ -47,7 +47,6 @@ import {
   StudentUpdateTeachingServiceRequestDto,
 } from '@/types/studentAddTeachingService'
 import {
-  AddStudentMemoRequestDto,
   EditStudentContactInfoRequestDto,
   EditStudentContactInfoV2RequestDto,
   StudentInfoResponse,
@@ -709,17 +708,14 @@ export const sendAddLessonNotiReq = async (
   return res.data.data
 }
 
-export const addMemo = async (
-  params: AddStudentMemoRequestDto
-): Promise<StudentInfoResponse> => {
-  const res = await apiClient.post({
+export const updateRemarks = async (params: {
+  userAliasId: number
+  remarks: string | null
+}): Promise<{ id: number; remarks: string | null }> => {
+  const res = await apiClient.patch({
     needAuth: true,
-    url: '/admin/student-onboard/add-memo',
-    data: {
-      userId: params.userId,
-      institutionId: params.institutionId,
-      memo: params.memo,
-    },
+    url: '/admin/student-onboard/update-remarks',
+    data: params,
   })
   return res.data.data
 }
@@ -758,6 +754,7 @@ export const updateStudentContactInfoV2 = async (
       email: params.email,
       phone: params.phone,
       invoiceId: params.invoiceId,
+      secondaryEmail: params.secondaryEmail,
     },
   })
   return res.data.data
@@ -767,6 +764,18 @@ export const updateAttendance = async (params: any): Promise<any> => {
   const res = await apiClient.patch({
     needAuth: true,
     url: '/admin/student-onboard/update-attendance',
+    data: params,
+  })
+  return res.data.data
+}
+
+export const updateStudentLessonRemarks = async (params: {
+  studentLessonId: number
+  remarks: string | null
+}): Promise<{ id: number; remarks: string | null }> => {
+  const res = await apiClient.patch({
+    needAuth: true,
+    url: '/admin/student-onboard/update-student-lesson-remarks',
     data: params,
   })
   return res.data.data
@@ -832,6 +841,19 @@ export const updatePaymentAmount = async (
   const res = await apiClient.post({
     needAuth: true,
     url: '/admin/invoices/update-payment-amount',
+    params: { institutionId },
+    data: payload,
+  })
+  return res.data.data
+}
+
+export const updateAmountPaid = async (
+  institutionId: number,
+  payload: { invoiceId: number; amountPaid: number }
+): Promise<void> => {
+  const res = await apiClient.post({
+    needAuth: true,
+    url: '/admin/invoices/update-amount-paid',
     params: { institutionId },
     data: payload,
   })
@@ -978,7 +1000,12 @@ export const getStudentsByPhone = async (
 
 export const updatePaymentDate = async (
   institutionId: number,
-  payload: { invoiceId: number; paymentDate: string }
+  payload: {
+    invoiceId: number
+    paymentDate?: string
+    createdAt?: string
+    updatedAt?: string
+  }
 ): Promise<void> => {
   const res = await apiClient.post({
     needAuth: true,

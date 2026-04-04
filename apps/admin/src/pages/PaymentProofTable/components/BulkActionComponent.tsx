@@ -1,18 +1,18 @@
 import { useCallback, useMemo, useState } from 'react'
 
 import { AnimatePresence, motion } from 'framer-motion'
+import JSZip from 'jszip'
 import { useTranslation } from 'react-i18next'
 import {
-  LuBellRing,
-  LuBookUp,
   LuCheckCircle,
+  LuDownload,
   LuFileSignature,
-  LuMails,
-  LuMessageSquare,
+  LuSend,
   LuTrash2,
   LuX,
 } from 'react-icons/lu'
 
+import { fetchInvoicePdf } from '@/api/invoiceCampaign'
 import Box from '@/components/ui/Box'
 import { Button } from '@/components/ui/Button'
 import {
@@ -25,10 +25,10 @@ import Text from '@/components/ui/Text'
 import { PaymentEvidenceState } from '@/constants/payment'
 import useGlobalConfirm from '@/hooks/useGlobalConfirm'
 import usePaymentEvidenceData from '@/hooks/usePaymentEvidenceData'
+import useSchoolData from '@/hooks/useSchoolData'
+import { theme } from '@/styles'
 import { PaymentEvidence, PaymentProofTableItem } from '@/types/enrollCourse'
 import { DeletePaymentPayload, SendPaymentActions } from '@/types/paymentProof'
-
-import SendCustomMessages from '../SendCustomMessages'
 
 import ConfirmSendPaymentProof from './ConfirmSendPaymentProof'
 
@@ -55,6 +55,7 @@ const BulkActionComponent = ({
   isLoadingApprove,
 }: BulkActionComponentProps): JSX.Element => {
   const { t } = useTranslation()
+  const { currentSchool } = useSchoolData()
   const { useDeletePaymentProof } = usePaymentEvidenceData()
   const { isLoading, mutateAsync: deletePaymentProof } = useDeletePaymentProof()
   const [reminderModalState, setReminderModalState] = useState<{
@@ -64,17 +65,7 @@ const BulkActionComponent = ({
     isOpen: false,
     action: null,
   })
-  const [isCustomMessagesModalOpen, setIsCustomMessagesModalOpen] =
-    useState(false)
-
-  const MailIcon = () => <LuMails size={24} />
-  const ReminderIcon = () => <LuBookUp size={24} />
-  const onClickSendReminder = useCallback((action: SendPaymentActions) => {
-    setReminderModalState({
-      isOpen: true,
-      action,
-    })
-  }, [])
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false)
 
   const handleCloseReminderModal = () => {
     setReminderModalState({
@@ -121,6 +112,7 @@ const BulkActionComponent = ({
       return paymentEvidence?.status === PaymentEvidenceState.PROCESSING
     })
   }, [selectedRows, paymentEvidenceList])
+
   const onClickDelete = () => {
     setConfirm({
       title: t('student:paymentProof.deletePaymentTitle').toString(),
@@ -138,28 +130,48 @@ const BulkActionComponent = ({
       },
     }).open()
   }
-  const notifMenus = useMemo(() => {
-    return [
-      {
-        key: 'resend-upload-payment-proof-mail',
-        typeIcon: <MailIcon />,
-        type: <ReminderIcon />,
-        text: t('student:paymentProof.sendPaymentReminder'),
-        onClick: () =>
-          onClickSendReminder(SendPaymentActions.RESEND_PAYMENT_REMINDER),
-      },
-      {
-        key: 'resend-success-payment-receipt',
-        typeIcon: <MailIcon />,
-        type: <LuCheckCircle size={24} />,
-        text: t('student:paymentProof.sendPaymentSuccess'),
-        onClick: () =>
-          onClickSendReminder(
-            SendPaymentActions.RESEND_SUCCESS_PAYMENT_REMINDER
-          ),
-      },
-    ]
-  }, [t, onClickSendReminder])
+
+  const handleDownloadPdf = useCallback(async () => {
+    if (!currentSchool?.id || selectedRows.length === 0) return
+    setIsDownloadingPdf(true)
+
+    try {
+      if (selectedRows.length === 1) {
+        const url = await fetchInvoicePdf(currentSchool.id, selectedRows[0].id)
+        if (url) window.open(url, '_blank')
+      } else {
+        const zip = new JSZip()
+        const results = await Promise.allSettled(
+          selectedRows.map(async row => {
+            const url = await fetchInvoicePdf(currentSchool.id, row.id)
+            if (!url) return null
+            const response = await fetch(url)
+            const blob = await response.blob()
+            const studentName =
+              row.userAlias?.name || row.sendWhatsapp?.name || `invoice`
+            return { name: `${studentName}_${row.id}.pdf`, blob }
+          })
+        )
+
+        results.forEach(result => {
+          if (result.status === 'fulfilled' && result.value) {
+            zip.file(result.value.name, result.value.blob)
+          }
+        })
+
+        const zipBlob = await zip.generateAsync({ type: 'blob' })
+        const link = document.createElement('a')
+        link.href = URL.createObjectURL(zipBlob)
+        link.download = `invoices_${new Date().toISOString().slice(0, 10)}.zip`
+        link.click()
+        URL.revokeObjectURL(link.href)
+      }
+    } catch {
+      // Download failed silently
+    } finally {
+      setIsDownloadingPdf(false)
+    }
+  }, [currentSchool?.id, selectedRows])
 
   const updateStatusMenus = useMemo(() => {
     return [
@@ -188,13 +200,7 @@ const BulkActionComponent = ({
     handleApprove,
     handleReject,
   ])
-  const handleSendCustomMessages = useCallback(() => {
-    setIsCustomMessagesModalOpen(true)
-  }, [])
 
-  const handleCloseCustomMessagesModal = useCallback(() => {
-    setIsCustomMessagesModalOpen(false)
-  }, [])
   return (
     <>
       <AnimatePresence>
@@ -207,7 +213,7 @@ const BulkActionComponent = ({
             style={{ width: '100%' }}
           >
             <Box
-              className="bg-background-layer-3  shadow-sm px-2 py-2 rounded-md"
+              className="bg-background-layer-3 shadow-sm px-2 py-2 rounded-md"
               justify="between"
             >
               <Box>
@@ -227,44 +233,32 @@ const BulkActionComponent = ({
               </Box>
               <Box className="gap-x-2" justify="end">
                 <Button
-                  iconBefore={<LuMessageSquare />}
+                  iconBefore={<LuDownload />}
                   variant="outline"
                   size="sm"
-                  onClick={handleSendCustomMessages}
+                  onClick={handleDownloadPdf}
+                  disabled={isDownloadingPdf}
+                  loading={isDownloadingPdf}
                 >
-                  {t('student:paymentProof.sendCustomMessages')}
+                  {t('student:paymentProof.action.downloadPDF')}
+                </Button>
+                <Button
+                  iconBefore={<LuSend />}
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setReminderModalState({
+                      isOpen: true,
+                      action: SendPaymentActions.RESEND_PAYMENT_REMINDER,
+                    })
+                  }
+                >
+                  {t('student:paymentProof.sendInvoice')}
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      iconBefore={<LuBellRing />}
-                      variant="outline"
-                      size="sm"
-                    >
-                      {t('student:paymentProof.sendNotifications')}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-fit max-w-80">
-                    {notifMenus.map(menu => (
-                      <DropdownMenuItem
-                        key={menu.key}
-                        className="flex gap-x-2 cursor-pointer"
-                        onClick={menu.onClick}
-                      >
-                        <div className="flex gap-x-2">
-                          {/* {menu.typeIcon} */}
-                          {menu.type}
-                        </div>
-                        {menu.text}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
                       disabled={isActionDisabled}
-                      // className="disabled:cursor-not-allowed"
                       iconBefore={<LuFileSignature />}
                       size="sm"
                       variant="outline"
@@ -308,13 +302,6 @@ const BulkActionComponent = ({
           selectedRows={selectedRows}
           isOpen={reminderModalState.isOpen}
           onClose={handleCloseReminderModal}
-        />
-      )}
-      {isCustomMessagesModalOpen && (
-        <SendCustomMessages
-          selectedRows={selectedRows}
-          isOpen={isCustomMessagesModalOpen}
-          onClose={handleCloseCustomMessagesModal}
         />
       )}
     </>

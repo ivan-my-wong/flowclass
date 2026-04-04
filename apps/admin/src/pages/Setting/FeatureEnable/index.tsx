@@ -6,6 +6,8 @@ import { LuCreditCard, LuFileText } from 'react-icons/lu'
 import { MdOutlineMailOutline } from 'react-icons/md'
 
 import BoxWithToggleGroup from '@/components/ToggleGroup/BoxWithToggleGroup'
+import useCheckPermissionAndQuota from '@/hooks/useCheckPermissionAndQuota'
+import { FeatureEnableEnum } from '@/types/schoolSubscriptionPlan'
 
 import CreditSystem from './CreditSystem'
 import EmailSetting from './EmailSetting'
@@ -58,10 +60,41 @@ const FeatureEnable = (): JSX.Element => {
           <EmailSetting tabName="email" />
         )}
         {currentSection === FeatureSections.STUDENT_PORTAL && (
-          <StudentPortalSetting />
+          <>
+            {isLoadingPermissionAndQuota ? (
+              <FullScreenLoading />
+            ) : (
+              <>
+                {isStudentPortalAllowed ? (
+                  <StudentPortalSetting />
+                ) : (
+                  <div className="p-8 text-center text-gray-500">
+                    {t('common:noActiveSubscription')}
+                  </div>
+                )}
+              </>
+            )}
+          </>
         )}
-        {currentSection === FeatureSections.TEXT_VERSION && (
-          <TextVersionSetting />
+        {currentSection === FeatureSections.INTEGRATIONS && (
+          <IntegrationsSetting />
+        )}
+        {currentSection === FeatureSections.CREDIT_SYSTEM && (
+          <>
+            {isLoadingPermissionAndQuota ? (
+              <FullScreenLoading />
+            ) : (
+              <>
+                {isCreditSystemAllowed ? (
+                  <CreditSystem />
+                ) : (
+                  <div className="p-8 text-center text-gray-500">
+                    {t('common:noActiveSubscription')}
+                  </div>
+                )}
+              </>
+            )}
+          </>
         )}
         {currentSection === FeatureSections.CREDIT_SYSTEM && <CreditSystem />}
       </BoxWithToggleGroup>

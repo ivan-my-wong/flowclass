@@ -2,7 +2,6 @@
 // eslint-disable-next-line simple-import-sort/imports
 import {
   CreateAndUpdateStudentContactInfoDto,
-  CreateAndUpdateStudentMemoDto,
   CreateOrUpdateStudentContactInfoV2Dto,
   StudentNotificationSettings,
 } from '@/application/admin/student-onboard/dtos/student-memo.dto'
@@ -359,6 +358,7 @@ export class StudentOnbService {
         'userAlias.email',
         'userAlias.isStudentParent',
         'userAlias.childOfUserAliasId',
+        'userAlias.remarks',
 
         'studentForms.formFieldId',
         'studentForms.formFieldType',
@@ -477,6 +477,7 @@ export class StudentOnbService {
         // 'userAlias.phone',
         'userAlias.name',
         'userAlias.email',
+        'userAlias.remarks',
 
         'user.firstName',
         'user.phone',
@@ -1838,21 +1839,15 @@ export class StudentOnbService {
     }
   }
 
-  async addStudentMemo(
-    createAndUpdateStudentMemoDto: CreateAndUpdateStudentMemoDto
-  ): Promise<UserAlias> {
-    const user = await this.userRepository.findOneBy({
-      id: createAndUpdateStudentMemoDto.userId,
-    })
-    const defaultName = user?.firstName || 'Student'
-
-    const userAlias = await this.userAliasesRepository.findOrCreateByUserIdAndInstitution(
-      createAndUpdateStudentMemoDto.institutionId,
-      createAndUpdateStudentMemoDto.userId,
-      defaultName
-    )
-    userAlias.memo = createAndUpdateStudentMemoDto.memo
-    return await this.userAliasesRepository.save(userAlias)
+  async updateRemarks(
+    userAliasId: number,
+    remarks: string | null
+  ): Promise<{ id: number; remarks: string | null }> {
+    const userAlias = await this.userAliasesRepository.findOneBy({ id: userAliasId })
+    if (!userAlias) throw new ApiError(ErrorCode.USERID_NOT_FOUND)
+    userAlias.remarks = remarks ?? null
+    await this.userAliasesRepository.save(userAlias)
+    return { id: userAlias.id, remarks: userAlias.remarks }
   }
 
   async editStudentContactInfo(params: CreateAndUpdateStudentContactInfoDto) {
@@ -2203,6 +2198,10 @@ export class StudentOnbService {
       }
 
       enrollCourse.paymentAmount = params.price
+    }
+
+    if (params.isPaused !== undefined) {
+      enrollCourse.isPaused = params.isPaused
     }
 
     return await this.enrollCourseRepository.save(enrollCourse)
@@ -3500,6 +3499,18 @@ export class StudentOnbService {
     return await Promise.all(fieldValues)
   }
 
+  async updateStudentLessonRemarks(
+    studentLessonId: number,
+    remarks: string | null
+  ): Promise<{ id: number; remarks: string | null }> {
+    const studentLesson = await this.studentLessonRepository.findOne({
+      where: { id: studentLessonId },
+    })
+    if (!studentLesson) throw new ApiError(ErrorCode.CLASS_LESSON_NOT_FOUND)
+    await this.studentLessonRepository.update(studentLessonId, { remarks })
+    return { id: studentLessonId, remarks }
+  }
+
   async updateStudentForm(params: UpdateStudentFormDto) {
     let studentForms
     if (params.userAliasId) {
@@ -4346,7 +4357,10 @@ export class StudentOnbService {
     if (!user) {
       throw new ApiError(ErrorCode.USERID_NOT_FOUND)
     }
-    return await this.studentNotifSettingService.getOrCreateNotification(user, data.institutionId)
+    return (await this.studentNotifSettingService.getOrCreateNotification(
+      user,
+      data.institutionId
+    )) as unknown as StudentNotificationSettings[]
   }
 
   async setNotificationSetting(payload: {
@@ -4358,11 +4372,11 @@ export class StudentOnbService {
     if (!user) {
       throw new ApiError(ErrorCode.USERID_NOT_FOUND)
     }
-    return await this.studentNotifSettingService.updateNotificationSettings(
+    return (await this.studentNotifSettingService.updateNotificationSettings(
       user,
       payload.institutionId,
       payload.data
-    )
+    )) as unknown as StudentNotificationSettings[]
   }
 
   async checkIfIsOnlyUserAlias(userId: number): Promise<boolean> {

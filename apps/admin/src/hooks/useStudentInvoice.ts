@@ -15,6 +15,7 @@ import {
   fetchBundleDiscountAvailability,
   fetchPossiblePromotions,
   getAllBundleDiscounts,
+  getAllPackageDiscounts,
 } from '@/api/promotion'
 import { getAllStudentsOfInstitutionNew } from '@/api/student'
 import { QUERY_KEY } from '@/constants/queryKey'
@@ -90,9 +91,13 @@ const useStudentInvoice = (): HookResult => {
     const result = useQuery(
       [QUERY_KEY.studentInvoice.getCouponAndBundle],
       async () => {
-        const [coupon, bundle] = await Promise.all([
+        const [coupon, bundle, packageDiscount] = await Promise.all([
           fetchPossiblePromotions(currentSchoolId),
           getAllBundleDiscounts(
+            currentSiteId.toString(),
+            currentSchoolId.toString()
+          ),
+          getAllPackageDiscounts(
             currentSiteId.toString(),
             currentSchoolId.toString()
           ),
@@ -105,6 +110,10 @@ const useStudentInvoice = (): HookResult => {
           ...(bundle ?? []).map(d => ({
             ...d,
             promotionType: PromotionTypeItem.BUNDLE,
+          })),
+          ...(packageDiscount ?? []).map(p => ({
+            ...p,
+            promotionType: PromotionTypeItem.PACKAGE,
           })),
         ]
       },

@@ -1,3 +1,4 @@
+import { SharedVideoStatus } from '@/constants/course'
 import {
   ClassLessonType,
   CreateLessonProps,
@@ -284,4 +285,15 @@ export const getListLessonMatrix = async (
   })
 
   return res.data.data
+}
+
+export const bulkUpdateSharedVideo = async (
+  classLessonIds: number[],
+  hasSharedVideo: SharedVideoStatus
+): Promise<void> => {
+  await apiClient.patch({
+    needAuth: true,
+    url: '/admin/class-lesson/bulk-update-shared-video',
+    data: { classLessonIds, hasSharedVideo },
+  })
 }

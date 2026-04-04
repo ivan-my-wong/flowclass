@@ -492,7 +492,7 @@ const RescheduleApprovalPage = () => {
               height={dynamicHeight}
               handleReset={handleReset}
               hasFilterSelection
-              filterSelector={
+              filterSelector={({ handleReset: reset }) => (
                 <Box direction="col">
                   <Box className="box-row-full">
                     <LabelSelector
@@ -528,12 +528,12 @@ const RescheduleApprovalPage = () => {
                       ref={statusRef}
                       isMulti
                     />
-                    <Button variant="outline" onClick={handleReset}>
+                    <Button variant="outline" onClick={reset}>
                       {t('recordLogs:notificationLogs.selectLabels.reset')}
                     </Button>
                   </Box>
                 </Box>
-              }
+              )}
             />
           )}
         </div>

@@ -9,6 +9,8 @@ import dayjs from '@/utils/dayjs'
 
 import PaymentReceiptStatusCell from '../../PaymentProofTableCells/PaymentReceiptStatusCell'
 
+import UpdateAmountPaid from './UpdateAmountPaid'
+import UpdateInvoiceDateField from './UpdateInvoiceDateField'
 import UpdatePayAmount from './UpdatePayAmount'
 import UpdatePayLeterMethod from './UpdatePayLeterMethod'
 import UploadPaymentProof from './UploadPaymentProof'
@@ -37,6 +39,10 @@ const PaymentStatus: FC<Props> = ({ invoiceData, refetch }): JSX.Element => {
         <div className="flex items-center justify-between font-medium">
           <div className="text-sm">{t('student:paymentProof.totalAmount')}</div>
           <UpdatePayAmount data={invoiceData} refetch={refetch} />
+        </div>
+        <div className="flex items-center justify-between font-medium">
+          <div className="text-sm">{t('student:paymentProof.amountPaid')}</div>
+          <UpdateAmountPaid data={invoiceData} refetch={refetch} />
         </div>
         <div className="flex items-center justify-between font-medium">
           <div className="text-sm">{t('student:paymentProof.status')}</div>
@@ -68,22 +74,24 @@ const PaymentStatus: FC<Props> = ({ invoiceData, refetch }): JSX.Element => {
             }}
           />
         </div>
-        {invoiceData.createdAt != null && (
-          <div className="flex items-center justify-between font-medium">
-            <div className="text-sm">{t('student:createdDate')}</div>
-            <div className="text-sm text-muted-foreground">
-              {dayjs(invoiceData.createdAt).format('D MMM YYYY HH:mm')}
-            </div>
+        <div className="flex items-center justify-between font-medium">
+          <div className="text-sm">{t('student:paymentProof.createdDate')}</div>
+          <UpdateInvoiceDateField
+            data={invoiceData}
+            field="createdAt"
+            refetch={refetch}
+          />
+        </div>
+        <div className="flex items-center justify-between font-medium">
+          <div className="text-sm">
+            {t('student:paymentProof.lastUpdatedDate')}
           </div>
-        )}
-        {invoiceData.updatedAt != null && (
-          <div className="flex items-center justify-between font-medium">
-            <div className="text-sm">{t('student:lastUpdated')}</div>
-            <div className="text-sm text-muted-foreground">
-              {dayjs(invoiceData.updatedAt).format('D MMM YYYY HH:mm')}
-            </div>
-          </div>
-        )}
+          <UpdateInvoiceDateField
+            data={invoiceData}
+            field="updatedAt"
+            refetch={refetch}
+          />
+        </div>
       </div>
     </div>
   )

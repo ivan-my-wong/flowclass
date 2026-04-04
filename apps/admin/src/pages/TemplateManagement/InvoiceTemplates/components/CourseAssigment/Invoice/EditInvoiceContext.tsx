@@ -173,7 +173,8 @@ export const InvoiceEditDialogProvider = ({
     >
   >({})
   const listStudents = useRecoilValue(studentListState)
-  const listInvoiceStudents = useRecoilValue(invoiceStudentState)
+  const [listInvoiceStudents, setListInvoiceStudents] =
+    useRecoilState(invoiceStudentState)
   const [appliedPromotions, setAppliedPromotions] = useRecoilState(
     appliedPromotionsState
   )
@@ -585,7 +586,13 @@ export const InvoiceEditDialogProvider = ({
 
     // Filter applied promotions to only include those belonging to the current student
     const isCombined = invoiceCampaign?.isCombined ?? false
+    const currentClassIds = new Set(currentClasses.map(c => c.classId))
+
     const studentPromotions = appliedPromotions.filter(item => {
+      // Package discounts are class-scoped: match by classId rather than studentId
+      if (item.type === PromotionTypeItem.PACKAGE) {
+        return item.classId != null && currentClassIds.has(item.classId)
+      }
       if (isCombined) {
         return item.parentId === currentActiveParent?.id
       }
@@ -599,6 +606,7 @@ export const InvoiceEditDialogProvider = ({
     )
   }, [
     appliedPromotions,
+    currentClasses,
     siteData.currency,
     totalPrice?.totalPrice,
     invoiceCampaign?.isCombined,
@@ -711,6 +719,47 @@ export const InvoiceEditDialogProvider = ({
     getParentBalance,
     setAppliedPromotions,
   ])
+
+  // Sync-back: persist appliedPromotions changes to invoiceStudentState
+  // so discount edits survive dialog close/reopen and student switching
+  useEffect(() => {
+    if (!currentActiveStudent) return
+    const isCombined = invoiceCampaign?.isCombined ?? false
+
+    // Filter to this student's promotions only
+    const studentPromotions = appliedPromotions.filter(item => {
+      if (isCombined) return item.parentId === currentActiveParent?.id
+      return item.studentId === currentActiveStudent?.id
+    })
+
+    // Check if the student's stored promotions differ from the global state
+    const storedStudent = listInvoiceStudents.find(
+      s => s.id === currentActiveStudent.id
+    )
+    const storedPromotions = storedStudent?.appliedPromotions ?? []
+
+    // Compare by ID + amount to detect both addition/removal and value changes
+    const storedKey = storedPromotions
+      .map(p => `${p.id}:${p.amount}`)
+      .sort()
+      .join(',')
+    const currentKey = studentPromotions
+      .map(p => `${p.id}:${p.amount}`)
+      .sort()
+      .join(',')
+    const isSame = storedKey === currentKey
+
+    if (!isSame) {
+      setListInvoiceStudents(prev =>
+        prev.map(s =>
+          s.id === currentActiveStudent.id
+            ? { ...s, appliedPromotions: studentPromotions }
+            : s
+        )
+      )
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appliedPromotions, currentActiveStudent?.id])
 
   const childs = useMemo(() => {
     return listStudents

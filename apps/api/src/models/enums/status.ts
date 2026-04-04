@@ -56,6 +56,7 @@ export enum PaymentStatus {
   PENDING = 'PENDING',
   SUBMITTED = 'SUBMITTED',
   PAID = 'PAID',
+  PARTIALLY_PAID = 'PARTIALLY_PAID',
   REFUNDED = 'REFUNDED',
   CRITICAL = 'CRITICAL',
   UNPAID = 'UNPAID',
@@ -125,4 +126,15 @@ export enum AvailabilityStatus {
   AVAILABLE = 'AVAILABLE',
   CONFLICT = 'CONFLICT',
   FULLY_BOOKED = 'FULLY_BOOKED',
+}
+
+export enum LessonType {
+  REGULAR = 'REGULAR',
+  WORKSHOP = 'WORKSHOP',
+  TRIAL = 'TRIAL',
+}
+
+export enum SharedVideoStatus {
+  NONE = 'NONE',
+  SHARED = 'SHARED',
 }

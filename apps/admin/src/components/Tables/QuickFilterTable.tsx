@@ -21,7 +21,10 @@ import {
   PaginationModule,
   provideGlobalGridOptions,
   QuickFilterModule,
+  RenderApiModule,
+  RowApiModule,
   RowAutoHeightModule,
+  RowHeightParams,
   RowSelectionModule,
   RowSelectionOptions,
   RowStyleModule,
@@ -57,6 +60,7 @@ ModuleRegistry.registerModules([
   TextFilterModule,
   RowSelectionModule,
   QuickFilterModule,
+  RenderApiModule,
   PaginationModule,
   ClientSideRowModelModule,
   RowAutoHeightModule,
@@ -80,11 +84,16 @@ type TableProps = {
   hasSortSelection?: boolean
   gridRef: RefObject<AgGridReact>
   hasFilterSelection?: boolean
-  filterSelector?: JSX.Element | JSX.Element[]
+  /** Receives handleReset that clears search input before calling parent's reset */
+  filterSelector?:
+    | ((props: { handleReset: () => void }) => React.ReactNode)
+    | React.ReactNode
   isLoading?: boolean
   useUrlSearch?: boolean
   handleReset?: () => void
   inputRef?: RefObject<HTMLInputElement>
+  /** When this changes, the search input is cleared (e.g. increment on reset) */
+  resetSearchTrigger?: number
   onPaginationChanged?: (page: number) => void
   onSelectionChanged?: () => void
   getRowId?: (params: any) => string
@@ -93,6 +102,8 @@ type TableProps = {
   getRowClass?: (params: any) => string
   onColumnMoved?: (event: ColumnMovedEvent) => void
   alwaysMultiSort?: boolean
+  getRowHeight?: (params: RowHeightParams) => number
+  checkboxColumnOverrides?: Partial<ColDef>
 } & ComponentPropsWithoutRef<'div'>
 
 const QuickFilterTable: React.FC<TableProps> = ({
@@ -108,6 +119,7 @@ const QuickFilterTable: React.FC<TableProps> = ({
   isLoading,
   handleReset,
   inputRef,
+  resetSearchTrigger,
   searchPlaceholder,
   onSelectionChanged,
   getRowId,
@@ -116,6 +128,8 @@ const QuickFilterTable: React.FC<TableProps> = ({
   showFilterBox = true,
   onColumnMoved,
   alwaysMultiSort = false,
+  getRowHeight,
+  checkboxColumnOverrides,
   ...props
 }) => {
   const { t } = useTranslation()
@@ -142,6 +156,11 @@ const QuickFilterTable: React.FC<TableProps> = ({
       minWidth: columnMinWidth,
     }
   }, [columnMinWidth])
+
+  const checkboxColumnDef = useMemo(
+    () => ({ ...createCheckboxColumnDef(), ...checkboxColumnOverrides }),
+    [checkboxColumnOverrides]
+  )
 
   const processedColumns = useMemo(() => {
     return columns.map(column => {
@@ -175,19 +194,45 @@ const QuickFilterTable: React.FC<TableProps> = ({
   }, [search, useUrlSearch])
 
   useEffect(() => {
+    if (resetSearchTrigger != null && resetSearchTrigger > 0) {
+      setQuickFilterText('')
+    }
+  }, [resetSearchTrigger])
+
+  const wrappedHandleReset = useCallback(() => {
+    setQuickFilterText('')
+    handleReset?.()
+  }, [handleReset])
+
+  useEffect(() => {
     if (!useUrlSearch) return
 
-    if (!debouncedQuickFilterText) {
-      const newSearchParams = new URLSearchParams(searchParams.toString())
-      newSearchParams.delete('search')
-      setSearchParams(newSearchParams)
+    // When user clears input (e.g. reset), quickFilterText is empty immediately but
+    // debouncedQuickFilterText lags. Prioritize quickFilterText so we clear URL right away.
+    const shouldClear = !quickFilterText || !debouncedQuickFilterText
+    if (shouldClear) {
+      const currentSearch = searchParams.get('search') ?? ''
+      if (currentSearch !== '') {
+        const next = new URLSearchParams(searchParams.toString())
+        next.delete('search')
+        setSearchParams(next)
+      }
       return
     }
 
-    const newSearchParams = new URLSearchParams(searchParams.toString())
-    newSearchParams.set('search', debouncedQuickFilterText)
-    setSearchParams(newSearchParams)
-  }, [debouncedQuickFilterText, searchParams, setSearchParams, useUrlSearch])
+    const currentSearch = searchParams.get('search') ?? ''
+    if (currentSearch !== debouncedQuickFilterText) {
+      const next = new URLSearchParams(searchParams.toString())
+      next.set('search', debouncedQuickFilterText)
+      setSearchParams(next)
+    }
+  }, [
+    quickFilterText,
+    debouncedQuickFilterText,
+    searchParams,
+    setSearchParams,
+    useUrlSearch,
+  ])
 
   const rowSelection = useMemo<
     RowSelectionOptions | 'single' | 'multiple' | undefined
@@ -226,11 +271,13 @@ const QuickFilterTable: React.FC<TableProps> = ({
             />
           </div>
           {hasFilterSelection && filterSelector && handleReset && (
-            <>
-              <FilterSelectorContainer>
-                {filterSelector}
-              </FilterSelectorContainer>
-            </>
+            <FilterSelectorContainer>
+              <>
+                {typeof filterSelector === 'function'
+                  ? filterSelector({ handleReset: wrappedHandleReset })
+                  : filterSelector}
+              </>
+            </FilterSelectorContainer>
           )}
           {hasSortSelection && (
             <Select
@@ -260,7 +307,8 @@ const QuickFilterTable: React.FC<TableProps> = ({
         animateRows // Optional - set to 'true' to have rows animate when sorted
         pagination
         headerHeight={HEADER_HEIGHT}
-        rowHeight={ROW_HEIGHT}
+        rowHeight={getRowHeight ? undefined : ROW_HEIGHT}
+        getRowHeight={getRowHeight}
         paginationPageSize={
           gridRef.current?.api?.getGridOption('paginationPageSize') ||
           DEFAULT_ROWS_PER_PAGE

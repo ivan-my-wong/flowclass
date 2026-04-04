@@ -87,10 +87,10 @@ type FilterKeys =
   | 'promotions'
 type FilterParamsType = Record<FilterKeys, SelectItemValuesProps[]>
 
-const initialDate = getInitialChartDateRange({
-  daysBeforeStart: 30,
-  daysBeforeEnd: 0,
-})
+const initialDate: ChartDate = {
+  startDate: dayjs().subtract(2, 'month').startOf('month').format('YYYY-MM-DD'),
+  endDate: dayjs().add(2, 'month').endOf('month').format('YYYY-MM-DD'),
+}
 
 const MAX_BULK_SELECTION = 50
 
@@ -942,7 +942,7 @@ const PaymentProofPage = (): JSX.Element => {
             height={dynamicHeight}
             handleReset={handleReset}
             hasFilterSelection
-            filterSelector={
+            filterSelector={({ handleReset: reset }) => (
               <div className="box-responsive-full">
                 <div className="md:flex w-full flex-row items-center justify-center gap-2 p-0 space-y-1">
                   <CourseAndClassSelector
@@ -1032,12 +1032,12 @@ const PaymentProofPage = (): JSX.Element => {
                     isMulti
                   />
 
-                  <Button className="w-full md:w-[80px]" onClick={handleReset}>
+                  <Button className="w-full md:w-[80px]" onClick={reset}>
                     {t('recordLogs:notificationLogs.selectLabels.reset')}
                   </Button>
                 </div>
               </div>
-            }
+            )}
           />
         </div>
       </div>

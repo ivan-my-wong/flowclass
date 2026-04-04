@@ -57,10 +57,12 @@ import dayjs from '@/utils/dayjs'
 import {
   buildInvoiceCampaignData,
   createSessionId,
+  getEarliestSessionDate,
 } from '@/utils/invoice-campaign.utils'
 
 import CourseAssignment from './CourseAssignment'
 import { InvoiceEditorProvider } from './InvoiceEditorContext'
+import PackageDiscountAutoApplyAll from './PackageDiscountAutoApplyAll'
 
 const InvoiceEditor = (): JSX.Element => {
   const { t } = useTranslation()
@@ -197,6 +199,9 @@ const InvoiceEditor = (): JSX.Element => {
             childOfUserAliasId: invoice?.childOfUserAliasId ?? null,
             isStudentParent: studentData?.isStudentParent ?? false,
             isSendToParent,
+            paymentDate: invoice.paymentDate
+              ? new Date(invoice.paymentDate)
+              : null,
           } as InvoiceStudent
         })
         setAllStudents(students)
@@ -411,6 +416,7 @@ const InvoiceEditor = (): JSX.Element => {
             usedBalance: studentItem.usedBalance ?? 0,
             isSendToParent,
             total: 0,
+            paymentDate: null,
             ...defaultStudentInvoiceConfig,
           }
           return newInvoiceStudentItem
@@ -418,9 +424,23 @@ const InvoiceEditor = (): JSX.Element => {
       setAllStudents(studentsToAssign)
       if (studentsToAssign.length > 0) {
         setCurrentActiveStudent(studentsToAssign[0])
+        // Auto-set title to first student's name if title is still default
+        const defaultTitle = t('invoiceCampaign:invoiceItem.title')
+        setInvoiceCampaign(prev => {
+          if (!prev) return prev
+          if (prev.title && prev.title !== defaultTitle) return prev
+          return { ...prev, title: studentsToAssign[0].name }
+        })
       }
     }
-  }, [setAllStudents, setCurrentActiveStudent, studentIdsToAssign, studentList])
+  }, [
+    setAllStudents,
+    setCurrentActiveStudent,
+    studentIdsToAssign,
+    studentList,
+    t,
+    setInvoiceCampaign,
+  ])
 
   const isDisabledActions = useMemo(() => {
     return isCreating || isUpdating
@@ -461,6 +481,29 @@ const InvoiceEditor = (): JSX.Element => {
       }
     })
   }, [isOneSingleParent, setInvoiceCampaign])
+
+  useEffect(() => {
+    if (allStudents.length === 0 || allSessions.length === 0) return
+
+    const updated = allStudents.map(student => {
+      // Only auto-set if no paymentDate exists yet; respect manually-set dates
+      if (student.paymentDate) return student
+      const earliest = getEarliestSessionDate(student.id, allSessions)
+      if (!earliest) return student
+      return { ...student, paymentDate: earliest }
+    })
+
+    const hasChanges = updated.some((s, i) => {
+      return (
+        s.paymentDate?.toString() !== allStudents[i].paymentDate?.toString()
+      )
+    })
+    if (hasChanges) {
+      setAllStudents(updated)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allSessions])
+
   const onChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = event.target.value
       .replace(/\s{2,}/g, ' ')
@@ -504,6 +547,7 @@ const InvoiceEditor = (): JSX.Element => {
 
   return (
     <InvoiceEditorProvider>
+      <PackageDiscountAutoApplyAll />
       <ContentLayout
         headerBackButton={{
           mode: 'back',

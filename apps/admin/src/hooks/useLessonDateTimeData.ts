@@ -10,6 +10,7 @@ import { useRecoilState } from 'recoil'
 import { toast } from 'sonner'
 
 import {
+  bulkUpdateSharedVideo,
   CreateLesson,
   delayFollowingLessons,
   DeleteLesson,
@@ -23,7 +24,12 @@ import {
   updateLessonLocationRoom,
   updateTimeLesson,
 } from '@/api/lessonDateTime'
-import { deleteSingleStudentLesson, updateAttendance } from '@/api/student'
+import {
+  deleteSingleStudentLesson,
+  updateAttendance,
+  updateStudentLessonRemarks,
+} from '@/api/student'
+import { SharedVideoStatus } from '@/constants/course'
 import { QUERY_KEY } from '@/constants/queryKey'
 import { lessonDateTimeState } from '@/stores/lessonDateTimeData'
 import {
@@ -314,6 +320,16 @@ const useLessonDateTimeData = () => {
     })
   }
 
+  const useUpdateStudentLessonRemarks = () => {
+    return useMutation({
+      mutationFn: (data: { studentLessonId: number; remarks: string | null }) =>
+        updateStudentLessonRemarks(data),
+      onError: (error: ApiError) => {
+        handleApiError({ error, t })
+      },
+    })
+  }
+
   const useFetchAvailableNextRecurring = () => {
     return useMutation({
       mutationFn: (data: GetAvailableNextRecurringPayload) =>
@@ -441,12 +457,34 @@ const useLessonDateTimeData = () => {
     useDelayFollowingLessons,
     useDeleteStudentLesson,
     useUpdateAttendanceLesson,
+    useUpdateStudentLessonRemarks,
     useFetchAvailableNextRecurring,
     useGetListStudentLesson,
     useUpdateLocationRoom,
     useUpdateInstructor,
     useCheckConflict,
     useGetLessonMatrix,
+    useBulkUpdateSharedVideo,
+  }
+
+  function useBulkUpdateSharedVideo(
+    onSuccess?: () => void
+  ): UseMutationResult<
+    void,
+    ApiError,
+    { classLessonIds: number[]; hasSharedVideo: SharedVideoStatus }
+  > {
+    return useMutation({
+      mutationFn: ({ classLessonIds, hasSharedVideo }) =>
+        bulkUpdateSharedVideo(classLessonIds, hasSharedVideo),
+      onSuccess: () => {
+        toast.success(t('lessonList:videoStatusUpdated'))
+        onSuccess?.()
+      },
+      onError: (error: ApiError) => {
+        handleApiError({ error, t })
+      },
+    })
   }
 }
 

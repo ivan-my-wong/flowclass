@@ -1,11 +1,12 @@
 import { useMemo } from 'react'
 
 import { useTranslation } from 'react-i18next'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 
 import { Button } from '@/components/ui/Button'
 import useInvoiceSummary from '@/hooks/useInvoiceSummary'
 import {
+  availableLessonsByClassState,
   currentActiveStudentState,
   invoiceClassesState,
   invoiceSessionState,
@@ -33,6 +34,7 @@ const EditorAction = (): JSX.Element => {
     setSelectedSessions,
     setShowAllClassesInCourse,
     setAllClassesLessonsData,
+    regularV2Lessons,
   } = useInvoiceEditorContext()
   const {
     totalPrice,
@@ -48,23 +50,19 @@ const EditorAction = (): JSX.Element => {
   const [allClasses, setAllClasses] = useRecoilState(invoiceClassesState)
   const [allSessions, setAllSessions] = useRecoilState(invoiceSessionState)
   const allStudents = useRecoilValue(invoiceStudentState)
+  const setAvailableLessonsByClass = useSetRecoilState(
+    availableLessonsByClassState
+  )
 
-  const extractPriceOptionData = useMemo(() => {
-    let calculatedPrice = 0
-    if (selectedPrice) {
-      const { priceType, amount, numberOfLessons } = selectedPrice
-      if (priceType === PriceType.PER_LESSON) {
-        calculatedPrice = Number(amount)
-      } else {
-        calculatedPrice = Number(amount) / (numberOfLessons || 1)
-      }
+  // Populate available lessons for package discount auto-apply
+  const populateAvailableLessons = (classId: number) => {
+    if (regularV2Lessons && regularV2Lessons.length > 0) {
+      setAvailableLessonsByClass(prev => ({
+        ...prev,
+        [classId]: regularV2Lessons.map(l => ({ id: l.id, date: l.date })),
+      }))
     }
-    return {
-      priceType: selectedPrice?.priceType ?? PriceType.PER_LESSON,
-      price: calculatedPrice,
-      priceOption: selectedPrice ?? undefined,
-    }
-  }, [selectedPrice])
+  }
 
   // Helper function to get class info for a session (multi-class support)
   const getClassForSession = (session: any): Classes | undefined => {
@@ -201,6 +199,20 @@ const EditorAction = (): JSX.Element => {
 
         setAllClasses(newClassItems)
         setAllSessions(newSessionItems)
+        // Populate available lessons for each class in multi-class mode
+        if (allClassesLessonsData) {
+          allClassesLessonsData.classes.forEach((cls: any) => {
+            if (cls.lessons) {
+              setAvailableLessonsByClass(prev => ({
+                ...prev,
+                [cls.classId]: cls.lessons.map((l: any) => ({
+                  id: l.id,
+                  date: l.date,
+                })),
+              }))
+            }
+          })
+        }
         closeAndResetDialog()
         return
       }
@@ -307,6 +319,7 @@ const EditorAction = (): JSX.Element => {
           setAllSessions(updatedSessions)
         }
       }
+      if (currentClass) populateAvailableLessons(currentClass.id)
       closeAndResetDialog()
     } else {
       // Append sessions to the existing class for this student
@@ -462,6 +475,7 @@ const EditorAction = (): JSX.Element => {
 
         setAllClasses(newClassItems)
         setAllSessions(newSessionItems)
+        if (currentClass) populateAvailableLessons(currentClass.id)
         closeAndResetDialog()
         return
       }
@@ -507,6 +521,7 @@ const EditorAction = (): JSX.Element => {
 
       setAllClasses(newClassItems)
       setAllSessions(newSessionItems)
+      if (currentClass) populateAvailableLessons(currentClass.id)
       closeAndResetDialog()
     }
   }

@@ -9,6 +9,7 @@ import { AppointmentService } from '@/domain/service/appointment.service'
 import { AuthService } from '@/domain/service/auth.service'
 import { AvailabilityService } from '@/domain/service/availability.service'
 import { BundleDiscountsService } from '@/domain/service/bundle-discounts.service'
+import { PackageDiscountsService } from '@/domain/service/package-discounts.service'
 import { ClassLessonService } from '@/domain/service/class-lesson.service'
 import { ClassService } from '@/domain/service/class.service'
 import { CommentService } from '@/domain/service/comment.service'
@@ -56,6 +57,8 @@ import { Appointment, AppointmentRepository } from '@/models/appointment.entity'
 import { Availability, AvailabilityRepository } from '@/models/availability.entity'
 import { BundleDiscount } from '@/models/bundle-discounts.entity'
 import { BundleDiscountsRepository } from '@/models/bundle-discounts.repository'
+import { PackageDiscount } from '@/models/package-discounts.entity'
+import { PackageDiscountsRepository } from '@/models/package-discounts.repository'
 import { ClassLessonRepository } from '@/models/class-lesson.repository'
 import { ClassLesson } from '@/models/class-lessons.entity'
 import { ClassEntity } from '@/models/classes.entity'
@@ -258,7 +261,7 @@ export const getAllEntities = () => [
   StudentLesson,
   CourseActivitiesOrderEntity,
   BundleDiscount,
-  StripeProductPricesEntity,
+  PackageDiscount,
   CommonForm,
   CommonField,
   SettingBlockTime,
@@ -334,7 +337,7 @@ export const getAllRepositories = () => [
   InstitutionGalleryRepository,
   CourseActivitiesOrderRepository,
   BundleDiscountsRepository,
-  StripeProductPricesRepository,
+  PackageDiscountsRepository,
   RecurringSchedulesRepository,
   SettingNotificationsRepository,
   StudentScheduleRepository,
@@ -409,7 +412,7 @@ export const getAllServices = () => [
   ClassLessonService,
   CourseActivitiesOrderService,
   BundleDiscountsService,
-  StripeProductPricesService,
+  PackageDiscountsService,
   ManagementService,
   EnrollmentFormService,
   SetingBlockTimeService,

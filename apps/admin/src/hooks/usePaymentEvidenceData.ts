@@ -22,6 +22,7 @@ import {
   getStudentInvoiceStatistics,
   getStudentSingleInvoice,
   sendInvoiceCustomMessage,
+  updateAmountPaid,
   updatePayLaterMethod,
   updatePaymentAmount,
   updatePaymentDate,
@@ -329,6 +330,19 @@ const usePaymentEvidenceData = () => {
     })
   }
 
+  const useAmountPaidUpdate = () => {
+    return useMutation({
+      mutationFn: (payload: { invoiceId: number; amountPaid: number }) =>
+        updateAmountPaid(currentSchoolId, payload),
+      onSuccess: () => {
+        toast.success(t('student:paymentProof.updateAmountPaidSuccess'))
+      },
+      onError: (error: ApiError) => {
+        handleApiError({ error, t })
+      },
+    })
+  }
+
   const usePayLaterMethodUpdate = () => {
     return useMutation({
       mutationFn: (payload: {
@@ -585,8 +599,12 @@ const usePaymentEvidenceData = () => {
 
   const usePaymentDateUpdate = () => {
     return useMutation({
-      mutationFn: (payload: { invoiceId: number; paymentDate: string }) =>
-        updatePaymentDate(currentSchoolId, payload),
+      mutationFn: (payload: {
+        invoiceId: number
+        paymentDate?: string
+        createdAt?: string
+        updatedAt?: string
+      }) => updatePaymentDate(currentSchoolId, payload),
       onSuccess: () => {
         toast.success(t('student:paymentProof.updatePaymentDateSuccess'))
       },
@@ -609,6 +627,7 @@ const usePaymentEvidenceData = () => {
     useGenerateNextMonthInvoice,
     useSendInvoiceCustomMessage,
     usePaymentAmountUpdate,
+    useAmountPaidUpdate,
     useUpdateRemarkInvoice,
     useDeleteRemarkInvoice,
     useInvoiceOverview,

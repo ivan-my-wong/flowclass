@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import DatePicker from 'react-datepicker'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { useRecoilValue } from 'recoil'
+import { LuCalendar } from 'react-icons/lu'
+import { useRecoilState, useRecoilValue } from 'recoil'
 
 import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
 import ModalDialog from '@/components/ui/ModalDialog'
 import { FEATURE_FLAG } from '@/constants/featureFlags'
 import { DEFAULT_CURRENCY } from '@/constants/invoices'
@@ -14,7 +17,10 @@ import { useSendingCampaign } from '@/hooks/useSendingCampaign'
 import { schoolState } from '@/stores/schoolData'
 import { siteState } from '@/stores/siteData'
 import {
+  currentActiveParentState,
+  currentActiveStudentState,
   invoiceCampaignState,
+  invoiceClassesSelector,
   invoiceClassesState,
   invoiceSessionState,
   invoiceStudentState,
@@ -29,9 +35,66 @@ import {
 import { InvoiceCampaign } from '@/types/templateManagement'
 import { buildInvoiceCampaignData } from '@/utils/invoice-campaign.utils'
 
+import SelectedCourseTable from '../components/CourseAssigment/Invoice/SelectedCourseTable'
 import SplitInvoice from '../components/CourseAssigment/Invoice/SplitInvoice'
 import InvoiceDeliveryMethods from '../components/SendInvoice/InvoiceDeliveryMethods'
 import InvoiceRecipients from '../components/SendInvoice/InvoiceRecipients'
+
+import 'react-datepicker/dist/react-datepicker.css'
+
+const PaymentDateAndCourses = () => {
+  const { t } = useTranslation(['invoiceCampaign'])
+  const currentActiveStudent = useRecoilValue(currentActiveStudentState)
+  const currentActiveParent = useRecoilValue(currentActiveParentState)
+  const invoiceCampaign = useRecoilValue(invoiceCampaignState)
+  const [invoiceStudents, setInvoiceStudents] =
+    useRecoilState(invoiceStudentState)
+  const currentClasses = useRecoilValue(
+    invoiceClassesSelector({
+      userAliasId: currentActiveStudent?.id ?? null,
+      parentId: invoiceCampaign?.isCombined
+        ? currentActiveParent?.id ?? null
+        : null,
+    })
+  )
+
+  const paymentDate = useMemo(() => {
+    if (!currentActiveStudent) return null
+    const student = invoiceStudents.find(s => s.id === currentActiveStudent.id)
+    return student?.paymentDate ? new Date(student.paymentDate) : null
+  }, [invoiceStudents, currentActiveStudent])
+
+  const handlePaymentDateChange = (date: Date | null) => {
+    if (!currentActiveStudent) return
+    setInvoiceStudents(prev =>
+      prev.map(s =>
+        s.id === currentActiveStudent.id ? { ...s, paymentDate: date } : s
+      )
+    )
+  }
+
+  return (
+    <>
+      <div className="flex items-center gap-2 mb-4">
+        <LuCalendar className="text-gray-500 shrink-0" size={16} />
+        <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
+          {t('editor.paymentDate')}
+        </span>
+        <DatePicker
+          selected={paymentDate}
+          dateFormat="MMMM d, yyyy"
+          className="h-9 rounded-md border text-sm border-gray-300 px-3 w-full"
+          onChange={handlePaymentDateChange}
+          isClearable
+          placeholderText={t('editor.selectPaymentDate') as string}
+        />
+      </div>
+      <Card className="p-4 shadow-none border-gray-300">
+        <SelectedCourseTable currentClasses={currentClasses} />
+      </Card>
+    </>
+  )
+}
 
 const DialogSendInvoice = (): JSX.Element => {
   const invoiceCampaign = useRecoilValue(invoiceCampaignState)
@@ -241,6 +304,7 @@ const DialogSendInvoice = (): JSX.Element => {
       isFixedHeader
       footerClassName="px-8"
     >
+      <PaymentDateAndCourses />
       <InvoiceDeliveryMethods />
       {isSingleInvoice && FEATURE_FLAG.SPLIT_INVOICE_FOR_MULTIPLE_STUDENTS && (
         <SplitInvoice

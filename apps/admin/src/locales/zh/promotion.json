@@ -18,6 +18,7 @@
     "promotion": "優惠",
     "coupon": "優惠券",
     "bundleDiscount": "套餐折扣",
+    "packageDiscount": "全月折扣",
     "recurrDiscount": "循環折扣",
     "directDiscount": "直接折扣",
     "trial": "試用課程"
@@ -144,6 +145,53 @@
       "tier": "層級",
       "tiers": "層級",
       "off": "折扣"
+    }
+  },
+  "packageDiscount": {
+    "createSuccess": "全月折扣創建成功",
+    "updateSuccess": "全月折扣更新成功",
+    "deleteSuccess": "全月折扣刪除成功",
+    "activateSuccess": "全月折扣已啟用",
+    "deactivateSuccess": "全月折扣已停用",
+    "noPackageDiscounts": "尚無全月折扣。創建一個以在學生選擇當月所有課堂時提供每課折扣。",
+    "perLesson": "每課折扣",
+    "perLessonDiscount": "每課減 {{amount}}",
+    "applicableTo": "適用於",
+    "allClasses": "所有班級",
+    "classes": "個班級",
+    "activeCount": "啟用中的全月折扣 ({{count}})",
+    "inactiveCount": "已停用的全月折扣 ({{count}})",
+    "badge": "全月折扣",
+    "autoApplied": "全月折扣已自動套用",
+    "editTitle": "編輯全月折扣",
+    "detailTitle": "全月折扣詳情",
+    "notFound": "找不到全月折扣。",
+    "confirmCreate": "確定要創建此全月折扣？",
+    "confirmCreateTitle": "創建全月折扣",
+    "confirmUpdate": "確定要更新此全月折扣？",
+    "confirmUpdateTitle": "更新全月折扣",
+    "deleteAction": {
+      "title": "刪除全月折扣",
+      "description": "確定要刪除「{{name}}」？此操作無法撤銷。"
+    },
+    "errors": {
+      "amountRequired": "每課折扣金額必須大於0"
+    },
+    "form": {
+      "name": "名稱",
+      "namePlaceholder": "例如：每月全套優惠",
+      "amountPerLesson": "每課折扣金額",
+      "amountPerLessonHint": "當選擇當月所有課堂時，從每課扣除的固定金額",
+      "applyToAllClasses": "套用至所有班級",
+      "applyToAllClassesHint": "啟用後，此折扣適用於所有班級",
+      "selectClasses": "選擇班級",
+      "noClassesAvailable": "沒有可用班級",
+      "noMatchingClasses": "沒有符合搜尋的班級",
+      "searchClasses": "搜尋班級...",
+      "selected": "已選擇",
+      "selectAllVisible": "全選 ({{count}})",
+      "startDate": "開始日期",
+      "endDate": "結束日期"
     }
   },
   "trialLesson": {

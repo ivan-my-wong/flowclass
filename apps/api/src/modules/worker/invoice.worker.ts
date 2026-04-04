@@ -164,7 +164,7 @@ class InvoiceWorker {
     })
     const customMessage = await this.customMessageService.getCustomMessageByType(
       institutionId,
-      SupportedType.STUDENT_NOTIF_PAYMENT_REMINDER
+      SupportedType.CREATE_INVOICE
     )
     const result = []
     for (const invoice of res) {

@@ -73,8 +73,8 @@ export class UpdateSettingNotificationsDTO {
 }
 
 export enum SendWtsDTOExample {
-  siteId = 106,
-  institutionId = 163,
+  siteId = 1,
+  institutionId = 1,
   customMessage = 'This is a friendly reminder',
   wtsApiToken = 'your-whatsapp-api-token',
   wtsApiSid = 'ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',

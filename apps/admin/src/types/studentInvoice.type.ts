@@ -56,6 +56,7 @@ export type InvoiceStudent = {
   isStudentParent: boolean
   childOfUserAliasId: number | null
   enrollMetaId?: string
+  paymentDate?: Date | null
 }
 
 export type InvoiceClassType = {
@@ -98,6 +99,7 @@ export enum PromotionTypeItem {
   BUNDLE = 'bundle',
   REFERRAL = 'referral',
   MANUAL = 'manual',
+  PACKAGE = 'package',
 }
 export enum InvoiceSplitType {
   SINGLE = 'single',
@@ -135,6 +137,10 @@ export type AppliedPromotion = {
   // Bundle discount specific fields
   retroactiveDiscount?: number // Discount amount on past payments
   courseNames?: string[] // List of course names used for the discount
+  // Package discount specific fields
+  packageDiscountPerLesson?: number // Per-lesson discount amount
+  classId?: number // Class this package discount applies to
+  qualifiedLessonCount?: number // Number of lessons that qualified for package discount
 }
 
 export type AllPromotionsType = PossiblePromotionsType
@@ -265,6 +271,7 @@ export type InvoiceCampaignDetailDto = {
     userId: number
     userAliasId: number
   }[]
+  paymentDate?: string | null
 }
 
 export interface RecipientDto {

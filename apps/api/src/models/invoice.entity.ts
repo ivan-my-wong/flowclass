@@ -119,6 +119,9 @@ export class Invoice extends BaseEntity {
   @Column({ name: 'pay_amount', default: 0, type: 'numeric' })
   payAmount: number
 
+  @Column({ name: 'amount_paid', default: 0, type: 'numeric' })
+  amountPaid: number
+
   @Column({ name: 'currency', nullable: true })
   currency: string
 
@@ -327,6 +330,7 @@ export class Invoice extends BaseEntity {
     if (this.paymentState === PaymentStatus.PAID && !this.paymentDate) {
       this.paymentDate = new Date()
     }
+    this.amountPaid = this.payAmount ?? 0
   }
 
   @BeforeUpdate()
@@ -344,6 +348,8 @@ export class Invoice extends BaseEntity {
     ) {
       this.paymentDate = null
     }
+
+    this.amountPaid = this.payAmount ?? 0
   }
   @Column({ type: 'text', nullable: true })
   remark?: string

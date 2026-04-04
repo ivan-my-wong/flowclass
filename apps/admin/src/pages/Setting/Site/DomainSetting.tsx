@@ -33,7 +33,6 @@ const BasicSite = ({
 }): JSX.Element => {
   const { t } = useTranslation()
   const { siteData, updateCurrentSite } = useSiteData()
-
   const { currentSite } = siteData
   const fixedDomain = `.${getAppDomain()}`
   const [newSiteBanner, setNewSiteBanner] = useState<string>(

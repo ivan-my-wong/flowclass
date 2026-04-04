@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useTranslation } from 'react-i18next'
+import { useRecoilValue } from 'recoil'
 
 import { Spinner } from '@/components/Loaders/Spinner'
 import { Input } from '@/components/ui/Inputs/Input'
@@ -13,6 +14,8 @@ import {
   SelectValue,
 } from '@/components/ui/Select'
 import { Separator } from '@/components/ui/Separator'
+import { FEATURE_FLAG } from '@/constants/featureFlags'
+import { invoiceClassesState } from '@/stores/studentInvoice.store'
 import { PromotionTypeItem } from '@/types/studentInvoice.type'
 
 import AppliedDiscount from './AppliedDiscount'
@@ -25,7 +28,7 @@ type DiscountTypeOptions = {
   label: string
   value: string
 }
-const promotionTypeList = ['all', 'coupon', 'bundle']
+const promotionTypeList = ['all', 'coupon', 'bundle', 'package']
 
 const InvoiceDiscount = (): JSX.Element => {
   const { t } = useTranslation('invoiceCampaign')
@@ -40,11 +43,33 @@ const InvoiceDiscount = (): JSX.Element => {
   const [search, setSearch] = useState<string>('')
   const [promotionType, setPromotionType] = useState<string>('all')
 
+  const currentClasses = useRecoilValue(invoiceClassesState)
+  const currentClassIds = useMemo(
+    () => new Set(currentClasses.map(c => c.classId)),
+    [currentClasses]
+  )
+
   const filteredDiscounts = useMemo(() => {
     const promos = allPromotions ?? []
     if (promos.length === 0) return []
-    if (search === '' && promotionType === 'all') return promos
     return promos.filter(item => {
+      // Filter out package discounts that don't apply to any current class
+      if (item.promotionType === PromotionTypeItem.PACKAGE) {
+        const isAllClasses =
+          'isAllClasses' in item
+            ? (item as Record<string, unknown>).isAllClasses
+            : false
+        if (!isAllClasses) {
+          const classIds =
+            'applicableClassIds' in item
+              ? ((item as Record<string, unknown>).applicableClassIds as
+                  | number[]
+                  | null) ?? []
+              : []
+          if (!classIds.some(id => currentClassIds.has(id))) return false
+        }
+      }
+
       let name: string = ''
       if (item.promotionType === PromotionTypeItem.COUPON && 'code' in item) {
         name = item.code || ''
@@ -56,7 +81,7 @@ const InvoiceDiscount = (): JSX.Element => {
         (promotionType === 'all' || item.promotionType === promotionType)
       )
     })
-  }, [search, promotionType, allPromotions])
+  }, [search, promotionType, allPromotions, currentClassIds])
 
   const promotionTypeOptions: DiscountTypeOptions[] = useMemo(() => {
     return promotionTypeList.map(item => {
@@ -144,7 +169,7 @@ const InvoiceDiscount = (): JSX.Element => {
         </div>
       </div>
       <ManualDiscountForm />
-      <ReferralDiscount />
+      {FEATURE_FLAG.REFERRAL_DISCOUNT && <ReferralDiscount />}
       <AppliedDiscount />
       <div className="border-t border-gray-200 px-4 pt-4">
         <div className="flex items-center justify-between text-sm mb-2">

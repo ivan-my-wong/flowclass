@@ -157,6 +157,18 @@ const CreateBundleDiscount = lazy(
 const EditBundleDiscount = lazy(
   () => import('@/pages/Promotion/BundleDiscounts/EditBundleDiscount')
 )
+const PackageDiscountsPage = lazy(
+  () => import('@/pages/Promotion/PackageDiscounts/PackageDiscounts')
+)
+const PackageDiscountDetail = lazy(
+  () => import('@/pages/Promotion/PackageDiscounts/PackageDiscountDetail')
+)
+const CreatePackageDiscount = lazy(
+  () => import('@/pages/Promotion/PackageDiscounts/CreatePackageDiscount')
+)
+const EditPackageDiscount = lazy(
+  () => import('@/pages/Promotion/PackageDiscounts/EditPackageDiscount')
+)
 const AdminPage = lazy(() => import('@/pages/Admin'))
 
 const Embed = lazy(() => import('@/pages/Embed'))
@@ -213,16 +225,10 @@ const CampaignRecipientsPage = lazy(
 const InvoiceEditor = lazy(
   () => import('@/pages/TemplateManagement/InvoiceTemplates/Editor')
 )
-const DialogSendMultipleInvoice = lazy(
+const DialogSendInvoice = lazy(
   () =>
     import(
-      '@/pages/TemplateManagement/InvoiceTemplates/Editor/DialogSendMultipleInvoice'
-    )
-)
-const DialogSendSingleInvoice = lazy(
-  () =>
-    import(
-      '@/pages/TemplateManagement/InvoiceTemplates/Editor/DialogSendSingleInvoice'
+      '@/pages/TemplateManagement/InvoiceTemplates/Editor/DialogSendInvoice'
     )
 )
 const SendingProgressPage = lazy(
@@ -309,6 +315,19 @@ const App = (): JSX.Element => {
       !bundleDiscounts ||
       bundleDiscounts.siteIds.length === 0 ||
       bundleDiscounts.siteIds.includes(currentSite.id)
+    )
+  }, [sitesFeatureEnabled, currentSite?.id])
+
+  const enabledPackageDiscounts = useMemo(() => {
+    if (!currentSite?.id) return false
+    if (!sitesFeatureEnabled) return true
+    const packageDiscounts = sitesFeatureEnabled.find(
+      o => o.feature === SiteFeature.PackageDiscounts
+    )
+    return (
+      !packageDiscounts ||
+      packageDiscounts.siteIds.length === 0 ||
+      packageDiscounts.siteIds.includes(currentSite.id)
     )
   }, [sitesFeatureEnabled, currentSite?.id])
 
@@ -625,6 +644,35 @@ const App = (): JSX.Element => {
                 </>
               )}
 
+              {enabledPackageDiscounts && (
+                <>
+                  <Route
+                    path="promotion/package-discounts"
+                    element={
+                      <ProtectedRoute element={<PackageDiscountsPage />} />
+                    }
+                  />
+                  <Route
+                    path="promotion/package-discounts/detail/:packageDiscountId"
+                    element={
+                      <ProtectedRoute element={<PackageDiscountDetail />} />
+                    }
+                  />
+                  <Route
+                    path="promotion/package-discounts/add"
+                    element={
+                      <ProtectedRoute element={<CreatePackageDiscount />} />
+                    }
+                  />
+                  <Route
+                    path="promotion/package-discounts/edit/:packageDiscountId"
+                    element={
+                      <ProtectedRoute element={<EditPackageDiscount />} />
+                    }
+                  />
+                </>
+              )}
+
               <Route
                 path="promotion/coupon-code/detail"
                 element={<ProtectedRoute element={<CouponDetailPage />} />}
@@ -833,11 +881,8 @@ const App = (): JSX.Element => {
                   path=":classId/add-subscription-class"
                   element={<ModalAddSubscriptionClass />}
                 />
-                <Route
-                  path="send-multiple"
-                  element={<DialogSendMultipleInvoice />}
-                />
-                <Route path="send" element={<DialogSendSingleInvoice />} />
+                <Route path="send-multiple" element={<DialogSendInvoice />} />
+                <Route path="send" element={<DialogSendInvoice />} />
                 <Route
                   path="sending-progress"
                   element={<SendingProgressPage />}

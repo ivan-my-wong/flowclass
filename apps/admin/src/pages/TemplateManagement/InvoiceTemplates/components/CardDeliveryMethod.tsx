@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next'
 import { FaWhatsapp } from 'react-icons/fa'
 import { LuMail } from 'react-icons/lu'
 
-import { WhatsAppConnectionStatus } from '@/api/whatsappWeb'
 import {
   Card,
   CardDescription,
@@ -25,8 +24,6 @@ import { Switch } from '@/components/ui/Switch'
 import TextArea from '@/components/ui/TextAreaBase'
 import useCustomMessageData from '@/hooks/useCustomMessageData'
 import useSchoolData from '@/hooks/useSchoolData'
-import { useWhatsappWeb } from '@/hooks/useWhatsappWeb'
-import WhatsappConnection from '@/pages/CustomMessages/components/WhatsappConnection'
 import { SupportedType } from '@/types/customMessage'
 import { StudentPrimaryIdentifier } from '@/types/school'
 import { NotificationChannel, VariableItem } from '@/types/studentInvoice.type'
@@ -103,6 +100,19 @@ const CardDeliveryMethod: FC<Props> = ({
       }, 0)
     }
   }
+  const { currentSchool } = useSchoolData()
+  const { useFetchCustomMessageData } = useCustomMessageData()
+  const { data: customMessagesData } = useFetchCustomMessageData()
+
+  // Get the default WhatsApp message from custom messages
+  const defaultWhatsAppMessage = useMemo(() => {
+    if (!customMessagesData?.data) return null
+    const invoiceMessage = customMessagesData.data.find(
+      msg => msg.type === SupportedType.CREATE_INVOICE
+    )
+    return invoiceMessage?.content || null
+  }, [customMessagesData?.data])
+
   const whatsappPlaceholder = useMemo(() => {
     if (module === 'material') {
       return t('setting:whatsappSetting.sendMaterialPlaceholder') as string
@@ -112,42 +122,14 @@ const CardDeliveryMethod: FC<Props> = ({
         'setting:whatsappSetting.sendStudentSubmissionPlaceholder'
       ) as string
     }
-    return t('editor.send.contentPlaceholder') as string
-  }, [module, t])
+    return defaultWhatsAppMessage ?? (t('editor.send.contentPlaceholder') as string)
+  }, [module, t, defaultWhatsAppMessage])
 
-  const { useGetSessionStatus } = useWhatsappWeb()
-  const {
-    data: whatsappSessionStatus,
-    isLoading: isWhatsappSessionStatusLoading,
-    refetch: refetchSessionStatus,
-  } = useGetSessionStatus()
-
-  const { currentSchool } = useSchoolData()
-  const { useFetchCustomMessageData } = useCustomMessageData()
-  const { data: customMessagesData } = useFetchCustomMessageData()
-
-  // Get the default WhatsApp message from custom messages
-  const defaultWhatsAppMessage = useMemo(() => {
-    if (!customMessagesData?.data) return null
-    const enrollmentMessage = customMessagesData.data.find(
-      msg => msg.type === SupportedType.STUDENT_NOTIF_AFTER_ENROLLMENT_SUBMITTED
-    )
-    return enrollmentMessage?.content || null
-  }, [customMessagesData?.data])
-
-  // Check if WhatsApp is ready/connected
-  const isWhatsAppReady = useMemo(() => {
-    return (
-      whatsappSessionStatus?.data?.status === WhatsAppConnectionStatus.READY
-    )
-  }, [whatsappSessionStatus?.data?.status])
-
-  // Set default values based on school settings and WhatsApp status
+  // Set default values based on school settings
   useEffect(() => {
     if (!switchName) return
 
     if (isEmail) {
-      // Email: default ON if primary identifier is EMAIL
       const shouldEnableEmail =
         currentSchool?.studentPrimaryIdentifier ===
         StudentPrimaryIdentifier.EMAIL
@@ -155,12 +137,7 @@ const CardDeliveryMethod: FC<Props> = ({
         form.setValue(switchName, true, { shouldDirty: false })
       }
     }
-
-    if (isWhatsAppReady) {
-      // WhatsApp: default ON only if WhatsApp is ready/connected
-      form.setValue(switchName, true, { shouldDirty: false })
-    }
-  }, [currentSchool?.studentPrimaryIdentifier, isWhatsAppReady])
+  }, [currentSchool?.studentPrimaryIdentifier])
 
   // Set default WhatsApp message content from custom message template
   useEffect(() => {
@@ -204,53 +181,6 @@ const CardDeliveryMethod: FC<Props> = ({
         </CardTitle>
       </CardHeader>
       <CardDescription className={cn(withSwitch && !isEnabled && 'hidden')}>
-        {!isEmail && (
-          <div className="p-4">
-            <WhatsappConnection
-              whatsappSessionStatus={whatsappSessionStatus}
-              refetchSessionStatus={refetchSessionStatus}
-              isWhatsappSessionStatusLoading={isWhatsappSessionStatusLoading}
-            />
-          </div>
-        )}
-        {/* {isEmail && subjectName && (
-          <FormField
-            control={form.control}
-            rules={{
-              required:
-                isRequired ?? isEnabled
-                  ? (t('editor.send.subjectRequired') as string)
-                  : false,
-            }}
-            name={subjectName}
-            render={({ field }) => (
-              <FormItem className="p-4 pt-0">
-                <div className="flex flex-col gap-2">
-                  <FormLabel
-                    required={Boolean(isRequired ?? isEnabled)}
-                    className="w-full"
-                  >
-                    {t('editor.send.subject')}
-                  </FormLabel>
-                  {isEmail && (
-                    <TemplateOptions onSelectMessage={onSelectMessage} />
-                  )}
-                </div>
-                <FormControl>
-                  <Input
-                    {...field}
-                    ref={el => {
-                      messageInputRef.current = el
-                      field.ref(el)
-                    }}
-                    placeholder={t('editor.send.subjectPlaceholder') as string}
-                  />
-                </FormControl>
-                <FormMessage className="text-warn" />
-              </FormItem>
-            )}
-          />
-        )} */}
         {!isEmail && (
           <FormField
             control={form.control}

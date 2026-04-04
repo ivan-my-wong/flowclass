@@ -307,9 +307,25 @@ export class ClassService extends BaseService<ClassEntity> {
       }
 
       if (dto.regularScheduleV2) {
+        // Strip identity/relation fields from the original schedule to avoid
+        // duplicate key errors when duplicating a class
+        const {
+          id: _id,
+          createdAt: _createdAt,
+          updatedAt: _updatedAt,
+          deletedAt: _deletedAt,
+          createdBy: _createdBy,
+          updatedBy: _updatedBy,
+          classId: _classId,
+          siteId: _siteId,
+          institutionId: _institutionId,
+          courseId: _courseId,
+          classEntity: _classEntity,
+          ...scheduleFields
+        } = dto.regularScheduleV2 as any
         regularScheduleDto = {
           ...regularScheduleDto,
-          ...dto.regularScheduleV2,
+          ...scheduleFields,
         }
       }
 

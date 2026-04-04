@@ -15,7 +15,6 @@ const SchoolSelector = () => {
   const { schoolData, setCurrentSchool } = useSchoolData()
   const { t } = useTranslation()
   const addSchoolModalHandle = useRef<AddSchoolModalHandle>(null)
-
   const navigate = useNavigate()
   const openModal = () => {
     addSchoolModalHandle.current?.handleOpenChange?.()

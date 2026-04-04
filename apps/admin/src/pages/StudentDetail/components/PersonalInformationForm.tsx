@@ -236,6 +236,26 @@ const PersonalInformationForm = ({
           </div>
         )}
       </Box>
+      <Box direction="col" padding="0">
+        <div className="flex items-center justify-start w-full gap-2">
+          <Text bold>{t('student:create.secondaryEmail')}</Text>
+        </div>
+        <TextInput
+          id="secondaryEmail"
+          vertical
+          disabled={disabled}
+          {...register('secondaryEmail', {
+            pattern: {
+              value: /\S+@\S+\.\S+/,
+              message: t('student:create.emailFormat'),
+            },
+            maxLength: 200,
+          })}
+        />
+        {errors.secondaryEmail && (
+          <ErrorField>{(errors.secondaryEmail as any).message}</ErrorField>
+        )}
+      </Box>
     </Box>
   )
 }

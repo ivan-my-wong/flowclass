@@ -22,6 +22,7 @@ import { OpenAiChatGptController } from '@/application/admin/open-ai/openaiChatS
 import { PasswordResetTokenController } from '@/application/admin/password-reset-token/password-reset-token.controller'
 import { PaymentEvidenceController } from '@/application/admin/payment-evidence/payment-evidence.controller'
 import { BundleDiscountsController } from '@/application/admin/promotions/bundle-discounts.controller'
+import { PackageDiscountsController } from '@/application/admin/promotions/package-discounts.controller'
 import { CouponsController } from '@/application/admin/promotions/coupons.controller'
 import { PromotionsController } from '@/application/admin/promotions/promotions.controller'
 import { RecordLogController } from '@/application/admin/record-log/record-logs.controller'
@@ -157,8 +158,7 @@ import { StatisticsController } from '@/application/admin/statistics/statistics.
     ClassLessonController,
     CourseActivitiesOrderController,
     BundleDiscountsController,
-    StripeProductsController,
-    StripeProductPricesController,
+    PackageDiscountsController,
     MasterAdminController,
     EnrollmentFormController,
     SetingBlockTimeController,

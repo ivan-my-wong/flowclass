@@ -10,7 +10,7 @@ import {
   LuMessageCircle,
   LuPencil,
 } from 'react-icons/lu'
-import { useRecoilValue } from 'recoil'
+import { useNavigate } from 'react-router'
 import { toast } from 'sonner'
 
 import { fetchInvoicePdf } from '@/api/invoiceCampaign'
@@ -28,12 +28,13 @@ import {
   TooltipTrigger,
 } from '@/components/ui/Tooltip'
 import { studentLinksBaseUrl } from '@/constants/enrollmentFormFieldNames'
+import useCustomMessageData from '@/hooks/useCustomMessageData'
 import useSchoolData from '@/hooks/useSchoolData'
 import { WHATSAPP_API_URL } from '@/pages/StudentCRM/components/WhatsappButton'
-import notificationSettingState from '@/stores/NotificationSettingData'
-import { siteState } from '@/stores/siteData'
+import { SupportedType } from '@/types/customMessage'
 import { PaymentEvidence, PaymentProofTableItem } from '@/types/enrollCourse'
-import { generateMessage, siteDomainIfCustom } from '@/utils/string'
+import dayjs from '@/utils/dayjs'
+import { getCmsOrigin } from '@/utils/generate-link.utils'
 
 import InvoiceBreakdown from './InvoiceBreakdown'
 
@@ -53,8 +54,15 @@ const ActionButtonCell = ({
   const { t } = useTranslation()
   const { schoolData, currentSchool } = useSchoolData()
 
-  const { currentSite } = useRecoilValue(siteState)
-  const notificationSettingData = useRecoilValue(notificationSettingState)
+  const { useFetchCustomMessageData } = useCustomMessageData()
+  const { data: customMessages } = useFetchCustomMessageData()
+
+  const invoiceTemplate = useMemo(() => {
+    const msgs = customMessages?.data ?? []
+    const match = msgs.find(m => m.type === SupportedType.CREATE_INVOICE)
+    return match?.content ?? '[invoiceDetails]\n\n付款連結: [uploadPaymentUrl]'
+  }, [customMessages])
+
   const [isOpenDialogInvoice, setOpenDialogInvoice] = useState(false)
   const hasChildInvoices = Boolean(studentInfo.childInvoices?.length)
   const CopyIconButton = (): JSX.Element => {
@@ -77,42 +85,131 @@ const ActionButtonCell = ({
     )
   }
 
+  const buildInvoiceDetailsBlock = (): string => {
+    const schoolName = schoolData.currentSchool?.name ?? ''
+    const currency = studentInfo.currency || 'HK$'
+
+    const allLessonDates = studentInfo.studentSchedules
+      .flatMap(s => s.studentLessons)
+      .map(l => dayjs(l.changeStartTime || l.startTime))
+      .sort((a, b) => a.valueOf() - b.valueOf())
+
+    const period =
+      allLessonDates.length > 0
+        ? `${allLessonDates[0].format('M')}/${allLessonDates[0].format('YYYY')}`
+        : ''
+
+    const classNames = studentInfo.enrollCourses
+      .flatMap(ec => ec.enrollInto.map(ei => ei.secondLevelName))
+      .join(', ')
+
+    const lines: string[] = [`${schoolName} ${period} ${classNames} 學費單`, '']
+
+    const discountAmt = parseFloat(studentInfo.discountAmount || '0')
+    if (discountAmt > 0) {
+      const discountName =
+        studentInfo.discounts || t('student:paymentProof.discount')
+      lines.push(
+        `${discountName}：${currency} -${discountAmt.toLocaleString()}`
+      )
+    }
+
+    lines.push('')
+    lines.push('學費總計：')
+    lines.push(
+      `👉 ${currency} ${parseFloat(studentInfo.payAmount).toLocaleString()}`
+    )
+    lines.push('')
+    lines.push('課堂安排 細項：')
+    lines.push('------ ------')
+
+    studentInfo.enrollCourses.forEach((ec, idx) => {
+      ec.enrollInto.forEach(ei => {
+        lines.push(`課程 ${idx + 1}) ${ei.secondLevelName}`)
+
+        const schedule = studentInfo.studentSchedules.find(
+          s => s.enrollCourseId === ec.id
+        )
+        const lessons = (schedule?.studentLessons ?? [])
+          .map(l => dayjs(l.changeStartTime || l.startTime))
+          .sort((a, b) => a.valueOf() - b.valueOf())
+
+        const lessonCount = lessons.length || ei.lessonCount
+        lines.push(`  共 ${lessonCount} 堂`)
+
+        if (lessons.length > 0) {
+          const dateStr = lessons.map(d => d.format('D')).join(', ')
+          lines.push(`  日期: ${dateStr} / ${lessons[0].format('M')}`)
+        }
+
+        const amt = ec.paymentAmount?.toLocaleString() ?? ''
+        lines.push(`  ${currency} ${amt}`)
+        lines.push('------ ------')
+      })
+    })
+
+    return lines.join('\n')
+  }
+
+  const buildInvoiceWhatsAppMessage = (): string => {
+    const schoolName = schoolData.currentSchool?.name ?? ''
+    const currency = studentInfo.currency || 'HK$'
+    const schoolId = schoolData.currentSchool?.id.toString() ?? '0'
+    const schoolUrl = schoolData.currentSchool?.url ?? ''
+    const linkParams = new URLSearchParams({
+      schoolId,
+      school: schoolUrl,
+      course: studentInfo.sendWhatsapp.course,
+      studentName: studentInfo.sendWhatsapp.name,
+      enrolId: studentInfo?.enrollCourses[0]?.id?.toString(),
+      token: studentInfo.sendWhatsapp.token,
+      institutionId: studentInfo.institutionId?.toString() ?? schoolId,
+    })
+    const paymentLink = `${getCmsOrigin()}${
+      studentLinksBaseUrl.uploadReceipt
+    }?${linkParams}`
+
+    const classNames = studentInfo.enrollCourses
+      .flatMap(ec => ec.enrollInto.map(ei => ei.secondLevelName))
+      .join(', ')
+
+    // Build the auto-generated invoice details block
+    const invoiceDetails = buildInvoiceDetailsBlock()
+
+    // Apply the custom message template with variable replacement
+    let message = invoiceTemplate
+    message = message.replace(/\[invoiceDetails\]/g, invoiceDetails)
+    message = message.replace(/\[uploadPaymentUrl\]/g, paymentLink)
+    message = message.replace(/\[institutionName\]/g, schoolName)
+    message = message.replace(
+      /\[studentName\]/g,
+      studentInfo.userAlias?.name ?? studentInfo.sendWhatsapp.name ?? ''
+    )
+    message = message.replace(/\[className\]/g, classNames)
+    message = message.replace(/\[courseName\]/g, classNames)
+    message = message.replace(
+      /\[paymentAmount\]/g,
+      `${currency} ${parseFloat(studentInfo.payAmount).toLocaleString()}`
+    )
+    message = message.replace(
+      /\[paymentMethod\]/g,
+      studentInfo.paymentMethod ?? ''
+    )
+    message = message.replace(
+      /\[paymentStatus\]/g,
+      studentInfo.paymentState ?? ''
+    )
+
+    return message
+  }
+
   const navigateToWhatsApp = () => {
     let url = WHATSAPP_API_URL.replace(
       ':phone',
       studentInfo.sendWhatsapp.phone || ''
     )
-    const schoolId = schoolData.currentSchool?.id.toString() ?? '0'
-    const schoolUrl = schoolData.currentSchool?.url ?? ''
-    const schoolName = schoolData.currentSchool?.name ?? ''
-    const presetMessage = notificationSettingData.currentSetting?.customMessage
-    const linkParams = new URLSearchParams({
-      schoolId,
-      school: schoolUrl,
-      course: studentInfo.sendWhatsapp.course,
-      studentName: studentInfo.sendWhatsapp.course,
-      enrolId: studentInfo?.enrollCourses[0]?.id?.toString(),
-      token: studentInfo.sendWhatsapp.token,
-    })
-
-    const siteUrl = currentSite?.url ?? ''
-    const domain = siteDomainIfCustom(currentSite?.customDomain, siteUrl)
-    const paymentLink = `https://${domain}${studentLinksBaseUrl.uploadReceipt}?${linkParams}`
-
-    const messageParams = {
-      courseName: studentInfo.sendWhatsapp.course,
-      studentName: studentInfo.sendWhatsapp.course,
-      institutionName: schoolName,
-      paymentLink,
-    }
-
-    const message = generateMessage(
-      presetMessage ?? '',
-      messageParams,
-      `${t('student:message.askForPayment')}: ${paymentLink}`
-    )
-
-    url += encodeURIComponent(message ?? '')
+    const message = buildInvoiceWhatsAppMessage()
+    url += encodeURIComponent(message)
     window.open(url, '_blank')
   }
 

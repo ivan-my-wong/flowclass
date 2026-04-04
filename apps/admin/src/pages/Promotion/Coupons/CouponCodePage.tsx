@@ -28,11 +28,6 @@ const CouponCodePage = (): JSX.Element => {
   const [isOpenCreatePage, setIsOpenCreatePage] = useState<boolean>(false)
   const { isLoading, isError, isSuccess, isIdle, data } = fetchCouponDataResult
   const hasCouponAccess = true
-  // Coupon should be free for all users
-  // const hasCouponAccess = checkSubscriptionAccess(
-  //   'promotionTier',
-  //   PromotionType.COUPON_DISCOUNT
-  // )
 
   const [searchParams] = useSearchParams()
   const idStudent = searchParams.get('student')

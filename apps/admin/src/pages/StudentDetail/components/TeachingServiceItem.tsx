@@ -233,10 +233,54 @@ const TeachingServiceItem = ({
     setShowConfirmDelete(false)
   }
 
+  const pauseStatusMapping = {
+    active: {
+      text: t('student:teachingService.statusActive'),
+      color: 'text-success border-success',
+    },
+    paused: {
+      text: t('student:teachingService.statusPaused'),
+      color: 'text-warn border-warn',
+    },
+  }
+
+  const getMenuPauseStatus = (
+    enrollCourseId: number
+  ): DropDownMenuItemType[] => [
+    {
+      ...renderMenuItem(pauseStatusMapping.active.text, () => {
+        mutationChangeSttPaymentAndEnroll.mutate({
+          institutionId,
+          siteId,
+          enrollCourseId,
+          confirmState:
+            enrollStatuses.get(enrollCourseId) || EnrollConfirmState.PENDING,
+          isPaused: false,
+        })
+      }),
+    },
+    {
+      ...renderMenuItem(pauseStatusMapping.paused.text, () => {
+        mutationChangeSttPaymentAndEnroll.mutate({
+          institutionId,
+          siteId,
+          enrollCourseId,
+          confirmState:
+            enrollStatuses.get(enrollCourseId) || EnrollConfirmState.PENDING,
+          isPaused: true,
+        })
+      }),
+    },
+  ]
+
   const paymentStatusMapping = {
     [PaymentState.PAID]: {
       text: t('student:statusPaid'),
       color: 'text-success border-success',
+    },
+    [PaymentState.PARTIALLY_PAID]: {
+      text: t('student:statusPartiallyPaid'),
+      color: 'text-orange-500 border-orange-500',
     },
     [PaymentState.PENDING]: {
       text: t('student:statusUnPaid'),
@@ -293,6 +337,14 @@ const TeachingServiceItem = ({
         ...renderMenuItem(paymentStatusMapping[PaymentState.PAID].text, () => {
           handlePaymentStatus(invoice.invoiceId, PaymentState.PAID)
         }),
+      },
+      {
+        ...renderMenuItem(
+          paymentStatusMapping[PaymentState.PARTIALLY_PAID].text,
+          () => {
+            handlePaymentStatus(invoice.invoiceId, PaymentState.PARTIALLY_PAID)
+          }
+        ),
       },
       {
         ...renderMenuItem(
@@ -484,6 +536,16 @@ const TeachingServiceItem = ({
                   </div>
                 </div>
                 <div className="box-row-full w-fit" data-testid="enroll-status">
+                  <DropdownMenu
+                    menuItems={getMenuPauseStatus(service.enrollCourseId)}
+                    trigger={
+                      <StatusChangeTrigger
+                        status={service.isPaused ? 'paused' : 'active'}
+                        statusMapping={pauseStatusMapping}
+                      />
+                    }
+                    contentProps={{ minWidth: '12rem', zIndex: 999 }}
+                  />
                   <Button
                     variant="outline"
                     onClick={() => {

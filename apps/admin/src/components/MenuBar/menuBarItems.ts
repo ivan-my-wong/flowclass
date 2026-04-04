@@ -14,6 +14,7 @@ import {
   LuMegaphone,
   LuMessageCircle,
   LuMessageSquare,
+  LuMessageSquareDashed,
   LuRocket,
   LuScrollText,
   LuTable,
@@ -25,6 +26,7 @@ import {
 // import LessonDateTimeIcon from '@/assets/svgs/LessonDateTimeIcon'
 import { RiWhatsappLine } from 'react-icons/ri'
 
+// import LessonDateTimeIcon from '@/assets/svgs/LessonDateTimeIcon'
 import { UserRole } from '@/stores/userPermissionData'
 import { SiteFeature } from '@/types/site-feature'
 
@@ -156,7 +158,6 @@ const menuItems: MenuItem[] = [
       UserRole.SiteAdmin,
       UserRole.SchoolAdmin,
     ],
-    availableSites: [],
   },
   {
     label: 'rescheduleApproval',
@@ -378,9 +379,19 @@ const menuItems: MenuItem[] = [
   // },
 
   {
-    label: 'integrations',
-    icon: LuLink,
-    path: '/integrations',
+    label: 'whatsappTemplate',
+    icon: LuMessageSquareDashed,
+    path: '/custom-messages',
+    permissions: [
+      UserRole.MasterAdmin,
+      UserRole.SiteAdmin,
+      UserRole.SchoolAdmin,
+    ],
+  },
+  {
+    label: 'notificationLog',
+    icon: LuScrollText,
+    path: '/notification-log',
     permissions: [
       UserRole.MasterAdmin,
       UserRole.SiteAdmin,

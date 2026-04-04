@@ -217,6 +217,7 @@ const StudentDatabase = (): JSX.Element => {
   const [selectedMatchMode, setSelectedMatchMode] = useState<FilterMatchMode>(
     FilterMatchMode.Any
   )
+  const [resetSearchTrigger, setResetSearchTrigger] = useState(0)
 
   const { isLoadingPermissionAndQuota } = useCheckPermissionAndQuota()
 
@@ -303,7 +304,6 @@ const StudentDatabase = (): JSX.Element => {
     persistCustomFieldColumnIds(val)
     // When custom columns change, also persist the new order
     // We'll persist the order of the current table columns (base + custom)
-    // But since tableColumns is a useMemo, we need to persist after render, so do it in useEffect below
   }
 
   // On fieldsCustom load, initialize customFieldColumns from cookie
@@ -363,7 +363,7 @@ const StudentDatabase = (): JSX.Element => {
         const processedData = data.map((student: StudentEnrolmentRecord) => {
           let currentEmail = student.email
           let currentPhone = student.phone
-          let currentName = student.name
+          const currentName = student.name
 
           if (student.user) {
             if (!currentEmail) {
@@ -374,19 +374,11 @@ const StudentDatabase = (): JSX.Element => {
             }
           }
 
-          if (student.studentMemo) {
-            if (student.studentMemo.name) {
-              currentName = student.studentMemo.name
-            }
-          }
-
           return {
             ...student,
             name: currentName,
             email: currentEmail,
             phone: currentPhone,
-            updatedAt: student?.studentMemo?.updatedAt ?? new Date(),
-            createdAt: student?.studentMemo?.createdAt ?? new Date(),
           }
         })
 
@@ -558,7 +550,85 @@ const StudentDatabase = (): JSX.Element => {
       {
         field: 'user.email',
         filter: false,
-        headerName: t('student:column.email').toString(),
+        valueGetter: (params: ValueGetterParams) =>
+          (params.data as TableRowType).student.id,
+        spanRows: true,
+        getQuickFilterText: (params: GetQuickFilterTextParams) => {
+          const row = params.data as TableRowType
+          return formatPhoneNumber(
+            row.student.phone || row.student.user?.phone || ''
+          )
+        },
+        cellRenderer: (params: ICellRendererParams) => {
+          const row = params.data as TableRowType
+          return formatPhoneNumber(
+            row.student.phone || row.student.user?.phone || ''
+          )
+        },
+      },
+      {
+        colId: 'email',
+        headerName: (t('student:column.email') as string) || '',
+        width: 200,
+        minWidth: 180,
+        filter: false,
+        valueGetter: (params: ValueGetterParams) =>
+          (params.data as TableRowType).student.id,
+        spanRows: true,
+        getQuickFilterText: (params: GetQuickFilterTextParams) => {
+          const row = params.data as TableRowType
+          return [
+            row.student.email || row.student.user?.email || '',
+            row.student.secondaryEmail || '',
+          ]
+            .filter(Boolean)
+            .join(' ')
+        },
+        cellRenderer: (params: ICellRendererParams) => {
+          const row = params.data as TableRowType
+          const primary = row.student.email || row.student.user?.email || '-'
+          const secondary = row.student.secondaryEmail
+          return (
+            <div className="flex flex-col gap-0.5">
+              <span>{primary}</span>
+              {secondary && (
+                <span className="text-[11px] text-gray-400">{secondary}</span>
+              )}
+            </div>
+          )
+        },
+      },
+      {
+        colId: 'numClasses',
+        headerName:
+          (t('student:column.numClasses') as string) || 'No. of classes',
+        width: 90,
+        minWidth: 80,
+        filter: false,
+        valueGetter: (params: ValueGetterParams) =>
+          (params.data as TableRowType).student.id,
+        spanRows: true,
+        cellRenderer: (params: ICellRendererParams) => {
+          const row = params.data as TableRowType
+          const currentMonth = dayjs().format('YYYY-MM')
+          const count =
+            row.student.enrollCourses?.filter(
+              o =>
+                o.course &&
+                o.studentSchedule?.some(schedule =>
+                  schedule.studentLessons?.some(
+                    lesson =>
+                      lesson.endTime &&
+                      dayjs(lesson.endTime).format('YYYY-MM') === currentMonth
+                  )
+                )
+            ).length ?? 0
+          return <span className="tabular-nums">{count}</span>
+        },
+      },
+      {
+        colId: 'classLabel',
+        headerName: t('student:column.teachingServiceEnrolled') as string,
         width: 220,
         valueGetter: (params: any) => {
           const studentData: StudentEnrolmentRecord = params?.data
@@ -802,7 +872,16 @@ const StudentDatabase = (): JSX.Element => {
           />
         </Box>
       ) : (
-        <div className="flex flex-row gap-2">
+        <>
+          <span className="text-sm font-medium text-gray-500">
+            {dayjs().format('MMMM YYYY')}
+          </span>
+          <ChartDatePicker
+            mode="month"
+            chartDate={paymentViewChartDate}
+            handleChartDateChange={handlePaymentViewMonthChange}
+            includeFuture
+          />
           <ExportCSV data={filteredStudentList} timeZoneId={timeZone} />
 
           <ProtectedComponent
@@ -864,7 +943,28 @@ const StudentDatabase = (): JSX.Element => {
       studentData: StudentEnrolmentRecord[],
       filters: FilterParams
     ): StudentEnrolmentRecord[] => {
-      const filteredList = studentData.filter(({ enrollCourses, user }) => {
+      let result = studentData
+
+      if (filters.search && filters.search.trim()) {
+        const searchLower = filters.search.trim().toLowerCase()
+        result = result.filter(student => {
+          const name = student.name || ''
+          const email = student.email || student.user?.email || ''
+          const phone = student.phone || student.user?.phone || ''
+          const studentId = student.studentId ?? ''
+          const id = String(student.id ?? '')
+          return (
+            name.toLowerCase().includes(searchLower) ||
+            email.toLowerCase().includes(searchLower) ||
+            phone.toLowerCase().includes(searchLower) ||
+            formatPhoneNumber(phone).toLowerCase().includes(searchLower) ||
+            studentId.toLowerCase().includes(searchLower) ||
+            id.includes(searchLower)
+          )
+        })
+      }
+
+      const filteredList = result.filter(({ enrollCourses, user }) => {
         const hasMatchingCourseId =
           (filters.selectedCourse.length === 0 &&
             filters.selectedClass.length === 0) ||
@@ -968,14 +1068,14 @@ const StudentDatabase = (): JSX.Element => {
         daysBeforeEnd: 0,
       })
     )
-    setSearchParams(
-      new URLSearchParams({
-        ...Object.fromEntries(searchParams),
-        startDate: '',
-        endDate: '',
-        search: '',
-      }).toString()
-    )
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev)
+      next.delete('search')
+      next.delete('startDate')
+      next.delete('endDate')
+      return next
+    })
+    setResetSearchTrigger(prev => prev + 1)
 
     gridRef?.current?.api.setFilterModel(null)
     setCustomFieldFilterList([])
@@ -1006,14 +1106,9 @@ const StudentDatabase = (): JSX.Element => {
       data?.map((student: StudentEnrolmentRecord) => {
         let currentEmail = student.email
         const currentPhone = student.phone || student.user?.phone
-        let currentName = student.name
+        const currentName = student.name
         if (student.user && !currentName) {
           currentEmail = student.user.email
-        }
-        if (student.studentMemo && !currentName) {
-          if (student.studentMemo.name) {
-            currentName = student.studentMemo.name
-          }
         }
         return {
           ...student,

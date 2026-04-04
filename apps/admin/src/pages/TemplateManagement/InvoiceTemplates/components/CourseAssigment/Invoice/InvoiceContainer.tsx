@@ -97,6 +97,7 @@ const InvoiceContainer = (): JSX.Element => {
       d => d.id === currentActiveStudent?.childOfUserAliasId
     )
   }, [allStudents, currentActiveStudent])
+
   const renderCourses = () => {
     if (currentClasses.length === 0)
       return (

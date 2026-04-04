@@ -28,6 +28,7 @@ export type EditStudentContactInfoV2RequestDto = {
   phone?: string
   email?: string
   invoiceId?: number
+  secondaryEmail?: string | null
 } & StudentMemoBase
 
 export type UserAlias = {
@@ -35,6 +36,7 @@ export type UserAlias = {
   name: string
   // phone: string
   email: string
+  secondaryEmail?: string | null
   userId: number
   isStudentParent: boolean
   childOfUserAliasId?: number

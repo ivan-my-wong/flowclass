@@ -21,6 +21,10 @@ export const handleStatusPayment = (status: string, t: TFunction) => {
   switch (status) {
     case PaymentState.PAID:
       return <Badge variant="success">{t('student:statusPaid')}</Badge>
+    case PaymentState.PARTIALLY_PAID:
+      return (
+        <Badge variant="secondary">{t('student:statusPartiallyPaid')}</Badge>
+      )
     case PaymentState.UNPAID:
       return <Badge variant="light">{t('student:statusUnPaid')}</Badge>
     case PaymentState.SUBMITTED:
@@ -75,17 +79,19 @@ const TeachingServiceEnrolledColumn = ({
 
   const allRows = useMemo(() => {
     const studentLessons =
-      enrolledStudent?.enrollCourses?.map(enrollCourse => {
-        // Support both invoice (new) and invoices (old) for backward compatibility
-        const invoices = enrollCourse.invoice
-          ? [enrollCourse.invoice]
-          : enrollCourse.invoices || []
-        return {
-          ...enrollCourse,
-          studentSchedule: enrollCourse.studentSchedule,
-          invoices,
-        }
-      }) || []
+      enrolledStudent?.enrollCourses
+        ?.filter(ec => !ec.isPaused)
+        ?.map(enrollCourse => {
+          // Support both invoice (new) and invoices (old) for backward compatibility
+          const invoices = enrollCourse.invoice
+            ? [enrollCourse.invoice]
+            : enrollCourse.invoices || []
+          return {
+            ...enrollCourse,
+            studentSchedule: enrollCourse.studentSchedule,
+            invoices,
+          }
+        }) || []
 
     // studentLessons grouped by enrollCourseId
     const groupedData = studentLessons.reduce(

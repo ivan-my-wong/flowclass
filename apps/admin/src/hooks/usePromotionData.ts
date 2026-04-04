@@ -15,19 +15,25 @@ import {
   changeStatusCoupon,
   createBundleDiscount,
   createCoupon,
+  createPackageDiscount,
   deleteBundleDiscount,
   deleteCoupon,
+  deletePackageDiscount,
   getAllBundleDiscounts,
   getAllExistCoupons,
+  getAllPackageDiscounts,
   getBundleDiscountsById,
   getCourseAndStudent,
   getCurrentCoupon,
   getListCourse,
   getListStudent,
+  getPackageDiscountById,
   toggleBundleDiscountStatus,
+  togglePackageDiscountStatus,
   updateBundleDiscount,
   UpdateBundleDiscountDto,
   updateCoupon,
+  updatePackageDiscount,
 } from '../api/promotion'
 import { getHistoryCoupon } from '../api/recordLogs'
 import { QUERY_KEY } from '../constants/queryKey'
@@ -45,6 +51,11 @@ import {
   HistoryCouponProps,
   StudentProps,
 } from '../types/coupon'
+import {
+  CreatePackageDiscountDto,
+  PackageDiscount,
+  UpdatePackageDiscountDto,
+} from '../types/packageDiscounts'
 
 import useSchoolData from './useSchoolData'
 
@@ -494,6 +505,185 @@ const usePromotionData = () => {
     }
   }
 
+  // ── Package Discounts ──
+
+  const useFetchAllPackageDiscountsData = (): UseQueryResult<
+    PackageDiscount[],
+    unknown
+  > => {
+    const result = useQuery(
+      [
+        QUERY_KEY.promotion.packageDiscountsListKey,
+        currentSiteId,
+        currentInstitutionId,
+      ],
+      () => getAllPackageDiscounts(currentSiteId, currentInstitutionId),
+      {
+        onSuccess: data => {
+          const currentPackageDiscount =
+            data.find(
+              (pd: PackageDiscount) =>
+                pd.id === promotionData.currentPackageDiscount?.id
+            ) || (data.length > 0 ? data[0] : null)
+
+          setPromotionData(prev => ({
+            ...prev,
+            currentPackageDiscount,
+            packageDiscounts: data,
+          }))
+        },
+        onError: (error: ApiError) => {
+          handleApiError({ error, t })
+        },
+        enabled: !!currentInstitutionId,
+      }
+    )
+    return result
+  }
+
+  const useFetchPackageDiscountById = (
+    id: number,
+    successfulCallback?: (data: PackageDiscount) => void
+  ): UseQueryResult<PackageDiscount, unknown> => {
+    const result = useQuery(
+      [QUERY_KEY.promotion.packageDiscountDetailKey, id],
+      () => getPackageDiscountById(id),
+      {
+        onSuccess: data => {
+          setPromotionData(prev => ({
+            ...prev,
+            currentPackageDiscount: data,
+          }))
+          successfulCallback?.(data)
+        },
+        onError: (error: ApiError) => {
+          handleApiError({ error, t })
+        },
+        enabled: !!id,
+        staleTime: STALE_TIME,
+      }
+    )
+    return result
+  }
+
+  const useCreatePackageDiscount = (
+    successfulCallback?: (data: PackageDiscount) => void
+  ): UseMutationResult<
+    PackageDiscount,
+    ApiError,
+    CreatePackageDiscountDto,
+    unknown
+  > => {
+    const mutation = useMutation({
+      mutationFn: (dto: CreatePackageDiscountDto) => {
+        return createPackageDiscount(dto)
+      },
+      onSuccess: data => {
+        toast.success(t('promotion:packageDiscount.createSuccess'))
+        successfulCallback?.(data)
+      },
+      onError: (error: ApiError) => {
+        handleApiError({ error, t })
+      },
+    })
+    return mutation
+  }
+
+  const useUpdatePackageDiscount = (
+    successfulCallback?: (data: PackageDiscount) => void
+  ): UseMutationResult<
+    PackageDiscount,
+    ApiError,
+    UpdatePackageDiscountDto,
+    unknown
+  > => {
+    const mutation = useMutation({
+      mutationFn: (payload: UpdatePackageDiscountDto) => {
+        return updatePackageDiscount(payload)
+      },
+      onSuccess: data => {
+        setPromotionData(prev => ({
+          ...prev,
+          packageDiscounts: prev.packageDiscounts.map(pd =>
+            pd.id === data.id ? data : pd
+          ),
+          currentPackageDiscount: data,
+        }))
+        toast.success(t('promotion:packageDiscount.updateSuccess'))
+        successfulCallback?.(data)
+      },
+      onError: (error: ApiError) => {
+        handleApiError({ error, t })
+      },
+    })
+    return mutation
+  }
+
+  const useDeletePackageDiscount = (
+    successfulCallback?: (data: PackageDiscount) => void
+  ): UseMutationResult<PackageDiscount, ApiError, number, unknown> => {
+    const mutation = useMutation({
+      mutationFn: (id: number) =>
+        deletePackageDiscount(id, currentInstitutionId),
+      onSuccess: data => {
+        setPromotionData(prev => ({
+          ...prev,
+          packageDiscounts: prev.packageDiscounts.filter(
+            pd => pd.id !== data.id
+          ),
+        }))
+        toast.success(t('promotion:packageDiscount.deleteSuccess'))
+        successfulCallback?.(data)
+      },
+      onError: (error: ApiError) => {
+        handleApiError({ error, t })
+      },
+    })
+    return mutation
+  }
+
+  const useTogglePackageDiscountStatus = (
+    successfulCallback?: (data: PackageDiscount) => void
+  ): UseMutationResult<PackageDiscount, ApiError, number, unknown> => {
+    const mutation = useMutation({
+      mutationFn: (id: number) => togglePackageDiscountStatus(id),
+      onSuccess: data => {
+        setPromotionData(prev => ({
+          ...prev,
+          packageDiscounts: prev.packageDiscounts.map(pd =>
+            pd.id === data.id ? data : pd
+          ),
+          currentPackageDiscount:
+            prev.currentPackageDiscount?.id === data.id
+              ? data
+              : prev.currentPackageDiscount,
+        }))
+        toast.success(
+          data.isActive
+            ? t('promotion:packageDiscount.activateSuccess')
+            : t('promotion:packageDiscount.deactivateSuccess')
+        )
+        successfulCallback?.(data)
+      },
+      onError: (error: ApiError) => {
+        handleApiError({ error, t })
+      },
+    })
+    return mutation
+  }
+
+  const setCurrentPackageDiscount = (id: number | string) => {
+    const current = promotionData.packageDiscounts.find(
+      (pd: PackageDiscount) => pd.id === id
+    )
+    if (current) {
+      setPromotionData(prev => ({
+        ...prev,
+        currentPackageDiscount: current,
+      }))
+    }
+  }
+
   return {
     promotionData,
     useFetchAllCouponData,
@@ -513,6 +703,14 @@ const usePromotionData = () => {
     useUpdateBundleDiscount,
     useToggleBundleDiscountStatus,
     setCurrentBundleDiscount,
+
+    useFetchAllPackageDiscountsData,
+    useFetchPackageDiscountById,
+    useCreatePackageDiscount,
+    useUpdatePackageDiscount,
+    useDeletePackageDiscount,
+    useTogglePackageDiscountStatus,
+    setCurrentPackageDiscount,
 
     useFetchStudentData,
     useFetchCourseData,

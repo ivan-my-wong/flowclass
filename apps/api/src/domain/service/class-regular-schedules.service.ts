@@ -182,8 +182,18 @@ export class ClassRegularSchedulesV2Service {
     )
 
     if (createDto.periodsV2) {
+      // Strip IDs from periods and their repeat formats so the update method
+      // creates new records instead of trying to update originals (important for duplication)
+      const cleanedPeriods = createDto.periodsV2.map((period) => {
+        const { id: _periodId, ...periodFields } = period as any
+        if (periodFields.lessonRepeatFormat) {
+          const { id: _repeatId, ...repeatFields } = periodFields.lessonRepeatFormat
+          periodFields.lessonRepeatFormat = repeatFields
+        }
+        return periodFields
+      })
       await this.update(schedule.id, {
-        periodsV2: createDto.periodsV2,
+        periodsV2: cleanedPeriods,
       })
     }
 

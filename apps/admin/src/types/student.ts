@@ -21,11 +21,7 @@ import {
   StudentSubmissionType,
   TeacherFeedbackType,
 } from './student-submission'
-import {
-  GetStudentMemoOnlyContactResponseDto,
-  StudentInfoResponse,
-  UserAlias,
-} from './studentMemo'
+import { UserAlias } from './studentMemo'
 
 export type EnrolInto = {
   type: ClassTypeEnum
@@ -82,6 +78,8 @@ export type SingleStudentCrmRecordEnrolledClassesInvoice = {
   updatedAt: string
   usedBalance: number
   proofToken?: string
+  remark?: string | null
+  documentCampaignId?: number | null
 }
 
 export type SingleStudentCrmRecordEnrolledClassesStudentSchedule = {
@@ -103,6 +101,7 @@ export type SingleStudentCrmRecordEnrollCourse = {
   invoices?: SingleStudentCrmRecordEnrolledClassesInvoice[]
   course: PickedCourse
   registrationForm: StudentFormResponse[]
+  isPaused?: boolean
 }
 
 export type SingleStudentCrmRecord = {
@@ -120,16 +119,15 @@ export type StudentEnrolmentRecord = {
   id: number // userAliasId
   name: string
   email: string
+  secondaryEmail?: string | null
   phone: string
   // status?: string
   userId: number
   // fullName?: string
   user: SingleStudentCrmRecord
   enrollCourses?: SingleStudentCrmRecordEnrollCourse[]
-  /** Deprecated  @deprecated */
-  studentMemo?: GetStudentMemoOnlyContactResponseDto
+  remarks?: string | null
   studentForms: StudentFormListResponse[]
-  // studentMemos?: GetStudentMemoOnlyContactResponseDto[]
   isStudentParent?: boolean
   childOfUserAliasId?: number
   usedBalance?: number
@@ -173,6 +171,7 @@ export type TypeUpdateEnrollCourse = {
   siteId: number
   enrollCourseId: number
   confirmState: string
+  isPaused?: boolean
 }
 
 export type UpdateInvoicePaymentStateDto = {
@@ -334,6 +333,12 @@ export type TypeTeachingServiceDetail = {
   invoices?: TeachingServiceSingleInvoice[]
   classType?: ClassTypeEnum
   lessons: StudentLesson[]
+  isPaused?: boolean
+  /** Period identifier for change-lesson init (from lesson matrix). Recurring: recurringScheduleId; Regular v1: periodId; Regular v2: regularScheduleId. */
+  recurringScheduleId?: number
+  regularScheduleId?: number
+  /** Period identifier for regular/workshop (v1) classes. */
+  periodId?: number
 }
 
 export type TypeTeachingServiceEnrollCourse = Omit<
@@ -593,8 +598,6 @@ export type ImportStudentResponse = {
   }
 
   userAlias: UserAlias
-
-  studentMemo: StudentInfoResponse
 
   customFields: StudentFormResponse[]
 }

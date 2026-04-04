@@ -185,7 +185,7 @@ const StudentSelectionDialog: React.FC<Props> = ({
         .map((student: StudentEnrolmentRecord) => {
           let currentEmail = student.email
           let currentPhone = student.phone
-          let currentName = student.name
+          const currentName = student.name
 
           if (student.user) {
             if (!currentEmail) {
@@ -196,19 +196,11 @@ const StudentSelectionDialog: React.FC<Props> = ({
             }
           }
 
-          if (student.studentMemo) {
-            if (student.studentMemo.name) {
-              currentName = student.studentMemo.name
-            }
-          }
-
           return {
             ...student,
             name: currentName,
             email: currentEmail,
             phone: currentPhone,
-            updatedAt: student?.studentMemo?.updatedAt ?? new Date(),
-            createdAt: student?.studentMemo?.createdAt ?? new Date(),
           }
         })
         .filter(({ enrollCourses }) => {
@@ -396,7 +388,7 @@ const StudentSelectionDialog: React.FC<Props> = ({
             columns={tableColumns}
             handleReset={handleReset}
             hasFilterSelection
-            filterSelector={
+            filterSelector={({ handleReset: reset }) => (
               <>
                 <Box direction="col">
                   <Box className="box-row-full grid grid-cols-1 md:grid-cols-10 md:gap-2">
@@ -476,7 +468,7 @@ const StudentSelectionDialog: React.FC<Props> = ({
                       <Button
                         variant="outline"
                         className="w-full"
-                        onClick={handleReset}
+                        onClick={reset}
                       >
                         {t('recordLogs:notificationLogs.selectLabels.reset')}
                       </Button>
@@ -484,7 +476,7 @@ const StudentSelectionDialog: React.FC<Props> = ({
                   </Box>
                 </Box>
               </>
-            }
+            )}
           />
         </DialogBody>
       </DialogContent>

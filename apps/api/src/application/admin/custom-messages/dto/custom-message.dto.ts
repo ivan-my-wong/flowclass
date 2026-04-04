@@ -14,19 +14,15 @@ import * as vars from '@/common/constants/custom-message'
 import { IMessageVariable } from '@/common/constants/custom-message'
 
 export enum SupportedType {
-  ADMIN_NOTIF_AFTER_ENROLLMENT_SUBMITTED = 'admin_notif_after_enrollment_submitted',
-  STUDENT_NOTIF_AFTER_ENROLLMENT_SUBMITTED = 'student_notif_after_enrollment_submitted',
-  STUDENT_NOTIF_AFTER_PAYMENT_APPROVED = 'student_notif_after_payment_approved',
-  STUDENT_NOTIF_AFTER_PAYMENT_REJECTED = 'student_notif_after_payment_rejected',
-  // STUDENT_NOTIF_AFTER_APPLICATION_CONFIRMED = 'student_notif_after_application_confirmed',
-  // TEACHER_NOTIF_AFTER_APPLICATION_SUBMITTED = 'teacher_notif_after_application_submitted',
-  STUDENT_NOTIF_AFTER_ADD_NEW_CLASS = 'student_notif_after_add_new_class',
-  ADMIN_NOTIF_AFTER_ADD_NEW_CLASS = 'admin_notif_after_add_new_class',
-  STUDENT_NOTIF_AFTER_ADD_NEW_LESSON = 'student_notif_after_add_new_lesson',
-  STUDENT_NOTIF_AFTER_CHANGE_LESSON_DATE = 'student_notif_after_change_lesson_date',
-  STUDENT_NOTIF_PAYMENT_REMINDER = 'student_notif_payment_reminder',
   STUDENT_LESSON_REMINDER = 'student_lesson_reminder',
   CREATE_INVOICE = 'create_invoice',
+  STUDENT_NOTIF_AFTER_ENROLLMENT_SUBMITTED = 'student_notif_after_enrollment_submitted',
+  ADMIN_NOTIF_AFTER_ENROLLMENT_SUBMITTED = 'admin_notif_after_enrollment_submitted',
+  STUDENT_NOTIF_AFTER_PAYMENT_APPROVED = 'student_notif_after_payment_approved',
+  STUDENT_NOTIF_AFTER_PAYMENT_REJECTED = 'student_notif_after_payment_rejected',
+  STUDENT_NOTIF_PAYMENT_REMINDER = 'student_notif_payment_reminder',
+  STUDENT_NOTIF_AFTER_ADD_NEW_LESSON = 'student_notif_after_add_new_lesson',
+  STUDENT_NOTIF_AFTER_CHANGE_LESSON_DATE = 'student_notif_after_change_lesson_date',
 }
 
 export type SupportedTypeVariables = {
@@ -70,19 +66,13 @@ const ENROLL_INFO: IMessageVariable[] = [
 
 export const supportedTypeVariables: SupportedTypeVariables[] = [
   {
-    type: SupportedType.ADMIN_NOTIF_AFTER_ENROLLMENT_SUBMITTED,
-    variables: [
-      ...ADMIN_BASIC_INFO,
-      vars.ADMIN_NAME_VAR,
-      ...CLASS_BASIC_INFO,
-      ...STUDENT_BASIC_INFO,
-      vars.LOCATION_VAR,
-      vars.INSTRUCTOR_VAR,
-    ],
-  },
-  {
     type: SupportedType.CREATE_INVOICE,
-    variables: [...CLASS_BASIC_INFO, vars.STUDENT_NAME_VAR, ...PAYMENT_INFO],
+    variables: [
+      vars.INVOICE_DETAILS_VAR,
+      ...CLASS_BASIC_INFO,
+      vars.STUDENT_NAME_VAR,
+      ...PAYMENT_INFO,
+    ],
   },
   {
     type: SupportedType.STUDENT_LESSON_REMINDER,
@@ -94,91 +84,6 @@ export const supportedTypeVariables: SupportedTypeVariables[] = [
       vars.SCHOOL_NAME_VAR,
     ],
   },
-  {
-    type: SupportedType.STUDENT_NOTIF_AFTER_ADD_NEW_LESSON,
-    variables: [
-      vars.STUDENT_NAME_VAR,
-      ...CLASS_BASIC_INFO,
-      ...LESSON_INFO,
-      vars.UPLOAD_PAYMENT_URL_VAR,
-    ],
-  },
-  // {
-  //   type: SupportedType.STUDENT_NOTIF_AFTER_APPLICATION_CONFIRMED,
-  //   variables: [
-  //     ...CLASS_BASIC_INFO,
-  //     vars.STUDENT_NAME_VAR,
-  //     vars.INSTRUCTOR_VAR,
-  //     vars.LOCATION_VAR,
-  //     ...ADMIN_BASIC_INFO,
-  //   ],
-  // },
-  {
-    type: SupportedType.STUDENT_NOTIF_AFTER_CHANGE_LESSON_DATE,
-    variables: [
-      vars.STUDENT_NAME_VAR,
-      ...CLASS_BASIC_INFO,
-      vars.CLASS_LESSON_DATE_VAR,
-      vars.NEW_CLASS_LESSON_DATE_VAR,
-      ...ADMIN_BASIC_INFO,
-      vars.LOCATION_VAR,
-      vars.INSTRUCTOR_VAR,
-    ],
-  },
-  {
-    type: SupportedType.STUDENT_NOTIF_AFTER_ENROLLMENT_SUBMITTED,
-    variables: [
-      ...CLASS_BASIC_INFO,
-      ...STUDENT_BASIC_INFO,
-      ...ADMIN_BASIC_INFO,
-      ...ENROLL_INFO,
-      vars.UPLOAD_PAYMENT_URL_VAR,
-      vars.PAYMENT_AMOUNT_VAR,
-      vars.LOCATION_VAR,
-      vars.INSTRUCTOR_VAR,
-    ],
-  },
-  {
-    type: SupportedType.STUDENT_NOTIF_AFTER_PAYMENT_APPROVED,
-    variables: [
-      ...CLASS_BASIC_INFO,
-      vars.STUDENT_NAME_VAR,
-      ...PAYMENT_INFO,
-      vars.SUCCESS_PAYMENT_LINK_VAR,
-      vars.PAYMENT_AMOUNT_VAR,
-      vars.LOCATION_VAR,
-      vars.INSTRUCTOR_VAR,
-    ],
-  },
-  {
-    type: SupportedType.STUDENT_NOTIF_AFTER_PAYMENT_REJECTED,
-    variables: [
-      vars.STUDENT_NAME_VAR,
-      ...CLASS_BASIC_INFO,
-      ...ADMIN_BASIC_INFO,
-      vars.UPLOAD_PAYMENT_URL_VAR,
-    ],
-  },
-  {
-    type: SupportedType.STUDENT_NOTIF_PAYMENT_REMINDER,
-    variables: [vars.STUDENT_NAME_VAR, ...CLASS_BASIC_INFO, ...PAYMENT_INFO, ...ADMIN_BASIC_INFO],
-  },
-  {
-    type: SupportedType.STUDENT_NOTIF_AFTER_ADD_NEW_CLASS,
-    variables: [
-      vars.INSTRUCTOR_VAR,
-      vars.LOCATION_VAR,
-      vars.SCHOOL_NAME_VAR,
-      vars.STUDENT_NAME_VAR,
-      vars.COURSE_NAME_VAR,
-      ...ADMIN_BASIC_INFO,
-    ],
-  },
-
-  // {
-  //   type: SupportedType.TEACHER_NOTIF_AFTER_APPLICATION_SUBMITTED,
-  //   variables: [...CLASS_BASIC_INFO, vars.STUDENT_NAME_VAR, ...ADMIN_BASIC_INFO],
-  // },
 ]
 
 export class CreateCustomMessageDTO {
@@ -210,7 +115,7 @@ export class CreateCustomMessageDTO {
   @ApiProperty({
     description: 'The type of the custom message',
     enum: SupportedType,
-    example: SupportedType.ADMIN_NOTIF_AFTER_ENROLLMENT_SUBMITTED,
+    example: SupportedType.CREATE_INVOICE,
   })
   @IsEnum(SupportedType)
   @IsNotEmpty()

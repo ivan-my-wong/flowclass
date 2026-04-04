@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
-import { useRecoilValue } from 'recoil'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
 
 import { getAllClassesLessonsInCourse } from '@/api/class'
 import { Button } from '@/components/ui/Button'
@@ -10,6 +10,7 @@ import { useEvents } from '@/components/ui/FullCalendar/EventProvider'
 import { useRegularClassData } from '@/hooks/useRegularClassData'
 import useSiteData from '@/hooks/useSiteData'
 import {
+  availableLessonsByClassState,
   currentActiveStudentState,
   invoiceSessionState,
 } from '@/stores/studentInvoice.store'
@@ -57,6 +58,9 @@ const SelectedSessionSide = (): JSX.Element => {
   } = useInvoiceEditorContext()
 
   const [isLoadingAllClasses, setIsLoadingAllClasses] = useState(false)
+  const setAvailableLessonsByClass = useSetRecoilState(
+    availableLessonsByClassState
+  )
 
   const { usePreviewClassLessons } = useRegularClassData()
   const { data: lessonsData } = usePreviewClassLessons(classData ?? undefined)
@@ -66,6 +70,19 @@ const SelectedSessionSide = (): JSX.Element => {
   useEffect(() => {
     setRegularV2Lessons(lessonsData?.lessons || [])
   }, [setRegularV2Lessons, lessonsData?.lessons])
+
+  // Populate available lessons by class for package discount auto-apply
+  useEffect(() => {
+    if (lessonsData?.lessons && classData?.id) {
+      setAvailableLessonsByClass(prev => ({
+        ...prev,
+        [classData.id]: lessonsData.lessons.map(lesson => ({
+          id: lesson.id,
+          date: lesson.date,
+        })),
+      }))
+    }
+  }, [lessonsData?.lessons, classData?.id, setAvailableLessonsByClass])
 
   // Fetch all classes lessons when toggle is ON
   useEffect(() => {

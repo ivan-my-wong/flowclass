@@ -8,6 +8,8 @@ import {
   LuCreditCard,
   LuEye,
   LuLink,
+  LuMessageSquare,
+  LuPrinter,
   LuUserCheck,
   LuUserMinus,
   LuUserPlus,
@@ -19,7 +21,7 @@ import { toast } from 'sonner'
 import ApiError, { handleApiError } from '@/api/errors/apiError'
 import { deleteStudent, editStatusStudent } from '@/api/student'
 import DeleteIcon from '@/assets/svgs/student/DeleteIcon'
-import RemarkIcon from '@/assets/svgs/student/RemarkIcon'
+import TeachingServiceIcon from '@/assets/svgs/student/TeachingServiceIcon'
 import ViewIcon from '@/assets/svgs/student/ViewIcon'
 import DropdownMenu, {
   DropDownMenuItemType,
@@ -33,18 +35,13 @@ import {
   STUDENT_TABS,
   StudentStatus,
 } from '@/constants/common'
-import { INCOMPLETE_FEATURE_FLAG } from '@/constants/featureFlags'
 import { QUERY_KEY } from '@/constants/queryKey'
 import useCredit from '@/hooks/useCredit'
 import { PrintLabelModalHandle } from '@/pages/StudentCRM/Label/PrintLabelModal'
 import { AlertTypes } from '@/reducers/confirm.reducers'
 import { schoolState } from '@/stores/schoolData'
 import { siteState } from '@/stores/siteData'
-import {
-  AddTeachingServiceMode,
-  remarksState,
-  studentState,
-} from '@/stores/studentData'
+import { AddTeachingServiceMode, studentState } from '@/stores/studentData'
 import { userPermissionState, UserRole } from '@/stores/userPermissionData'
 import {
   StudentEnrolmentRecord,
@@ -54,6 +51,7 @@ import {
 import { StudentUser } from '@/types/user'
 import { generateDataTestId } from '@/utils/data-testid.utils'
 
+import AddOrDeductCreditModal from './AddOrDeductCreditModal'
 import AddToParentGroupModal, {
   AddToParentGroupModalHandle,
 } from './AddToParentGroupModal'
@@ -63,6 +61,7 @@ import ChangeToNewFamilyGroupModal, {
 import CreditBalanceModal, {
   CreditBalanceModalHandle,
 } from './CreditBalanceModal'
+import EditRemarksModal, { EditRemarksModalHandle } from './EditRemarksModal'
 import RemoveFromCurrentGroupModal, {
   RemoveFromCurrentGroupModalHandle,
 } from './RemoveFromCurrentGroupModal'
@@ -111,7 +110,6 @@ const ActionButton = ({
   ].includes(userPermission)
 
   const [, setStudentData] = useRecoilState(studentState)
-  const [, setRemarks] = useRecoilState(remarksState)
   const registrationForm = useMemo(() => {
     return (studentInfo.enrollCourses || []).flatMap(
       enrollCourse => enrollCourse.registrationForm || []
@@ -146,6 +144,7 @@ const ActionButton = ({
   }, [registrationForm])
 
   const printLabelModalHandle = useRef<PrintLabelModalHandle>(null)
+  const editRemarksModalHandle = useRef<EditRemarksModalHandle>(null)
   const creditBalanceModalHandle = useRef<CreditBalanceModalHandle>(null)
   const addToParentGroupModalHandle = useRef<AddToParentGroupModalHandle>(null)
   const setAsParentAccountModalHandle =
@@ -217,15 +216,6 @@ const ActionButton = ({
 
   const handleEditStudent = () => {
     navigate(`/student-record/${studentInfo.id}?userId=${studentInfo.userId}`)
-  }
-  const handleAddRemarks = () => {
-    setRemarks(prevRemarks => ({
-      ...prevRemarks,
-      [studentInfo.id]: {
-        ...prevRemarks[studentInfo.id],
-        isShow: true,
-      },
-    }))
   }
   const renderMenuItem = ({
     icon,
@@ -320,19 +310,18 @@ const ActionButton = ({
         }),
       },
 
-      INCOMPLETE_FEATURE_FLAG.STUDENT_CRM_MEMO_FEATURE
-        ? {
-            ...renderMenuItem({
-              icon: <RemarkIcon />,
-              title: `${t('student:menu:addRemark')}`,
-              funcHandleEvent: () => {
-                handleAddRemarks()
-              },
-            }),
-          }
-        : {
-            type: 'separator',
+      {
+        ...renderMenuItem({
+          icon: <LuMessageSquare size={20} />,
+          title: t('student:menu:addRemark'),
+          funcHandleEvent: () => {
+            editRemarksModalHandle.current?.open(
+              studentInfo.id,
+              studentInfo.remarks ?? null
+            )
           },
+        }),
+      },
 
       ...(!childOfUserAliasId && showCreditSystem
         ? [
@@ -473,6 +462,7 @@ const ActionButton = ({
         loading={mutationEditStatusStudent.isLoading}
       />
 
+      <EditRemarksModal ref={editRemarksModalHandle} />
       <CreditBalanceModal
         ref={creditBalanceModalHandle}
         userAliasId={userAliasId}

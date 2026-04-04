@@ -1131,6 +1131,16 @@ export class InvoiceCampaignService {
           null
         ))
       parentInvoice.remark = invoice?.invoiceRemark
+      if (!tempInvoice) {
+        const splitFirstLessonDate = this.getFirstLessonDate([], multipleClassInfo)
+        if (splitFirstLessonDate) {
+          parentInvoice.createdAt = splitFirstLessonDate
+          parentInvoice.updatedAt = splitFirstLessonDate
+        }
+      }
+      if (invoice.paymentDate) {
+        parentInvoice.paymentDate = new Date(invoice.paymentDate)
+      }
       // Set currency on parent invoice if not already set
       if (!parentInvoice.currency) {
         const parentCurrency =
@@ -1264,6 +1274,16 @@ export class InvoiceCampaignService {
     if (currency) {
       invoiceResult.currency = currency
     }
+    if (!tempInvoice) {
+      const firstLessonDate = this.getFirstLessonDate(studentScheduleList, multipleClassInfo)
+      if (firstLessonDate) {
+        invoiceResult.createdAt = firstLessonDate
+        invoiceResult.updatedAt = firstLessonDate
+      }
+    }
+    if (invoice.paymentDate) {
+      invoiceResult.paymentDate = new Date(invoice.paymentDate)
+    }
     let newInvoice = await this.invoiceRepository.save(invoiceResult)
     newInvoice.institution = institution
     // When creating bundle discounts, always ensure discountType is FIXED_AMOUNT (not PERCENTAGE)
@@ -1395,7 +1415,9 @@ export class InvoiceCampaignService {
         })
         invoice.creditTransactionsId = creditTransaction.id
         invoice.payAmount = Math.max(0, invoice.payAmount - invoice.usedBalance)
-        invoice.paymentState = invoice.payAmount <= 0 ? PaymentStatus.PAID : PaymentStatus.UNPAID
+        invoice.paymentState =
+          invoice.payAmount <= 0 ? PaymentStatus.PAID : PaymentStatus.PARTIALLY_PAID
+        invoice.amountPaid = invoice.payAmount ?? 0
       } catch (error) {
         this.logger.error('Error deducting credit:', error)
       }
@@ -2284,5 +2306,28 @@ export class InvoiceCampaignService {
         invoice.userAlias
       )
     }
+  }
+
+  private getFirstLessonDate(
+    studentScheduleList: StudentLesson[][],
+    multipleClassInfo: StudentMultipleClassInfo
+  ): Date | null {
+    const allLessons = studentScheduleList.flat()
+    if (allLessons.length > 0) {
+      const sorted = allLessons.slice().sort((a, b) => {
+        const aTime = (a.changeStartTime ?? a.startTime)?.getTime() ?? 0
+        const bTime = (b.changeStartTime ?? b.startTime)?.getTime() ?? 0
+        return aTime - bTime
+      })
+      const earliest = sorted[0].changeStartTime ?? sorted[0].startTime
+      if (earliest) return earliest
+    }
+    const classStartTimes = multipleClassInfo.classes
+      .map((c) => (c as any).startTime as Date | undefined)
+      .filter(Boolean) as Date[]
+    if (classStartTimes.length > 0) {
+      return classStartTimes.sort((a, b) => a.getTime() - b.getTime())[0]
+    }
+    return null
   }
 }

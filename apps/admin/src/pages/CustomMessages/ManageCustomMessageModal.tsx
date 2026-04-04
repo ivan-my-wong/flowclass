@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next'
 import { FaWhatsapp } from 'react-icons/fa'
 import { LuMail } from 'react-icons/lu'
 
-import { WhatsAppConnectionStatus } from '@/api/whatsappWeb'
 import { Spinner } from '@/components/Loaders/Spinner'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
@@ -37,15 +36,24 @@ import {
 import { Switch } from '@/components/ui/Switch'
 import TextArea from '@/components/ui/TextAreaBase'
 import {
+  courseItemVariableOptions,
   customMessageOptions,
+<<<<<<< HEAD:apps/admin/src/pages/CustomMessages/ManageCustomMessageModal.tsx
   defaultWhatsappTemplate,
+=======
+  CustomMessageType,
+  defaultWhatsappTemplate,
+  lessonItemVariableOptions,
+>>>>>>> eb806cf94 (feat: remove WhatsApp connection components and related logic):src/pages/CustomMessages/ManageCustomMessageModal.tsx
 } from '@/constants/whatsappTemplate'
 import useCustomMessageData from '@/hooks/useCustomMessageData'
 import useNavigateDialogPage from '@/hooks/useNavigateDialogPage'
-import { useWhatsappWeb } from '@/hooks/useWhatsappWeb'
 import { CustomMessage } from '@/types/customMessage'
+<<<<<<< HEAD:apps/admin/src/pages/CustomMessages/ManageCustomMessageModal.tsx
 import { CustomMessageType } from '@/types/whatsappTemplate'
 import { cn } from '@/utils/cn'
+=======
+>>>>>>> eb806cf94 (feat: remove WhatsApp connection components and related logic):src/pages/CustomMessages/ManageCustomMessageModal.tsx
 
 // import { countPlaceholder } from '@/utils/string'
 
@@ -58,10 +66,7 @@ const ManageCustomMessage = (): React.ReactElement => {
   } = useCustomMessageData()
   const [params] = useSearchParams()
 
-  const { useGetSessionStatus } = useWhatsappWeb()
-  const { data: sessionStatus } = useGetSessionStatus()
   const [isEditWaMessage, setIsEditWaMessage] = useState(true)
-  const [isOpenWhatsappConnect, setIsOpenWhatsappConnect] = useState(false)
   const { data: preparedData } = useGetPreparedData()
 
   const types = useMemo(() => preparedData?.data?.types, [preparedData?.data])
@@ -70,6 +75,7 @@ const ManageCustomMessage = (): React.ReactElement => {
     [preparedData?.data?.variables]
   )
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
+  const repeaterTextAreaRef = useRef<HTMLTextAreaElement | null>(null)
 
   const customMessageId = useMemo(
     () => (params.get('id') ? Number(params.get('id')) : -1),
@@ -181,6 +187,38 @@ const ManageCustomMessage = (): React.ReactElement => {
   const content = formData.watch('content')
   const emailNotification = formData.watch('emailNotification')
   const whatsappNotification = formData.watch('whatsappNotification')
+
+  const hasCourseItems = content?.includes('{{courseItems}}')
+  const hasLessonItems = content?.includes('{{lessonItems}}')
+  const showRepeaterFormat = hasCourseItems || hasLessonItems
+
+  const repeaterVariableOptions = useMemo(() => {
+    if (hasCourseItems) return courseItemVariableOptions
+    if (hasLessonItems) return lessonItemVariableOptions
+    return []
+  }, [hasCourseItems, hasLessonItems])
+
+  const onSelectRepeaterVariable = (messageItem: CustomMessageType) => {
+    const content = formData.getValues('repeaterFormat') || ''
+    if (repeaterTextAreaRef.current) {
+      const textarea = repeaterTextAreaRef.current
+      const startPos = textarea.selectionStart ?? content.length
+      const endPos = textarea.selectionEnd ?? content.length
+      const char = messageItem.value
+      const currentValue = content
+      const newValue =
+        currentValue.substring(0, startPos) +
+        char +
+        currentValue.substring(endPos, currentValue.length)
+      formData.setValue('repeaterFormat', newValue)
+      setTimeout(() => {
+        textarea.setSelectionRange(
+          startPos + char.length,
+          startPos + char.length
+        )
+      }, 0)
+    }
+  }
 
   return (
     <>
@@ -319,12 +357,7 @@ const ManageCustomMessage = (): React.ReactElement => {
                   </Button> */}
                 </CardTitle>
               </CardHeader>
-              <CardDescription
-                className={cn(
-                  sessionStatus?.data?.status !==
-                    WhatsAppConnectionStatus.READY && 'p-0'
-                )}
-              >
+              <CardDescription>
                 {isEditWaMessage && (
                   <FormField
                     control={formData.control}
@@ -373,6 +406,53 @@ const ManageCustomMessage = (): React.ReactElement => {
                 )}
               </CardDescription>
             </Card>
+            {showRepeaterFormat && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    {t('customMessage:form.repeaterFormat')}
+                  </CardTitle>
+                </CardHeader>
+                <CardDescription>
+                  <FormField
+                    control={formData.control}
+                    name="repeaterFormat"
+                    render={({ field }) => (
+                      <FormItem className="p-4 pt-0">
+                        <div className="flex flex-col gap-2">
+                          <p className="text-xs text-gray-400">
+                            {t('customMessage:form.repeaterFormatHint')}
+                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            {repeaterVariableOptions.map(item => (
+                              <Badge
+                                key={item.value}
+                                variant="light"
+                                className="cursor-pointer"
+                                onClick={() => onSelectRepeaterVariable(item)}
+                              >
+                                {t(item.name)}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                        <FormControl>
+                          <TextArea
+                            {...field}
+                            ref={repeaterTextAreaRef}
+                            placeholder={t(
+                              'customMessage:form.repeaterFormatPlaceholder'
+                            ).toString()}
+                            rows={8}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-warn" />
+                      </FormItem>
+                    )}
+                  />
+                </CardDescription>
+              </Card>
+            )}
           </>
         )}
       </ModalDialog>

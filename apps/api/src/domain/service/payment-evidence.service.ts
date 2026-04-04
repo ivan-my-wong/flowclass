@@ -874,6 +874,7 @@ export class PaymentEvidenceService {
       throw new NotFoundException(EnrollCourseErrorMessage.ENROLL_COURSE_NOT_FOUND)
     }
     invoice.paymentState = PaymentStatus.REJECTED
+    invoice.amountPaid = invoice.payAmount ?? 0
 
     //get course info
     const course =
@@ -1246,6 +1247,7 @@ export class PaymentEvidenceService {
     // update invoice's payment state
     const invoiceRepository = this.invoiceService.getRepository()
     invoice.paymentState = status
+    invoice.amountPaid = invoice.payAmount ?? 0
     invoice.reviewed = reviewed
     invoice.approvedBy = `${user.firstName} ${user.lastName}`
     invoice.approverId = user.id
@@ -1291,14 +1293,21 @@ export class PaymentEvidenceService {
           ? status === PaymentStatus.PAID
           : child.paymentState === PaymentStatus.PAID
       )
+      const isAnyPaid = allChildren.some((child) =>
+        child.id === invoice.id
+          ? status === PaymentStatus.PAID
+          : child.paymentState === PaymentStatus.PAID
+      )
       const parentInvoice = await invoiceRepository.findOneBy({ id: invoice.invoiceParentId })
       if (parentInvoice) {
         if (isAllPaid) {
           parentInvoice.paymentState = PaymentStatus.PAID
-        } else if (parentInvoice.paymentState === PaymentStatus.PAID) {
-          // optional: downgrade if any child not paid
+        } else if (isAnyPaid) {
+          parentInvoice.paymentState = PaymentStatus.PARTIALLY_PAID
+        } else {
           parentInvoice.paymentState = PaymentStatus.UNPAID
         }
+        parentInvoice.amountPaid = parentInvoice.payAmount ?? 0
         await invoiceRepository.save(parentInvoice)
       }
     }
