@@ -1023,7 +1023,7 @@ export class InvoiceService {
     const hasCreatedAt = payload.createdAt != null && payload.createdAt !== ''
     const hasUpdatedAt = payload.updatedAt != null && payload.updatedAt !== ''
 
-    const parsedDate = dayjs(paymentDate)
+    const parsedDate = dayjs(payload.paymentDate)
     if (!parsedDate.isValid()) {
       throw new BadRequestException('Invalid payment date format. Expected YYYY-MM-DD.')
     }

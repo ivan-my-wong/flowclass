@@ -12,7 +12,6 @@ import {
 } from '@/application/admin/setting-notifications/setting-notifications.dto'
 import { QRCodeAttendanceDto } from '@/application/admin/student-onboard/dtos/student-onboard.dto'
 import { ApiError } from '@/common/api-formats/api-error'
-import { emailTemplates } from '@/common/constants/email-templates.constants'
 import { CloudWatchLoggerProvider } from '@/config/loggers/cloudwatch-nestjs.provider'
 import { ObjectStorageProvider } from '@/config/storage/object-storage.provider'
 import {
@@ -331,7 +330,7 @@ export class EmailService {
       emailAddress: parentUser.email,
       recipientUserId,
       recipientName: parentUser.name,
-      templateId: emailTemplates.CLASS_STUDENT_WAITING_PAYMENT,
+      templateId: 'remind-payment',
       personalization,
       advancePersonalization,
       notificationType: NotificationType.WAITING_FOR_PAYMENT,
@@ -394,7 +393,7 @@ export class EmailService {
       emailAddress: rest.emailAddress,
       recipientUserId: rest.userId,
       recipientName: studentName,
-      templateId: emailTemplates.UPLOADED_TEACHER_FEEDBACK,
+      templateId: 'teacher-feedback-uploaded',
       personalization,
       advancePersonalization,
       notificationType: NotificationType.TEACHER_FEEDBACK,
@@ -583,7 +582,7 @@ export class EmailService {
       emailAddress: effectiveEmail,
       recipientUserId: recipientUser.id,
       recipientName: recipientUser.studentName,
-      templateId: emailTemplates.CLASS_STUDENT_CONFIRMATION,
+      templateId: 'student-confirmation',
       personalization,
       advancePersonalization,
       notificationType: NotificationType.ENROLLED_IN_COURSE,
@@ -1048,7 +1047,7 @@ export class EmailService {
       emailAddress,
       recipientUserId: recipientId,
       recipientName: institutionName,
-      templateId: emailTemplates.CLASS_ADMIN_NEW_REGISTRATION,
+      templateId: 'admin-new-registration',
       personalization,
       advancePersonalization,
       notificationType: NotificationType.STUDENT_REGISTERED,
@@ -1194,7 +1193,7 @@ export class EmailService {
       emailAddress,
       recipientUserId,
       recipientName: institutionName,
-      templateId: emailTemplates.CLASS_ADMIN_PAYMENT_CONFIRMATION,
+      templateId: 'admin-payment-confirmation',
       personalization,
       advancePersonalization,
       notificationType: NotificationType.STUDENT_PAID,
@@ -1409,7 +1408,7 @@ export class EmailService {
       emailAddress,
       recipientUserId,
       recipientName: institutionName,
-      templateId: emailTemplates.CLASS_ADMIN_PAYMENT_SUBMITTED,
+      templateId: 'admin-payment-submitted',
       personalization,
       notificationType: NotificationType.CONFIRM_PAYMENT,
       advancePersonalization,
@@ -1465,7 +1464,7 @@ export class EmailService {
       emailAddress: studentEmail,
       recipientUserId: userId,
       recipientName: studentName,
-      templateId: emailTemplates.ASSIGN_COUPON,
+      templateId: 'assign-coupon',
       personalization,
       notificationType: NotificationType.RECEIVED_COUPON,
       institutionName,
@@ -1498,7 +1497,7 @@ export class EmailService {
       emailAddress,
       recipientUserId: userId,
       recipientName: '',
-      templateId: emailTemplates.REQUEST_RESET_PASSWORD,
+      templateId: 'forgot-password',
       personalization,
       notificationType: NotificationType.FORGET_PASSWORD,
     }
@@ -1652,7 +1651,7 @@ export class EmailService {
       emailAddress: studentEmail,
       recipientUserId,
       recipientName: studentName,
-      templateId: customTemplateId || emailTemplates.CLASS_STUDENT_COURSE_REMINDER,
+      templateId: customTemplateId || 'student-course-reminder',
       personalization,
       advancePersonalization,
       notificationType: NotificationType.REMINDER,
@@ -1859,7 +1858,7 @@ export class EmailService {
       emailAddress: studentEmail,
       recipientUserId: Number(recipientUserId),
       recipientName: studentFirstName,
-      templateId: emailTemplates.CLASS_STUDENT_ASSIGNED_COURSE,
+      templateId: 'student-assigned-course',
       personalization,
       notificationType: NotificationType.ASSIGN_COURSE,
       institutionName,
@@ -1905,7 +1904,7 @@ export class EmailService {
       emailAddress: invitedUserEmail,
       recipientUserId: Number(recipientUserId),
       recipientName: invitedUserEmail,
-      templateId: emailTemplates.ADMIN_INVITATION,
+      templateId: 'invitation-institution-to-user',
       personalization,
       notificationType: NotificationType.INVITATION,
     }
@@ -1964,7 +1963,7 @@ export class EmailService {
       emailAddress: params.studentEmail,
       recipientUserId: params.recipientUserId,
       recipientName: params.studentFirstName,
-      templateId: emailTemplates.CLASS_STUDENT_NEW_LESSON,
+      templateId: 'student-new-lesson',
       personalization,
       notificationType: NotificationType.ASSIGN_COURSE,
       institutionName: params.institutionName,
@@ -2031,7 +2030,7 @@ export class EmailService {
       emailAddress: params.studentEmail,
       recipientUserId: params.recipientUserId,
       recipientName: params.studentFirstName,
-      templateId: emailTemplates.CLASS_STUDENT_CHANGE_LESSON,
+      templateId: 'student-change-lesson',
       institutionName: params.institutionName,
       personalization,
       notificationType: NotificationType.UPDATE_ON_COURSE_STATUS,
@@ -2090,7 +2089,7 @@ export class EmailService {
       emailAddress: studentEmail,
       recipientUserId,
       recipientName: studentName,
-      templateId: emailTemplates.CLASS_STUDENT_POSTPONE,
+      templateId: 'student-postpone',
       institutionName: courseName,
       personalization,
       notificationType: NotificationType.LESSON_POSTPONE,
@@ -2278,7 +2277,7 @@ export class EmailService {
 
     const templateId = this.hasCustomEmailTemplate(params.course)
       ? courseEmailSettings.emailId
-      : emailTemplates.CLASS_STUDENT_UPLOAD_RECEIPT
+      : 'student-upload-receipt'
 
     const emailPayload = {
       emailSubject,
@@ -2353,7 +2352,7 @@ export class EmailService {
       advancePersonalization,
       recipientUserId: 0,
       recipientName: 'Applicant',
-      templateId: emailTemplates.APPLICATION_EMAIL_VERIFICATION,
+      templateId: 'application-email-verification',
       institutionId: params.institutionId,
       institutionName: params.institutionName,
       personalization,
@@ -2383,7 +2382,7 @@ export class EmailService {
       emailAddress: emailData.studentEmail,
       recipientUserId: emailData.recipientUserId,
       recipientName: emailData.studentName,
-      templateId: emailTemplates.REMIND_ENROLL_COURSE_T4,
+      templateId: 'remind-enroll-course-t4',
       institutionName: emailData.courseName,
       personalization,
       notificationType: NotificationType.REMINDER,
@@ -2414,7 +2413,7 @@ export class EmailService {
       recipientUserId: emailData.recipientUserId,
       recipientName: emailData.studentName,
       institutionName: emailData.courseName,
-      templateId: emailTemplates.REMIND_ENROLL_COURSE_T0,
+      templateId: 'remind-enroll-course-t0',
       personalization,
       notificationType: NotificationType.REMINDER,
     }
@@ -2648,7 +2647,7 @@ export class EmailService {
       where: {
         studentId: recipientUserId,
         institutionId,
-        notificationType: notificationType as SupportedType,
+        notificationType: notificationType as unknown as SupportedType,
       },
     })
 
@@ -2799,7 +2798,7 @@ export class EmailService {
       emailAddress,
       recipientUserId,
       recipientName: institutionName,
-      templateId: emailTemplates.CLASS_STUDENT_REJECT_PAYMENT,
+      templateId: 'student-reject-payment',
       personalization,
       advancePersonalization,
       notificationType: NotificationType.REJECT_PAYMENT,

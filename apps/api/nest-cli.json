@@ -9,6 +9,11 @@
         "include": "templates/**/*",
         "watchAssets": true,
         "outDir": "dist/src"
+      },
+      {
+        "include": "common/email-templates/**/*",
+        "watchAssets": true,
+        "outDir": "dist/src"
       }
     ]
   }

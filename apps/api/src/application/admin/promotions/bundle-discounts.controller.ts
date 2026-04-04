@@ -110,8 +110,8 @@ export class BundleDiscountsController {
       allItemsPercentage: {
         summary: 'All Items - Percentage Discount',
         value: {
-          siteId: 914,
-          institutionId: 1071,
+          siteId: 1,
+          institutionId: 1,
           name: 'Summer Promo',
           discountType: 'percentage',
           amount: 30,
@@ -130,8 +130,8 @@ export class BundleDiscountsController {
       specificItemsFixed: {
         summary: 'Specific Items - Fixed Amount Discount',
         value: {
-          siteId: 914,
-          institutionId: 1071,
+          siteId: 1,
+          institutionId: 1,
           name: 'Exam Bundle',
           discountType: 'fixedAmount',
           amount: 30000,
@@ -141,7 +141,7 @@ export class BundleDiscountsController {
           //   { minQty: 5, amount: 20 }
           // ],
           isAllItems: false,
-          applicableItemIds: [3081, 3082, 3083, 3084, 3084, 3085, 3086],
+          applicableItemIds: [1, 2, 3],
           isAutoApply: true,
           isRetroactive: true,
           startDate: '2025-09-01T00:00:00Z',
@@ -151,8 +151,8 @@ export class BundleDiscountsController {
       openCampaign: {
         summary: 'Ongoing Discount without End Date',
         value: {
-          siteId: 914,
-          institutionId: 1071,
+          siteId: 1,
+          institutionId: 1,
           name: 'Unlimited Deal',
           discountType: 'percentage',
           amount: 30000,
@@ -322,10 +322,10 @@ export class BundleDiscountsController {
         summary: 'Invoice Eligible to Apply Bundle Discounts',
         description: 'Invoice Eligible to Apply Bundle Discounts with provided minimum courses',
         value: {
-          siteId: 914,
-          institutionId: 1071,
+          siteId: 1,
+          institutionId: 1,
           bundleId: 1,
-          courseIds: [3081, 3082],
+          courseIds: [1, 2],
         },
       },
     },

@@ -568,6 +568,6 @@ export class InvoicesController {
   @UseGuards(RolesGuard)
   @RequireParams(RequireParam.INSTITUTION_ID)
   async updatePaymentDate(@Body() params: { invoiceId: number; paymentDate: string }) {
-    return this.invoiceService.updatePaymentDate(params.invoiceId, params.paymentDate)
+    return this.invoiceService.updatePaymentDate(params.invoiceId, { paymentDate: params.paymentDate })
   }
 }

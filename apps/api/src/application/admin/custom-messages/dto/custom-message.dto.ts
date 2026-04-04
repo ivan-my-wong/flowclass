@@ -16,6 +16,13 @@ import { IMessageVariable } from '@/common/constants/custom-message'
 export enum SupportedType {
   STUDENT_LESSON_REMINDER = 'student_lesson_reminder',
   CREATE_INVOICE = 'create_invoice',
+  STUDENT_NOTIF_AFTER_ENROLLMENT_SUBMITTED = 'student_notif_after_enrollment_submitted',
+  ADMIN_NOTIF_AFTER_ENROLLMENT_SUBMITTED = 'admin_notif_after_enrollment_submitted',
+  STUDENT_NOTIF_AFTER_PAYMENT_APPROVED = 'student_notif_after_payment_approved',
+  STUDENT_NOTIF_AFTER_PAYMENT_REJECTED = 'student_notif_after_payment_rejected',
+  STUDENT_NOTIF_PAYMENT_REMINDER = 'student_notif_payment_reminder',
+  STUDENT_NOTIF_AFTER_ADD_NEW_LESSON = 'student_notif_after_add_new_lesson',
+  STUDENT_NOTIF_AFTER_CHANGE_LESSON_DATE = 'student_notif_after_change_lesson_date',
 }
 
 export type SupportedTypeVariables = {

@@ -2307,4 +2307,27 @@ export class InvoiceCampaignService {
       )
     }
   }
+
+  private getFirstLessonDate(
+    studentScheduleList: StudentLesson[][],
+    multipleClassInfo: StudentMultipleClassInfo
+  ): Date | null {
+    const allLessons = studentScheduleList.flat()
+    if (allLessons.length > 0) {
+      const sorted = allLessons.slice().sort((a, b) => {
+        const aTime = (a.changeStartTime ?? a.startTime)?.getTime() ?? 0
+        const bTime = (b.changeStartTime ?? b.startTime)?.getTime() ?? 0
+        return aTime - bTime
+      })
+      const earliest = sorted[0].changeStartTime ?? sorted[0].startTime
+      if (earliest) return earliest
+    }
+    const classStartTimes = multipleClassInfo.classes
+      .map((c) => (c as any).startTime as Date | undefined)
+      .filter(Boolean) as Date[]
+    if (classStartTimes.length > 0) {
+      return classStartTimes.sort((a, b) => a.getTime() - b.getTime())[0]
+    }
+    return null
+  }
 }

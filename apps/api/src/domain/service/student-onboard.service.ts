@@ -4357,7 +4357,10 @@ export class StudentOnbService {
     if (!user) {
       throw new ApiError(ErrorCode.USERID_NOT_FOUND)
     }
-    return await this.studentNotifSettingService.getOrCreateNotification(user, data.institutionId)
+    return (await this.studentNotifSettingService.getOrCreateNotification(
+      user,
+      data.institutionId
+    )) as unknown as StudentNotificationSettings[]
   }
 
   async setNotificationSetting(payload: {
@@ -4369,11 +4372,11 @@ export class StudentOnbService {
     if (!user) {
       throw new ApiError(ErrorCode.USERID_NOT_FOUND)
     }
-    return await this.studentNotifSettingService.updateNotificationSettings(
+    return (await this.studentNotifSettingService.updateNotificationSettings(
       user,
       payload.institutionId,
       payload.data
-    )
+    )) as unknown as StudentNotificationSettings[]
   }
 
   async checkIfIsOnlyUserAlias(userId: number): Promise<boolean> {

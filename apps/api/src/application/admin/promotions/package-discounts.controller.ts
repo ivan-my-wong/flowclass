@@ -98,8 +98,8 @@ export class PackageDiscountsController {
       allClasses: {
         summary: 'Apply to all classes',
         value: {
-          siteId: 914,
-          institutionId: 1071,
+          siteId: 1,
+          institutionId: 1,
           name: 'Monthly Full Package',
           amountPerLesson: 5000,
           isAllClasses: true,
@@ -110,8 +110,8 @@ export class PackageDiscountsController {
       specificClasses: {
         summary: 'Apply to specific classes',
         value: {
-          siteId: 914,
-          institutionId: 1071,
+          siteId: 1,
+          institutionId: 1,
           name: 'Math Package Deal',
           amountPerLesson: 10000,
           isAllClasses: false,
