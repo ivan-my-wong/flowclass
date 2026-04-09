@@ -196,6 +196,8 @@
     "recurringPayment": "定期付款",
     "removeSession": "移除課堂",
     "saveCampaign": "儲存發票",
+    "editMode": "編輯模式",
+    "editAndSendInvoices": "編輯並發送發票",
     "viewOnly": "僅供查看",
     "searchStudents": "搜尋學生",
     "selectClass": "選擇班級",

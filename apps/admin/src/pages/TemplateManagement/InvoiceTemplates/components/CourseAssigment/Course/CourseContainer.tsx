@@ -131,14 +131,15 @@ const CourseContainer = (): JSX.Element => {
             <div className="text-lg font-semibold">
               {t('courseAssignment.title')}
             </div>
-            {currentActiveStudent && !isInvoiceExist && (
-              <Button
-                iconBefore={<IoMdAdd aria-hidden="true" focusable="false" />}
-                onClick={() => setOpenEnrolledDialog(true)}
-              >
-                {t('enrolledClass.addEnrolledClass')}
-              </Button>
-            )}
+            {FEATURE_FLAG.ADD_ENROLLED_CLASS_IN_INVOICE_CAMPAIGN &&
+              currentActiveStudent && (
+                <Button
+                  iconBefore={<IoMdAdd aria-hidden="true" focusable="false" />}
+                  onClick={() => setOpenEnrolledDialog(true)}
+                >
+                  {t('enrolledClass.addEnrolledClass')}
+                </Button>
+              )}
           </div>
           <div className="relative">
             <Input

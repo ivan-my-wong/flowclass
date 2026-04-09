@@ -112,6 +112,7 @@
     "appliedCourse": "申請課程",
     "channel": "渠道",
     "createdAt": "創建於",
+    "createdByEmail": "建立者",
     "createdDate": "創建日期",
     "currency": "貨幣",
     "email": "電郵",
@@ -506,6 +507,8 @@
     "action": {
       "copyLink": "複製連結",
       "downloadPDF": "下載PDF",
+      "noCampaign": "此發票未連結到任何活動",
+      "advancedEdit": "進階編輯",
       "editInvoice": "編輯發票",
       "invoiceBreakdown": "發票明細",
       "linkToWhatsApp": "鏈接到WhatsApp",

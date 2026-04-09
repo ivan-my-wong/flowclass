@@ -184,6 +184,8 @@
     "regularV2periodLabel": "Period {{period}}",
     "removeSession": "Remove Session",
     "saveCampaign": "Save Campaign",
+    "editMode": "Edit Mode",
+    "editAndSendInvoices": "Edit and Send Invoice",
     "viewOnly": "View Only",
     "searchStudents": "Search Students",
     "selectClass": "Select Class",

@@ -277,8 +277,7 @@ export const getInvoiceOfStudentSelector = selectorFamily({
       const appliedPromotions = student?.appliedPromotions ?? []
       const total = calculateTotalDiscount(
         invoice.total ?? 0,
-        appliedPromotions,
-        currentSite?.currency || DEFAULT_CURRENCY
+        appliedPromotions
       )
       return {
         ...invoice,

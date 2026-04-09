@@ -24,6 +24,7 @@ import {
   invoiceCampaignState,
   invoiceClassesSelector,
 } from '@/stores/studentInvoice.store'
+import { formatCurrency } from '@/utils/currency'
 import { formatTotalPriceInvoice } from '@/utils/invoice-campaign.utils'
 
 import { useContextInvoiceEditDialog } from '../components/CourseAssigment/Invoice/EditInvoiceContext'
@@ -185,7 +186,7 @@ const PreviewInvoiceContent = () => {
                 {t('editor.invoicePreview.discount')}
               </TableCell>
               <TableCell className="text-right text-red-600 py-1">
-                {calculatedDiscount?.totalDiscountLabel}
+                {`-${formatCurrency(calculatedDiscount?.totalDiscount ?? 0, currency)}`}
               </TableCell>
             </TableRow>
             {(usedBalance?.value ?? 0) > 0 && (

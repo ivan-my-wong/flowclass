@@ -91,7 +91,9 @@ const TotalCellRenderer: FC<ICellRendererParams<RecipientRow>> = ({ data }) => {
     return <span className="text-gray-400">-</span>
   }
   return (
-    <span>{formatCurrency(invoiceOfStudent.total ?? 0, currentSite.currency)}</span>
+    <span>
+      {formatCurrency(invoiceOfStudent.total ?? 0, currentSite.currency)}
+    </span>
   )
 }
 
@@ -130,7 +132,6 @@ const InvoiceRecipients = (): JSX.Element => {
   const gridRef = useRef<AgGridReact<RecipientRow>>(null)
   const allStudents = useRecoilValue(invoiceStudentState)
   const studentList = useRecoilValue(studentListState)
-  const invoiceCampaign = useRecoilValue(invoiceCampaignState)
   useContextInvoiceEditDialog()
 
   const rows = useMemo<RecipientRow[]>(() => {
@@ -164,62 +165,68 @@ const InvoiceRecipients = (): JSX.Element => {
     return result
   }, [allStudents, studentList])
 
-  const columnDefs = useMemo((): ColDef<RecipientRow>[] => [
-    {
-      headerName: t('invoiceCampaign:editor.invoiceTable.send'),
-      width: 80,
-      minWidth: 80,
-      maxWidth: 80,
-      filter: false,
-      sortable: false,
-      resizable: false,
-      cellClass: '!flex !items-center',
-      cellRenderer: SendCellRenderer,
-    },
-    {
-      headerName: t('invoiceCampaign:editor.invoiceTable.customer'),
-      flex: 2,
-      minWidth: 160,
-      filter: false,
-      sortable: false,
-      cellClass: '!flex !items-center',
-      cellRenderer: NameCellRenderer,
-    },
-    {
-      headerName: t('invoiceCampaign:editor.invoiceTable.email'),
-      flex: 2,
-      minWidth: 140,
-      filter: false,
-      sortable: false,
-      cellClass: '!flex !items-center text-sm text-gray-600',
-      valueGetter: ({ data }) => {
-        if (!data) return '-'
-        return data.kind === 'student'
-          ? (data.student.email ?? '-')
-          : (data.email || '-')
+  const columnDefs = useMemo(
+    (): ColDef<RecipientRow>[] => [
+      {
+        headerName: t('invoiceCampaign:editor.invoiceTable.send'),
+        width: 80,
+        minWidth: 80,
+        maxWidth: 80,
+        filter: false,
+        sortable: false,
+        resizable: false,
+        cellClass: '!flex !items-center',
+        cellRenderer: SendCellRenderer,
       },
-    },
-    {
-      headerName: t('invoiceCampaign:editor.invoiceTable.phone'),
-      width: 150,
-      filter: false,
-      sortable: false,
-      cellClass: '!flex !items-center text-sm text-gray-600',
-      valueGetter: ({ data }) => {
-        if (!data) return '-'
-        const phone = data.kind === 'student' ? data.student.phone : data.phone
-        return phone ? formatPhoneNumber(phone) : '-'
+      {
+        headerName: t('invoiceCampaign:editor.invoiceTable.customer'),
+        flex: 2,
+        minWidth: 160,
+        filter: false,
+        sortable: false,
+        cellClass: '!flex !items-center',
+        cellRenderer: NameCellRenderer,
       },
-    },
-    {
-      headerName: t('invoiceCampaign:editor.invoicePreview.invoiceItem.total'),
-      width: 120,
-      filter: false,
-      sortable: false,
-      cellClass: '!flex !items-center text-sm',
-      cellRenderer: TotalCellRenderer,
-    },
-  ], [t])
+      {
+        headerName: t('invoiceCampaign:editor.invoiceTable.email'),
+        flex: 2,
+        minWidth: 140,
+        filter: false,
+        sortable: false,
+        cellClass: '!flex !items-center text-sm text-gray-600',
+        valueGetter: ({ data }) => {
+          if (!data) return '-'
+          return data.kind === 'student'
+            ? data.student.email ?? '-'
+            : data.email || '-'
+        },
+      },
+      {
+        headerName: t('invoiceCampaign:editor.invoiceTable.phone'),
+        width: 150,
+        filter: false,
+        sortable: false,
+        cellClass: '!flex !items-center text-sm text-gray-600',
+        valueGetter: ({ data }) => {
+          if (!data) return '-'
+          const phone =
+            data.kind === 'student' ? data.student.phone : data.phone
+          return phone ? formatPhoneNumber(phone) : '-'
+        },
+      },
+      {
+        headerName: t(
+          'invoiceCampaign:editor.invoicePreview.invoiceItem.total'
+        ),
+        width: 120,
+        filter: false,
+        sortable: false,
+        cellClass: '!flex !items-center text-sm',
+        cellRenderer: TotalCellRenderer,
+      },
+    ],
+    [t]
+  )
 
   return (
     <>

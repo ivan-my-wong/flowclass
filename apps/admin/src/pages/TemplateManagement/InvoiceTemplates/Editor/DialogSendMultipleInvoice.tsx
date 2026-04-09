@@ -32,8 +32,16 @@ import {
   InvoiceSplitType,
   SendingResponse,
 } from '@/types/studentInvoice.type'
-import { InvoiceCampaign } from '@/types/templateManagement'
-import { buildInvoiceCampaignData } from '@/utils/invoice-campaign.utils'
+import {
+  BulkSendDocumentStatus,
+  InvoiceCampaign,
+} from '@/types/templateManagement'
+import { formatCurrency } from '@/utils/currency'
+import {
+  buildInvoiceCampaignData,
+  calculateTotalDiscount,
+  formatTotalPriceInvoice,
+} from '@/utils/invoice-campaign.utils'
 
 import SelectedCourseTable from '../components/CourseAssigment/Invoice/SelectedCourseTable'
 import SplitInvoice from '../components/CourseAssigment/Invoice/SplitInvoice'
@@ -44,11 +52,14 @@ import 'react-datepicker/dist/react-datepicker.css'
 
 const PaymentDateAndCourses = () => {
   const { t } = useTranslation(['invoiceCampaign'])
+  const { currentSite } = useRecoilValue(siteState)
+  const currency = currentSite?.currency ?? DEFAULT_CURRENCY
   const currentActiveStudent = useRecoilValue(currentActiveStudentState)
   const currentActiveParent = useRecoilValue(currentActiveParentState)
   const invoiceCampaign = useRecoilValue(invoiceCampaignState)
   const [invoiceStudents, setInvoiceStudents] =
     useRecoilState(invoiceStudentState)
+  const allClasses = useRecoilValue(invoiceClassesState)
   const currentClasses = useRecoilValue(
     invoiceClassesSelector({
       userAliasId: currentActiveStudent?.id ?? null,
@@ -73,9 +84,42 @@ const PaymentDateAndCourses = () => {
     )
   }
 
+  // Overall summary across all students so it always shows regardless of selection
+  const overallSummary = useMemo(() => {
+    let totalGross = 0
+    let totalDiscount = 0
+    let totalAdditionalFee = 0
+    let totalUsedBal = 0
+    let totalFinal = 0
+
+    invoiceStudents.forEach(student => {
+      const classes = allClasses.filter(c => c.studentItem.id === student.id)
+      const gross = formatTotalPriceInvoice(classes, currency)
+      const discount = calculateTotalDiscount(
+        gross.totalPrice,
+        student.appliedPromotions ?? []
+      )
+      const usedBal = student.usedBalance ?? 0
+      const final = Math.max(0, discount.priceAfterDiscount - usedBal)
+      totalGross += gross.totalPrice
+      totalDiscount += discount.totalDiscount
+      totalAdditionalFee += discount.additionalFee ?? 0
+      totalUsedBal += usedBal
+      totalFinal += final
+    })
+
+    return {
+      totalGross,
+      totalDiscount,
+      totalAdditionalFee,
+      totalUsedBal,
+      totalFinal,
+    }
+  }, [invoiceStudents, allClasses, currency])
+
   return (
     <>
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center justify-between gap-2 mb-4">
         <LuCalendar className="text-gray-500 shrink-0" size={16} />
         <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
           {t('editor.paymentDate')}
@@ -91,6 +135,57 @@ const PaymentDateAndCourses = () => {
       </div>
       <Card className="p-4 shadow-none border-gray-300">
         <SelectedCourseTable currentClasses={currentClasses} hideTotals />
+        {!invoiceCampaign?.isCombined && (
+          <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-gray-600">
+                {t('editor.invoicePreview.subTotal')}
+              </span>
+              <span className="font-medium text-blue-600">
+                {formatCurrency(overallSummary.totalGross, currency)}
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-gray-600">
+                {t('editor.invoicePreview.discount')}
+              </span>
+              <span className="font-medium text-red-600">
+                {`-${formatCurrency(overallSummary.totalDiscount, currency)}`}
+              </span>
+            </div>
+            {overallSummary.totalAdditionalFee > 0 && (
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-gray-600">
+                  {t('editor.invoicePreview.additionalFee')}
+                </span>
+                <span className="font-medium text-blue-600">
+                  {`+${formatCurrency(
+                    overallSummary.totalAdditionalFee,
+                    currency
+                  )}`}
+                </span>
+              </div>
+            )}
+            {overallSummary.totalUsedBal > 0 && (
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-gray-600">
+                  {t('editor.invoicePreview.creditApplied')}
+                </span>
+                <span className="font-medium text-red-600">
+                  {`-${formatCurrency(overallSummary.totalUsedBal, currency)}`}
+                </span>
+              </div>
+            )}
+            <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+              <span className="font-semibold text-gray-900">
+                {t('editor.invoicePreview.total')}
+              </span>
+              <span className="font-bold text-blue-600">
+                {formatCurrency(overallSummary.totalFinal, currency)}
+              </span>
+            </div>
+          </div>
+        )}
       </Card>
     </>
   )
@@ -211,6 +306,9 @@ const DialogSendInvoice = (): JSX.Element => {
   const isWhatsappEnabled = form.watch('sendViaWhatsapp')
   const invoices = form.watch('invoices')
 
+  const isCompleted =
+    invoiceCampaign?.status === BulkSendDocumentStatus.COMPLETED
+
   const isSingleInvoice = useMemo(
     () => invoices.length === 1 || invoiceCampaign?.isCombined,
     [invoices, invoiceCampaign]
@@ -306,11 +404,13 @@ const DialogSendInvoice = (): JSX.Element => {
     >
       <PaymentDateAndCourses />
       <InvoiceDeliveryMethods />
-      {isSingleInvoice && FEATURE_FLAG.SPLIT_INVOICE_FOR_MULTIPLE_STUDENTS && (
+      {isSingleInvoice &&
+        (FEATURE_FLAG.SPLIT_INVOICE_FOR_MULTIPLE_STUDENTS || isCompleted) && (
         <SplitInvoice
           invoice={invoices[0]}
           onChangeSplitType={handleSplitTypeChange}
           onChangeInstallments={onChangeInstallments}
+          readOnly={isCompleted}
         />
       )}
       <InvoiceRecipients />

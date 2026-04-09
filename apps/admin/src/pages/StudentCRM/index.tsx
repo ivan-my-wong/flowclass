@@ -602,6 +602,27 @@ const StudentDatabase = (): JSX.Element => {
         cellClass: '!flex !items-center',
       },
       {
+        colId: 'createdByEmail',
+        headerName: (t('student:column.createdByEmail') as string) || 'Created By',
+        width: 200,
+        minWidth: 160,
+        filter: false,
+        valueGetter: (params: ValueGetterParams) =>
+          (params.data as TableRowType).student.id,
+        spanRows: true,
+        cellRenderer: (params: ICellRendererParams) => {
+          const row = params.data as TableRowType
+          const emails = new Set<string>()
+          for (const ec of row.student.enrollCourses ?? []) {
+            const inv = ec.invoice ?? ec.invoices?.[0]
+            if (inv?.createdByUser?.email) emails.add(inv.createdByUser.email)
+          }
+          const label = emails.size > 0 ? [...emails].join(', ') : '—'
+          return <span className="text-sm">{label}</span>
+        },
+        cellClass: '!flex !items-center',
+      },
+      {
         colId: 'numClasses',
         headerName:
           (t('student:column.numClasses') as string) || 'No. of classes',

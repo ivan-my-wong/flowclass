@@ -4,12 +4,9 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { IoMdAdd } from 'react-icons/io'
 import { LuCalculator, LuCheck, LuMapPin, LuUser2 } from 'react-icons/lu'
-import { useRecoilValue } from 'recoil'
-
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import useSiteData from '@/hooks/useSiteData'
-import { isInvoiceExistOnCampaignSelector } from '@/stores/studentInvoice.store'
 import { Classes } from '@/types/classes'
 import { ClassTypeEnum, PriceType } from '@/types/course'
 import { PriceOption } from '@/types/regularClass'
@@ -33,11 +30,8 @@ const CourseItem = ({
   const [searchParams] = useSearchParams()
   const { t } = useTranslation('invoiceCampaign')
   const siteData = useSiteData()
-  const isInvoiceExist = useRecoilValue(isInvoiceExistOnCampaignSelector)
-
-  const formatPrice = useCallback(
-    (priceOptions: PriceOption[]) => {
-      if (!priceOptions || priceOptions.length === 0) return '-'
+  const price = useMemo(() => {
+    const amount = classItem?.tuition != null ? Number(classItem.tuition) : 0
 
       const prices = priceOptions
         .map(price => Number(price.amount))
@@ -131,7 +125,7 @@ const CourseItem = ({
       </div>
       <div className="text-right w-fit shrink-0">
         <div className="text-lg font-bold mb-3">{price.priceLabel}</div>
-        {currentActiveStudent && !isAssigned && !isInvoiceExist ? (
+        {currentActiveStudent && !isAssigned ? (
           <Button
             iconBefore={<IoMdAdd aria-hidden="true" focusable="false" />}
             onClick={() => {

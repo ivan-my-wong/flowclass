@@ -9,6 +9,7 @@ import {
   appliedPromotionsState,
   availableLessonsByClassState,
   currentActiveStudentState,
+  invoiceCampaignState,
   invoiceClassesState,
   invoiceSessionState,
   invoiceStudentState,
@@ -19,6 +20,7 @@ import {
   DiscountType,
   PromotionTypeItem,
 } from '@/types/studentInvoice.type'
+import { BulkSendDocumentStatus } from '@/types/templateManagement'
 import { isPackageDiscountQualified } from '@/utils/invoice-campaign.utils'
 
 /**
@@ -32,6 +34,9 @@ const PackageDiscountAutoApplyAll = (): null => {
   const { t } = useTranslation()
   const { useGetAllPromotions } = useStudentInvoice()
   const { data: allPromotions } = useGetAllPromotions()
+  const invoiceCampaign = useRecoilValue(invoiceCampaignState)
+  const isCompleted =
+    invoiceCampaign?.status === BulkSendDocumentStatus.COMPLETED
   const allClasses = useRecoilValue(invoiceClassesState)
   const allSessions = useRecoilValue(invoiceSessionState)
   const availableLessonsByClass = useRecoilValue(availableLessonsByClassState)
@@ -65,6 +70,13 @@ const PackageDiscountAutoApplyAll = (): null => {
       )
       if (studentClasses.length === 0) return student
 
+      // If no lessons data is loaded yet for any of this student's classes, skip —
+      // otherwise we'd incorrectly clear any already-applied package discounts.
+      const hasAnyLessonsData = studentClasses.some(
+        c => (availableLessonsByClass[c.classId]?.length ?? 0) > 0
+      )
+      if (!hasAnyLessonsData) return student
+
       const newPackageDiscounts: AppliedPromotion[] = []
 
       studentClasses.forEach(invoiceClass => {
@@ -84,19 +96,47 @@ const PackageDiscountAutoApplyAll = (): null => {
             classId
           )
 
-          if (result.qualified) {
+          // Also qualify if this package discount was previously used on the invoice
+          const wasUsedInInvoice = (student.invoicePromotionsUsed ?? []).some(
+            used =>
+              used.promotionType === 'PACKAGE_DISCOUNT' &&
+              used.promotionId === pd.id
+          )
+
+          if (result.qualified || wasUsedInInvoice) {
             const perLesson = parseFloat(String(pd.amountPerLesson)) || 0
+
+            // For completed invoices, preserve the amount already stored on the
+            // student's promotions (set from the original invoice data) rather
+            // than re-computing from the current per-lesson rate, which may have
+            // changed since the invoice was created.
+            const storedPromo = isCompleted
+              ? (student.appliedPromotions ?? []).find(
+                  p =>
+                    p.type === PromotionTypeItem.PACKAGE &&
+                    p.id === pd.id &&
+                    p.classId === classId
+                )
+              : undefined
+            const amount =
+              storedPromo != null
+                ? storedPromo.amount
+                : result.qualified
+                  ? perLesson * result.lessonCount
+                  : ((student.invoicePromotionsUsed ?? []).find(
+                      u => u.promotionId === pd.id
+                    )?.amount ?? 0)
             newPackageDiscounts.push({
               id: pd.id,
               name: pd.name,
               type: PromotionTypeItem.PACKAGE,
               discountType: 'fixedAmount' as DiscountType,
-              amount: perLesson * result.lessonCount,
+              amount,
               order: 0,
               isApplicable: true,
               feeType: 'deduct',
               packageDiscountPerLesson: perLesson,
-              qualifiedLessonCount: result.lessonCount,
+              qualifiedLessonCount: result.qualified ? result.lessonCount : 0,
               classId,
               studentId: student.id,
               parentId: null,

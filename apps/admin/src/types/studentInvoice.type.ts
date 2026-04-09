@@ -44,6 +44,10 @@ export type InvoiceStudent = {
   email: string
   phone: string
   subTotal?: number
+  /** Actual stored discount amount from the linked invoice row (edit mode only) */
+  discountAmount?: number
+  /** Actual stored additional fee from the linked invoice row (edit mode only) */
+  additionalFee?: number
   totalDiscount?: number
   total: number
   invoiceRemark: string
@@ -57,6 +61,11 @@ export type InvoiceStudent = {
   childOfUserAliasId: number | null
   enrollMetaId?: string
   paymentDate?: Date | null
+  invoicePromotionsUsed?: Array<{
+    promotionType: string
+    promotionId: number | null
+    amount: number
+  }>
 }
 
 export type InvoiceClassType = {

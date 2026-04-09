@@ -74,7 +74,6 @@ export type Coupon = {
   studentsAssigned: StudentProps[]
   courseAssigned: CourseProps[]
   classIds: number[]
-  couponUsed?: CoursePromotionUsed[]
 
   // For history
   usedCount: number
@@ -129,17 +128,4 @@ export type HistoryCouponProps = {
 export enum PromotionUsedStatus {
   REDEEMED = 'REDEEMED',
   USED = 'USED',
-}
-
-export type CoursePromotionUsed = {
-  id: number
-  siteId: number
-  institutionId: number
-  courseId: number
-  couponId: number
-  coupon?: { id: number } & CreateCouponProps
-  studentId: number
-  enrollId: number
-  invoiceId: number
-  usedStatus: PromotionUsedStatus
 }

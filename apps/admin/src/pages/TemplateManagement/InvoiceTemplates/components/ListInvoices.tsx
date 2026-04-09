@@ -29,6 +29,10 @@ import { AlertTypes } from '@/reducers/confirm.reducers'
 import { theme } from '@/styles'
 import { InvoiceCampaign } from '@/types/templateManagement'
 import dayjs from '@/utils/dayjs'
+import {
+  buildStudentNamesLabel,
+  getUniqueStudentCount,
+} from '@/utils/invoice-campaign.utils'
 
 import InvoiceStatus from './InvoiceStatus'
 import SearchInvoice from './SearchInvoice'
@@ -219,39 +223,10 @@ const ListInvoices: FC<Props> = ({ onShowRecipients }) => {
       cellClass: '!flex !items-center',
       cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
         if (!data) return null
-        const names: string[] = []
-        if (data.metadata?.invoices && data.metadata.invoices.length > 0) {
-          const seen = new Set<number>()
-          for (const inv of data.metadata.invoices) {
-            if (!seen.has(inv.userAliasId) && inv.name) {
-              seen.add(inv.userAliasId)
-              names.push(inv.name)
-              if (names.length === 3) break
-            }
-          }
-        } else if (data.invoices && data.invoices.length > 0) {
-          const seen = new Set<number>()
-          for (const inv of data.invoices) {
-            const id = inv.userAlias?.id
-            const name = inv.userAlias?.name
-            if (id !== undefined && !seen.has(id) && name) {
-              seen.add(id)
-              names.push(name)
-              if (names.length === 3) break
-            }
-          }
-        }
-        const totalStudents =
-          data.metadata?.invoices
-            ? new Set(data.metadata.invoices.map(i => i.userAliasId)).size
-            : new Set(data.invoices?.map(i => i.userAlias?.id).filter(Boolean)).size
-        const extra = totalStudents - names.length
-        const label =
-          names.length === 0
-            ? t('invoiceCampaign:untitledCampaign')
-            : extra > 0
-            ? `${names.join(', ')} +${extra}`
-            : names.join(', ')
+        const label = buildStudentNamesLabel(
+          data,
+          t('invoiceCampaign:untitledCampaign')
+        )
         return <span className="font-medium text-gray-900">{label}</span>
       },
     },
@@ -280,10 +255,7 @@ const ListInvoices: FC<Props> = ({ onShowRecipients }) => {
       cellClass: '!flex !items-center !justify-center',
       cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
         if (!data) return null
-        const count =
-          data.metadata?.invoices
-            ? new Set(data.metadata.invoices.map(i => i.userAliasId)).size
-            : new Set(data.invoices?.map(i => i.userAlias?.id).filter(Boolean)).size
+        const count = getUniqueStudentCount(data)
         return (
           <span className="text-sm font-semibold text-gray-700">{count}</span>
         )

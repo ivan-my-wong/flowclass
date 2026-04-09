@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Outlet, useNavigate, useSearchParams } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
@@ -51,7 +51,10 @@ import {
   InvoiceSplitType,
   type InvoiceStudent,
 } from '@/types/studentInvoice.type'
-import { BulkSendDocumentStatus, type InvoiceCampaign } from '@/types/templateManagement'
+import {
+  BulkSendDocumentStatus,
+  type InvoiceCampaign,
+} from '@/types/templateManagement'
 import dayjs from '@/utils/dayjs'
 import {
   buildInvoiceCampaignData,
@@ -62,6 +65,9 @@ import {
 import CourseAssignment from './CourseAssignment'
 import { InvoiceEditorProvider } from './InvoiceEditorContext'
 import PackageDiscountAutoApplyAll from './PackageDiscountAutoApplyAll'
+import ConfirmSendPaymentProof from '@/pages/PaymentProofTable/components/ConfirmSendPaymentProof'
+import { PaymentProofTableItem } from '@/types/enrollCourse'
+import { SendPaymentActions } from '@/types/paymentProof'
 
 const InvoiceEditor = (): JSX.Element => {
   const { t } = useTranslation()
@@ -142,7 +148,11 @@ const InvoiceEditor = (): JSX.Element => {
       }
       if (invoiceCampaign.metadata) {
         const { invoices } = invoiceCampaign.metadata
+        const actualInvoices = invoiceCampaign.invoices ?? []
         const students = (invoices ?? []).map(invoice => {
+          const matchedActualInvoice = actualInvoices.find(
+            ai => ai.userAliasId === invoice.userAliasId
+          )
           const formatApliedPromotions = (invoice?.discounts ?? []).map(
             appliedItem => {
               const promotionData = allPromotions?.find(
@@ -201,6 +211,20 @@ const InvoiceEditor = (): JSX.Element => {
             paymentDate: invoice.paymentDate
               ? new Date(invoice.paymentDate)
               : null,
+            invoicePromotionsUsed:
+              matchedActualInvoice?.invoicePromotionsUsed ?? [],
+            subTotal: matchedActualInvoice
+              ? Number(matchedActualInvoice.payAmount || 0) +
+                Number(matchedActualInvoice.usedBalance || 0) +
+                Number(matchedActualInvoice.discountAmount || 0) -
+                Number(matchedActualInvoice.additionalFee || 0)
+              : Number(invoice.total || 0),
+            discountAmount: matchedActualInvoice
+              ? Number(matchedActualInvoice.discountAmount || 0)
+              : undefined,
+            additionalFee: matchedActualInvoice
+              ? Number(matchedActualInvoice.additionalFee || 0)
+              : undefined,
           } as InvoiceStudent
         })
         setAllStudents(students)
@@ -444,9 +468,51 @@ const InvoiceEditor = (): JSX.Element => {
   const isCompleted =
     invoiceCampaign?.status === BulkSendDocumentStatus.COMPLETED
 
+  const [isWhatsappModalOpen, setIsWhatsappModalOpen] = useState(false)
+
+  const whatsappRows = useMemo<PaymentProofTableItem[]>(() => {
+    if (!isCompleted || !invoiceCampaign?.invoices) return []
+    return invoiceCampaign.invoices
+      .filter(inv => inv.proofToken)
+      .map(inv => {
+        const firstEnroll = inv.enrollCourses?.[0]
+        return {
+          id: inv.id,
+          proofToken: inv.proofToken,
+          institutionId: inv.institutionId ?? 0,
+          userId: inv.userId ?? 0,
+          userAlias: {
+            id: inv.userAlias?.id ?? 0,
+            name: firstEnroll?.name ?? '',
+            email: firstEnroll?.email ?? '',
+            userId: inv.userId ?? 0,
+          },
+          sendWhatsapp: {
+            phone: firstEnroll?.phone ?? '',
+            email: firstEnroll?.email ?? '',
+            name: firstEnroll?.name ?? '',
+          },
+        } as unknown as PaymentProofTableItem
+      })
+  }, [isCompleted, invoiceCampaign?.invoices])
+
   const isDisabledActions = useMemo(() => {
-    return isCreating || isUpdating || isCompleted
-  }, [isCreating, isUpdating, isCompleted])
+    return isCreating || isUpdating
+  }, [isCreating, isUpdating])
+
+  const handleSendInvoices = () => {
+    let endPath = 'send-multiple'
+    if (existingInvoiceCampaign?.isCombined) {
+      endPath = 'send'
+    }
+    if (invoiceCampaign?.jobId && !isCompleted) {
+      endPath = 'sending-progress'
+    }
+    navigate(
+      `/invoice-templates/editor/${endPath}` +
+        `?documentId=${searchParams.get('documentId') || ''}`
+    )
+  }
 
   const parentIds = useMemo(() => {
     // This should add the user's itself ID too
@@ -477,6 +543,7 @@ const InvoiceEditor = (): JSX.Element => {
   useEffect(() => {
     setInvoiceCampaign(prev => {
       if (!prev) return null
+      if (prev.isCombined === isOneSingleParent) return prev
       return {
         ...prev,
         isCombined: isOneSingleParent,
@@ -506,8 +573,6 @@ const InvoiceEditor = (): JSX.Element => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allSessions])
 
-
-
   const onChangeMode = (value: boolean) => {
     setAppliedPromotions([])
     setInvoiceCampaign(prev => {
@@ -536,7 +601,7 @@ const InvoiceEditor = (): JSX.Element => {
   ])
 
   return (
-    <InvoiceEditorProvider isViewOnly={isCompleted}>
+    <InvoiceEditorProvider>
       <PackageDiscountAutoApplyAll />
       <ContentLayout
         headerBackButton={{
@@ -546,11 +611,6 @@ const InvoiceEditor = (): JSX.Element => {
         headerClassName="px-4 md:flex-row flex-col"
         leftHeader={
           <>
-            {isCompleted && (
-              <span className="text-xs font-medium text-gray-500 bg-gray-100 border border-gray-300 rounded px-2 py-1">
-                {t('invoiceCampaign:editor.viewOnly')}
-              </span>
-            )}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -579,7 +639,24 @@ const InvoiceEditor = (): JSX.Element => {
           </>
         }
         rightHeader={
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            {isCompleted && (
+              <div className="flex items-center gap-2">
+                <span className="rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
+                  {t('invoiceCampaign:editor.editMode')}
+                </span>
+                {existingInvoiceCampaign?.invoiceIds?.[0] && (
+                  <a
+                    href={`/application/edit?id=${existingInvoiceCampaign.invoiceIds[0]}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-600 underline hover:text-blue-800"
+                  >
+                    #{existingInvoiceCampaign.invoiceIds[0]}
+                  </a>
+                )}
+              </div>
+            )}
             {/* <Button
               variant="outline"
               iconBefore={<LuEye aria-hidden="true" />}
@@ -593,7 +670,7 @@ const InvoiceEditor = (): JSX.Element => {
             >
               {t('invoiceCampaign:editor.previewAllInvoices')}
             </Button> */}
-            {allStudents.length > 0 && (
+            {allStudents.length > 0 && !isCompleted && (
               <Button
                 iconBefore={<AiOutlineSave />}
                 variant="primary-outline"
@@ -605,23 +682,23 @@ const InvoiceEditor = (): JSX.Element => {
               </Button>
             )}
 
+            {isCompleted && (
+              <Button
+                variant="outline"
+                iconBefore={<LuSend />}
+                disabled={whatsappRows.length === 0}
+                onClick={() => setIsWhatsappModalOpen(true)}
+              >
+                {t('editor.send.sendViaWhatsApp', { ns: 'invoiceCampaign' })}
+              </Button>
+            )}
+
             <Button
               variant="default"
               iconBefore={<LuSend />}
               disabled={allStudents.length === 0 || isDisabledActions}
-              onClick={() => {
-                let endPath = 'send-multiple'
-                if (existingInvoiceCampaign?.isCombined) {
-                  endPath = 'send'
-                }
-                if (invoiceCampaign?.jobId) {
-                  endPath = 'sending-progress'
-                }
-                navigate(
-                  `/invoice-templates/editor/${endPath}` +
-                    `?documentId=${searchParams.get('documentId') || ''}`
-                )
-              }}
+              loading={isCreating || isUpdating}
+              onClick={handleSendInvoices}
             >
               {t('invoiceCampaign:editor.sendInvoices')}
             </Button>
@@ -632,6 +709,14 @@ const InvoiceEditor = (): JSX.Element => {
         <CourseAssignment />
         <Outlet />
       </ContentLayout>
+      {isWhatsappModalOpen && (
+        <ConfirmSendPaymentProof
+          action={SendPaymentActions.RESEND_PAYMENT_REMINDER}
+          selectedRows={whatsappRows}
+          isOpen={isWhatsappModalOpen}
+          onClose={() => setIsWhatsappModalOpen(false)}
+        />
+      )}
     </InvoiceEditorProvider>
   )
 }

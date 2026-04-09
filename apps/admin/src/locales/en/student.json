@@ -116,6 +116,7 @@
     "appliedCourse": "Applied Course",
     "channel": "Channel",
     "createdAt": "Created At",
+    "createdByEmail": "Created By",
     "createdDate": "Created Date",
     "currency": "Currency",
     "email": "Email",
@@ -536,6 +537,8 @@
     "action": {
       "copyLink": "Copy Link",
       "downloadPDF": "Download PDF",
+      "noCampaign": "This invoice is not linked to a campaign",
+      "advancedEdit": "Advanced Edit",
       "editInvoice": "Edit Invoice",
       "invoiceBreakdown": "Invoice Breakdown",
       "linkToWhatsApp": "Link to WhatsApp",

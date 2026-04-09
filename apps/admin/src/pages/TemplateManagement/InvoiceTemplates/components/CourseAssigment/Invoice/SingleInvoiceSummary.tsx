@@ -1,10 +1,15 @@
 import { useTranslation } from 'react-i18next'
 import { GrNotes } from 'react-icons/gr'
 
+import useSiteData from '@/hooks/useSiteData'
+import { formatCurrency } from '@/utils/currency'
+
 import { useContextInvoiceEditDialog } from './EditInvoiceContext'
 
 const SingleInvoiceSummary = (): JSX.Element => {
   const { t } = useTranslation('invoiceCampaign')
+  const { currentSite } = useSiteData()
+  const currency = currentSite?.currency ?? 'HKD'
   const { finalPrice, totalPrice, calculatedDiscount, usedBalance } =
     useContextInvoiceEditDialog()
   return (
@@ -23,7 +28,7 @@ const SingleInvoiceSummary = (): JSX.Element => {
             {t('invoice.discount.totalDiscount')}
           </div>
           <div className="font-semibold text-red-600">
-            {calculatedDiscount.totalDiscountLabel}
+            {`-${formatCurrency(calculatedDiscount.totalDiscount, currency)}`}
           </div>
         </div>
 

@@ -18,6 +18,9 @@ import { FEATURE_FLAG } from '@/constants/featureFlags'
 import { invoiceClassesState } from '@/stores/studentInvoice.store'
 import { PromotionTypeItem } from '@/types/studentInvoice.type'
 
+import useSiteData from '@/hooks/useSiteData'
+import { formatCurrency } from '@/utils/currency'
+
 import AppliedDiscount from './AppliedDiscount'
 import { useContextInvoiceEditDialog } from './EditInvoiceContext'
 import { useInvoiceEditorContext } from '@/pages/TemplateManagement/InvoiceTemplates/Editor/InvoiceEditorContext'
@@ -33,6 +36,8 @@ const promotionTypeList = ['all', 'coupon', 'bundle', 'package']
 
 const InvoiceDiscount = (): JSX.Element => {
   const { t } = useTranslation('invoiceCampaign')
+  const { currentSite } = useSiteData()
+  const currency = currentSite?.currency ?? 'HKD'
   const { isViewOnly } = useInvoiceEditorContext()
   const {
     allPromotions,
@@ -185,7 +190,7 @@ const InvoiceDiscount = (): JSX.Element => {
             {t('invoice.discount.totalDiscount')}
           </div>
           <div className="font-semibold text-red-600">
-            {calculatedDiscount.totalDiscountLabel}
+            {`-${formatCurrency(calculatedDiscount.totalDiscount, currency)}`}
           </div>
         </div>
         <div className="flex items-center justify-between text-sm mb-2">
@@ -193,14 +198,14 @@ const InvoiceDiscount = (): JSX.Element => {
             {t('invoice.discount.additionalFee')}
           </div>
           <div className="font-semibold text-blue-600">
-            {calculatedDiscount.additionalFeeLabel}
+            {`+${formatCurrency(calculatedDiscount.additionalFee ?? 0, currency)}`}
           </div>
         </div>
         <Separator className="bg-gray-200 mb-2" />
         <div className="flex items-center text-gray-900 justify-between text-sm">
           <div className="font-semibold">{t('invoice.discount.total')}</div>
           <div className="font-semibold">
-            {calculatedDiscount.priceAfterDiscountLabel}
+            {formatCurrency(calculatedDiscount.priceAfterDiscount, currency)}
           </div>
         </div>
       </div>
