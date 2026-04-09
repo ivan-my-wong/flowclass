@@ -112,12 +112,12 @@ const PackageDiscountAutoApplyAll = (): null => {
       // Compare by ID + amount to detect both additions and value changes
       const existingPackageKey = (student.appliedPromotions ?? [])
         .filter(p => p.type === PromotionTypeItem.PACKAGE)
-        .map(p => `${p.id}:${p.classId}:${p.amount}`)
+        .map(p => `${p.id}:${p.amount}`)
         .sort()
         .join(',')
 
       const newKey = newPackageDiscounts
-        .map(p => `${p.id}:${p.classId}:${p.amount}`)
+        .map(p => `${p.id}:${p.amount}`)
         .sort()
         .join(',')
 
@@ -129,10 +129,10 @@ const PackageDiscountAutoApplyAll = (): null => {
       const existingIds = new Set(
         (student.appliedPromotions ?? [])
           .filter(p => p.type === PromotionTypeItem.PACKAGE)
-          .map(p => `${p.id}:${p.classId}`)
+          .map(p => `${p.id}`)
       )
       const hasNewIds = newPackageDiscounts.some(
-        p => !existingIds.has(`${p.id}:${p.classId}`)
+        p => !existingIds.has(`${p.id}`)
       )
       if (hasNewIds) hasAnyNewDiscount = true
 
