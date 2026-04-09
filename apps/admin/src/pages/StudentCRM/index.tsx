@@ -546,6 +546,7 @@ const StudentDatabase = (): JSX.Element => {
             </div>
           )
         },
+        cellClass: '!flex !items-center',
       },
       {
         field: 'user.email',
@@ -565,6 +566,7 @@ const StudentDatabase = (): JSX.Element => {
             row.student.phone || row.student.user?.phone || ''
           )
         },
+        cellClass: '!flex !items-center',
       },
       {
         colId: 'email',
@@ -597,6 +599,7 @@ const StudentDatabase = (): JSX.Element => {
             </div>
           )
         },
+        cellClass: '!flex !items-center',
       },
       {
         colId: 'numClasses',
@@ -608,6 +611,7 @@ const StudentDatabase = (): JSX.Element => {
         valueGetter: (params: ValueGetterParams) =>
           (params.data as TableRowType).student.id,
         spanRows: true,
+        cellClass: '!flex !items-center',
         cellRenderer: (params: ICellRendererParams) => {
           const row = params.data as TableRowType
           const currentMonth = dayjs().format('YYYY-MM')
@@ -933,7 +937,7 @@ const StudentDatabase = (): JSX.Element => {
       label: t('teachingService:paymentStatus.submitted'),
     },
     {
-      value: PaymentState.UNPAID,
+      value: PaymentState.PENDING,
       label: t('teachingService:paymentStatus.unpaid'),
     },
   ]

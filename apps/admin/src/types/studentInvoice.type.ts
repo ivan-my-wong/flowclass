@@ -327,6 +327,11 @@ export interface SendingInvoiceData {
   amount?: string
   status: SendingCampaignStatus
   message?: string
+  invoiceId?: number
+  proofToken?: string
+  userAliasId?: number
+  userId?: number
+  institutionId?: number
 }
 export interface SendingInvoiceCampaignState {
   eventSource: EventSource | null

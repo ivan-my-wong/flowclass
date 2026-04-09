@@ -322,7 +322,6 @@ const Dashboard = (): JSX.Element => {
           totalRevenueCurrent += invoiceAmount
         } else if (
           [
-            PaymentState.UNPAID,
             PaymentState.PENDING,
             PaymentState.SUBMITTED,
           ].includes(invoice.paymentState)
@@ -339,7 +338,6 @@ const Dashboard = (): JSX.Element => {
           totalRevenuePrevious += invoiceAmount
         } else if (
           [
-            PaymentState.UNPAID,
             PaymentState.PENDING,
             PaymentState.SUBMITTED,
           ].includes(invoice.paymentState)

@@ -80,7 +80,7 @@ const UpdateAmountPaid = (props: UpdateAmountPaidProps): JSX.Element => {
                 description: t(
                   'student:paymentProof.updateAmountPaidDescription'
                 ).toString(),
-                alertType: AlertTypes.WARN,
+                alertType: AlertTypes.CONFIRM,
                 cancelText: t('common:action.cancel').toString(),
                 confirmText: t('common:action.confirm').toString(),
                 onConfirm: async () => {

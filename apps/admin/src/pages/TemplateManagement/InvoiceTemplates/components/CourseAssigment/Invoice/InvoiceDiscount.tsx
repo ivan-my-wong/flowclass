@@ -20,6 +20,7 @@ import { PromotionTypeItem } from '@/types/studentInvoice.type'
 
 import AppliedDiscount from './AppliedDiscount'
 import { useContextInvoiceEditDialog } from './EditInvoiceContext'
+import { useInvoiceEditorContext } from '@/pages/TemplateManagement/InvoiceTemplates/Editor/InvoiceEditorContext'
 import ManualDiscountForm from './ManualDiscountForm'
 import PromotionItem from './PromotionItem'
 import ReferralDiscount from './ReferralDiscount'
@@ -32,6 +33,7 @@ const promotionTypeList = ['all', 'coupon', 'bundle', 'package']
 
 const InvoiceDiscount = (): JSX.Element => {
   const { t } = useTranslation('invoiceCampaign')
+  const { isViewOnly } = useInvoiceEditorContext()
   const {
     allPromotions,
     appliedPromotions,
@@ -111,65 +113,67 @@ const InvoiceDiscount = (): JSX.Element => {
 
   return (
     <div className="border border-gray-300 rounded-lg mb-6 pb-4">
-      <div className="p-4 border-b border-gray-300 mb-4">
-        <div className="mb-4 flex items-center gap-2 text-gray-800 font-medium">
-          {t('invoice.discount.availableDiscounts')}
-        </div>
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-8/12">
-            <Input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder={t(
-                'invoice.discount.searchDiscountsPlaceholder'
-              ).toString()}
-              className="border-gray-300 w-full"
-            />
+      {!isViewOnly && (
+        <div className="p-4 border-b border-gray-300 mb-4">
+          <div className="mb-4 flex items-center gap-2 text-gray-800 font-medium">
+            {t('invoice.discount.availableDiscounts')}
           </div>
-          <div className="w-4/12">
-            <Select value={promotionType} onValueChange={setPromotionType}>
-              <SelectTrigger className="w-full border-gray-300 rounded-lg text-gray-500">
-                <SelectValue
-                  placeholder={t(
-                    'invoice.discount.selectDiscountTypePlaceholder'
-                  ).toString()}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {promotionTypeOptions.map(item => (
-                    <SelectItem key={item.value} value={item.value}>
-                      {item.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8/12">
+              <Input
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder={t(
+                  'invoice.discount.searchDiscountsPlaceholder'
+                ).toString()}
+                className="border-gray-300 w-full"
+              />
+            </div>
+            <div className="w-4/12">
+              <Select value={promotionType} onValueChange={setPromotionType}>
+                <SelectTrigger className="w-full border-gray-300 rounded-lg text-gray-500">
+                  <SelectValue
+                    placeholder={t(
+                      'invoice.discount.selectDiscountTypePlaceholder'
+                    ).toString()}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {promotionTypeOptions.map(item => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div>
+            {isLoadingPromotions ? (
+              <Spinner className="my-20" />
+            ) : (
+              <>
+                {filteredDiscounts.length === 0 && (
+                  <div className="text-sm text-gray-600">
+                    {t('invoice.discount.noCouponAvailable')}
+                  </div>
+                )}
+                {filteredDiscounts.map(promo => (
+                  <PromotionItem
+                    key={promo.id}
+                    promo={promo}
+                    isApplied={isApplied(promo.id)}
+                  />
+                ))}
+              </>
+            )}
           </div>
         </div>
-        <div>
-          {isLoadingPromotions ? (
-            <Spinner className="my-20" />
-          ) : (
-            <>
-              {filteredDiscounts.length === 0 && (
-                <div className="text-sm text-gray-600">
-                  {t('invoice.discount.noCouponAvailable')}
-                </div>
-              )}
-              {filteredDiscounts.map(promo => (
-                <PromotionItem
-                  key={promo.id}
-                  promo={promo}
-                  isApplied={isApplied(promo.id)}
-                />
-              ))}
-            </>
-          )}
-        </div>
-      </div>
-      <ManualDiscountForm />
-      {FEATURE_FLAG.REFERRAL_DISCOUNT && <ReferralDiscount />}
+      )}
+      {!isViewOnly && <ManualDiscountForm />}
+      {!isViewOnly && FEATURE_FLAG.REFERRAL_DISCOUNT && <ReferralDiscount />}
       <AppliedDiscount />
       <div className="border-t border-gray-200 px-4 pt-4">
         <div className="flex items-center justify-between text-sm mb-2">

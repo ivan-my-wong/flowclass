@@ -17,10 +17,12 @@ import { formatCurrency } from '@/utils/currency'
 
 import BundleDiscountStatus from './BundleDiscountStatus'
 import { useContextInvoiceEditDialog } from './EditInvoiceContext'
+import { useInvoiceEditorContext } from '@/pages/TemplateManagement/InvoiceTemplates/Editor/InvoiceEditorContext'
 
 const AppliedDiscount = (): JSX.Element => {
   const { t } = useTranslation(['invoiceCampaign'])
   const siteData = useSiteData()
+  const { isViewOnly } = useInvoiceEditorContext()
 
   const {
     appliedPromotions,
@@ -28,9 +30,6 @@ const AppliedDiscount = (): JSX.Element => {
     calculatedDiscount,
     bundleDiscountInfoMap,
   } = useContextInvoiceEditDialog()
-
-  console.log('AppliedPromotions', appliedPromotions)
-  console.log('CalculatedDiscount', calculatedDiscount)
 
   const amountLabel = (promo: AppliedPromotion) => {
     if (promo.discountType === DiscountType.PERCENTAGE) {
@@ -169,11 +168,13 @@ const AppliedDiscount = (): JSX.Element => {
                     />
                   )}
               </div>
-              <LuTrash
-                className="text-red-600 hover:text-red-700 cursor-pointer ml-4 text-2xl"
-                onClick={() => removeDiscount(promo)}
-                aria-hidden="true"
-              />
+              {!isViewOnly && (
+                <LuTrash
+                  className="text-red-600 hover:text-red-700 cursor-pointer ml-4 text-2xl"
+                  onClick={() => removeDiscount(promo)}
+                  aria-hidden="true"
+                />
+              )}
             </DraggableCard>
           )
         })}

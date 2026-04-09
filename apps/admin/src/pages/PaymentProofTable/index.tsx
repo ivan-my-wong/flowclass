@@ -495,9 +495,9 @@ const PaymentProofPage = (): JSX.Element => {
       },
       cellClass: '!flex !items-center',
       cellStyle: ({ value }: { value: string }) => {
-        let color = 'var(--color-text-subtle)'
-        if (value === PaymentState.PENDING || value === PaymentState.UNPAID) {
-          color = 'var(--color-warn)'
+        let color = String(theme.colors.textSubtle)
+        if (value === PaymentState.PENDING) {
+          color = String(theme.colors.warn)
         } else if (value === PaymentState.CRITICAL) {
           color = 'var(--color-tertiary)'
         }

@@ -2,6 +2,13 @@
   --ag-cell-horizontal-border: var(--ag-row-border-width)
     var(--ag-row-border-style) var(--ag-row-border-color); /* Add left and right borders to each cell and use row border's properties  */
   --ag-header-column-separator-display: block;
+  --ag-header-column-separator-color: #d1d5db;
+  --ag-header-column-separator-height: 60%;
+  --ag-header-column-separator-width: 1px;
+  --ag-header-column-resize-handle-display: block;
+  --ag-header-column-resize-handle-color: #9ca3af;
+  --ag-header-column-resize-handle-height: 60%;
+  --ag-header-column-resize-handle-width: 2px;
 }
 .ag-row .ag-cell {
   /* display: flex;

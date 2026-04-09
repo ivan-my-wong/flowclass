@@ -184,6 +184,7 @@
     "regularV2periodLabel": "Period {{period}}",
     "removeSession": "Remove Session",
     "saveCampaign": "Save Campaign",
+    "viewOnly": "View Only",
     "searchStudents": "Search Students",
     "selectClass": "Select Class",
     "selectedLessons": "Selected Lessons",
@@ -205,6 +206,7 @@
       "processingInvoicesDesc": "Please wait while we create and send your invoices",
       "createButton": "Create Invoices",
       "sendButton": "Send Invoices",
+      "sendViaWhatsApp": "Send via WhatsApp",
       "sending": "Sending",
       "sendProgress": "Sending invoices...",
       "sendSingleButton": "Send Invoice",
@@ -394,6 +396,7 @@
     "title": "Untitled Campaign"
   },
   "noInvoices": "No invoice campaigns created yet",
+  "untitledCampaign": "Untitled Campaign",
   "resend": {
     "confirmDetailBelow": "Please confirm the details below",
     "previewInvoice": "Preview Invoice",

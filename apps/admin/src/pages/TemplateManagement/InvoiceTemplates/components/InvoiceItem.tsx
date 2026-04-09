@@ -73,6 +73,36 @@ const InvoiceItem: FC<Props> = ({
     return 0
   }, [invoiceItem.invoices, invoiceItem.metadata?.invoices])
 
+  const studentNamesLabel = useMemo(() => {
+    const names: string[] = []
+    if (invoiceItem.metadata?.invoices && invoiceItem.metadata.invoices.length > 0) {
+      const seen = new Set<number>()
+      for (const inv of invoiceItem.metadata.invoices) {
+        if (!seen.has(inv.userAliasId) && inv.name) {
+          seen.add(inv.userAliasId)
+          names.push(inv.name)
+          if (names.length === 3) break
+        }
+      }
+    } else if (invoiceItem.invoices && invoiceItem.invoices.length > 0) {
+      const seen = new Set<number>()
+      for (const inv of invoiceItem.invoices) {
+        const id = inv.userAlias?.id
+        const name = inv.userAlias?.name
+        if (id !== undefined && !seen.has(id) && name) {
+          seen.add(id)
+          names.push(name)
+          if (names.length === 3) break
+        }
+      }
+    }
+    if (names.length === 0) return t('invoiceCampaign:untitledCampaign')
+    const extra = studentCount - names.length
+    return extra > 0
+      ? `${names.join(', ')} +${extra}`
+      : names.join(', ')
+  }, [invoiceItem.metadata?.invoices, invoiceItem.invoices, studentCount, t])
+
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <Card
@@ -87,7 +117,7 @@ const InvoiceItem: FC<Props> = ({
         </div>
         <div>
           <h3 className="text-lg font-semibold text-gray-900">
-            {invoiceItem.title || 'Untitled Campaign'}
+            {studentNamesLabel}
           </h3>
           <div className="flex flex-wrap items-center text-sm text-gray-500 space-x-4 mt-1">
             <Badge variant="light">{t('editor.invoiceTable.invoice')}</Badge>

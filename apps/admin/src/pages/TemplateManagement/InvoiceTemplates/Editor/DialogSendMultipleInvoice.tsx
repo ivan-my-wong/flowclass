@@ -90,7 +90,7 @@ const PaymentDateAndCourses = () => {
         />
       </div>
       <Card className="p-4 shadow-none border-gray-300">
-        <SelectedCourseTable currentClasses={currentClasses} />
+        <SelectedCourseTable currentClasses={currentClasses} hideTotals />
       </Card>
     </>
   )

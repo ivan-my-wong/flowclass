@@ -15,7 +15,6 @@ export enum PaymentEvidenceState {
 export enum PaymentState {
   PAID = 'PAID',
   PARTIALLY_PAID = 'PARTIALLY_PAID',
-  UNPAID = 'UNPAID',
   PENDING = 'PENDING',
   REFUNDED = 'REFUNDED',
   CRITICAL = 'CRITICAL',

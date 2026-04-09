@@ -151,7 +151,7 @@ const StudentSelectionDialog: React.FC<Props> = ({
       label: t('teachingService:paymentStatus.submitted'),
     },
     {
-      value: PaymentState.UNPAID,
+      value: PaymentState.PENDING,
       label: t('teachingService:paymentStatus.unpaid'),
     },
   ]

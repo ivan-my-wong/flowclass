@@ -12,7 +12,6 @@ import {
 } from 'recoil'
 
 import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Inputs/Input'
 import SegmentedSwitch from '@/components/ui/SegmentedSwitch'
 import {
   Tooltip,
@@ -52,7 +51,7 @@ import {
   InvoiceSplitType,
   type InvoiceStudent,
 } from '@/types/studentInvoice.type'
-import type { InvoiceCampaign } from '@/types/templateManagement'
+import { BulkSendDocumentStatus, type InvoiceCampaign } from '@/types/templateManagement'
 import dayjs from '@/utils/dayjs'
 import {
   buildInvoiceCampaignData,
@@ -442,9 +441,12 @@ const InvoiceEditor = (): JSX.Element => {
     setInvoiceCampaign,
   ])
 
+  const isCompleted =
+    invoiceCampaign?.status === BulkSendDocumentStatus.COMPLETED
+
   const isDisabledActions = useMemo(() => {
-    return isCreating || isUpdating
-  }, [isCreating, isUpdating])
+    return isCreating || isUpdating || isCompleted
+  }, [isCreating, isUpdating, isCompleted])
 
   const parentIds = useMemo(() => {
     // This should add the user's itself ID too
@@ -504,19 +506,7 @@ const InvoiceEditor = (): JSX.Element => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allSessions])
 
-  const onChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newTitle = event.target.value
-      .replace(/\s{2,}/g, ' ')
-      .replace(/^\s+/, '')
-    setInvoiceCampaign(prev => {
-      if (!prev) return null
-      return {
-        ...prev,
-        title: newTitle ?? prev.title,
-        isCombined: prev.isCombined ?? false,
-      }
-    })
-  }
+
 
   const onChangeMode = (value: boolean) => {
     setAppliedPromotions([])
@@ -546,7 +536,7 @@ const InvoiceEditor = (): JSX.Element => {
   ])
 
   return (
-    <InvoiceEditorProvider>
+    <InvoiceEditorProvider isViewOnly={isCompleted}>
       <PackageDiscountAutoApplyAll />
       <ContentLayout
         headerBackButton={{
@@ -556,15 +546,11 @@ const InvoiceEditor = (): JSX.Element => {
         headerClassName="px-4 md:flex-row flex-col"
         leftHeader={
           <>
-            <Input
-              id="name"
-              placeholder={t(
-                'invoiceCampaign:studentCard.invoiceCampaignName'
-              ).toString()}
-              value={existingInvoiceCampaign?.title ?? ''}
-              onChange={onChangeName}
-              disabled={!existingInvoiceCampaign}
-            />
+            {isCompleted && (
+              <span className="text-xs font-medium text-gray-500 bg-gray-100 border border-gray-300 rounded px-2 py-1">
+                {t('invoiceCampaign:editor.viewOnly')}
+              </span>
+            )}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>

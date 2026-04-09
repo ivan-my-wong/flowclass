@@ -1,7 +1,9 @@
-import { useMemo } from 'react'
+import { FC, useMemo, useRef } from 'react'
 
 import { useTranslation } from 'react-i18next'
 import { FiUsers } from 'react-icons/fi'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
+import { AgGridReact } from 'ag-grid-react'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 
 import { Badge } from '@/components/ui/Badge'
@@ -18,6 +20,10 @@ import { InvoiceStudent } from '@/types/studentInvoice.type'
 import { formatCurrency } from '@/utils/currency'
 import { formatPhoneNumber } from '@/utils/misc'
 
+import 'ag-grid-community/styles/ag-grid.css'
+import 'ag-grid-community/styles/ag-theme-alpine.css'
+import '@/styles/components/table.css'
+
 type RecipientRow =
   | { kind: 'student'; student: InvoiceStudent }
   | {
@@ -30,129 +36,102 @@ type RecipientRow =
       isStudentParent: boolean
     }
 
-const StudentRow = ({
-  student,
-  showTotal,
-}: {
-  student: InvoiceStudent
-  showTotal: boolean
-}) => {
-  const { currentSite } = useRecoilValue(siteState)
-  const invoiceCampaign = useRecoilValue(invoiceCampaignState)
-  const invoiceOfStudent = useRecoilValue(
-    getInvoiceOfStudentSelector({
-      userAliasId: student.id,
-      isCombined: invoiceCampaign?.isCombined ?? false,
-    })
-  )
+const SendCellRenderer: FC<ICellRendererParams<RecipientRow>> = ({ data }) => {
+  const allStudents = useRecoilValue(invoiceStudentState)
   const setAllInvoiceStudents = useSetRecoilState(invoiceStudentState)
 
-  const toggleSend = (checked: boolean) => {
-    setAllInvoiceStudents(prev =>
-      prev.map(s =>
-        s.id === student.id ? { ...s, isSendToParent: !checked } : s
-      )
+  if (!data) return null
+
+  if (data.kind === 'student') {
+    const isSendToParent =
+      allStudents.find(s => s.id === data.student.id)?.isSendToParent ?? false
+    return (
+      <Switch
+        checked={!isSendToParent}
+        onCheckedChange={checked => {
+          setAllInvoiceStudents(prev =>
+            prev.map(s =>
+              s.id === data.student.id ? { ...s, isSendToParent: !checked } : s
+            )
+          )
+        }}
+      />
     )
   }
 
+  const isSendToParent =
+    allStudents.find(s => s.id === data.forStudentId)?.isSendToParent ?? true
   return (
-    <tr className="text-gray-600 border-t border-gray-200">
-      <td className="py-4 pl-4 font-medium flex items-center gap-2 text-gray-800">
-        {student.name}
+    <Switch
+      checked={isSendToParent}
+      onCheckedChange={checked => {
+        setAllInvoiceStudents(prev =>
+          prev.map(s =>
+            s.id === data.forStudentId ? { ...s, isSendToParent: checked } : s
+          )
+        )
+      }}
+    />
+  )
+}
+
+const TotalCellRenderer: FC<ICellRendererParams<RecipientRow>> = ({ data }) => {
+  const { currentSite } = useRecoilValue(siteState)
+  const invoiceCampaign = useRecoilValue(invoiceCampaignState)
+  const isCombined = invoiceCampaign?.isCombined ?? false
+  const userAliasId = data?.kind === 'student' ? data.student.id : 0
+  const invoiceOfStudent = useRecoilValue(
+    getInvoiceOfStudentSelector({ userAliasId, isCombined })
+  )
+
+  if (!data || data.kind === 'parent' || isCombined) {
+    return <span className="text-gray-400">-</span>
+  }
+  if (invoiceOfStudent == null || !currentSite?.currency) {
+    return <span className="text-gray-400">-</span>
+  }
+  return (
+    <span>{formatCurrency(invoiceOfStudent.total ?? 0, currentSite.currency)}</span>
+  )
+}
+
+const NameCellRenderer: FC<ICellRendererParams<RecipientRow>> = ({ data }) => {
+  if (!data) return null
+
+  if (data.kind === 'student') {
+    return (
+      <div className="flex items-center gap-2">
+        <span className="font-medium text-gray-800">{data.student.name}</span>
         <Badge
           variant="outline"
           className="bg-gray-50 border-gray-300 text-gray-600 text-xs"
         >
           Student
         </Badge>
-      </td>
-      <td className="py-4">{student.email ?? '-'}</td>
-      <td className="py-4">
-        {student.phone ? formatPhoneNumber(student.phone) : '-'}
-      </td>
-      <td className="py-4">
-        {showTotal && invoiceOfStudent != null && currentSite?.currency
-          ? formatCurrency(invoiceOfStudent.total ?? 0, currentSite.currency)
-          : '-'}
-      </td>
-      <td className="py-4 pr-4">
-        <Switch
-          checked={!student.isSendToParent}
-          onCheckedChange={toggleSend}
-        />
-      </td>
-    </tr>
-  )
-}
-
-const ParentRow = ({
-  name,
-  email,
-  phone,
-  forStudentId,
-  isStudentParent,
-}: {
-  name: string
-  email: string
-  phone: string
-  forStudentId: number
-  isStudentParent: boolean
-}) => {
-  const allStudents = useRecoilValue(invoiceStudentState)
-  const setAllInvoiceStudents = useSetRecoilState(invoiceStudentState)
-  const isSendToParent =
-    allStudents.find(s => s.id === forStudentId)?.isSendToParent ?? true
-
-  const toggleSend = (checked: boolean) => {
-    setAllInvoiceStudents(prev =>
-      prev.map(s =>
-        s.id === forStudentId ? { ...s, isSendToParent: checked } : s
-      )
+      </div>
     )
   }
 
   return (
-    <tr className="text-gray-500 bg-blue-50 border-t border-gray-100">
-      <td className="py-3 pl-4 font-medium flex items-center gap-2 text-gray-700">
-        {name}
-        <Badge
-          variant="outline"
-          className="border-primary text-primary !bg-transparent text-xs"
-        >
-          {isStudentParent ? 'Student Parent' : 'Parent'}
-        </Badge>
-      </td>
-      <td className="py-3">{email || '-'}</td>
-      <td className="py-3">{phone ? formatPhoneNumber(phone) : '-'}</td>
-      <td className="py-3">-</td>
-      <td className="py-3 pr-4">
-        <Switch checked={isSendToParent} onCheckedChange={toggleSend} />
-      </td>
-    </tr>
+    <div className="flex items-center gap-2">
+      <span className="font-medium text-gray-700">{data.name}</span>
+      <Badge
+        variant="outline"
+        className="border-primary text-primary !bg-transparent text-xs"
+      >
+        {data.isStudentParent ? 'Student Parent' : 'Parent'}
+      </Badge>
+    </div>
   )
 }
 
 const InvoiceRecipients = (): JSX.Element => {
   const { t } = useTranslation()
+  const gridRef = useRef<AgGridReact<RecipientRow>>(null)
   const allStudents = useRecoilValue(invoiceStudentState)
   const studentList = useRecoilValue(studentListState)
   const invoiceCampaign = useRecoilValue(invoiceCampaignState)
-  const { finalPrice, totalPrice, calculatedDiscount } =
-    useContextInvoiceEditDialog()
-  const isCombined = invoiceCampaign?.isCombined ?? false
-
-  // eslint-disable-next-line no-console
-  console.log('[InvoiceRecipients]', {
-    isCombined,
-    totalPrice,
-    calculatedDiscount,
-    finalPrice,
-    students: allStudents.map(s => ({
-      id: s.id,
-      name: s.name,
-      promotions: s.appliedPromotions,
-    })),
-  })
+  useContextInvoiceEditDialog()
 
   const rows = useMemo<RecipientRow[]>(() => {
     const result: RecipientRow[] = []
@@ -164,7 +143,6 @@ const InvoiceRecipients = (): JSX.Element => {
 
       if (student.childOfUserAliasId) {
         const parentId = student.childOfUserAliasId
-        // Skip parent row if the parent is already in the student list
         if (!addedParentIds.has(parentId) && !studentIds.has(parentId)) {
           addedParentIds.add(parentId)
           const parent = studentList.find(s => s.id === parentId)
@@ -186,6 +164,63 @@ const InvoiceRecipients = (): JSX.Element => {
     return result
   }, [allStudents, studentList])
 
+  const columnDefs = useMemo((): ColDef<RecipientRow>[] => [
+    {
+      headerName: t('invoiceCampaign:editor.invoiceTable.send'),
+      width: 80,
+      minWidth: 80,
+      maxWidth: 80,
+      filter: false,
+      sortable: false,
+      resizable: false,
+      cellClass: '!flex !items-center',
+      cellRenderer: SendCellRenderer,
+    },
+    {
+      headerName: t('invoiceCampaign:editor.invoiceTable.customer'),
+      flex: 2,
+      minWidth: 160,
+      filter: false,
+      sortable: false,
+      cellClass: '!flex !items-center',
+      cellRenderer: NameCellRenderer,
+    },
+    {
+      headerName: t('invoiceCampaign:editor.invoiceTable.email'),
+      flex: 2,
+      minWidth: 140,
+      filter: false,
+      sortable: false,
+      cellClass: '!flex !items-center text-sm text-gray-600',
+      valueGetter: ({ data }) => {
+        if (!data) return '-'
+        return data.kind === 'student'
+          ? (data.student.email ?? '-')
+          : (data.email || '-')
+      },
+    },
+    {
+      headerName: t('invoiceCampaign:editor.invoiceTable.phone'),
+      width: 150,
+      filter: false,
+      sortable: false,
+      cellClass: '!flex !items-center text-sm text-gray-600',
+      valueGetter: ({ data }) => {
+        if (!data) return '-'
+        const phone = data.kind === 'student' ? data.student.phone : data.phone
+        return phone ? formatPhoneNumber(phone) : '-'
+      },
+    },
+    {
+      headerName: t('invoiceCampaign:editor.invoicePreview.invoiceItem.total'),
+      width: 120,
+      filter: false,
+      sortable: false,
+      cellClass: '!flex !items-center text-sm',
+      cellRenderer: TotalCellRenderer,
+    },
+  ], [t])
+
   return (
     <>
       <div className="flex items-center gap-2 mb-4 text-gray-900">
@@ -196,51 +231,28 @@ const InvoiceRecipients = (): JSX.Element => {
           })}
         </div>
       </div>
-      <div className="mb-4 rounded-lg border border-gray-300 overflow-x-auto">
-        <table className="text-sm w-full">
-          <thead>
-            <tr>
-              <th className="py-4 bg-gray-50 rounded-tl-lg text-left pl-4">
-                {t('invoiceCampaign:editor.invoiceTable.customer')}
-              </th>
-              <th className="py-4 bg-gray-50 text-left">
-                {t('invoiceCampaign:editor.invoiceTable.email')}
-              </th>
-              <th className="py-4 bg-gray-50 text-left">
-                {t('invoiceCampaign:editor.invoiceTable.phone')}
-              </th>
-              <th className="py-4 bg-gray-50 text-left">
-                {t('invoiceCampaign:editor.invoicePreview.invoiceItem.total')}
-              </th>
-              <th className="py-4 bg-gray-50 rounded-tr-lg text-left">
-                {t('invoiceCampaign:editor.invoiceTable.send')}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map(row => {
-              if (row.kind === 'student') {
-                return (
-                  <StudentRow
-                    key={`student-${row.student.id}`}
-                    student={row.student}
-                    showTotal={!isCombined}
-                  />
-                )
-              }
-              return (
-                <ParentRow
-                  key={`parent-${row.parentId}`}
-                  name={row.name}
-                  email={row.email}
-                  phone={row.phone}
-                  forStudentId={row.forStudentId}
-                  isStudentParent={row.isStudentParent}
-                />
-              )
-            })}
-          </tbody>
-        </table>
+      <div
+        className="ag-theme-alpine mb-4 w-full rounded-lg overflow-hidden border border-gray-300"
+        style={{ height: Math.min(40 + rows.length * 48 + 48, 480) }}
+      >
+        <AgGridReact<RecipientRow>
+          ref={gridRef}
+          rowData={rows}
+          columnDefs={columnDefs}
+          rowHeight={48}
+          headerHeight={40}
+          suppressMovableColumns
+          suppressCellFocus
+          suppressRowClickSelection
+          getRowClass={({ data }) =>
+            data?.kind === 'parent' ? 'bg-blue-50' : ''
+          }
+          getRowId={({ data }) =>
+            data.kind === 'student'
+              ? `student-${data.student.id}`
+              : `parent-${data.parentId}`
+          }
+        />
       </div>
     </>
   )

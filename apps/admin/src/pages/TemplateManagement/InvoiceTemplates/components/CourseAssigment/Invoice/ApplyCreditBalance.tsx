@@ -9,10 +9,12 @@ import useSiteData from '@/hooks/useSiteData'
 import { formatCurrency } from '@/utils/currency'
 
 import { useContextInvoiceEditDialog } from './EditInvoiceContext'
+import { useInvoiceEditorContext } from '@/pages/TemplateManagement/InvoiceTemplates/Editor/InvoiceEditorContext'
 
 const ApplyCreditBalance = (): JSX.Element => {
   const { t } = useTranslation('invoiceCampaign')
   const siteData = useSiteData()
+  const { isViewOnly } = useInvoiceEditorContext()
   const {
     isPayByCredit,
     setPayByCredit,
@@ -42,7 +44,7 @@ const ApplyCreditBalance = (): JSX.Element => {
           checked={isPayByCredit}
           onCheckedChange={setPayByCredit}
           className="ml-auto"
-          disabled={creditBalance <= 0}
+          disabled={isViewOnly || creditBalance <= 0}
           aria-label={t('invoice.applyCreditBalance.accountCredit') as string}
         />
       </div>
