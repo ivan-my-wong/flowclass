@@ -317,7 +317,9 @@ const PromotionItem: React.FC<Props> = ({ promo, isApplied }): JSX.Element => {
         )}
       </div>
       <div className="flex items-center gap-3 text-right">
-        <div className="text-sm font-semibold text-gray-800 whitespace-nowrap">{amountLabel}</div>
+        <div className="text-sm font-semibold text-gray-800 whitespace-nowrap">
+          {amountLabel}
+        </div>
         {promo.promotionType === PromotionTypeItem.BUNDLE && promo.id ? (
           <BundleDiscountStatus
             bundleId={promo.id}
@@ -338,11 +340,7 @@ const PromotionItem: React.FC<Props> = ({ promo, isApplied }): JSX.Element => {
           <Button
             type="button"
             className="h-8 min-w-24 w-32 ml-auto"
-            variant={
-              isPackageAlreadyApplied
-                ? 'default'
-                : 'primary-outline'
-            }
+            variant={isPackageAlreadyApplied ? 'default' : 'primary-outline'}
             disabled={!isPackageQualified && !isPackageAlreadyApplied}
             iconBefore={
               isPackageAlreadyApplied ? (

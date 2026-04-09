@@ -433,7 +433,14 @@ const InvoiceEditor = (): JSX.Element => {
         })
       }
     }
-  }, [setAllStudents, setCurrentActiveStudent, studentIdsToAssign, studentList, t, setInvoiceCampaign])
+  }, [
+    setAllStudents,
+    setCurrentActiveStudent,
+    studentIdsToAssign,
+    studentList,
+    t,
+    setInvoiceCampaign,
+  ])
 
   const isDisabledActions = useMemo(() => {
     return isCreating || isUpdating
