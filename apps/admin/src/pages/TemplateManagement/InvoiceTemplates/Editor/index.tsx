@@ -26,6 +26,7 @@ import useInvoiceCampaignData from '@/hooks/useInvoiceCampaignData'
 import { useSendingCampaign } from '@/hooks/useSendingCampaign'
 import useStudentInvoice from '@/hooks/useStudentInvoice'
 import ContentLayout from '@/layouts/ContentLayout'
+import ConfirmSendPaymentProof from '@/pages/PaymentProofTable/components/ConfirmSendPaymentProof'
 import { schoolState } from '@/stores/schoolData'
 import { siteState } from '@/stores/siteData'
 import {
@@ -42,6 +43,8 @@ import {
 import { BundleDiscount } from '@/types/bundleDiscounts'
 import type { Classes } from '@/types/classes'
 import { ClassTypeEnum, PriceType } from '@/types/course'
+import { PaymentProofTableItem } from '@/types/enrollCourse'
+import { SendPaymentActions } from '@/types/paymentProof'
 import { PriceOption } from '@/types/regularClass'
 import {
   type InvoiceCampaignDetailDto,
@@ -65,9 +68,6 @@ import {
 import CourseAssignment from './CourseAssignment'
 import { InvoiceEditorProvider } from './InvoiceEditorContext'
 import PackageDiscountAutoApplyAll from './PackageDiscountAutoApplyAll'
-import ConfirmSendPaymentProof from '@/pages/PaymentProofTable/components/ConfirmSendPaymentProof'
-import { PaymentProofTableItem } from '@/types/enrollCourse'
-import { SendPaymentActions } from '@/types/paymentProof'
 
 const InvoiceEditor = (): JSX.Element => {
   const { t } = useTranslation()

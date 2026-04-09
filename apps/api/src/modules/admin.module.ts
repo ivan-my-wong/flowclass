@@ -37,8 +37,6 @@ import { SettingWebpageInstitutionController } from '@/application/admin/setting
 import { SiteRegisterController } from '@/application/admin/sites/site-register.controller'
 import { SitesController } from '@/application/admin/sites/sites.controller'
 import { StripeConnectController } from '@/application/admin/stripe-connect/stripe-connect.controller'
-import { StripeProductPricesController } from '@/application/admin/stripe-product-prices/stripe-product-prices.controller'
-import { StripeProductsController } from '@/application/admin/stripe-products/stripe-products.controller'
 import { StudentOnbController } from '@/application/admin/student-onboard/student-onboard.controller'
 import { UsersController } from '@/application/admin/users/users.controller'
 import { WhatsappTemplateController } from '@/application/admin/whatsapp-template/whatsapp-template.controller'

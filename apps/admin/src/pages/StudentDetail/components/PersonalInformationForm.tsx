@@ -25,6 +25,8 @@ import { StudentPrimaryIdentifier } from '@/types/school'
 import { UserAlias } from '@/types/studentMemo'
 import { formatPhoneNumber } from '@/utils/misc'
 
+import { ErrorField } from './createTeachingService'
+
 type PersonalInformationFormProps = {
   register: UseFormRegister<any>
   errors: FieldErrors<IFormInput>

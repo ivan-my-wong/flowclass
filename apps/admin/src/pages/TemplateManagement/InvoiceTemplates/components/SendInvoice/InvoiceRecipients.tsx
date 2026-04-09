@@ -1,9 +1,9 @@
 import { FC, useMemo, useRef } from 'react'
 
-import { useTranslation } from 'react-i18next'
-import { FiUsers } from 'react-icons/fi'
 import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
+import { useTranslation } from 'react-i18next'
+import { FiUsers } from 'react-icons/fi'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 
 import { Badge } from '@/components/ui/Badge'

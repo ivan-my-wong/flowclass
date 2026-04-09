@@ -28,7 +28,10 @@ interface Props {
   currentClasses: InvoiceClassType[]
   hideTotals?: boolean
 }
-const SelectedCourseTable: FC<Props> = ({ currentClasses, hideTotals = false }): JSX.Element => {
+const SelectedCourseTable: FC<Props> = ({
+  currentClasses,
+  hideTotals = false,
+}): JSX.Element => {
   const { t } = useTranslation('invoiceCampaign')
   const siteData = useSiteData()
   const currency = siteData?.currency ?? DEFAULT_CURRENCY

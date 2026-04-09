@@ -436,11 +436,12 @@ const DialogSendInvoice = () => {
             disabled={!isStepValid}
             loading={isCreating || isSending || isUpdating}
           >
-            {isLastStep
-              ? isEmailEnabled || isWhatsappEnabled
+            {(() => {
+              if (!isLastStep) return t('invoiceCampaign:editor.send.nextStep')
+              return isEmailEnabled || isWhatsappEnabled
                 ? t('invoiceCampaign:editor.send.sendButton')
                 : t('invoiceCampaign:editor.send.createButton')
-              : t('invoiceCampaign:editor.send.nextStep')}
+            })()}
           </Button>
         </>
       }

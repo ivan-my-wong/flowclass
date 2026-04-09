@@ -29,12 +29,17 @@ import { CloudWatchLoggerProvider } from '@/config/loggers/cloudwatch-nestjs.pro
 import { EmailService } from '@/domain/external/email.service'
 import { SettingSiteErrorMessage } from '@/exceptions/error-message/setting-site'
 import { StripeErrorMessage } from '@/exceptions/error-message/stripe'
-import { UserErrorMessage } from '@/exceptions/error-message/user'
 import { Course } from '@/models/courses.entity'
 import { CreateCheckoutSessionReturnType } from '@/models/custom-types/stripe'
 import { EnrollCourse } from '@/models/enroll-courses.entity'
 import { EnrollCourseRepository } from '@/models/enroll-courses.repository'
-import { GaMeasurementEventName, PaymentMethod, PromotionType as PromotionTypeEnum, StripeCheckoutSessionType } from '@/models/enums/'
+import {
+  PaymentMethod,
+  PromotionType as PromotionTypeEnum,
+  StripeCheckoutSessionType,
+  StripePriceInterval,
+  StripePriceSessionType,
+} from '@/models/enums/'
 import {
   CheckoutStatus,
   EnrollConfirmStatus,
@@ -44,8 +49,8 @@ import {
 } from '@/models/enums/status'
 import { Institution } from '@/models/institutions.entity'
 import { InstitutionsRepository } from '@/models/institutions.repository'
-import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
+import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { SettingSiteRepository } from '@/models/setting-site.repository'
 import { StripeConnect } from '@/models/stripe-connect.entity'
 import { StripeConnectRepository } from '@/models/stripe-connect.repository'
@@ -59,8 +64,6 @@ import { enrollIntoInfoToString } from '@/utils/string.utils'
 import { CouponsService } from '../service/coupons.service'
 import { SettingSiteService } from '../service/setting-site.service'
 import { StripeProductPricesService } from '../service/stripe-product-prices.service'
-
-import { ChatGPTService } from './openAi.service'
 
 export interface CreateCheckoutSessionParams {
   course: Course
@@ -85,9 +88,10 @@ export class StripeConnectService {
     private readonly emailService: EmailService,
     private settingSiteRepository: SettingSiteRepository,
     private readonly invoicePromotionUsedRepository: InvoicePromotionUsedRepository,
-    private readonly gaMeasurementService: GaMeasurementService,
     private readonly settingSiteService: SettingSiteService,
     private readonly usersRepository: UsersRepository,
+    private readonly stripeProductPricesService: StripeProductPricesService,
+    private readonly stripeProductPricesRepository: StripeProductPricesRepository,
     @Inject(STRIPE_CLIENT)
     private readonly stripeClient: Stripe | null
   ) {}
@@ -837,7 +841,6 @@ export class StripeConnectService {
     }
 
     for (const enrollCourse of invoice.enrollCourses) {
-
       /**
        * The following code is for sending email confirmation to student and admin
        */
@@ -866,44 +869,7 @@ export class StripeConnectService {
         this.logger.error('EMAIL_CONFIRMATION_TO_STUDENT_ENROLLMENT', JSON.stringify(e.body))
       }
 
-      /**
-       * The following code is only for sending event to GA4
-       */
-      try {
-        const timeZone = await this.settingSiteService.getTimeZone(invoice.siteId)
-
-        this.gaMeasurementService.sendToWebGa({
-          userId: invoice.userId,
-          clientId: invoice.proofToken,
-          events: [
-            {
-              name: GaMeasurementEventName.PURCHASE,
-              params: {
-                value: invoice.payAmount,
-                transaction_id: transaction.id,
-                currency: enrollCourse.currency,
-                courseId: invoice.courseId,
-                schoolId: invoice.institutionId,
-                paymentMethod: PaymentMethod.PAY_NOW,
-                coupon: invoicePromoUsed?.promotionId ?? undefined,
-                timeZone,
-                items: [
-                  {
-                    item_id: invoice.courseId,
-                    item_name: enrollCourse.preferredName,
-                    discount: invoice?.discountAmount,
-                    price: invoice.payAmount,
-                    currency: invoice.currency,
-                    coupon: invoicePromoUsed?.promotionId ?? undefined,
-                  },
-                ],
-              },
-            },
-          ],
-        })
-      } catch (err) {
-        this.logger.error(UserErrorMessage.WEB_ANALYTICS_CANNOT_BE_SENT, err.stack)
-      }
+      // GA4 measurement removed from open-source build
     }
   }
 

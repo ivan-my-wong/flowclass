@@ -26,13 +26,13 @@ import { InvoicePromotionUsed } from '@/models/invoice-promotion-used.entity'
 import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
-import * as PDFDocument from 'pdfkit'
+import PDFDocument from 'pdfkit'
 
 import { ObjectStorageProvider } from '@/config/storage/object-storage.provider'
 import { DocumentCampaign, DocumentCampaignStatus } from '@/models/document-campaign.entity'
 import { DocumentTemplateType } from '@/models/document-template.entity'
 import { UserAlias } from '@/models/user-aliases.entity'
-import * as dayjs from 'dayjs'
+import dayjs from 'dayjs'
 import 'dayjs/plugin/timezone'
 import { NodemailerEmailTransport } from '@/domain/external/email-transport.provider'
 
@@ -58,6 +58,7 @@ import {
   FeeModeType,
   PaymentMethod,
   PaymentStatus,
+  PriceType,
   PromotionType as PromotionTypeEnum,
 } from '@/models/enums'
 
@@ -376,7 +377,7 @@ export class InvoiceCampaignService {
           await this.documentCampaignRepository.save(document)
         }
       } catch (err) {
-        error = err
+        error = err as Error
         console.log(err)
         throw err
       }
@@ -649,7 +650,8 @@ export class InvoiceCampaignService {
         const invoice = invoices.find((inv) => {
           if (inv.userAliasId === userAlias.id) return true
           if (inv.userAlias?.userId && inv.userAlias.userId === userAlias.userId) return true
-          if (inv.userAlias?.user?.email && inv.userAlias.user.email === recipient.email) return true
+          if (inv.userAlias?.user?.email && inv.userAlias.user.email === recipient.email)
+            return true
           return false
         })
 
@@ -824,10 +826,10 @@ export class InvoiceCampaignService {
       }
     } catch (error) {
       this.logger.error(
-        `Failed to send invoice for user ${userAlias.name}: ${error.message}`,
-        error.stack
+        `Failed to send invoice for user ${userAlias.name}: ${(error as any).message}`,
+        (error as any).stack
       )
-      result.error = error.message
+      result.error = (error as any).message
     }
     await this.documentCampaignRepository.update(
       {
@@ -920,7 +922,7 @@ export class InvoiceCampaignService {
           amount: (invoice.total || 0).toString(),
           invoiceNumber: undefined, // Will not be set since invoice creation failed
           status: SendingCampaignStatus.FAILED,
-          message: error.message,
+          message: (error as any).message,
         }
       }
       this.emitSendCampaignSseEvent({
@@ -1368,7 +1370,12 @@ export class InvoiceCampaignService {
     }
     newInvoice.userAliasId = userAlias.id
     await this.invoiceRepository.save(newInvoice)
-    await this.saveInvoicePromotionsUsed(newInvoice.id, invoice.siteId, institutionId, invoice.discounts ?? [])
+    await this.saveInvoicePromotionsUsed(
+      newInvoice.id,
+      invoice.siteId,
+      institutionId,
+      invoice.discounts ?? []
+    )
     if (userAlias.id) {
       const reminderData = await this.enrollCourseService.prepareReminderData(
         institutionId,
@@ -1845,9 +1852,9 @@ export class InvoiceCampaignService {
       this.logger.log(`Email sent successfully to ${userAlias.name} (${userAlias.email})`)
       if (documentRecipient) documentRecipient.status = DocumentCampaignRecipientsStatus.DELIVERED
     } catch (err) {
-      this.logger.error('sendEmail', JSON.stringify(err.body))
+      this.logger.error('sendEmail', JSON.stringify((err as any).body))
       if (documentRecipient) documentRecipient.status = DocumentCampaignRecipientsStatus.FAILED
-      result.error = err.body
+      result.error = (err as any).body
       throw err
     } finally {
       if (documentRecipient) await this.documentRecipientRepository.save(documentRecipient)

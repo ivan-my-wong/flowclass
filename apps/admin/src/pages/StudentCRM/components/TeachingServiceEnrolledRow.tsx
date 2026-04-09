@@ -39,12 +39,6 @@ export const handleStatusPayment = (status: string, t: TFunction) => {
     //       {t('teachingService:paymentStatus.critical')}
     //     </Badge>
     //   )
-    case PaymentState.PENDING:
-      return (
-        <Badge variant="light">
-          {t('teachingService:paymentStatus.pending')}
-        </Badge>
-      )
 
     default:
       return (

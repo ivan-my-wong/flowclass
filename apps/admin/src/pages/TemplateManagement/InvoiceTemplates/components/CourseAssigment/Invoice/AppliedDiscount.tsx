@@ -7,6 +7,7 @@ import {
 } from '@/components/Containers/Draggable'
 import { DEFAULT_CURRENCY } from '@/constants/invoices'
 import useSiteData from '@/hooks/useSiteData'
+import { useInvoiceEditorContext } from '@/pages/TemplateManagement/InvoiceTemplates/Editor/InvoiceEditorContext'
 import { DiscountType } from '@/types/coupon'
 import {
   AppliedPromotion,
@@ -17,7 +18,6 @@ import { formatCurrency } from '@/utils/currency'
 
 import BundleDiscountStatus from './BundleDiscountStatus'
 import { useContextInvoiceEditDialog } from './EditInvoiceContext'
-import { useInvoiceEditorContext } from '@/pages/TemplateManagement/InvoiceTemplates/Editor/InvoiceEditorContext'
 
 const AppliedDiscount = (): JSX.Element => {
   const { t } = useTranslation(['invoiceCampaign'])

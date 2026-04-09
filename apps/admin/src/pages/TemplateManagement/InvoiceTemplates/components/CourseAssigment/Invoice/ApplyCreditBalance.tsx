@@ -6,10 +6,10 @@ import { BsCreditCard2Back } from 'react-icons/bs'
 import { Separator } from '@/components/ui/Separator'
 import { Switch } from '@/components/ui/Switch'
 import useSiteData from '@/hooks/useSiteData'
+import { useInvoiceEditorContext } from '@/pages/TemplateManagement/InvoiceTemplates/Editor/InvoiceEditorContext'
 import { formatCurrency } from '@/utils/currency'
 
 import { useContextInvoiceEditDialog } from './EditInvoiceContext'
-import { useInvoiceEditorContext } from '@/pages/TemplateManagement/InvoiceTemplates/Editor/InvoiceEditorContext'
 
 const ApplyCreditBalance = (): JSX.Element => {
   const { t } = useTranslation('invoiceCampaign')

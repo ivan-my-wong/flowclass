@@ -406,13 +406,13 @@ const DialogSendInvoice = (): JSX.Element => {
       <InvoiceDeliveryMethods />
       {isSingleInvoice &&
         (FEATURE_FLAG.SPLIT_INVOICE_FOR_MULTIPLE_STUDENTS || isCompleted) && (
-        <SplitInvoice
-          invoice={invoices[0]}
-          onChangeSplitType={handleSplitTypeChange}
-          onChangeInstallments={onChangeInstallments}
-          readOnly={isCompleted}
-        />
-      )}
+          <SplitInvoice
+            invoice={invoices[0]}
+            onChangeSplitType={handleSplitTypeChange}
+            onChangeInstallments={onChangeInstallments}
+            readOnly={isCompleted}
+          />
+        )}
       <InvoiceRecipients />
     </ModalDialog>
   )

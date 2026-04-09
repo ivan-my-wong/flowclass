@@ -1,10 +1,10 @@
 import { FC, useCallback, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { AnimatePresence, motion } from 'framer-motion'
+import { useDebounce } from '@uidotdev/usehooks'
 import { ColDef, ICellRendererParams, IRowNode } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
-import { useDebounce } from '@uidotdev/usehooks'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import {
   LuCopy,
@@ -14,15 +14,15 @@ import {
   LuX,
 } from 'react-icons/lu'
 
-import { Button } from '@/components/ui/Button'
 import Box from '@/components/ui/Box'
-import Text from '@/components/ui/Text'
+import { Button } from '@/components/ui/Button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu'
+import Text from '@/components/ui/Text'
 import useConfirm from '@/hooks/useGlobalConfirm'
 import useInvoiceCampaignData from '@/hooks/useInvoiceCampaignData'
 import { AlertTypes } from '@/reducers/confirm.reducers'
@@ -55,7 +55,9 @@ const ListInvoices: FC<Props> = ({ onShowRecipients }) => {
   const [page] = useState(1)
   const { t } = useTranslation(['invoiceCampaign', 'common'])
   const gridRef = useRef<AgGridReact<InvoiceCampaign>>(null)
-  const [selectedNodes, setSelectedNodes] = useState<IRowNode<InvoiceCampaign>[]>([])
+  const [selectedNodes, setSelectedNodes] = useState<
+    IRowNode<InvoiceCampaign>[]
+  >([])
 
   const {
     useFetchInvoiceCampaigns,
@@ -82,7 +84,8 @@ const ListInvoices: FC<Props> = ({ onShowRecipients }) => {
   const { setConfirm, closeConfirm } = useConfirm(isDeleting || isDuplicating)
 
   const selectedRows = useMemo(
-    () => selectedNodes.map(n => n.data).filter((d): d is InvoiceCampaign => !!d),
+    () =>
+      selectedNodes.map(n => n.data).filter((d): d is InvoiceCampaign => !!d),
     [selectedNodes]
   )
 
@@ -144,135 +147,151 @@ const ListInvoices: FC<Props> = ({ onShowRecipients }) => {
         closeConfirm()
       },
     }).open()
-  }, [selectedRows, setConfirm, t, deleteInvoiceCampaign, handleClearSelection, closeConfirm])
+  }, [
+    selectedRows,
+    setConfirm,
+    t,
+    deleteInvoiceCampaign,
+    handleClearSelection,
+    closeConfirm,
+  ])
 
-  const columnDefs = useMemo((): ColDef<InvoiceCampaign>[] => [
-    {
-      headerCheckboxSelection: true,
-      checkboxSelection: true,
-      width: 48,
-      minWidth: 48,
-      maxWidth: 48,
-      filter: false,
-      sortable: false,
-      resizable: false,
-      cellClass: '!flex !items-center !justify-center',
-    },
-    {
-      headerName: '',
-      field: 'id',
-      width: 130,
-      filter: false,
-      sortable: false,
-      cellClass: '!flex !items-center gap-1',
-      cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
-        if (!data) return null
-        return (
-          <div
-            className="flex items-center gap-1"
-            onClick={e => e.stopPropagation()}
-          >
-            {(data.recipientList ?? []).length > 0 && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2"
-                onClick={() => onShowRecipients(data)}
-                iconBefore={<LuUsers aria-hidden="true" size={14} />}
-              >
-                {t('viewRecipients')}
-              </Button>
-            )}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-7 w-7 p-0">
-                  <LuMoreHorizontal aria-hidden="true" size={14} />
+  const columnDefs = useMemo(
+    (): ColDef<InvoiceCampaign>[] => [
+      {
+        headerCheckboxSelection: true,
+        checkboxSelection: true,
+        width: 48,
+        minWidth: 48,
+        maxWidth: 48,
+        filter: false,
+        sortable: false,
+        resizable: false,
+        cellClass: '!flex !items-center !justify-center',
+      },
+      {
+        headerName: '',
+        field: 'id',
+        width: 130,
+        filter: false,
+        sortable: false,
+        cellClass: '!flex !items-center gap-1',
+        cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
+          if (!data) return null
+          return (
+            <div
+              className="flex items-center gap-1"
+              role="presentation"
+              onClick={e => e.stopPropagation()}
+              onKeyDown={e => e.stopPropagation()}
+            >
+              {(data.recipientList ?? []).length > 0 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => onShowRecipients(data)}
+                  iconBefore={<LuUsers aria-hidden="true" size={14} />}
+                >
+                  {t('viewRecipients')}
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="border-none outline-none shadow-md"
-              >
-                <DropdownMenuItem
-                  className="cursor-pointer"
-                  onClick={() => onDuplicate(data)}
+              )}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-7 w-7 p-0">
+                    <LuMoreHorizontal aria-hidden="true" size={14} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="border-none outline-none shadow-md"
                 >
-                  <LuCopy className="mr-2" aria-hidden="true" />
-                  {t('duplicate.title')}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="cursor-pointer space-x-2 text-red-500"
-                  onClick={() => onDelete(data)}
-                >
-                  <LuTrash2 className="mr-2" aria-hidden="true" />
-                  {t('delete.title')}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        )
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => onDuplicate(data)}
+                  >
+                    <LuCopy className="mr-2" aria-hidden="true" />
+                    {t('duplicate.title')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer space-x-2 text-red-500"
+                    onClick={() => onDelete(data)}
+                  >
+                    <LuTrash2 className="mr-2" aria-hidden="true" />
+                    {t('delete.title')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )
+        },
       },
-    },
-    {
-      headerName: t('invoiceCampaign:editor.invoiceTable.customer'),
-      field: 'title',
-      flex: 2,
-      minWidth: 200,
-      filter: false,
-      cellClass: '!flex !items-center',
-      cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
-        if (!data) return null
-        const label = buildStudentNamesLabel(
-          data,
-          t('invoiceCampaign:untitledCampaign')
-        )
-        return <span className="font-medium text-gray-900">{label}</span>
+      {
+        headerName: t('invoiceCampaign:editor.invoiceTable.customer'),
+        field: 'title',
+        flex: 2,
+        minWidth: 200,
+        filter: false,
+        cellClass: '!flex !items-center',
+        cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
+          if (!data) return null
+          const label = buildStudentNamesLabel(
+            data,
+            t('invoiceCampaign:untitledCampaign')
+          )
+          return <span className="font-medium text-gray-900">{label}</span>
+        },
       },
-    },
-    {
-      headerName: t('student:column.lastUpdated'),
-      field: 'createdAt',
-      width: 175,
-      filter: false,
-      cellClass: '!flex !items-center',
-      cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
-        if (!data) return null
-        const parentInvoice = data.invoices?.find(d => d.isParent)
-        const date = parentInvoice?.createdAt || data.updatedAt || data.createdAt
-        return (
-          <span className="text-sm text-gray-500">
-            {date ? dayjs(date).format('DD MMM YYYY, HH:mm') : '-'}
-          </span>
-        )
+      {
+        headerName: t('student:column.lastUpdated'),
+        field: 'createdAt',
+        width: 175,
+        filter: false,
+        cellClass: '!flex !items-center',
+        cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
+          if (!data) return null
+          const parentInvoice = data.invoices?.find(d => d.isParent)
+          const date =
+            parentInvoice?.createdAt || data.updatedAt || data.createdAt
+          return (
+            <span className="text-sm text-gray-500">
+              {date ? dayjs(date).format('DD MMM YYYY, HH:mm') : '-'}
+            </span>
+          )
+        },
       },
-    },
-    {
-      headerName: t('invoiceCampaign:recipients.title').replace('Campaign ', ''),
-      field: 'recipients',
-      width: 110,
-      filter: false,
-      cellClass: '!flex !items-center !justify-center',
-      cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
-        if (!data) return null
-        const count = getUniqueStudentCount(data)
-        return (
-          <span className="text-sm font-semibold text-gray-700">{count}</span>
-        )
+      {
+        headerName: t('invoiceCampaign:recipients.title').replace(
+          'Campaign ',
+          ''
+        ),
+        field: 'recipients',
+        width: 110,
+        filter: false,
+        cellClass: '!flex !items-center !justify-center',
+        cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
+          if (!data) return null
+          const count = getUniqueStudentCount(data)
+          return (
+            <span className="text-sm font-semibold text-gray-700">{count}</span>
+          )
+        },
       },
-    },
-    {
-      headerName: t('student:paymentProof.status'),
-      field: 'status',
-      width: 130,
-      filter: false,
-      cellClass: '!flex !items-center',
-      cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
-        if (!data) return null
-        return <InvoiceStatus status={data.status} />
+      {
+        headerName: t('student:paymentProof.status'),
+        field: 'status',
+        width: 130,
+        filter: false,
+        cellClass: '!flex !items-center',
+        cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
+          if (!data) return null
+          return <InvoiceStatus status={data.status} />
+        },
       },
-    },
-  ], [t, onShowRecipients, onDuplicate, onDelete])
+    ],
+    [t, onShowRecipients, onDuplicate, onDelete]
+  )
 
   return (
     <div className="w-full p-4 flex flex-col gap-y-4">
@@ -304,7 +323,8 @@ const ListInvoices: FC<Props> = ({ onShowRecipients }) => {
                   <LuX fill={theme.colors.primary.toString()} />
                 </Button>
                 <Text className="text-sm text-text-subtle">
-                  {selectedRows.length} {t('invoiceCampaign:editor.invoiceTable.invoice')}
+                  {selectedRows.length}{' '}
+                  {t('invoiceCampaign:editor.invoiceTable.invoice')}
                 </Text>
               </Box>
               <Box className="gap-x-2" justify="end">
@@ -326,7 +346,9 @@ const ListInvoices: FC<Props> = ({ onShowRecipients }) => {
 
       <div
         className="ag-theme-alpine w-full rounded-md overflow-hidden border border-gray-200"
-        style={{ height: Math.min(40 + invoiceCampaigns.length * 48 + 48, 600) }}
+        style={{
+          height: Math.min(40 + invoiceCampaigns.length * 48 + 48, 600),
+        }}
       >
         <AgGridReact<InvoiceCampaign>
           ref={gridRef}
@@ -341,7 +363,8 @@ const ListInvoices: FC<Props> = ({ onShowRecipients }) => {
           suppressRowClickSelection
           onSelectionChanged={onSelectionChanged}
           onRowClicked={({ data }) => {
-            if (data?.id) navigate(`/invoice-templates/editor?documentId=${data.id}`)
+            if (data?.id)
+              navigate(`/invoice-templates/editor?documentId=${data.id}`)
           }}
           getRowClass={() => 'cursor-pointer hover:bg-gray-50'}
         />

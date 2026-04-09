@@ -11,12 +11,12 @@ import {
   PaymentProofTableEnrollCourse,
   PaymentProofTableItem,
 } from '@/types/enrollCourse'
+import { SendPaymentActions } from '@/types/paymentProof'
 import {
   SendingCampaignStatus,
   SendingInvoiceData,
 } from '@/types/studentInvoice.type'
 import { formatPhoneNumber } from '@/utils/misc'
-import { SendPaymentActions } from '@/types/paymentProof'
 
 interface CompleteStepProps {
   invoices: SendingInvoiceData[]
@@ -143,19 +143,26 @@ export function CompleteStep({
             action={SendPaymentActions.RESEND_PAYMENT_REMINDER}
             selectedRows={createdInvoices
               .filter(inv => inv.invoiceId && inv.proofToken)
-              .map(inv => ({
-                id: inv.invoiceId!,
-                proofToken: inv.proofToken!,
-                institutionId: inv.institutionId ?? 0,
-                userId: inv.userId ?? 0,
-                userAlias: {
-                  id: inv.userAliasId ?? 0,
-                  name: inv.name,
-                  email: inv.email,
-                  userId: inv.userId ?? 0,
-                },
-                sendWhatsapp: { phone: inv.phone, email: inv.email, name: inv.name },
-              } as unknown as PaymentProofTableItem))}
+              .map(
+                inv =>
+                  ({
+                    id: inv.invoiceId!,
+                    proofToken: inv.proofToken!,
+                    institutionId: inv.institutionId ?? 0,
+                    userId: inv.userId ?? 0,
+                    userAlias: {
+                      id: inv.userAliasId ?? 0,
+                      name: inv.name,
+                      email: inv.email,
+                      userId: inv.userId ?? 0,
+                    },
+                    sendWhatsapp: {
+                      phone: inv.phone,
+                      email: inv.email,
+                      name: inv.name,
+                    },
+                  } as unknown as PaymentProofTableItem)
+              )}
             isOpen={isSendModalOpen}
             onClose={() => setIsSendModalOpen(false)}
           />

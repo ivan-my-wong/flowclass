@@ -15,15 +15,14 @@ import {
 } from '@/components/ui/Select'
 import { Separator } from '@/components/ui/Separator'
 import { FEATURE_FLAG } from '@/constants/featureFlags'
+import useSiteData from '@/hooks/useSiteData'
+import { useInvoiceEditorContext } from '@/pages/TemplateManagement/InvoiceTemplates/Editor/InvoiceEditorContext'
 import { invoiceClassesState } from '@/stores/studentInvoice.store'
 import { PromotionTypeItem } from '@/types/studentInvoice.type'
-
-import useSiteData from '@/hooks/useSiteData'
 import { formatCurrency } from '@/utils/currency'
 
 import AppliedDiscount from './AppliedDiscount'
 import { useContextInvoiceEditDialog } from './EditInvoiceContext'
-import { useInvoiceEditorContext } from '@/pages/TemplateManagement/InvoiceTemplates/Editor/InvoiceEditorContext'
 import ManualDiscountForm from './ManualDiscountForm'
 import PromotionItem from './PromotionItem'
 import ReferralDiscount from './ReferralDiscount'
@@ -198,7 +197,10 @@ const InvoiceDiscount = (): JSX.Element => {
             {t('invoice.discount.additionalFee')}
           </div>
           <div className="font-semibold text-blue-600">
-            {`+${formatCurrency(calculatedDiscount.additionalFee ?? 0, currency)}`}
+            {`+${formatCurrency(
+              calculatedDiscount.additionalFee ?? 0,
+              currency
+            )}`}
           </div>
         </div>
         <Separator className="bg-gray-200 mb-2" />

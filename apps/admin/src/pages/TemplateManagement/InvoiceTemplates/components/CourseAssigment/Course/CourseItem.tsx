@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { IoMdAdd } from 'react-icons/io'
 import { LuCalculator, LuCheck, LuMapPin, LuUser2 } from 'react-icons/lu'
+
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import useSiteData from '@/hooks/useSiteData'
@@ -30,9 +31,8 @@ const CourseItem = ({
   const [searchParams] = useSearchParams()
   const { t } = useTranslation('invoiceCampaign')
   const siteData = useSiteData()
-  const price = useMemo(() => {
-    const amount = classItem?.tuition != null ? Number(classItem.tuition) : 0
-
+  const formatPrice = useCallback(
+    (priceOptions: PriceOption[]) => {
       const prices = priceOptions
         .map(price => Number(price.amount))
         .filter(n => Number.isFinite(n))

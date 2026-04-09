@@ -319,4 +319,8 @@ export enum StudentPrimaryIdentifier {
   PHONE = 'phone',
 }
 
+export enum GaMeasurementEventName {
+  PURCHASE = 'purchase',
+}
+
 export * from './status'

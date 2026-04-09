@@ -38,22 +38,13 @@ import TextArea from '@/components/ui/TextAreaBase'
 import {
   courseItemVariableOptions,
   customMessageOptions,
-<<<<<<< HEAD:apps/admin/src/pages/CustomMessages/ManageCustomMessageModal.tsx
-  defaultWhatsappTemplate,
-=======
-  CustomMessageType,
   defaultWhatsappTemplate,
   lessonItemVariableOptions,
->>>>>>> eb806cf94 (feat: remove WhatsApp connection components and related logic):src/pages/CustomMessages/ManageCustomMessageModal.tsx
 } from '@/constants/whatsappTemplate'
 import useCustomMessageData from '@/hooks/useCustomMessageData'
 import useNavigateDialogPage from '@/hooks/useNavigateDialogPage'
 import { CustomMessage } from '@/types/customMessage'
-<<<<<<< HEAD:apps/admin/src/pages/CustomMessages/ManageCustomMessageModal.tsx
 import { CustomMessageType } from '@/types/whatsappTemplate'
-import { cn } from '@/utils/cn'
-=======
->>>>>>> eb806cf94 (feat: remove WhatsApp connection components and related logic):src/pages/CustomMessages/ManageCustomMessageModal.tsx
 
 // import { countPlaceholder } from '@/utils/string'
 

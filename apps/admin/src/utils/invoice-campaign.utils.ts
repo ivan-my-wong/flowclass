@@ -479,24 +479,26 @@ export function buildStudentNamesLabel(
   const names: string[] = []
   if (item.metadata?.invoices && item.metadata.invoices.length > 0) {
     const seen = new Set<number>()
-    for (const inv of item.metadata.invoices) {
+    item.metadata.invoices.some(inv => {
       if (!seen.has(inv.userAliasId) && inv.name) {
         seen.add(inv.userAliasId)
         names.push(inv.name)
-        if (names.length === 3) break
+        if (names.length === 3) return true
       }
-    }
+      return false
+    })
   } else if (item.invoices && item.invoices.length > 0) {
     const seen = new Set<number>()
-    for (const inv of item.invoices) {
+    item.invoices.some(inv => {
       const id = inv.userAlias?.id
       const name = inv.userAlias?.name
       if (id !== undefined && !seen.has(id) && name) {
         seen.add(id)
         names.push(name)
-        if (names.length === 3) break
+        if (names.length === 3) return true
       }
-    }
+      return false
+    })
   }
   if (names.length === 0) return fallback
   const total = getUniqueStudentCount(item)

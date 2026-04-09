@@ -48,12 +48,19 @@ export const StyledOverlay = (props: React.ComponentProps<typeof Overlay>) => (
 
 const ModalTitle = ({
   className,
+  children,
   ...props
 }: React.HTMLAttributes<HTMLHeadingElement>) => (
   <h3
-    className={cn('leading-relaxed m-0 mr-4 mb-4 p-0 font-bold text-2xl', className)}
+    className={cn(
+      'leading-relaxed m-0 mr-4 mb-4 p-0 font-bold text-2xl',
+      className
+    )}
+    aria-label={typeof children === 'string' ? children : undefined}
     {...props}
-  />
+  >
+    {children}
+  </h3>
 )
 
 const ButtonGroup = ({

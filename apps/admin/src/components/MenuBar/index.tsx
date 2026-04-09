@@ -262,7 +262,7 @@ const MenuBar: React.FC = () => {
           </div>
         )
       })}
-    </nav>
+    </MenuBarContainer>
   )
 }
 

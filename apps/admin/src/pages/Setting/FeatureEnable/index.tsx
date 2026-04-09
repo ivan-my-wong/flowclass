@@ -5,12 +5,14 @@ import { BsDoorClosed } from 'react-icons/bs'
 import { LuCreditCard, LuFileText } from 'react-icons/lu'
 import { MdOutlineMailOutline } from 'react-icons/md'
 
+import FullScreenLoading from '@/components/FullScreen/FullScreenLoading'
 import BoxWithToggleGroup from '@/components/ToggleGroup/BoxWithToggleGroup'
 import useCheckPermissionAndQuota from '@/hooks/useCheckPermissionAndQuota'
 import { FeatureEnableEnum } from '@/types/schoolSubscriptionPlan'
 
 import CreditSystem from './CreditSystem'
 import EmailSetting from './EmailSetting'
+import IntegrationsSetting from './IntegrationsSetting'
 import StudentPortalSetting from './StudentPortalSetting'
 import TextVersionSetting from './TextVersionSetting'
 

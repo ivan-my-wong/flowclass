@@ -67,17 +67,16 @@ const PromotionItem: React.FC<Props> = ({ promo, isApplied }): JSX.Element => {
     if (promo.promotionType !== PromotionTypeItem.PACKAGE) return false
     const pd = promo as any
     // Check each class in the invoice for qualification
-    for (const invoiceClass of currentClasses) {
+    return currentClasses.some(invoiceClass => {
       const { classId } = invoiceClass
       const isApplicable =
         pd.isAllClasses || pd.applicableClassIds?.includes(classId)
-      if (!isApplicable) continue
+      if (!isApplicable) return false
       const available = availableLessonsByClass[classId]
-      if (!available?.length) continue
+      if (!available?.length) return false
       const result = isPackageDiscountQualified(allSessions, available, classId)
-      if (result.qualified) return true
-    }
-    return false
+      return result.qualified
+    })
   }, [promo, currentClasses, allSessions, availableLessonsByClass])
 
   const isPackageAlreadyApplied = useMemo(() => {
@@ -320,57 +319,68 @@ const PromotionItem: React.FC<Props> = ({ promo, isApplied }): JSX.Element => {
         <div className="text-sm font-semibold text-gray-800 whitespace-nowrap">
           {amountLabel}
         </div>
-        {promo.promotionType === PromotionTypeItem.BUNDLE && promo.id ? (
-          <BundleDiscountStatus
-            bundleId={promo.id}
-            bundleDiscountInfo={bundleDiscountInfoMap[promo.id] ?? null}
-            isApplied={isApplied}
-            onApply={() => updateAppliedPromotion(false)}
-            calculatedDiscountAmount={
-              calculatedDiscount?.discountAmountsByPromoId?.[promo.id ?? ''] ??
-              0
-            }
-            bundlePromo={promo}
-            totalPrice={totalPrice?.totalPrice}
-            compact
-            showButtonOnly
-            priceAfterDiscount={calculatedDiscount?.priceAfterDiscount}
-          />
-        ) : promo.promotionType === PromotionTypeItem.PACKAGE ? (
-          <Button
-            type="button"
-            className="h-8 min-w-24 w-32 ml-auto"
-            variant={isPackageAlreadyApplied ? 'default' : 'primary-outline'}
-            disabled={!isPackageQualified && !isPackageAlreadyApplied}
-            iconBefore={
-              isPackageAlreadyApplied ? (
-                <LuCheck aria-hidden="true" />
-              ) : (
-                <LuPlus aria-hidden="true" />
-              )
-            }
-            onClick={() => {
-              // Package discounts are auto-managed — no manual action needed
-            }}
-          >
-            {isPackageAlreadyApplied
-              ? t('invoiceCampaign:editor.packageDiscount.applied')
-              : t('invoice.discount.bundleNotApplicable')}
-          </Button>
-        ) : (
-          <Button
-            type="button"
-            className="h-8 min-w-24 w-32 ml-auto"
-            variant="primary-outline"
-            iconBefore={<LuPlus aria-hidden="true" />}
-            onClick={() => updateAppliedPromotion(false)}
-            disabled={
-              isApplied || (calculatedDiscount?.priceAfterDiscount ?? 0) <= 0
-            }
-          >
-            {t('invoice.discount.applyBtn')}
-          </Button>
-        )}
+        {(() => {
+          if (promo.promotionType === PromotionTypeItem.BUNDLE && promo.id) {
+            return (
+              <BundleDiscountStatus
+                bundleId={promo.id}
+                bundleDiscountInfo={bundleDiscountInfoMap[promo.id] ?? null}
+                isApplied={isApplied}
+                onApply={() => updateAppliedPromotion(false)}
+                calculatedDiscountAmount={
+                  calculatedDiscount?.discountAmountsByPromoId?.[
+                    promo.id ?? ''
+                  ] ?? 0
+                }
+                bundlePromo={promo}
+                totalPrice={totalPrice?.totalPrice}
+                compact
+                showButtonOnly
+                priceAfterDiscount={calculatedDiscount?.priceAfterDiscount}
+              />
+            )
+          }
+          if (promo.promotionType === PromotionTypeItem.PACKAGE) {
+            return (
+              <Button
+                type="button"
+                className="h-8 min-w-24 w-32 ml-auto"
+                variant={
+                  isPackageAlreadyApplied ? 'default' : 'primary-outline'
+                }
+                disabled={!isPackageQualified && !isPackageAlreadyApplied}
+                iconBefore={
+                  isPackageAlreadyApplied ? (
+                    <LuCheck aria-hidden="true" />
+                  ) : (
+                    <LuPlus aria-hidden="true" />
+                  )
+                }
+                onClick={() => {
+                  // Package discounts are auto-managed — no manual action needed
+                }}
+              >
+                {isPackageAlreadyApplied
+                  ? t('invoiceCampaign:editor.packageDiscount.applied')
+                  : t('invoice.discount.bundleNotApplicable')}
+              </Button>
+            )
+          }
+          return (
+            <Button
+              type="button"
+              className="h-8 min-w-24 w-32 ml-auto"
+              variant="primary-outline"
+              iconBefore={<LuPlus aria-hidden="true" />}
+              onClick={() => updateAppliedPromotion(false)}
+              disabled={
+                isApplied || (calculatedDiscount?.priceAfterDiscount ?? 0) <= 0
+              }
+            >
+              {t('invoice.discount.applyBtn')}
+            </Button>
+          )
+        })()}
       </div>
     </div>
   )

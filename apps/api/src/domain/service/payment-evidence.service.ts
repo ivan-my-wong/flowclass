@@ -36,7 +36,6 @@ import { CloudWatchLoggerProvider } from '@/config/loggers/cloudwatch-nestjs.pro
 import { ObjectStorageProvider } from '@/config/storage/object-storage.provider'
 import { UploadedStorageFile } from '@/config/storage/storage-image-upload-interceptor'
 import { EmailService } from '@/domain/external/email.service'
-import { WhatsappService } from '@/domain/external/whatsapp.service'
 import { StudentScheduleService } from '@/domain/service/student-schedule.service'
 import { AuthorizationException } from '@/exceptions/authorization.exception'
 import { EnrollCourseErrorMessage } from '@/exceptions/error-message/course'
@@ -45,13 +44,14 @@ import { InvoiceErrorMessage } from '@/exceptions/error-message/invoice'
 import { PaymentEvidenceErrorMessage } from '@/exceptions/error-message/payment-evidence'
 import { SiteErrorMessage } from '@/exceptions/error-message/site'
 import { UserErrorMessage } from '@/exceptions/error-message/user'
+import { WhatsappTemplateErrorMessage } from '@/exceptions/error-message/whatsapp-template'
 import { Course } from '@/models/courses.entity'
 import { CoursesRepository } from '@/models/courses.repository'
 import { CreditSourceType } from '@/models/credit-transactions.entity'
 import { ClassAdminPaymentSubmittedEmailParams } from '@/models/custom-types/email-params'
 import { EnrollCourse } from '@/models/enroll-courses.entity'
 import { EnrollCourseRepository } from '@/models/enroll-courses.repository'
-import { GaMeasurementEventName, PaymentMethod, PromotionType as PromotionTypeEnum } from '@/models/enums/'
+import { PaymentMethod, PromotionType as PromotionTypeEnum } from '@/models/enums/'
 import {
   CheckoutStatus,
   EnrollConfirmStatus,
@@ -62,8 +62,8 @@ import {
 import { Institution } from '@/models/institutions.entity'
 import { InstitutionsRepository } from '@/models/institutions.repository'
 import { Invoice } from '@/models/invoice.entity'
-import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
+import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { NotificationStatus } from '@/models/notification-record.entity'
 import { PaymentEvidence } from '@/models/payment-evidence.entity'
 import { PaymentEvidenceRepository } from '@/models/payment-evidence.repository'
@@ -77,7 +77,6 @@ import { TransactionRepository } from '@/models/transaction.repository'
 import { User } from '@/models/user.entity'
 import { UserAliasesRepository } from '@/models/user-aliases.repository'
 import { UsersRepository } from '@/models/users.repository'
-import { WhatsappTemplateRepository } from '@/models/whatsapp-template.entity'
 import { buildSuccessPaymentLink, buildUploadReceiptLink } from '@/utils/payment-link.utils'
 import { replaceContentVariables, shallow } from '@/utils/shallow.utils'
 import {
@@ -128,7 +127,9 @@ export class PaymentEvidenceService {
     private readonly usersService: UsersService,
     private readonly notificationRecordService: NotificationRecordService,
     private readonly studentNotifSettingService: StudentNotifSettingService,
-    private readonly requestTimeChangeRepository: RequestTimeChangeRepository
+    private readonly requestTimeChangeRepository: RequestTimeChangeRepository,
+    private readonly customMessageService: CustomMessageService,
+    private readonly whatsappWebService: WhatsappWebService
   ) {
     this.jwtOption = {
       secret: process.env.JWT_SECRET,
@@ -783,47 +784,14 @@ export class PaymentEvidenceService {
    * @param timeZone The time zone of the institution
    */
   async sendGoogleAnalyticsMeasurement(
-    enrollCourse: EnrollCourse,
-    transaction: Transaction,
-    invoice: Invoice,
-    user: User,
-    couponId?: number,
-    timeZone?: string
+    _enrollCourse: EnrollCourse,
+    _transaction: Transaction,
+    _invoice: Invoice,
+    _user: User,
+    _couponId?: number,
+    _timeZone?: string
   ): Promise<void> {
-    // Send the Google Analytics measurement for the purchase event
-    this.gaMeasurementService.sendToWebGa({
-      userId: enrollCourse.userId,
-      clientId: invoice.proofToken,
-      events: [
-        {
-          name: GaMeasurementEventName.PURCHASE,
-          params: {
-            value: enrollCourse.paymentAmount,
-            transaction_id: transaction.id,
-            currency: enrollCourse.currency,
-            courseId: enrollCourse.courseId,
-            schoolId: enrollCourse.institutionId,
-            paymentMethod: PaymentMethod.PAY_NOW,
-            coupon: couponId ?? undefined,
-            timeZone,
-            items: [
-              {
-                item_id: enrollCourse.courseId,
-                item_name: enrollCourse.preferredName,
-                discount: invoice.discountAmount,
-                price: enrollCourse.paymentAmount,
-                currency: enrollCourse.currency,
-                coupon: couponId ?? undefined,
-              },
-            ],
-          },
-        },
-      ],
-      userProperties: {
-        email: enrollCourse.preferredEmail,
-        firebaseId: user.firebaseId,
-      },
-    })
+    // GA4 measurement removed from open-source build
   }
 
   @Transactional()

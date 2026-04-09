@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { plainToInstance } from 'class-transformer'
 import { randomUUID } from 'crypto'
 import { utcToZonedTime } from 'date-fns-tz'
-import * as dayjs from 'dayjs'
+import dayjs from 'dayjs'
 import Stripe from 'stripe'
 import { Between, FindOptionsOrder, FindOptionsWhere, ILike, In, Repository } from 'typeorm'
 import { Transactional } from 'typeorm-transactional'
@@ -82,6 +82,7 @@ import {
   AdditionalFeeConditions,
   ClassTypeEnum,
   PaymentMethod,
+  PriceType,
   PromotionType as PromotionTypeEnum,
   RecordLogType,
   STRIPE_CURRENCY,
@@ -873,7 +874,7 @@ export class EnrollCoursesService {
     const successfulAccounts: StudentEnrollCourseAlias[] = listStudentAccount
       .filter((result) => result.status === 'fulfilled')
       // eslint-disable-next-line no-undef
-      .map((result: PromiseFulfilledResult<StudentEnrollCourseAlias>) => result.value)
+      .map((result) => (result as PromiseFulfilledResult<StudentEnrollCourseAlias>).value)
 
     const failedAccounts = listStudentAccount
       .filter((result) => result.status === 'rejected')
@@ -1121,7 +1122,7 @@ export class EnrollCoursesService {
       ...pricingInfoWithAdditionalFee,
       priceType: pickedClass.priceType,
       discountInfo: isTrialLesson
-        ? [pricingInfoWithAdditionalFee.discountInfo, PromotionType.TRIAL_LESSON]
+        ? [pricingInfoWithAdditionalFee.discountInfo, PromotionTypeEnum.TRIAL_LESSON]
             .filter(Boolean)
             .join(',')
         : pricingInfoWithAdditionalFee.discountInfo,
@@ -1150,7 +1151,7 @@ export class EnrollCoursesService {
       numberOfLesson: lessonCount,
       feePerLesson: meta.lessonPrice / lessonCount,
       originalFee: meta.lessonPrice,
-      discountInfo: isTrialLesson ? PromotionType.TRIAL_LESSON : '',
+      discountInfo: isTrialLesson ? PromotionTypeEnum.TRIAL_LESSON : '',
       couponDiscount: 0,
       additionalFee: 0,
       directDiscount: 0,
@@ -2379,9 +2380,9 @@ export class EnrollCoursesService {
       this.emitEnrollSseEvent({
         jobId,
         status: EnrollCourseSteps.FAILED,
-        error: error.message,
+        error: (error as any).message,
       })
-      const isCustomisedEnrollment = isCustomised || error.message.includes('customised')
+      const isCustomisedEnrollment = isCustomised || (error as any).message.includes('customised')
       if (isCustomisedEnrollment) {
         // Re throw the error
         throw error
@@ -2870,10 +2871,10 @@ export class EnrollCoursesService {
     try {
       await this.jwtService.verify(token, { ...this.jwtOption })
     } catch (error) {
-      if (error.name === 'TokenExpiredError') {
+      if ((error as any).name === 'TokenExpiredError') {
         throw AuthorizationException.tokenExpiredException()
       }
-      throw AuthorizationException.tokenInvalidException(error.message)
+      throw AuthorizationException.tokenInvalidException((error as any).message)
     }
 
     const invoice = await this.invoiceRepository.findOne({

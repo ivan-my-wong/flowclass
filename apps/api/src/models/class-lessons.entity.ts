@@ -1,7 +1,6 @@
 import { AfterLoad, Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
 
 import { Course } from '@/models/courses.entity'
-import { LessonType } from '@/models/enums/status'
 import { BaseEntity } from '@/modules/base/base.entity'
 
 import { ClassRegularPeriodsV2 } from './class-regular-periods.entity'
