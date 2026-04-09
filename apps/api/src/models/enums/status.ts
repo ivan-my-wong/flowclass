@@ -59,7 +59,6 @@ export enum PaymentStatus {
   PARTIALLY_PAID = 'PARTIALLY_PAID',
   REFUNDED = 'REFUNDED',
   CRITICAL = 'CRITICAL',
-  UNPAID = 'UNPAID',
   REJECTED = 'REJECTED',
 }
 

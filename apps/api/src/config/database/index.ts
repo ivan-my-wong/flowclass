@@ -71,12 +71,6 @@ import { CommonFormRepository } from '@/models/common-form.repository'
 import { Coupon } from '@/models/coupons.entity'
 import { CouponsRepository } from '@/models/coupons.repository'
 import {
-  CourseActivitiesOrderEntity,
-  CourseActivitiesOrderRepository,
-} from '@/models/course-activities-order.entity'
-import { CoursePromotionUsed } from '@/models/course-promotion-used.entity'
-import { CoursePromotionUsedRepository } from '@/models/course-promotion-used.repository'
-import {
   RecurringSchedules,
   RecurringSchedulesRepository,
 } from '@/models/course-recurring-schedules.entity'
@@ -104,6 +98,8 @@ import {
 import { InviteMember } from '@/models/invite-member.entity'
 import { InviteMembersRepository } from '@/models/invite-members.repository'
 import { Invoice } from '@/models/invoice.entity'
+import { InvoicePromotionUsed } from '@/models/invoice-promotion-used.entity'
+import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
 import { LessonQuestion } from '@/models/lesson-question.entity'
 import { LessonQuestionRepository } from '@/models/lesson-question.repository'
@@ -228,7 +224,6 @@ export const getAllEntities = () => [
   ClassPriceOption,
   CommentEntity,
   Coupon,
-  CoursePromotionUsed,
   Course,
   EnrollClassMapping,
   EnrollCourse,
@@ -236,6 +231,7 @@ export const getAllEntities = () => [
   Institution,
   InviteMember,
   Invoice,
+  InvoicePromotionUsed,
   RegularPeriods,
   PasswordResetToken,
   PaymentEvidence,
@@ -333,9 +329,7 @@ export const getAllRepositories = () => [
   TransactionRepository,
   PaymentEvidenceRepository,
   InvoiceRepository,
-  CoursePromotionUsedRepository,
-  InstitutionGalleryRepository,
-  CourseActivitiesOrderRepository,
+  InvoicePromotionUsedRepository,
   BundleDiscountsRepository,
   PackageDiscountsRepository,
   RecurringSchedulesRepository,

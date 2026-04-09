@@ -24,6 +24,7 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger'
 
+import { CurrentUser } from '@/common/decorators/current-user.decorator'
 import { RequireParams } from '@/common/decorators/require-param.decorator'
 import { Roles } from '@/common/decorators/roles.decorator'
 import { AdminAuthGuard } from '@/common/guards/admin-auth.guard'
@@ -32,6 +33,7 @@ import { RolesGuard } from '@/common/guards/roles.guard'
 import { InvoiceCampaignService } from '@/domain/service/invoice-campaign.service'
 import { DocumentCampaign } from '@/models/document-campaign.entity'
 import { RequireParam, Role } from '@/models/enums'
+import { User } from '@/models/user.entity'
 
 import {
   InvoiceCampaignDto,
@@ -101,11 +103,12 @@ export class InvoiceCampaignController {
   async sendInvoice(
     @Query('institutionId', ParseIntPipe) institutionId: number,
     @Param('documentId', ParseIntPipe) documentId: number,
-    @Body() payload: SendInvoiceDto
+    @Body() payload: SendInvoiceDto,
+    @CurrentUser() currentUser: User
   ): Promise<{
     jobId: string
   }> {
-    return this.invoiceCampaignService.sendInvoiceSynchronous(documentId, institutionId, payload)
+    return this.invoiceCampaignService.sendInvoiceSynchronous(documentId, institutionId, payload, currentUser.id)
   }
 
   @Get(':documentId/detail')

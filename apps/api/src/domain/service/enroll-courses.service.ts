@@ -61,8 +61,6 @@ import { ClassPriceOption } from '@/models/class-price-options.entity'
 import { ClassEntity } from '@/models/classes.entity'
 import { ClassRepository } from '@/models/classes.repository'
 import { Coupon } from '@/models/coupons.entity'
-import { CoursePromotionUsed } from '@/models/course-promotion-used.entity'
-import { CoursePromotionUsedRepository } from '@/models/course-promotion-used.repository'
 import { Course, CustomField } from '@/models/courses.entity'
 import {
   ClassAdminNewRegistrationEmailParams,
@@ -84,8 +82,7 @@ import {
   AdditionalFeeConditions,
   ClassTypeEnum,
   PaymentMethod,
-  PriceType,
-  PromotionType,
+  PromotionType as PromotionTypeEnum,
   RecordLogType,
   STRIPE_CURRENCY,
   StripeCheckoutSessionType,
@@ -100,6 +97,7 @@ import {
 } from '@/models/enums/status'
 import { InstitutionsRepository } from '@/models/institutions.repository'
 import { Invoice } from '@/models/invoice.entity'
+import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
 import { LocationRoom } from '@/models/location-room.entity'
 import { RecordLog } from '@/models/record-log.entity'
@@ -180,7 +178,7 @@ export class EnrollCoursesService {
   constructor(
     private readonly enrollCourseRepository: EnrollCourseRepository,
     private readonly enrollClassMappingRepository: EnrollClassMappingRepository,
-    private readonly coursePromotionUsedRepository: CoursePromotionUsedRepository,
+    private readonly invoicePromotionUsedRepository: InvoicePromotionUsedRepository,
     private readonly transactionRepository: TransactionRepository,
     private readonly classLessonService: ClassLessonService,
     private readonly invoiceRepository: InvoiceRepository,
@@ -2902,15 +2900,16 @@ export class EnrollCoursesService {
     return plainToInstance(StudentEnrollCourseResponse, found)
   }
 
-  async findPromotion(enrolId: number): Promise<CoursePromotionUsed> {
-    const found = await this.coursePromotionUsedRepository.findOne({
-      where: { enrollId: enrolId },
-    })
-    if (!found) {
+  async findPromotion(enrolId: number): Promise<any> {
+    const enrollCourse = await this.enrollCourseRepository.findOneBy({ id: enrolId })
+    if (!enrollCourse) {
       throw new NotFoundException(EnrollCourseErrorMessage.ENROLL_COURSE_NOT_FOUND)
     }
-
-    return plainToInstance(CoursePromotionUsed, found)
+    const found = await this.invoicePromotionUsedRepository.findOneBy({
+      invoiceId: enrollCourse.invoiceId,
+      promotionType: PromotionTypeEnum.COUPON_DISCOUNT,
+    })
+    return found ?? null
   }
 
   async beforePayment(dto: StudentConfirmEnrollDto, course: Course) {

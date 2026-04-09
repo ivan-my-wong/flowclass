@@ -3,7 +3,6 @@ export const relations = {
     'Appointment',
     'ClassEntity',
     'Coupon',
-    'CoursePromotionUsed',
     'Course',
     'InviteMember',
     'RegularPeriods',
@@ -19,7 +18,6 @@ export const relations = {
   Site: [
     'ClassEntity',
     'Coupon',
-    'CoursePromotionUsed',
     'Course',
     'Institution',
     'InviteMember',

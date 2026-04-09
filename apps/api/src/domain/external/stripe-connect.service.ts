@@ -29,17 +29,12 @@ import { CloudWatchLoggerProvider } from '@/config/loggers/cloudwatch-nestjs.pro
 import { EmailService } from '@/domain/external/email.service'
 import { SettingSiteErrorMessage } from '@/exceptions/error-message/setting-site'
 import { StripeErrorMessage } from '@/exceptions/error-message/stripe'
-import { CoursePromotionUsedRepository } from '@/models/course-promotion-used.repository'
+import { UserErrorMessage } from '@/exceptions/error-message/user'
 import { Course } from '@/models/courses.entity'
 import { CreateCheckoutSessionReturnType } from '@/models/custom-types/stripe'
 import { EnrollCourse } from '@/models/enroll-courses.entity'
 import { EnrollCourseRepository } from '@/models/enroll-courses.repository'
-import {
-  PaymentMethod,
-  StripeCheckoutSessionType,
-  StripePriceInterval,
-  StripePriceSessionType,
-} from '@/models/enums/'
+import { GaMeasurementEventName, PaymentMethod, PromotionType as PromotionTypeEnum, StripeCheckoutSessionType } from '@/models/enums/'
 import {
   CheckoutStatus,
   EnrollConfirmStatus,
@@ -49,6 +44,7 @@ import {
 } from '@/models/enums/status'
 import { Institution } from '@/models/institutions.entity'
 import { InstitutionsRepository } from '@/models/institutions.repository'
+import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
 import { SettingSiteRepository } from '@/models/setting-site.repository'
 import { StripeConnect } from '@/models/stripe-connect.entity'
@@ -88,10 +84,8 @@ export class StripeConnectService {
     private readonly logger: CloudWatchLoggerProvider,
     private readonly emailService: EmailService,
     private settingSiteRepository: SettingSiteRepository,
-    private readonly chatGptService: ChatGPTService,
-    private readonly stripeProductPricesService: StripeProductPricesService,
-    private readonly stripeProductPricesRepository: StripeProductPricesRepository,
-    private readonly coursePromotionUsedRepository: CoursePromotionUsedRepository,
+    private readonly invoicePromotionUsedRepository: InvoicePromotionUsedRepository,
+    private readonly gaMeasurementService: GaMeasurementService,
     private readonly settingSiteService: SettingSiteService,
     private readonly usersRepository: UsersRepository,
     @Inject(STRIPE_CLIENT)
@@ -830,24 +824,19 @@ export class StripeConnectService {
     invoice.transactionId = transaction.transactionId
     await this.invoiceRepository.save(invoice)
 
-    for (const enrollCourse of invoice.enrollCourses) {
-      const promotionUsed = await this.coursePromotionUsedRepository.findOne({
-        where: { invoiceId: invoice.id },
-        relations: { coupon: true },
+    const invoicePromoUsed = await this.invoicePromotionUsedRepository.findOneBy({
+      invoiceId: invoice.id,
+      promotionType: PromotionTypeEnum.COUPON_DISCOUNT,
+    })
+
+    if (invoicePromoUsed && invoicePromoUsed.usedStatus !== PromotionUsedStatus.CONFIRMED) {
+      await this.invoicePromotionUsedRepository.save({
+        ...invoicePromoUsed,
+        usedStatus: PromotionUsedStatus.CONFIRMED,
       })
+    }
 
-      if (promotionUsed) {
-        const user = await this.usersRepository.findOneBy({ id: enrollCourse.userId })
-
-        await this.couponsService.updatePromotionHistory({
-          coupon: promotionUsed.coupon,
-          course: invoice.course,
-          enrollId: enrollCourse.id,
-          invoiceId: invoice.id,
-          student: user,
-          status: PromotionUsedStatus.CONFIRMED,
-        })
-      }
+    for (const enrollCourse of invoice.enrollCourses) {
 
       /**
        * The following code is for sending email confirmation to student and admin
@@ -875,6 +864,45 @@ export class StripeConnectService {
         })
       } catch (e) {
         this.logger.error('EMAIL_CONFIRMATION_TO_STUDENT_ENROLLMENT', JSON.stringify(e.body))
+      }
+
+      /**
+       * The following code is only for sending event to GA4
+       */
+      try {
+        const timeZone = await this.settingSiteService.getTimeZone(invoice.siteId)
+
+        this.gaMeasurementService.sendToWebGa({
+          userId: invoice.userId,
+          clientId: invoice.proofToken,
+          events: [
+            {
+              name: GaMeasurementEventName.PURCHASE,
+              params: {
+                value: invoice.payAmount,
+                transaction_id: transaction.id,
+                currency: enrollCourse.currency,
+                courseId: invoice.courseId,
+                schoolId: invoice.institutionId,
+                paymentMethod: PaymentMethod.PAY_NOW,
+                coupon: invoicePromoUsed?.promotionId ?? undefined,
+                timeZone,
+                items: [
+                  {
+                    item_id: invoice.courseId,
+                    item_name: enrollCourse.preferredName,
+                    discount: invoice?.discountAmount,
+                    price: invoice.payAmount,
+                    currency: invoice.currency,
+                    coupon: invoicePromoUsed?.promotionId ?? undefined,
+                  },
+                ],
+              },
+            },
+          ],
+        })
+      } catch (err) {
+        this.logger.error(UserErrorMessage.WEB_ANALYTICS_CANNOT_BE_SENT, err.stack)
       }
     }
   }

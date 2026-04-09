@@ -20,10 +20,10 @@ import { ErrorCode } from '@/exceptions/error-message/errors'
 import { PromotionErrorMessage } from '@/exceptions/error-message/promotion'
 import { Coupon } from '@/models/coupons.entity'
 import { CouponsRepository } from '@/models/coupons.repository'
-import { CoursePromotionUsedRepository } from '@/models/course-promotion-used.repository'
 import { Course } from '@/models/courses.entity'
 import { CoursesRepository } from '@/models/courses.repository'
-import { DiscountType, RecordLogType } from '@/models/enums/'
+import { DiscountType, PromotionType as PromotionTypeEnum, RecordLogType } from '@/models/enums/'
+import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { CouponStatus, PromotionUsedStatus } from '@/models/enums/status'
 import { InstitutionsRepository } from '@/models/institutions.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
@@ -47,7 +47,6 @@ import * as _ from 'lodash'
 import {
   ArrayContains,
   FindOptionsOrder,
-  FindOptionsRelations,
   FindOptionsWhere,
   In,
   MoreThanOrEqual,
@@ -71,8 +70,7 @@ export class CouponsService extends BaseService<Coupon> {
     private recordLogService: RecordLogService,
 
     // private studentOnbService: StudentOnbService
-    private userAliasesRepository: UserAliasesRepository,
-    private coursePromotionUsedRepository: CoursePromotionUsedRepository,
+    private readonly invoicePromotionUsedRepository: InvoicePromotionUsedRepository,
     private emailService: EmailService,
     private enrollCourseRepository: EnrollCourseRepository,
     private enrollClassRepository: EnrollClassMappingRepository
@@ -97,15 +95,22 @@ export class CouponsService extends BaseService<Coupon> {
 
     whereCondition.expireDate = MoreThanOrEqual(new Date())
 
-    const relations: FindOptionsRelations<Coupon> = {
-      couponUsed: true,
-    }
-
     const listOfCoupons = await this.couponsRepository.pagination(
       pageOptionsDto,
       whereCondition,
-      orderOption,
-      relations
+      orderOption
+    )
+
+    await Promise.all(
+      listOfCoupons.content.map(async (coupon) => {
+        coupon.usedCount = await this.invoicePromotionUsedRepository.count({
+          where: {
+            promotionId: coupon.id,
+            promotionType: PromotionTypeEnum.COUPON_DISCOUNT,
+            usedStatus: PromotionUsedStatus.CONFIRMED,
+          },
+        })
+      })
     )
 
     return listOfCoupons
@@ -117,29 +122,13 @@ export class CouponsService extends BaseService<Coupon> {
       throw new BadRequestException(PromotionErrorMessage.COUPON_NOT_FOUND)
     }
 
-    const coursePromotionUsed = await this.coursePromotionUsedRepository.find({
+    const usedCount = await this.invoicePromotionUsedRepository.count({
       where: {
-        couponId: coupon.id,
+        promotionId: coupon.id,
+        promotionType: PromotionTypeEnum.COUPON_DISCOUNT,
         usedStatus: PromotionUsedStatus.CONFIRMED,
       },
-      relations: {
-        coupon: true,
-      },
     })
-
-    const enrolIds = coursePromotionUsed.map((o) => o.enrollId)
-
-    // const [enrollCourses, enrollClasses] = await Promise.all([
-    //   this.enrollCourseRepository.find({
-    //     where: { id: In(enrolIds) },
-    //   }),
-    //   this.enrollClassRepository.find({
-    //     where: { enrollCourseId: In(enrolIds) },
-    //   }),
-    // ])
-
-    // const userIds = [...new Set(enrollCourses.map((o) => o.userId))]
-    // const classIds = [...new Set(enrollClasses.map((o) => o.classId))]
 
     const [studentAssigned, courseAssigned] = await Promise.all([
       this.getStudentAssigned(coupon.userIds),
@@ -147,7 +136,7 @@ export class CouponsService extends BaseService<Coupon> {
     ])
     return plainToInstance(CouponDetailDtoV2, {
       ...coupon,
-      usage: enrolIds.length,
+      usage: usedCount,
       studentsAssigned: studentAssigned,
       courseAssigned,
     })
@@ -520,10 +509,11 @@ export class CouponsService extends BaseService<Coupon> {
       }
     }
 
-    // NEED CHECK THE COURSE PROMOTION USED TO SEE IF THE COUPON IS USED
-    const couponUsed = await this.coursePromotionUsedRepository.count({
+    // NEED CHECK THE INVOICE PROMOTION USED TO SEE IF THE COUPON IS USED
+    const couponUsed = await this.invoicePromotionUsedRepository.count({
       where: {
-        couponId: coupon.id,
+        promotionId: coupon.id,
+        promotionType: PromotionTypeEnum.COUPON_DISCOUNT,
         usedStatus: PromotionUsedStatus.CONFIRMED,
       },
     })
@@ -597,7 +587,6 @@ export class CouponsService extends BaseService<Coupon> {
       order: {
         createdAt: 'DESC',
       },
-      relations: { couponUsed: true },
     })
   }
 
@@ -617,13 +606,29 @@ export class CouponsService extends BaseService<Coupon> {
         return []
       }
 
+      // Compute usedCount for each coupon via invoice_promotion_used
+      const couponIds = coupon.map((c) => c.id)
+      if (couponIds.length > 0) {
+        const usedRecords = await this.invoicePromotionUsedRepository.find({
+          where: {
+            promotionId: In(couponIds),
+            promotionType: PromotionTypeEnum.COUPON_DISCOUNT,
+            usedStatus: PromotionUsedStatus.CONFIRMED,
+          },
+          select: ['promotionId'],
+        })
+        const usedCountMap: Record<number, number> = {}
+        usedRecords.forEach((u) => {
+          usedCountMap[u.promotionId] = (usedCountMap[u.promotionId] || 0) + 1
+        })
+        coupon.forEach((c) => {
+          c.usedCount = usedCountMap[c.id] || 0
+        })
+      }
+
       // The above function get ALL coupon that belongs to a student. We need to filter out the expired coupons
       const filteredCoupon = coupon.filter((c) => {
-        if (!c.couponUsed || c.couponUsed.length === 0) {
-          return c.expireDate >= new Date()
-        }
-
-        return c.expireDate >= new Date() && c.usedCount < c.quota
+        return c.expireDate >= new Date() && (c.quota === UN_LIMITED_COUPON || c.usedCount < c.quota)
       })
 
       return filteredCoupon
@@ -730,22 +735,29 @@ export class CouponsService extends BaseService<Coupon> {
     student: User
     status: PromotionUsedStatus
   }): Promise<void> {
-    const coursePromotionUsed = await this.coursePromotionUsedRepository.findOneBy({
+    const existingPromoUsed = await this.invoicePromotionUsedRepository.findOneBy({
       invoiceId,
+      promotionType: PromotionTypeEnum.COUPON_DISCOUNT,
     })
 
-    // To prevent double-saving two course promotion used records
-    if (!coursePromotionUsed) {
-      const newRecord = this.coursePromotionUsedRepository.create()
-      newRecord.couponId = coupon.id
-      newRecord.courseId = course.id
-      newRecord.siteId = course.siteId
-      newRecord.institutionId = course.institutionId
-      newRecord.enrollId = enrollId
-      newRecord.invoiceId = invoiceId
-      newRecord.studentId = student.id
-      newRecord.usedStatus = status
-      await this.coursePromotionUsedRepository.save(newRecord)
+    if (!existingPromoUsed) {
+      const invoice = await this.invoiceRepository.findOneBy({ id: invoiceId })
+      const amount =
+        coupon.discountType === DiscountType.FIXED_AMOUNT
+          ? coupon.amount
+          : invoice
+            ? (coupon.amount / 100) * invoice.payAmount
+            : 0
+      await this.invoicePromotionUsedRepository.save({
+        invoiceId,
+        siteId: course.siteId,
+        institutionId: course.institutionId,
+        promotionType: PromotionTypeEnum.COUPON_DISCOUNT,
+        promotionId: coupon.id,
+        name: coupon.code,
+        amount,
+        usedStatus: status,
+      })
 
       await this.recordLogService.create([
         {
@@ -761,12 +773,8 @@ export class CouponsService extends BaseService<Coupon> {
         },
       ])
     } else {
-      if (coursePromotionUsed.usedStatus !== PromotionUsedStatus.CONFIRMED) {
-        await this.coursePromotionUsedRepository.save({
-          ...coursePromotionUsed,
-          couponId: coupon.id,
-          usedStatus: status,
-        })
+      if (existingPromoUsed.usedStatus !== PromotionUsedStatus.CONFIRMED) {
+        await this.invoicePromotionUsedRepository.save({ ...existingPromoUsed, usedStatus: status })
       }
 
       await this.recordLogService.create([

@@ -1,10 +1,9 @@
-import { AfterLoad, Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
+import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm'
 
 import { DiscountType } from '@/models/enums/'
-import { CouponStatus, PromotionUsedStatus } from '@/models/enums/status'
+import { CouponStatus } from '@/models/enums/status'
 import { BaseEntity } from '@/modules/base/base.entity'
 
-import { CoursePromotionUsed } from './course-promotion-used.entity'
 import { Institution } from './institutions.entity'
 
 @Entity('coupons')
@@ -62,20 +61,5 @@ export class Coupon extends BaseEntity {
   @JoinColumn({ name: 'institution_id' })
   institution: Promise<Institution[]>
 
-  @OneToMany(() => CoursePromotionUsed, (promotion) => promotion.coupon, {
-    createForeignKeyConstraints: false,
-  })
-  couponUsed: CoursePromotionUsed[]
-
   usedCount: number
-
-  @AfterLoad()
-  async calculateAmountUsed(): Promise<void> {
-    if (!this.couponUsed) {
-      return
-    }
-    this.usedCount = (await this.couponUsed).filter(
-      (promotion) => promotion.usedStatus === PromotionUsedStatus.CONFIRMED
-    ).length
-  }
 }
