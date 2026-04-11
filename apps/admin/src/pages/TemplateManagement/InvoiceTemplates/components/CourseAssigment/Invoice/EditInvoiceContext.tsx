@@ -731,8 +731,7 @@ export const InvoiceEditDialogProvider = ({
         s => s.id === currentActiveStudent.id
       )
       const studentAppliedPromotions =
-        latestStudent?.appliedPromotions ??
-        currentActiveStudent.appliedPromotions
+        latestStudent?.appliedPromotions ?? currentActiveStudent.appliedPromotions
 
       setRemark(invoiceRemark)
       setAppliedPromotions(studentAppliedPromotions)

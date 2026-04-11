@@ -227,21 +227,21 @@ const ListInvoices: FC<Props> = ({ onShowRecipients }) => {
           )
         },
       },
-      {
-        headerName: t('invoiceCampaign:editor.invoiceTable.customer'),
-        field: 'title',
-        flex: 2,
-        minWidth: 200,
-        filter: false,
-        cellClass: '!flex !items-center',
-        cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
-          if (!data) return null
-          const label = buildStudentNamesLabel(
-            data,
-            t('invoiceCampaign:untitledCampaign')
-          )
-          return <span className="font-medium text-gray-900">{label}</span>
-        },
+    },
+    {
+      headerName: t('invoiceCampaign:editor.invoiceTable.customer'),
+      field: 'title',
+      flex: 2,
+      minWidth: 200,
+      filter: false,
+      cellClass: '!flex !items-center',
+      cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
+        if (!data) return null
+        const label = buildStudentNamesLabel(
+          data,
+          t('invoiceCampaign:untitledCampaign')
+        )
+        return <span className="font-medium text-gray-900">{label}</span>
       },
       {
         headerName: t('student:column.lastUpdated'),
@@ -261,22 +261,19 @@ const ListInvoices: FC<Props> = ({ onShowRecipients }) => {
           )
         },
       },
-      {
-        headerName: t('invoiceCampaign:recipients.title').replace(
-          'Campaign ',
-          ''
-        ),
-        field: 'recipients',
-        width: 110,
-        filter: false,
-        cellClass: '!flex !items-center !justify-center',
-        cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
-          if (!data) return null
-          const count = getUniqueStudentCount(data)
-          return (
-            <span className="text-sm font-semibold text-gray-700">{count}</span>
-          )
-        },
+    },
+    {
+      headerName: t('invoiceCampaign:recipients.title').replace('Campaign ', ''),
+      field: 'recipients',
+      width: 110,
+      filter: false,
+      cellClass: '!flex !items-center !justify-center',
+      cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
+        if (!data) return null
+        const count = getUniqueStudentCount(data)
+        return (
+          <span className="text-sm font-semibold text-gray-700">{count}</span>
+        )
       },
       {
         headerName: t('student:paymentProof.status'),

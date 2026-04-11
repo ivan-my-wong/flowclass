@@ -68,6 +68,9 @@ import {
 import CourseAssignment from './CourseAssignment'
 import { InvoiceEditorProvider } from './InvoiceEditorContext'
 import PackageDiscountAutoApplyAll from './PackageDiscountAutoApplyAll'
+import ConfirmSendPaymentProof from '@/pages/PaymentProofTable/components/ConfirmSendPaymentProof'
+import { PaymentProofTableItem } from '@/types/enrollCourse'
+import { SendPaymentActions } from '@/types/paymentProof'
 
 const InvoiceEditor = (): JSX.Element => {
   const { t } = useTranslation()

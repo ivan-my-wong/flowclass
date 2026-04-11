@@ -279,6 +279,12 @@ export const getInvoiceOfStudentSelector = selectorFamily({
         invoice.total ?? 0,
         appliedPromotions
       )
+      // Final price = price after all discounts - credits used
+      const usedBalance = student?.usedBalance ?? invoice?.usedBalance ?? 0
+      const finalTotal = Math.max(
+        0,
+        calculatedDiscount.priceAfterDiscount - usedBalance
+      )
       return {
         ...invoice,
         total: total.priceAfterDiscount,

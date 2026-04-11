@@ -21,6 +21,9 @@ import { invoiceClassesState } from '@/stores/studentInvoice.store'
 import { PromotionTypeItem } from '@/types/studentInvoice.type'
 import { formatCurrency } from '@/utils/currency'
 
+import useSiteData from '@/hooks/useSiteData'
+import { formatCurrency } from '@/utils/currency'
+
 import AppliedDiscount from './AppliedDiscount'
 import { useContextInvoiceEditDialog } from './EditInvoiceContext'
 import ManualDiscountForm from './ManualDiscountForm'
@@ -197,10 +200,7 @@ const InvoiceDiscount = (): JSX.Element => {
             {t('invoice.discount.additionalFee')}
           </div>
           <div className="font-semibold text-blue-600">
-            {`+${formatCurrency(
-              calculatedDiscount.additionalFee ?? 0,
-              currency
-            )}`}
+            {`+${formatCurrency(calculatedDiscount.additionalFee ?? 0, currency)}`}
           </div>
         </div>
         <Separator className="bg-gray-200 mb-2" />

@@ -4,7 +4,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { IoMdAdd } from 'react-icons/io'
 import { LuCalculator, LuCheck, LuMapPin, LuUser2 } from 'react-icons/lu'
-
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import useSiteData from '@/hooks/useSiteData'
@@ -31,22 +30,6 @@ const CourseItem = ({
   const [searchParams] = useSearchParams()
   const { t } = useTranslation('invoiceCampaign')
   const siteData = useSiteData()
-  const formatPrice = useCallback(
-    (priceOptions: PriceOption[]) => {
-      const prices = priceOptions
-        .map(price => Number(price.amount))
-        .filter(n => Number.isFinite(n))
-
-      if (prices.length === 0) return '-'
-
-      const min = formatCurrency(Math.min(...prices), siteData.currency)
-      const max = formatCurrency(Math.max(...prices), siteData.currency)
-
-      return `${min} - ${max}`
-    },
-    [siteData.currency]
-  )
-
   const price = useMemo(() => {
     const values = {
       priceLabel: t('courseAssignment.free'),
