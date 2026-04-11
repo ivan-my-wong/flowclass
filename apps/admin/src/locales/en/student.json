@@ -471,8 +471,19 @@
     "removeFromCurrentGroup": "Remove from Current Group",
     "setAsActive": "Set as 'Active'",
     "setasInactive": "Set as 'Inactive'",
+    "merge": "Merge Account",
     "setAsParentAccount": "Set as Parent Account",
     "view": "View detail"
+  },
+  "merge": {
+    "title": "Merge into another account",
+    "selectTarget": "Select target account",
+    "selectTargetPlaceholder": "Search by name or phone",
+    "noStudentsFound": "No students found",
+    "targetHasEnrollments": "{{name}} already has enrollments — they will be combined.",
+    "warning": "All enroll courses, invoices, memos, and credit balance from {{name}} will be moved to the selected account. This cannot be undone.",
+    "btnConfirm": "Merge",
+    "successMerge": "Accounts merged successfully"
   },
   "message": {
     "askForApply": "Here is the application link for the course",

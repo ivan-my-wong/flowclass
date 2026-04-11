@@ -286,6 +286,24 @@ export const deleteStudent = async (
   return res.data.data
 }
 
+export const mergeStudent = async (params: {
+  institutionId: number
+  siteId: number
+  sourceUserAliasId: number
+  targetUserAliasId: number
+}): Promise<any> => {
+  const res = await apiClient.post({
+    url: `/admin/student-onboard/merge-student`,
+    needAuth: true,
+    params: {
+      institutionId: params.institutionId,
+      siteId: params.siteId,
+    },
+    data: params,
+  })
+  return res.data.data
+}
+
 export const editStatusStudent = async (
   params: Partial<TypeEditStatusStudentParams>
 ): Promise<any> => {

@@ -51,10 +51,10 @@ import {
 import { StudentUser } from '@/types/user'
 import { generateDataTestId } from '@/utils/data-testid.utils'
 
-import AddOrDeductCreditModal from './AddOrDeductCreditModal'
 import AddToParentGroupModal, {
   AddToParentGroupModalHandle,
 } from './AddToParentGroupModal'
+import MergeStudentModal, { MergeStudentModalHandle } from './MergeStudentModal'
 import ChangeToNewFamilyGroupModal, {
   ChangeToNewFamilyGroupModalHandle,
 } from './ChangeToNewFamilyGroupModal'
@@ -153,6 +153,7 @@ const ActionButton = ({
     useRef<ChangeToNewFamilyGroupModalHandle>(null)
   const removeFromCurrentGroupModalHandle =
     useRef<RemoveFromCurrentGroupModalHandle>(null)
+  const mergeStudentModalHandle = useRef<MergeStudentModalHandle>(null)
 
   const reInvalidateQueries = async () => {
     await Promise.all([
@@ -273,6 +274,18 @@ const ActionButton = ({
           funcHandleEvent: handleEditStudent,
           dataTestId: generateDataTestId('view-student', studentInfo.name),
         }),
+      },
+      {
+        ...renderMenuItem({
+          icon: <LuMerge size={20} />,
+          title: t('student:menu.merge'),
+          funcHandleEvent: () => {
+            mergeStudentModalHandle.current?.handleOpenChange?.()
+          },
+        }),
+      },
+      {
+        type: 'separator',
       },
       {
         ...renderMenuItem({
@@ -485,6 +498,12 @@ const ActionButton = ({
       <RemoveFromCurrentGroupModal
         ref={removeFromCurrentGroupModalHandle}
         userAliasId={userAliasId}
+        refetch={refetchAllStudents}
+      />
+      <MergeStudentModal
+        ref={mergeStudentModalHandle}
+        userAliasId={userAliasId}
+        studentName={studentInfo.name}
         refetch={refetchAllStudents}
       />
       {/* <AddOrDeductCreditModal

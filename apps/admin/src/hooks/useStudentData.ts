@@ -13,6 +13,7 @@ import { ApiError, handleApiError } from '@/api/errors/apiError'
 import {
   addToParentGroup,
   changeParentGroup,
+  mergeStudent,
   checkImportStudentDataValid,
   getAllStudentsOfInstitutionNew,
   getCurrentStudentQrCodeAttendanceData,
@@ -423,6 +424,7 @@ const useStudentData = () => {
     useRemoveFromParentGroup,
     useGetDetailAccountGroup,
     useGetStudentsByPhone,
+    useMergeStudent,
   }
 }
 

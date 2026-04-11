@@ -461,8 +461,19 @@
     "removeFromCurrentGroup": "從當前群組中移除",
     "setAsActive": "設為「活躍」",
     "setasInactive": "設為「非活躍」",
+    "merge": "合併帳戶",
     "setAsParentAccount": "設為家長帳戶",
     "view": "查看詳情"
+  },
+  "merge": {
+    "title": "合併到另一個帳戶",
+    "selectTarget": "選擇目標帳戶",
+    "selectTargetPlaceholder": "按姓名或電話搜索",
+    "noStudentsFound": "找不到學生",
+    "targetHasEnrollments": "{{name}} 已有報名記錄，將會合併。",
+    "warning": "{{name}} 的所有課程報名、發票、備忘錄及積分餘額將移至所選帳戶，此操作無法撤銷。",
+    "btnConfirm": "合併",
+    "successMerge": "帳戶合併成功"
   },
   "message": {
     "askForApply": "以下是課程的申請連結",
