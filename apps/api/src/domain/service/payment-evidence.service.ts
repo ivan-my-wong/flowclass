@@ -44,14 +44,13 @@ import { InvoiceErrorMessage } from '@/exceptions/error-message/invoice'
 import { PaymentEvidenceErrorMessage } from '@/exceptions/error-message/payment-evidence'
 import { SiteErrorMessage } from '@/exceptions/error-message/site'
 import { UserErrorMessage } from '@/exceptions/error-message/user'
-import { WhatsappTemplateErrorMessage } from '@/exceptions/error-message/whatsapp-template'
 import { Course } from '@/models/courses.entity'
 import { CoursesRepository } from '@/models/courses.repository'
 import { CreditSourceType } from '@/models/credit-transactions.entity'
 import { ClassAdminPaymentSubmittedEmailParams } from '@/models/custom-types/email-params'
 import { EnrollCourse } from '@/models/enroll-courses.entity'
 import { EnrollCourseRepository } from '@/models/enroll-courses.repository'
-import { PaymentMethod, PromotionType as PromotionTypeEnum } from '@/models/enums/'
+import { GaMeasurementEventName, PaymentMethod, PromotionType as PromotionTypeEnum } from '@/models/enums/'
 import {
   CheckoutStatus,
   EnrollConfirmStatus,
@@ -62,6 +61,7 @@ import {
 import { Institution } from '@/models/institutions.entity'
 import { InstitutionsRepository } from '@/models/institutions.repository'
 import { Invoice } from '@/models/invoice.entity'
+import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
 import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { NotificationStatus } from '@/models/notification-record.entity'
@@ -784,14 +784,47 @@ export class PaymentEvidenceService {
    * @param timeZone The time zone of the institution
    */
   async sendGoogleAnalyticsMeasurement(
-    _enrollCourse: EnrollCourse,
-    _transaction: Transaction,
-    _invoice: Invoice,
-    _user: User,
-    _couponId?: number,
-    _timeZone?: string
+    enrollCourse: EnrollCourse,
+    transaction: Transaction,
+    invoice: Invoice,
+    user: User,
+    couponId?: number,
+    timeZone?: string
   ): Promise<void> {
-    // GA4 measurement removed from open-source build
+    // Send the Google Analytics measurement for the purchase event
+    this.gaMeasurementService.sendToWebGa({
+      userId: enrollCourse.userId,
+      clientId: invoice.proofToken,
+      events: [
+        {
+          name: GaMeasurementEventName.PURCHASE,
+          params: {
+            value: enrollCourse.paymentAmount,
+            transaction_id: transaction.id,
+            currency: enrollCourse.currency,
+            courseId: enrollCourse.courseId,
+            schoolId: enrollCourse.institutionId,
+            paymentMethod: PaymentMethod.PAY_NOW,
+            coupon: couponId ?? undefined,
+            timeZone,
+            items: [
+              {
+                item_id: enrollCourse.courseId,
+                item_name: enrollCourse.preferredName,
+                discount: invoice.discountAmount,
+                price: enrollCourse.paymentAmount,
+                currency: enrollCourse.currency,
+                coupon: couponId ?? undefined,
+              },
+            ],
+          },
+        },
+      ],
+      userProperties: {
+        email: enrollCourse.preferredEmail,
+        firebaseId: user.firebaseId,
+      },
+    })
   }
 
   @Transactional()

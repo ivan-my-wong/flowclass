@@ -44,7 +44,13 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { plainToInstance } from 'class-transformer'
 import * as dayjs from 'dayjs'
 import * as _ from 'lodash'
-import { ArrayContains, FindOptionsOrder, FindOptionsWhere, In, MoreThanOrEqual } from 'typeorm'
+import {
+  ArrayContains,
+  FindOptionsOrder,
+  FindOptionsWhere,
+  In,
+  MoreThanOrEqual,
+} from 'typeorm'
 
 // import { StudentOnbService } from '@/domain/service/student-onboard.service';
 const UN_LIMITED_COUPON = -1
@@ -623,9 +629,7 @@ export class CouponsService extends BaseService<Coupon> {
 
       // The above function get ALL coupon that belongs to a student. We need to filter out the expired coupons
       const filteredCoupon = coupon.filter((c) => {
-        return (
-          c.expireDate >= new Date() && (c.quota === UN_LIMITED_COUPON || c.usedCount < c.quota)
-        )
+        return c.expireDate >= new Date() && (c.quota === UN_LIMITED_COUPON || c.usedCount < c.quota)
       })
 
       return filteredCoupon
@@ -743,8 +747,8 @@ export class CouponsService extends BaseService<Coupon> {
         coupon.discountType === DiscountType.FIXED_AMOUNT
           ? coupon.amount
           : invoice
-          ? (coupon.amount / 100) * invoice.payAmount
-          : 0
+            ? (coupon.amount / 100) * invoice.payAmount
+            : 0
       await this.invoicePromotionUsedRepository.save({
         invoiceId,
         siteId: course.siteId,

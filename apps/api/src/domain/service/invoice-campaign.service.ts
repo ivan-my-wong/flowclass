@@ -58,7 +58,6 @@ import {
   FeeModeType,
   PaymentMethod,
   PaymentStatus,
-  PriceType,
   PromotionType as PromotionTypeEnum,
 } from '@/models/enums'
 
@@ -1370,12 +1369,7 @@ export class InvoiceCampaignService {
     }
     newInvoice.userAliasId = userAlias.id
     await this.invoiceRepository.save(newInvoice)
-    await this.saveInvoicePromotionsUsed(
-      newInvoice.id,
-      invoice.siteId,
-      institutionId,
-      invoice.discounts ?? []
-    )
+    await this.saveInvoicePromotionsUsed(newInvoice.id, invoice.siteId, institutionId, invoice.discounts ?? [])
     if (userAlias.id) {
       const reminderData = await this.enrollCourseService.prepareReminderData(
         institutionId,

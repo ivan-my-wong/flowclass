@@ -1,8 +1,8 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm'
 
+import { BaseEntity } from '@/modules/base/base.entity'
 import { PromotionType } from '@/models/enums'
 import { PromotionUsedStatus } from '@/models/enums/status'
-import { BaseEntity } from '@/modules/base/base.entity'
 
 import { Invoice } from './invoice.entity'
 

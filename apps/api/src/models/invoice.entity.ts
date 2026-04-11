@@ -19,6 +19,7 @@ import {
   SplitItem,
 } from '@/application/admin/invoice-campaign/dto/send-invoice.dto'
 import { Course } from '@/models/courses.entity'
+import { InvoicePromotionUsed } from '@/models/invoice-promotion-used.entity'
 import { EnrollCourse } from '@/models/enroll-courses.entity'
 import { DiscountType, PaymentMethod } from '@/models/enums/'
 import { PaymentStatus } from '@/models/enums/status'
@@ -29,7 +30,6 @@ import { StudentSchedule } from '@/models/student-schedule.entity'
 import { User } from '@/models/user.entity'
 import { BaseEntity } from '@/modules/base/base.entity'
 
-import { ClassPriceOption } from './class-price-options.entity'
 import { CreditTransactions } from './credit-transactions.entity'
 import { Institution } from './institutions.entity'
 import { Site } from './site.entity'

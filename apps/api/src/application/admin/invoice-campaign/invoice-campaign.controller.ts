@@ -108,12 +108,7 @@ export class InvoiceCampaignController {
   ): Promise<{
     jobId: string
   }> {
-    return this.invoiceCampaignService.sendInvoiceSynchronous(
-      documentId,
-      institutionId,
-      payload,
-      currentUser.id
-    )
+    return this.invoiceCampaignService.sendInvoiceSynchronous(documentId, institutionId, payload, currentUser.id)
   }
 
   @Get(':documentId/detail')

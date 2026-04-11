@@ -70,10 +70,6 @@ import { CommonFormRepository } from '@/models/common-form.repository'
 import { Coupon } from '@/models/coupons.entity'
 import { CouponsRepository } from '@/models/coupons.repository'
 import {
-  CourseActivitiesOrderEntity,
-  CourseActivitiesOrderRepository,
-} from '@/models/course-activities-order.entity'
-import {
   RecurringSchedules,
   RecurringSchedulesRepository,
 } from '@/models/course-recurring-schedules.entity'
