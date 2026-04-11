@@ -96,6 +96,7 @@ import { StudentLesson } from '@/models/student-lesson.entity'
 import { StudentLessonRepository } from '@/models/student-lesson.repository'
 import { StudentSchedule, StudentScheduleType } from '@/models/student-schedule.entity'
 import { StudentScheduleRepository } from '@/models/student-schedule.repository'
+import { UserRole } from '@/models/user-role.entity'
 import { UserRolesRepository } from '@/models/user-roles.repository'
 import { User } from '@/models/user.entity'
 import { UsersRepository } from '@/models/users.repository'
@@ -128,7 +129,9 @@ import { AppointmentRepository } from '@/models/appointment.entity'
 import { ClassPriceOptionRepository } from '@/models/class-price-options.repository'
 import { CommonFieldRepository } from '@/models/common-field.repository'
 import { CommonFormRepository } from '@/models/common-form.repository'
+import { CreditTransactions } from '@/models/credit-transactions.entity'
 import { CreditTransactionsRepository } from '@/models/credit-transactions.repository'
+import { DocumentCampaignRecipients } from '@/models/document-campaign-recipients.entity'
 import { Institution } from '@/models/institutions.entity'
 import { NotificationStatus } from '@/models/notification-record.entity'
 import { PaymentEvidenceRepository } from '@/models/payment-evidence.repository'
@@ -1057,23 +1060,23 @@ export class StudentOnbService {
       const movingEnrollIds = movingEnrollCourses.map((r) => r.id)
 
       // 2. Reassign EnrollCourse
-      const enrollUpdate: Record<string, any> = { user_alias_id: params.targetUserAliasId }
-      if (isDifferentUser) enrollUpdate.user_id = targetUserId
+      const enrollUpdate: Partial<EnrollCourse> = { userAliasId: params.targetUserAliasId }
+      if (isDifferentUser) enrollUpdate.userId = targetUserId
       if (movingEnrollIds.length > 0) {
         await manager
           .createQueryBuilder()
-          .update('enroll_courses')
+          .update(EnrollCourse)
           .set(enrollUpdate)
           .where('user_alias_id = :sourceId', { sourceId: params.sourceUserAliasId })
           .execute()
       }
 
       // 3. Reassign Invoice
-      const invoiceUpdate: Record<string, any> = { user_alias_id: params.targetUserAliasId }
-      if (isDifferentUser) invoiceUpdate.user_id = targetUserId
+      const invoiceUpdate: Partial<Invoice> = { userAliasId: params.targetUserAliasId }
+      if (isDifferentUser) invoiceUpdate.userId = targetUserId
       await manager
         .createQueryBuilder()
-        .update('invoices')
+        .update(Invoice)
         .set(invoiceUpdate)
         .where('user_alias_id = :sourceId', { sourceId: params.sourceUserAliasId })
         .execute()
@@ -1081,32 +1084,32 @@ export class StudentOnbService {
       // 4. Reassign StudentMemo
       await manager
         .createQueryBuilder()
-        .update('student_memo')
-        .set({ user_alias_id: params.targetUserAliasId })
+        .update(StudentMemo)
+        .set({ userAliasId: params.targetUserAliasId })
         .where('user_alias_id = :sourceId AND deleted_at IS NULL', { sourceId: params.sourceUserAliasId })
         .execute()
 
       // 5. Reassign CreditTransactions
       await manager
         .createQueryBuilder()
-        .update('credit_transactions')
-        .set({ user_alias_id: params.targetUserAliasId })
+        .update(CreditTransactions)
+        .set({ userAliasId: params.targetUserAliasId })
         .where('user_alias_id = :sourceId AND deleted_at IS NULL', { sourceId: params.sourceUserAliasId })
         .execute()
 
       // 6. Reassign StudentForm userAliasId (always — it has both userId and userAliasId columns)
       await manager
         .createQueryBuilder()
-        .update('student_form')
-        .set({ user_alias_id: params.targetUserAliasId })
+        .update(StudentForm)
+        .set({ userAliasId: params.targetUserAliasId })
         .where('user_alias_id = :sourceId AND deleted_at IS NULL', { sourceId: params.sourceUserAliasId })
         .execute()
 
-      // 7. Reassign DocumentCampaignRecipients (student_id is a UserAlias FK)
+      // 7. Reassign DocumentCampaignRecipients (studentId is a UserAlias FK)
       await manager
         .createQueryBuilder()
-        .update('document_campaign_recipients')
-        .set({ student_id: params.targetUserAliasId })
+        .update(DocumentCampaignRecipients)
+        .set({ studentId: params.targetUserAliasId })
         .where('student_id = :sourceId AND deleted_at IS NULL', { sourceId: params.sourceUserAliasId })
         .execute()
 
@@ -1114,8 +1117,8 @@ export class StudentOnbService {
       if (isDifferentUser) {
         await manager
           .createQueryBuilder()
-          .update('student_form')
-          .set({ user_id: targetUserId })
+          .update(StudentForm)
+          .set({ userId: targetUserId })
           .where('user_alias_id = :targetId AND institution_id = :institutionId AND deleted_at IS NULL', {
             targetId: params.targetUserAliasId,
             institutionId: params.institutionId,
@@ -1125,8 +1128,8 @@ export class StudentOnbService {
         if (movingEnrollIds.length > 0) {
           await manager
             .createQueryBuilder()
-            .update('student_lesson')
-            .set({ user_id: targetUserId })
+            .update(StudentLesson)
+            .set({ userId: targetUserId })
             .where(
               'user_id = :sourceUserId AND enroll_course_id IN (:...enrollIds) AND deleted_at IS NULL',
               { sourceUserId, enrollIds: movingEnrollIds }
@@ -1138,8 +1141,8 @@ export class StudentOnbService {
       // 9. Reparent any child aliases that point to the source
       await manager
         .createQueryBuilder()
-        .update('user_aliases')
-        .set({ child_of_user_alias_id: params.targetUserAliasId })
+        .update(UserAlias)
+        .set({ childOfUserAliasId: params.targetUserAliasId })
         .where('child_of_user_alias_id = :sourceId AND deleted_at IS NULL', { sourceId: params.sourceUserAliasId })
         .execute()
 
@@ -1157,8 +1160,8 @@ export class StudentOnbService {
       if (remainingAliases.length === 0) {
         await manager
           .createQueryBuilder()
-          .update('user_roles')
-          .set({ deleted_at: new Date() })
+          .update(UserRole)
+          .set({ deletedAt: new Date() })
           .where(
             'user_id = :sourceUserId AND institution_id = :institutionId AND is_student = true AND deleted_at IS NULL',
             { sourceUserId, institutionId: params.institutionId }
@@ -1169,8 +1172,8 @@ export class StudentOnbService {
       // Soft-delete the source alias
       await manager
         .createQueryBuilder()
-        .update('user_aliases')
-        .set({ deleted_at: new Date() })
+        .update(UserAlias)
+        .set({ deletedAt: new Date() })
         .where('id = :sourceId', { sourceId: params.sourceUserAliasId })
         .execute()
     })
