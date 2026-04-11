@@ -599,6 +599,18 @@ export class UpdateEnrollCourseDto extends StudentOnbBaseDto {
   isPaused?: boolean
 }
 
+export class MergeStudentDto extends StudentOnbBaseDto {
+  @ApiProperty({ example: 1 })
+  @IsNotEmpty()
+  @IsNumber()
+  sourceUserAliasId: number
+
+  @ApiProperty({ example: 2 })
+  @IsNotEmpty()
+  @IsNumber()
+  targetUserAliasId: number
+}
+
 export class UpdateInvoicePaymentStateDto extends StudentOnbBaseDto {
   @ApiProperty({
     example: 1,

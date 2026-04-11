@@ -81,6 +81,7 @@ import {
   StudentChangeLessonOptDto,
   StudentCouponDto,
   StudentFormDto,
+  MergeStudentDto,
   StudentOnbDeleteDto,
   StudentOnbDetailtByAliasIdDto,
   StudentOnbFilterListDto,
@@ -174,6 +175,20 @@ export class StudentOnbController {
   @RequireParams(RequireParam.INSTITUTION_ID)
   async delete(@Body() params: StudentOnbDeleteDto): Promise<User[]> {
     return await this.studentOnboardService.deleteStudentRecord(params)
+  }
+
+  @Post('merge-student')
+  @ApiOperation({
+    summary: 'Merge all data from one student alias into another, then soft-delete the source.',
+  })
+  @ApiOkResponse({ type: ApiResult })
+  @ApiBadRequestResponse({ description: 'Source or target alias not found' })
+  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @UseGuards(RolesGuard)
+  @RequireParams(RequireParam.INSTITUTION_ID)
+  async mergeStudent(@Body() params: MergeStudentDto) {
+    const result = await this.studentOnboardService.mergeStudentRecord(params)
+    return new ApiResult().success(result)
   }
 
   @Post('create')

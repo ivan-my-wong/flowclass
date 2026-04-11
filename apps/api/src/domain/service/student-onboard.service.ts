@@ -31,6 +31,7 @@ import {
   StudentOnbDetailtByAliasIdDto,
   StudentOnbFilterListDto,
   StudentOnbListDto,
+  MergeStudentDto,
   UpdateEnrollCourseDto,
   UpdateLessonAttendanceDto,
   UpdateStatusDto,
@@ -1028,6 +1029,153 @@ export class StudentOnbService {
 
     // await this.userRepository.softRemove(users)
     return users
+  }
+
+  async mergeStudentRecord(params: MergeStudentDto): Promise<UserAlias> {
+    const sourceAlias = await this.userAliasesRepository.findOne({
+      where: { id: params.sourceUserAliasId, institutionId: params.institutionId },
+    })
+    const targetAlias = await this.userAliasesRepository.findOne({
+      where: { id: params.targetUserAliasId, institutionId: params.institutionId },
+    })
+
+    if (!sourceAlias) throw new ApiError(ErrorCode.STUDENT_NOT_FOUND)
+    if (!targetAlias) throw new ApiError(ErrorCode.STUDENT_NOT_FOUND)
+
+    const isDifferentUser = sourceAlias.userId !== targetAlias.userId
+    const sourceUserId = sourceAlias.userId
+    const targetUserId = targetAlias.userId
+
+    await this.dataSource.transaction(async (manager) => {
+      // 1. Collect enrollCourse IDs being moved (needed for StudentLesson update)
+      const movingEnrollCourses = await manager
+        .createQueryBuilder()
+        .select('ec.id', 'id')
+        .from('enroll_courses', 'ec')
+        .where('ec.user_alias_id = :sourceId AND ec.deleted_at IS NULL', { sourceId: params.sourceUserAliasId })
+        .getRawMany()
+      const movingEnrollIds = movingEnrollCourses.map((r) => r.id)
+
+      // 2. Reassign EnrollCourse
+      const enrollUpdate: Record<string, any> = { user_alias_id: params.targetUserAliasId }
+      if (isDifferentUser) enrollUpdate.user_id = targetUserId
+      if (movingEnrollIds.length > 0) {
+        await manager
+          .createQueryBuilder()
+          .update('enroll_courses')
+          .set(enrollUpdate)
+          .where('user_alias_id = :sourceId', { sourceId: params.sourceUserAliasId })
+          .execute()
+      }
+
+      // 3. Reassign Invoice
+      const invoiceUpdate: Record<string, any> = { user_alias_id: params.targetUserAliasId }
+      if (isDifferentUser) invoiceUpdate.user_id = targetUserId
+      await manager
+        .createQueryBuilder()
+        .update('invoices')
+        .set(invoiceUpdate)
+        .where('user_alias_id = :sourceId', { sourceId: params.sourceUserAliasId })
+        .execute()
+
+      // 4. Reassign StudentMemo
+      await manager
+        .createQueryBuilder()
+        .update('student_memo')
+        .set({ user_alias_id: params.targetUserAliasId })
+        .where('user_alias_id = :sourceId AND deleted_at IS NULL', { sourceId: params.sourceUserAliasId })
+        .execute()
+
+      // 5. Reassign CreditTransactions
+      await manager
+        .createQueryBuilder()
+        .update('credit_transactions')
+        .set({ user_alias_id: params.targetUserAliasId })
+        .where('user_alias_id = :sourceId AND deleted_at IS NULL', { sourceId: params.sourceUserAliasId })
+        .execute()
+
+      // 6. Reassign StudentForm userAliasId (always — it has both userId and userAliasId columns)
+      await manager
+        .createQueryBuilder()
+        .update('student_form')
+        .set({ user_alias_id: params.targetUserAliasId })
+        .where('user_alias_id = :sourceId AND deleted_at IS NULL', { sourceId: params.sourceUserAliasId })
+        .execute()
+
+      // 7. Reassign DocumentCampaignRecipients (student_id is a UserAlias FK)
+      await manager
+        .createQueryBuilder()
+        .update('document_campaign_recipients')
+        .set({ student_id: params.targetUserAliasId })
+        .where('student_id = :sourceId AND deleted_at IS NULL', { sourceId: params.sourceUserAliasId })
+        .execute()
+
+      // 8. If different users — also update userId on StudentForm and StudentLesson
+      if (isDifferentUser) {
+        await manager
+          .createQueryBuilder()
+          .update('student_form')
+          .set({ user_id: targetUserId })
+          .where('user_alias_id = :targetId AND institution_id = :institutionId AND deleted_at IS NULL', {
+            targetId: params.targetUserAliasId,
+            institutionId: params.institutionId,
+          })
+          .execute()
+
+        if (movingEnrollIds.length > 0) {
+          await manager
+            .createQueryBuilder()
+            .update('student_lesson')
+            .set({ user_id: targetUserId })
+            .where(
+              'user_id = :sourceUserId AND enroll_course_id IN (:...enrollIds) AND deleted_at IS NULL',
+              { sourceUserId, enrollIds: movingEnrollIds }
+            )
+            .execute()
+        }
+      }
+
+      // 9. Reparent any child aliases that point to the source
+      await manager
+        .createQueryBuilder()
+        .update('user_aliases')
+        .set({ child_of_user_alias_id: params.targetUserAliasId })
+        .where('child_of_user_alias_id = :sourceId AND deleted_at IS NULL', { sourceId: params.sourceUserAliasId })
+        .execute()
+
+      // 10. Clean up userRole if this was the last alias for that user in this institution
+      const remainingAliases = await manager
+        .createQueryBuilder()
+        .select('ua.id', 'id')
+        .from('user_aliases', 'ua')
+        .where(
+          'ua.user_id = :sourceUserId AND ua.institution_id = :institutionId AND ua.id != :sourceId AND ua.deleted_at IS NULL',
+          { sourceUserId, institutionId: params.institutionId, sourceId: params.sourceUserAliasId }
+        )
+        .getRawMany()
+
+      if (remainingAliases.length === 0) {
+        await manager
+          .createQueryBuilder()
+          .update('user_roles')
+          .set({ deleted_at: new Date() })
+          .where(
+            'user_id = :sourceUserId AND institution_id = :institutionId AND is_student = true AND deleted_at IS NULL',
+            { sourceUserId, institutionId: params.institutionId }
+          )
+          .execute()
+      }
+
+      // Soft-delete the source alias
+      await manager
+        .createQueryBuilder()
+        .update('user_aliases')
+        .set({ deleted_at: new Date() })
+        .where('id = :sourceId', { sourceId: params.sourceUserAliasId })
+        .execute()
+    })
+
+    return targetAlias
   }
 
   async updateStatus(params: UpdateStatusDto, currentUser) {
