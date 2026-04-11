@@ -93,7 +93,7 @@ export class InvoiceCampaignController {
   }
 
   @Patch(':documentId/send-campaign')
-  @ApiOperation({ summary: 'Send invoice to designated contact for a campaign' })
+  @ApiOperation({ summary: 'Send invoice to designated contact for a campaign (initial send)' })
   @RequireParams(RequireParam.INSTITUTION_ID)
   @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
   @UseGuards(RolesGuard, RequireParamsGuard)
@@ -109,6 +109,30 @@ export class InvoiceCampaignController {
     jobId: string
   }> {
     return this.invoiceCampaignService.sendInvoiceSynchronous(documentId, institutionId, payload, currentUser.id)
+  }
+
+  @Patch(':documentId/edit-and-resend')
+  @ApiOperation({
+    summary: 'Edit and re-send a completed invoice campaign, preserving the original amountPaid',
+  })
+  @RequireParams(RequireParam.INSTITUTION_ID)
+  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @UseGuards(RolesGuard, RequireParamsGuard)
+  @ApiBody({ type: SendInvoiceDto })
+  @ApiResponse({ status: HttpStatus.ACCEPTED, description: 'Invoice updated and re-sent successfully' })
+  @HttpCode(HttpStatus.ACCEPTED)
+  async editAndResendInvoice(
+    @Query('institutionId', ParseIntPipe) institutionId: number,
+    @Param('documentId', ParseIntPipe) documentId: number,
+    @Body() payload: SendInvoiceDto,
+    @CurrentUser() currentUser: User
+  ): Promise<{ jobId: string }> {
+    return this.invoiceCampaignService.editAndResendInvoiceCampaign(
+      documentId,
+      institutionId,
+      payload,
+      currentUser.id
+    )
   }
 
   @Get(':documentId/detail')

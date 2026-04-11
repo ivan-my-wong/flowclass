@@ -569,6 +569,38 @@ export class InvoiceCampaignService {
     }
   }
 
+  /**
+   * Edit and re-send an already-sent invoice campaign.
+   *
+   * Unlike `sendInvoiceSynchronous` (which is used for first-time sends),
+   * this method validates that the campaign already has linked invoice records
+   * (invoiceIds). Those existing invoices are updated in-place, preserving
+   * the original `amountPaid` and setting `paymentState` to PARTIALLY_PAID
+   * when the new total exceeds what was already collected.
+   */
+  async editAndResendInvoiceCampaign(
+    documentCampaignId: number,
+    institutionId: number,
+    dto: SendInvoiceDto,
+    createdByUserId: number
+  ) {
+    const documentCampaign = await this.getOneInvoiceCampaign(documentCampaignId, institutionId)
+
+    if (!documentCampaign.invoiceIds?.length) {
+      throw new NotFoundException(
+        `Campaign ${documentCampaignId} has no existing invoices. Use /send-campaign for the initial send.`
+      )
+    }
+
+    const jobId = randomUUID()
+    this.sendInvoices(documentCampaign, institutionId, dto, jobId, createdByUserId)
+
+    return {
+      jobId,
+      document: documentCampaign,
+    }
+  }
+
   async sendInvoices(
     documentCampaign: DocumentCampaign,
     institutionId: number,
@@ -1333,18 +1365,22 @@ export class InvoiceCampaignService {
       newInvoice.currency = currency
     }
     const parentUserAliasId = userAlias.childOfUserAliasId ?? userAlias.id
-    const originalWasPaid = tempInvoice?.paymentState === PaymentStatus.PAID
-    if (originalWasPaid) {
-      // Editing a paid invoice: preserve amountPaid, adjust paymentState only
-      const preservedAmountPaid = tempInvoice.amountPaid ?? 0
-      newInvoice.amountPaid = preservedAmountPaid
-      if (payAmount > preservedAmountPaid) {
-        // New total exceeds what was already paid → partially paid
+    // Use amountPaid > 0 rather than paymentState === PAID so that
+    // PARTIALLY_PAID invoices are also protected — any collected amount
+    // must be preserved unconditionally once an invoice exists.
+    const collectedAmount = tempInvoice?.amountPaid ?? 0
+    const hasCollectedPayment = !!tempInvoice && collectedAmount > 0
+    if (hasCollectedPayment) {
+      // Editing an invoice that has been at least partially paid:
+      // lock amountPaid and derive paymentState from the new total.
+      newInvoice.amountPaid = collectedAmount
+      if (payAmount > collectedAmount) {
+        // New total exceeds what was collected → still owes a balance
         newInvoice.paymentState = PaymentStatus.PARTIALLY_PAID
       } else {
-        // New total <= amountPaid → still fully paid; credit the difference
+        // New total <= amount collected → fully settled; credit the excess
         newInvoice.paymentState = PaymentStatus.PAID
-        const excess = preservedAmountPaid - payAmount
+        const excess = collectedAmount - payAmount
         if (excess > 0) {
           const refundUserAliasId = userAlias.childOfUserAliasId ?? userAlias.id
           await this.creditManagementService.addCredit(institutionId, {
@@ -1356,9 +1392,9 @@ export class InvoiceCampaignService {
           })
         }
       }
-      // Never apply payByCredit on an already-paid invoice
+      // Never apply payByCredit on an invoice that already has a collected amount
     } else {
-      // New invoice or originally unpaid: normal payment state flow
+      // New invoice or existing invoice with zero collected: normal flow
       newInvoice.paymentState = PaymentStatus.PENDING
       if (invoice.isPayByCredit && parentUserAliasId) {
         const parentUserAlias = await this.userAliasRepository.findOneById(parentUserAliasId)
