@@ -23,6 +23,7 @@ import {
   getStudentNotification,
   getStudentsByCustomFieldFilter,
   getStudentsByPhone,
+  mergeStudent,
   removeFromParentGroup,
   setParentAccount,
   submitStudentNotification,
@@ -314,6 +315,26 @@ const useStudentData = () => {
         addToParentGroup({ ...data, institutionId: currentSchoolId }),
       onSuccess: () => {
         toast.success(t('student:parentAccount.successAddToParentGroup'))
+      },
+      onError: (error: ApiError) => {
+        handleApiError({ error, t })
+      },
+    })
+  }
+
+  const useMergeStudent = () => {
+    return useMutation({
+      mutationFn: (data: {
+        sourceUserAliasId: number
+        targetUserAliasId: number
+      }) =>
+        mergeStudent({
+          ...data,
+          institutionId: currentSchoolId,
+          siteId: currentSiteId,
+        }),
+      onSuccess: () => {
+        toast.success(t('student:merge.successMerge'))
       },
       onError: (error: ApiError) => {
         handleApiError({ error, t })
