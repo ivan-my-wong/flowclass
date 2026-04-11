@@ -49,9 +49,21 @@ export const sendInvoiceCampaign = async (
 ): Promise<SendingResponse> => {
   const response = await apiClient.patch({
     url: `/admin/invoice-campaign/${documentId}/send-campaign`,
-    params: {
-      institutionId,
-    },
+    params: { institutionId },
+    data: payload,
+  })
+  return response?.data?.data
+}
+
+/** Re-send a completed invoice campaign, preserving the original amountPaid. */
+export const editAndResendInvoiceCampaign = async (
+  institutionId: number,
+  documentId: string,
+  payload: InvoiceCampaignDto
+): Promise<SendingResponse> => {
+  const response = await apiClient.patch({
+    url: `/admin/invoice-campaign/${documentId}/edit-and-resend`,
+    params: { institutionId },
     data: payload,
   })
   return response?.data?.data

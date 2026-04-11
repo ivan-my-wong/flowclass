@@ -13,6 +13,7 @@ import {
 } from './enrollCourse'
 import { type PriceOption } from './regularClass'
 import { type StudentSchedule } from './student'
+import { BulkSendDocumentStatus } from './templateManagement'
 
 // Minimal interface to break circular reference with templateManagement.ts
 export interface PickedInvoiceCampaign {
@@ -303,6 +304,7 @@ export type InvoiceCampaignDto = SendInvoiceBaseDto & {
   isCombined: boolean
   title: string
   isDraft: boolean
+  status?: BulkSendDocumentStatus
   invoices: InvoiceCampaignDetailDto[]
   combinedInvoice?: InvoiceCampaignDetailDto
   splitType?: InvoiceSplitType

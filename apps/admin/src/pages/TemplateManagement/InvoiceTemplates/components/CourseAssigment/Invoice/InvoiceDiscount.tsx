@@ -200,7 +200,10 @@ const InvoiceDiscount = (): JSX.Element => {
             {t('invoice.discount.additionalFee')}
           </div>
           <div className="font-semibold text-blue-600">
-            {`+${formatCurrency(calculatedDiscount.additionalFee ?? 0, currency)}`}
+            {`+${formatCurrency(
+              calculatedDiscount.additionalFee ?? 0,
+              currency
+            )}`}
           </div>
         </div>
         <Separator className="bg-gray-200 mb-2" />

@@ -207,6 +207,21 @@
     "selectStudentToViewCourse": "選擇學生以查看已分配的課程",
     "send": {
       "allDone": "全部完成！",
+      "allDoneWhatsApp": "發票已創建 — 您現在可以透過 WhatsApp 發送",
+      "waitingForInvoices": "等待發票創建中...",
+      "table": {
+        "name": "學生",
+        "amount": "金額",
+        "status": "狀態",
+        "completed": "已完成"
+      },
+      "status": {
+        "sent": "已發送",
+        "created": "已創建",
+        "failed": "失敗",
+        "processing": "處理中",
+        "pending": "等待中"
+      },
       "contentPlaceholder": "您好 [studentName]，\n\n請查看附件中的發票。\n\n此致敬禮，\n[schoolName]",
       "contentRequired": "內容必填",
       "createdInvoices": "已創建發票",
@@ -240,6 +255,7 @@
       "whatsappPlaceholder": "您好 [studentName]，\n\n請查看附件中的發票。\n\n此致敬禮，\n[schoolName]",
       "steps": {
         "step1Title": "步驟 1：選擇折扣與積分",
+        "step1Preview": "步驟 1：預覽發票",
         "step2PaymentInstallments": "步驟 2：選擇付款分期",
         "step2SendNotification": "步驟 2：發送通知",
         "billTo": "帳單收件人"

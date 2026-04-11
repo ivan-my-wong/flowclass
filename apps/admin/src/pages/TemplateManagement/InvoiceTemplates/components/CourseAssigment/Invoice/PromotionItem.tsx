@@ -61,13 +61,21 @@ const PromotionItem: React.FC<Props> = ({ promo, isApplied }): JSX.Element => {
   // Package discount qualification check
   const availableLessonsByClass = useRecoilValue(availableLessonsByClassState)
   const allSessions = useRecoilValue(invoiceSessionState)
-  const currentClasses = useRecoilValue(invoiceClassesState)
+  const allInvoiceClasses = useRecoilValue(invoiceClassesState)
+  // Only check the current student's classes — not all students' classes
+  const currentClasses = useMemo(
+    () =>
+      allInvoiceClasses.filter(
+        c => c.studentItem.id === currentActiveStudent?.id
+      ),
+    [allInvoiceClasses, currentActiveStudent]
+  )
 
   const isPackageQualified = useMemo(() => {
     if (promo.promotionType !== PromotionTypeItem.PACKAGE) return false
     const pd = promo as any
-    // Check each class in the invoice for qualification
-    return currentClasses.some(invoiceClass => {
+    // Check only this student's classes for qualification
+    for (const invoiceClass of currentClasses) {
       const { classId } = invoiceClass
       const isApplicable =
         pd.isAllClasses || pd.applicableClassIds?.includes(classId)
@@ -81,11 +89,9 @@ const PromotionItem: React.FC<Props> = ({ promo, isApplied }): JSX.Element => {
 
   const isPackageAlreadyApplied = useMemo(() => {
     if (promo.promotionType !== PromotionTypeItem.PACKAGE) return false
+    // PackageDiscountAutoApplyAll stores id as a number (pd.id) — match by value
     return (appliedPromotions ?? []).some(
-      p =>
-        p.type === PromotionTypeItem.PACKAGE &&
-        typeof p.id === 'string' &&
-        p.id.startsWith(`package-${promo.id}-`)
+      p => p.type === PromotionTypeItem.PACKAGE && p.id === promo.id
     )
   }, [promo, appliedPromotions])
 

@@ -30,6 +30,7 @@ import {
 } from '@/stores/studentInvoice.store'
 import { BundleDiscount } from '@/types/bundleDiscounts'
 import { DiscountType } from '@/types/coupon'
+import { BulkSendDocumentStatus } from '@/types/templateManagement'
 import {
   AllPromotionsType,
   AppliedPromotion,
@@ -607,10 +608,20 @@ export const InvoiceEditDialogProvider = ({
       return item.studentId === currentActiveStudent?.id
     })
 
-    // If the campaign is linked to an actual invoice, use the stored DB columns
-    // as ground truth rather than re-computing from appliedPromotions (which may
-    // have drifted due to rate changes or lesson count differences).
-    if (currentActiveStudent?.discountAmount !== undefined) {
+    // For COMPLETED campaigns, use the stored DB columns as ground truth rather
+    // than re-computing from appliedPromotions. For editable campaigns (even
+    // when linked to an actual invoice), always compute from current promotions
+    // so user edits (adding/removing discounts) are reflected immediately.
+    // Use stored DB columns only for completed campaigns where the user hasn't
+    // actively changed any promotions. Once appliedPromotions is non-empty, the
+    // user is editing live — compute from those instead.
+    const isCompleted =
+      invoiceCampaign?.status === BulkSendDocumentStatus.COMPLETED
+    if (
+      isCompleted &&
+      currentActiveStudent?.discountAmount !== undefined &&
+      appliedPromotions.length === 0
+    ) {
       const computed = calculateTotalDiscount(currentPrice, studentPromotions)
       const storedDiscount = currentActiveStudent.discountAmount
       const storedAdditionalFee = currentActiveStudent.additionalFee ?? 0
@@ -632,6 +643,7 @@ export const InvoiceEditDialogProvider = ({
     totalPrice?.totalPrice,
     currentActiveStudent?.subTotal,
     invoiceCampaign?.isCombined,
+    invoiceCampaign?.status,
     currentActiveParent?.id,
     currentActiveStudent?.id,
   ])

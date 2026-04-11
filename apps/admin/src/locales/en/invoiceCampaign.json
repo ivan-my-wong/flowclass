@@ -195,6 +195,21 @@
     "selectStudentToViewCourse": "Select a student to view assigned courses",
     "send": {
       "allDone": "All Done!",
+      "allDoneWhatsApp": "Invoices created — you can now send via WhatsApp",
+      "waitingForInvoices": "Waiting for invoices to be created...",
+      "table": {
+        "name": "Student",
+        "amount": "Amount",
+        "status": "Status",
+        "completed": "completed"
+      },
+      "status": {
+        "sent": "Sent",
+        "created": "Created",
+        "failed": "Failed",
+        "processing": "Processing",
+        "pending": "Pending"
+      },
       "nextStep": "Next Step",
       "contentPlaceholder": "Hi [studentName],\n\nPlease find your invoice attached.\n\nBest regards,\n[schoolName]",
       "contentRequired": "Content is required",
@@ -229,6 +244,7 @@
       "whatsappPlaceholder": "Hi [studentName],\n\nPlease find your invoice attached.\n\nBest regards,\n[schoolName]",
       "steps": {
         "step1Title": "Step 1: Select Discounts & Credits",
+        "step1Preview": "Step 1: Preview Invoices",
         "step2PaymentInstallments": "Step 2: Select Payment Installments",
         "step2SendNotification": "Step 2: Send Notification",
         "billTo": "Bill to"
