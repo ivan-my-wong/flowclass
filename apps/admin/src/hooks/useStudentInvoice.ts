@@ -29,6 +29,7 @@ import {
   PossiblePromotionsType,
   PromotionTypeItem,
 } from '@/types/studentInvoice.type'
+import { PackageDiscount } from '@/types/packageDiscounts'
 
 import useAuth from './useAuth'
 
@@ -36,7 +37,7 @@ interface HookResult {
   useGetAllStudents: () => UseQueryResult<StudentEnrolmentRecord[]>
 
   useGetAllPromotions: () => UseQueryResult<
-    (PossiblePromotionsType | BundleDiscount)[],
+    (PossiblePromotionsType | BundleDiscount | (PackageDiscount & { promotionType: PromotionTypeItem }))[],
     ApiError
   >
 

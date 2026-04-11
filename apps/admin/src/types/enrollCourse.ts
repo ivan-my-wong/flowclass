@@ -295,6 +295,7 @@ export type PaymentProofTableItem = {
   splitItems?: InvoiceSplit[]
 
   remark?: string
+  invoicePromotionsUsed?: InvoicePromotionUsedItem[]
 }
 
 export type MultipleClassMapping = {

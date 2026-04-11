@@ -8,7 +8,7 @@ import { TiEye } from 'react-icons/ti'
 import { useMutation } from 'react-query'
 import { toast } from 'sonner'
 
-import { updateInvoicePaymentState } from '@/api/student'
+import { updateAmountPaid, updateInvoicePaymentState } from '@/api/student'
 import LoadingButton from '@/components/Buttons/LoadingButton'
 import Box from '@/components/Containers/Box'
 import PaymentEvidenceReceiptPopup from '@/components/Popups/PaymentEvidenceReceiptPopup'
@@ -57,6 +57,7 @@ export const PaymentReceiptStatusCell = ({
     paymentState: _paymentState,
     paymentMethod,
     paymentEvidence: uploadedEvidence,
+    payAmount,
   } = params
 
   const [uploadPaymentEvidenceStatus, setUploadPaymentEvidenceStatus] =
@@ -66,6 +67,7 @@ export const PaymentReceiptStatusCell = ({
 
   const [paymentState, setPaymentState] = useState<PaymentState>(_paymentState)
   const [isManualModalOpen, setIsManualModalOpen] = useState(false)
+  const [isPaidConfirmOpen, setIsPaidConfirmOpen] = useState(false)
 
   const isNeedToCheck = useMemo(() => {
     if (paymentMethod === PaymentMethodsEnum.PAY_NOW) return false
@@ -102,6 +104,42 @@ export const PaymentReceiptStatusCell = ({
       },
     }
   )
+
+  const { mutate: confirmMarkAsPaid, isLoading: isMarkingAsPaid } = useMutation(
+    async () => {
+      const amount = Number(payAmount ?? 0)
+      await updateAmountPaid(institutionId, {
+        invoiceId: id,
+        amountPaid: amount,
+      })
+      await updateInvoicePaymentState({
+        invoiceId: id,
+        siteId,
+        institutionId,
+        paymentState: PaymentState.PAID,
+      })
+    },
+    {
+      onSuccess: () => {
+        setPaymentState(PaymentState.PAID)
+        setIsPaidConfirmOpen(false)
+        setIsManualModalOpen(false)
+        refetch?.()
+        onPaymentStateUpdate?.()
+      },
+      onError: () => {
+        toast.error(t('common:error.unexpectedError'))
+      },
+    }
+  )
+
+  const handleStateClick = (state: PaymentState) => {
+    if (state === PaymentState.PAID) {
+      setIsPaidConfirmOpen(true)
+    } else {
+      applyState(state)
+    }
+  }
 
   const renderTrigger =
     (buttonText: string, isDisabled = false, variant = 'subtle') =>
@@ -224,12 +262,45 @@ export const PaymentReceiptStatusCell = ({
                 variant="outline"
                 className="w-full justify-center py-2"
                 loading={isApplyingState}
-                onClick={() => applyState(state)}
+                onClick={() => handleStateClick(state)}
               >
                 {t(labelKey)}
               </Button>
             ))}
           </div>
+        </ModalDialog>
+
+        <ModalDialog
+          open={isPaidConfirmOpen}
+          onOpenChange={setIsPaidConfirmOpen}
+          title={t('student:paymentProof.approved') as string}
+          className="max-w-sm"
+          footer={
+            <>
+              <Button
+                variant="outline"
+                onClick={() => setIsPaidConfirmOpen(false)}
+              >
+                {t('common:action.cancel')}
+              </Button>
+              <Button
+                variant="default"
+                loading={isMarkingAsPaid}
+                onClick={() => confirmMarkAsPaid()}
+              >
+                {t('common:action.confirm')}
+              </Button>
+            </>
+          }
+        >
+          <p className="text-sm text-gray-600 px-1">
+            {t('student:paymentProof.confirmMarkAsPaidDesc', {
+              amount: payAmount ?? 0,
+              defaultValue:
+                `The amount paid will be set to ${payAmount ?? 0}.` +
+                ' The invoice will be marked as fully paid.',
+            })}
+          </p>
         </ModalDialog>
       </Box>
     )

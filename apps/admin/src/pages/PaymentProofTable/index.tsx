@@ -671,7 +671,6 @@ const PaymentProofPage = (): JSX.Element => {
     },
     {
       headerName: t('student:promotionUsed') as string,
-      field: 'promotionUsed',
       cellRenderer: ({ data }: ICellRendererParams<PaymentProofTableItem>) => {
         const currency = siteData.currentSite?.currency ?? ''
         return <PromotionCell currency={currency} data={data} t={t} />
@@ -935,7 +934,8 @@ const PaymentProofPage = (): JSX.Element => {
             hasCheckboxSelection
             rowData={filteredStudentList}
             useUrlSearch
-            columns={courseStudentTable}
+            hasCheckboxSelection
+            columns={courseStudentTable ?? []}
             isLoading={isLoadingStudentList || isFetchingStudentList}
             gridRef={gridRef}
             inputRef={inputRef}

@@ -160,7 +160,7 @@ const InvoiceEditor = (): JSX.Element => {
         const actualInvoices = invoiceCampaign.invoices ?? []
         const students = (invoices ?? []).map(invoice => {
           const matchedActualInvoice = actualInvoices.find(
-            ai => ai.userAliasId === invoice.userAliasId
+            ai => ai.userAlias?.id === invoice.userAliasId
           )
           const formatApliedPromotions = (invoice?.discounts ?? []).map(
             appliedItem => {
@@ -217,6 +217,7 @@ const InvoiceEditor = (): JSX.Element => {
             childOfUserAliasId: invoice?.childOfUserAliasId ?? null,
             isStudentParent: studentData?.isStudentParent ?? false,
             isSendToParent,
+            total: 0,
             paymentDate: invoice.paymentDate
               ? new Date(invoice.paymentDate)
               : null,
@@ -689,8 +690,10 @@ const InvoiceEditor = (): JSX.Element => {
                     className="min-w-fit"
                     value={existingInvoiceCampaign?.isCombined ?? false}
                     onChange={onChangeMode}
-                    trueLabel={t('invoiceCampaign:editor.single') as string}
-                    falseLabel={t('invoiceCampaign:editor.multiple') as string}
+                    trueLabel={t('invoiceCampaign:editor.combined') as string}
+                    falseLabel={
+                      t('invoiceCampaign:editor.individual') as string
+                    }
                   />
                 </TooltipTrigger>
                 {!isOneSingleParent && (

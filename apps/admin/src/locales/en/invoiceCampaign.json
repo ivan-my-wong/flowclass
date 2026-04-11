@@ -52,8 +52,8 @@
   "editor": {
     "addAllLessonsOfCurrentSchedule": "Add All Lessons of Current Schedule",
     "addCourse": "Add Course",
-    "single": "Single Invoice",
-    "multiple": "Multiple Invoices",
+    "combined": "Combined Invoice",
+    "individual": "Individual Invoices",
     "combineInvoiceTooltip": "All users must belong to the same family group in order to combine the invoice",
     "addCourseFromList": "Add Courses from the list",
     "addCourseWithSchedule": "Add Course with Schedule",

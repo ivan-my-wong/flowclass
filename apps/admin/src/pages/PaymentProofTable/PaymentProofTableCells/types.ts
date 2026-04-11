@@ -10,6 +10,7 @@ export interface IPaymentReceiptCellProps {
     paymentMethod: string
     paymentEvidence: PaymentEvidence
     proofToken: string
+    payAmount?: string | number
   }
   paymentEvidenceList?: PaymentEvidence[]
   onPaymentStateUpdate?: () => void

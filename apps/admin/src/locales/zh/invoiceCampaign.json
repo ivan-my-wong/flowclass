@@ -174,7 +174,7 @@
     "isRecurringPayment": "是否為定期付款？",
     "minutes": "{{count}} 分鐘",
     "minutes_plural": "{{count}} 分鐘",
-    "multiple": "多張發票",
+    "individual": "個別發票",
     "multiplePrices": {
       "max": "最大：{{count}} 課時",
       "min": "最小：{{count}} 課時",
@@ -265,7 +265,7 @@
     "sendInvoiceDocuments": "發送發票文檔",
     "sendInvoices": "創建發票",
     "sessionsSelected": "已選擇 {{count}} 課時",
-    "single": "單獨發票",
+    "combined": "合併發票",
     "studentSelect": {
       "description": "選擇學生來分配課程",
       "replaceAllStudent": "加入所有學生 ({{count}})",

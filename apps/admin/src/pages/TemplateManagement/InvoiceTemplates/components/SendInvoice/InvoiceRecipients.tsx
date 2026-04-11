@@ -168,7 +168,7 @@ const InvoiceRecipients = (): JSX.Element => {
   const columnDefs = useMemo(
     (): ColDef<RecipientRow>[] => [
       {
-        headerName: t('invoiceCampaign:editor.invoiceTable.send'),
+        headerName: t('invoiceCampaign:editor.invoiceTable.send') as string,
         width: 80,
         minWidth: 80,
         maxWidth: 80,
@@ -179,7 +179,7 @@ const InvoiceRecipients = (): JSX.Element => {
         cellRenderer: SendCellRenderer,
       },
       {
-        headerName: t('invoiceCampaign:editor.invoiceTable.customer'),
+        headerName: t('invoiceCampaign:editor.invoiceTable.customer') as string,
         flex: 2,
         minWidth: 160,
         filter: false,
@@ -188,7 +188,7 @@ const InvoiceRecipients = (): JSX.Element => {
         cellRenderer: NameCellRenderer,
       },
       {
-        headerName: t('invoiceCampaign:editor.invoiceTable.email'),
+        headerName: t('invoiceCampaign:editor.invoiceTable.email') as string,
         flex: 2,
         minWidth: 140,
         filter: false,
@@ -202,7 +202,7 @@ const InvoiceRecipients = (): JSX.Element => {
         },
       },
       {
-        headerName: t('invoiceCampaign:editor.invoiceTable.phone'),
+        headerName: t('invoiceCampaign:editor.invoiceTable.phone') as string,
         width: 150,
         filter: false,
         sortable: false,
@@ -217,7 +217,7 @@ const InvoiceRecipients = (): JSX.Element => {
       {
         headerName: t(
           'invoiceCampaign:editor.invoicePreview.invoiceItem.total'
-        ),
+        ) as string,
         width: 120,
         filter: false,
         sortable: false,
