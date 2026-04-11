@@ -12,8 +12,8 @@ import { Card } from '@/components/ui/Card'
 import ModalDialog from '@/components/ui/ModalDialog'
 import { DEFAULT_CURRENCY } from '@/constants/invoices'
 import useInvoiceCampaignData from '@/hooks/useInvoiceCampaignData'
-import useSiteData from '@/hooks/useSiteData'
 import { useSendingCampaign } from '@/hooks/useSendingCampaign'
+import useSiteData from '@/hooks/useSiteData'
 import { schoolState } from '@/stores/schoolData'
 import { siteState } from '@/stores/siteData'
 import {
@@ -122,7 +122,8 @@ const IndividualPreviewStep = (): JSX.Element => {
   const { t } = useTranslation(['invoiceCampaign'])
   const { currentSite } = useSiteData()
   const currency = currentSite?.currency ?? DEFAULT_CURRENCY
-  const [invoiceStudents, setInvoiceStudents] = useRecoilState(invoiceStudentState)
+  const [invoiceStudents, setInvoiceStudents] =
+    useRecoilState(invoiceStudentState)
   const allClasses = useRecoilValue(invoiceClassesState)
 
   const [pageIndex, setPageIndex] = useState(0)
@@ -569,9 +570,7 @@ const DialogSendInvoice = (): JSX.Element => {
         <p className="text-sm text-gray-600 text-center">
           {currentStep === 1
             ? step1Label
-            : t(
-                'invoiceCampaign:editor.send.steps.step2SendNotification'
-              )}
+            : t('invoiceCampaign:editor.send.steps.step2SendNotification')}
         </p>
       </div>
 

@@ -227,63 +227,67 @@ const ListInvoices: FC<Props> = ({ onShowRecipients }) => {
           )
         },
       },
-    },
-    {
-      headerName: t('invoiceCampaign:editor.invoiceTable.customer') as string,
-      field: 'title',
-      flex: 2,
-      minWidth: 200,
-      filter: false,
-      cellClass: '!flex !items-center',
-      cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
-        if (!data) return null
-        const label = buildStudentNamesLabel(
-          data,
-          t('invoiceCampaign:untitledCampaign')
-        )
-        return <span className="font-medium text-gray-900">{label}</span>
+      {
+        headerName: t('invoiceCampaign:editor.invoiceTable.customer') as string,
+        field: 'title',
+        flex: 2,
+        minWidth: 200,
+        filter: false,
+        cellClass: '!flex !items-center',
+        cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
+          if (!data) return null
+          const label = buildStudentNamesLabel(
+            data,
+            t('invoiceCampaign:untitledCampaign')
+          )
+          return <span className="font-medium text-gray-900">{label}</span>
+        },
       },
-    },
-    {
-      headerName: t('student:column.lastUpdated') as string,
-      field: 'createdAt',
-      width: 175,
-      filter: false,
-      cellClass: '!flex !items-center',
-      cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
-        if (!data) return null
-        const parentInvoice = data.invoices?.find(d => d.isParent)
-        const date = parentInvoice?.createdAt || data.updatedAt || data.createdAt
-        return (
-          <span className="text-sm text-gray-500">
-            {date ? dayjs(date).format('DD MMM YYYY, HH:mm') : '-'}
-          </span>
-        )
+      {
+        headerName: t('student:column.lastUpdated') as string,
+        field: 'createdAt',
+        width: 175,
+        filter: false,
+        cellClass: '!flex !items-center',
+        cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
+          if (!data) return null
+          const parentInvoice = data.invoices?.find(d => d.isParent)
+          const date =
+            parentInvoice?.createdAt || data.updatedAt || data.createdAt
+          return (
+            <span className="text-sm text-gray-500">
+              {date ? dayjs(date).format('DD MMM YYYY, HH:mm') : '-'}
+            </span>
+          )
+        },
       },
-    },
-    {
-      headerName: t('invoiceCampaign:recipients.title').replace('Campaign ', ''),
-      field: 'recipients',
-      width: 110,
-      filter: false,
-      cellClass: '!flex !items-center !justify-center',
-      cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
-        if (!data) return null
-        const count = getUniqueStudentCount(data)
-        return (
-          <span className="text-sm font-semibold text-gray-700">{count}</span>
-        )
+      {
+        headerName: t('invoiceCampaign:recipients.title').replace(
+          'Campaign ',
+          ''
+        ),
+        field: 'recipients',
+        width: 110,
+        filter: false,
+        cellClass: '!flex !items-center !justify-center',
+        cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
+          if (!data) return null
+          const count = getUniqueStudentCount(data)
+          return (
+            <span className="text-sm font-semibold text-gray-700">{count}</span>
+          )
+        },
       },
-    },
-    {
-      headerName: t('student:paymentProof.status') as string,
-      field: 'status',
-      width: 130,
-      filter: false,
-      cellClass: '!flex !items-center',
-      cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
-        if (!data) return null
-        return <InvoiceStatus status={data.status} />
+      {
+        headerName: t('student:paymentProof.status') as string,
+        field: 'status',
+        width: 130,
+        filter: false,
+        cellClass: '!flex !items-center',
+        cellRenderer: ({ data }: ICellRendererParams<InvoiceCampaign>) => {
+          if (!data) return null
+          return <InvoiceStatus status={data.status} />
+        },
       },
     ],
     [t, onShowRecipients, onDuplicate, onDelete]

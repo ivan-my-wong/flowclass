@@ -108,7 +108,12 @@ export class InvoiceCampaignController {
   ): Promise<{
     jobId: string
   }> {
-    return this.invoiceCampaignService.sendInvoiceSynchronous(documentId, institutionId, payload, currentUser.id)
+    return this.invoiceCampaignService.sendInvoiceSynchronous(
+      documentId,
+      institutionId,
+      payload,
+      currentUser.id
+    )
   }
 
   @Patch(':documentId/edit-and-resend')
@@ -119,7 +124,10 @@ export class InvoiceCampaignController {
   @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
   @UseGuards(RolesGuard, RequireParamsGuard)
   @ApiBody({ type: SendInvoiceDto })
-  @ApiResponse({ status: HttpStatus.ACCEPTED, description: 'Invoice updated and re-sent successfully' })
+  @ApiResponse({
+    status: HttpStatus.ACCEPTED,
+    description: 'Invoice updated and re-sent successfully',
+  })
   @HttpCode(HttpStatus.ACCEPTED)
   async editAndResendInvoice(
     @Query('institutionId', ParseIntPipe) institutionId: number,

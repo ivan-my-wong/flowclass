@@ -74,17 +74,17 @@ const PromotionItem: React.FC<Props> = ({ promo, isApplied }): JSX.Element => {
   const isPackageQualified = useMemo(() => {
     if (promo.promotionType !== PromotionTypeItem.PACKAGE) return false
     const pd = promo as any
-    // Check only this student's classes for qualification
-    for (const invoiceClass of currentClasses) {
-      const { classId } = invoiceClass
-      const isApplicable =
-        pd.isAllClasses || pd.applicableClassIds?.includes(classId)
-      if (!isApplicable) return false
-      const available = availableLessonsByClass[classId]
-      if (!available?.length) return false
-      const result = isPackageDiscountQualified(allSessions, available, classId)
-      return result.qualified
-    })
+    // Check only this student's first class for qualification
+    const firstClass = currentClasses[0]
+    if (!firstClass) return false
+    const { classId } = firstClass
+    const isApplicable =
+      pd.isAllClasses || pd.applicableClassIds?.includes(classId)
+    if (!isApplicable) return false
+    const available = availableLessonsByClass[classId]
+    if (!available?.length) return false
+    const result = isPackageDiscountQualified(allSessions, available, classId)
+    return result.qualified
   }, [promo, currentClasses, allSessions, availableLessonsByClass])
 
   const isPackageAlreadyApplied = useMemo(() => {

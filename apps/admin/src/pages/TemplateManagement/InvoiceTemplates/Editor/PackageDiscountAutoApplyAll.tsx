@@ -118,14 +118,17 @@ const PackageDiscountAutoApplyAll = (): null => {
                     p.classId === classId
                 )
               : undefined
-            const amount =
-              storedPromo != null
-                ? storedPromo.amount
-                : result.qualified
-                  ? perLesson * result.lessonCount
-                  : ((student.invoicePromotionsUsed ?? []).find(
-                      u => u.promotionId === pd.id
-                    )?.amount ?? 0)
+            let amount: number
+            if (storedPromo != null) {
+              amount = storedPromo.amount
+            } else if (result.qualified) {
+              amount = perLesson * result.lessonCount
+            } else {
+              amount =
+                (student.invoicePromotionsUsed ?? []).find(
+                  u => u.promotionId === pd.id
+                )?.amount ?? 0
+            }
             newPackageDiscounts.push({
               id: pd.id,
               name: pd.name,

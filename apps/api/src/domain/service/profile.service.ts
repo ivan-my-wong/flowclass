@@ -502,7 +502,8 @@ export class ProfileService {
             },
           }))
         }),
-        promotion: i.invoicePromotionsUsed?.find(p => p.promotionType === 'COUPON_DISCOUNT') ?? null,
+        promotion:
+          i.invoicePromotionsUsed?.find((p) => p.promotionType === 'COUPON_DISCOUNT') ?? null,
         paymentDate,
         user: {
           email: i.userAlias?.email,

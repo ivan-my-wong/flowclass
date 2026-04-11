@@ -1,14 +1,14 @@
 import { useEffect, useMemo } from 'react'
 
-import { useSetRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
 
 import { useRegularClassData } from '@/hooks/useRegularClassData'
 import {
   availableLessonsByClassState,
   invoiceClassesState,
 } from '@/stores/studentInvoice.store'
-import { ClassTypeEnum } from '@/types/course'
 import type { Classes } from '@/types/classes'
+import { ClassTypeEnum } from '@/types/course'
 
 /**
  * Fetches and caches lesson data for a single regularV2 class.
@@ -16,11 +16,7 @@ import type { Classes } from '@/types/classes'
  * PackageDiscountAutoApplyAll can compute qualification without
  * requiring the user to visit the lesson selection page first.
  */
-const ClassLessonDataLoader = ({
-  classId,
-}: {
-  classId: number
-}): null => {
+const ClassLessonDataLoader = ({ classId }: { classId: number }): null => {
   const setAvailableLessonsByClass = useSetRecoilState(
     availableLessonsByClassState
   )
@@ -28,7 +24,7 @@ const ClassLessonDataLoader = ({
 
   // Minimal entity — usePreviewClassLessons only needs id and type
   const classEntity = useMemo(
-    () => ({ id: classId, type: ClassTypeEnum.regularV2 }) as Classes,
+    () => ({ id: classId, type: ClassTypeEnum.regularV2 } as Classes),
     [classId]
   )
 

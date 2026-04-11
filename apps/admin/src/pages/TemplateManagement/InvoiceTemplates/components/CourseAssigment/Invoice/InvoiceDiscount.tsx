@@ -21,9 +21,6 @@ import { invoiceClassesState } from '@/stores/studentInvoice.store'
 import { PromotionTypeItem } from '@/types/studentInvoice.type'
 import { formatCurrency } from '@/utils/currency'
 
-import useSiteData from '@/hooks/useSiteData'
-import { formatCurrency } from '@/utils/currency'
-
 import AppliedDiscount from './AppliedDiscount'
 import { useContextInvoiceEditDialog } from './EditInvoiceContext'
 import ManualDiscountForm from './ManualDiscountForm'

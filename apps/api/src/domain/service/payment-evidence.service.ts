@@ -50,7 +50,11 @@ import { CreditSourceType } from '@/models/credit-transactions.entity'
 import { ClassAdminPaymentSubmittedEmailParams } from '@/models/custom-types/email-params'
 import { EnrollCourse } from '@/models/enroll-courses.entity'
 import { EnrollCourseRepository } from '@/models/enroll-courses.repository'
-import { GaMeasurementEventName, PaymentMethod, PromotionType as PromotionTypeEnum } from '@/models/enums/'
+import {
+  GaMeasurementEventName,
+  PaymentMethod,
+  PromotionType as PromotionTypeEnum,
+} from '@/models/enums/'
 import {
   CheckoutStatus,
   EnrollConfirmStatus,
@@ -61,8 +65,8 @@ import {
 import { Institution } from '@/models/institutions.entity'
 import { InstitutionsRepository } from '@/models/institutions.repository'
 import { Invoice } from '@/models/invoice.entity'
-import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
+import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { NotificationStatus } from '@/models/notification-record.entity'
 import { PaymentEvidence } from '@/models/payment-evidence.entity'

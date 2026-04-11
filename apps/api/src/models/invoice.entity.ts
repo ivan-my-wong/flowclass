@@ -19,10 +19,10 @@ import {
   SplitItem,
 } from '@/application/admin/invoice-campaign/dto/send-invoice.dto'
 import { Course } from '@/models/courses.entity'
-import { InvoicePromotionUsed } from '@/models/invoice-promotion-used.entity'
 import { EnrollCourse } from '@/models/enroll-courses.entity'
 import { DiscountType, PaymentMethod } from '@/models/enums/'
 import { PaymentStatus } from '@/models/enums/status'
+import { InvoicePromotionUsed } from '@/models/invoice-promotion-used.entity'
 import { InvoicePromotionUsed } from '@/models/invoice-promotion-used.entity'
 import { PaymentEvidence } from '@/models/payment-evidence.entity'
 import { PayoutMethod } from '@/models/payout-method.entity'

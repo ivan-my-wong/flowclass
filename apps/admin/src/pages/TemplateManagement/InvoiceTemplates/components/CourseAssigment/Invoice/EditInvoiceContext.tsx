@@ -30,7 +30,6 @@ import {
 } from '@/stores/studentInvoice.store'
 import { BundleDiscount } from '@/types/bundleDiscounts'
 import { DiscountType } from '@/types/coupon'
-import { BulkSendDocumentStatus } from '@/types/templateManagement'
 import {
   AllPromotionsType,
   AppliedPromotion,
@@ -40,6 +39,7 @@ import {
   InvoiceSplitType,
   PromotionTypeItem,
 } from '@/types/studentInvoice.type'
+import { BulkSendDocumentStatus } from '@/types/templateManagement'
 import { formatCurrency } from '@/utils/currency'
 import {
   calculateTotalDiscount,
@@ -743,7 +743,8 @@ export const InvoiceEditDialogProvider = ({
         s => s.id === currentActiveStudent.id
       )
       const studentAppliedPromotions =
-        latestStudent?.appliedPromotions ?? currentActiveStudent.appliedPromotions
+        latestStudent?.appliedPromotions ??
+        currentActiveStudent.appliedPromotions
 
       setRemark(invoiceRemark)
       setAppliedPromotions(studentAppliedPromotions)

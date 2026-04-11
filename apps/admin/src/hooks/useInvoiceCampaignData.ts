@@ -125,7 +125,9 @@ const useInvoiceCampaignData = () => {
   }
 
   /** Re-send a completed campaign. Preserves amountPaid on the existing invoices. */
-  const useEditAndResendCampaign = (onSuccess?: (res: SendingResponse) => void) => {
+  const useEditAndResendCampaign = (
+    onSuccess?: (res: SendingResponse) => void
+  ) => {
     return useMutation({
       mutationFn: (data: InvoiceCampaignDto) =>
         editAndResendInvoiceCampaign(

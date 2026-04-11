@@ -934,7 +934,6 @@ const PaymentProofPage = (): JSX.Element => {
             hasCheckboxSelection
             rowData={filteredStudentList}
             useUrlSearch
-            hasCheckboxSelection
             columns={courseStudentTable ?? []}
             isLoading={isLoadingStudentList || isFetchingStudentList}
             gridRef={gridRef}

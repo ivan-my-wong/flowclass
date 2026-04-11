@@ -29,12 +29,15 @@ import { CloudWatchLoggerProvider } from '@/config/loggers/cloudwatch-nestjs.pro
 import { EmailService } from '@/domain/external/email.service'
 import { SettingSiteErrorMessage } from '@/exceptions/error-message/setting-site'
 import { StripeErrorMessage } from '@/exceptions/error-message/stripe'
-import { UserErrorMessage } from '@/exceptions/error-message/user'
 import { Course } from '@/models/courses.entity'
 import { CreateCheckoutSessionReturnType } from '@/models/custom-types/stripe'
 import { EnrollCourse } from '@/models/enroll-courses.entity'
 import { EnrollCourseRepository } from '@/models/enroll-courses.repository'
-import { GaMeasurementEventName, PaymentMethod, PromotionType as PromotionTypeEnum, StripeCheckoutSessionType } from '@/models/enums/'
+import {
+  PaymentMethod,
+  PromotionType as PromotionTypeEnum,
+  StripeCheckoutSessionType,
+} from '@/models/enums/'
 import {
   CheckoutStatus,
   EnrollConfirmStatus,
@@ -44,8 +47,8 @@ import {
 } from '@/models/enums/status'
 import { Institution } from '@/models/institutions.entity'
 import { InstitutionsRepository } from '@/models/institutions.repository'
-import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
+import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { SettingSiteRepository } from '@/models/setting-site.repository'
 import { StripeConnect } from '@/models/stripe-connect.entity'
