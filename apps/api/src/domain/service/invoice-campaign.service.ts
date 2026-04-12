@@ -58,6 +58,7 @@ import {
   FeeModeType,
   PaymentMethod,
   PaymentStatus,
+  PriceType,
   PromotionType as PromotionTypeEnum,
 } from '@/models/enums'
 

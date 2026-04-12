@@ -7,6 +7,17 @@ Flowclass is organized as a minimal `pnpm` workspaces monorepo for simple local 
 - **Website:** [flowclass.io](https://flowclass.io)
 - **Documentation:** [flowclass.io/docs](https://flowclass.io/docs)
 
+## Documentation & Guide
+
+Full documentation is available at **[flowclass.io/docs](https://flowclass.io/docs)**, including:
+
+- **Getting started** — environment setup, first run, and configuration
+- **Architecture overview** — how the web, API, and admin apps fit together
+- **Self-hosting guide** — deploying with Docker and configuring your environment
+- **Contributing guide** — code style, branching, and PR process
+
+For the fastest path from zero to a running instance, start with the [Getting Started](https://flowclass.io/docs) guide before working through the sections below.
+
 ## Quick start
 
 PostgreSQL is required and must run via Docker. Use the start script to run the entire application:

@@ -82,6 +82,7 @@ import {
   AdditionalFeeConditions,
   ClassTypeEnum,
   PaymentMethod,
+  PriceType,
   PromotionType as PromotionTypeEnum,
   RecordLogType,
   STRIPE_CURRENCY,

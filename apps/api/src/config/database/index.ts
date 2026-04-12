@@ -3,6 +3,7 @@ import { ObjectStorageProvider } from '@/config/storage/object-storage.provider'
 import { EmailService } from '@/domain/external/email.service'
 import { ChatGPTService } from '@/domain/external/openAi.service'
 import { StripeConnectService } from '@/domain/external/stripe-connect.service'
+import { StripeProductPricesService } from '@/domain/service/stripe-product-prices.service'
 import { WhatsappService } from '@/domain/external/whatsapp.service'
 import { AdditionalFeeService } from '@/domain/service/additional-fee.service'
 import { AppointmentService } from '@/domain/service/appointment.service'
@@ -74,6 +75,10 @@ import {
   RecurringSchedulesRepository,
 } from '@/models/course-recurring-schedules.entity'
 import { RegularPeriods, RegularPeriodsRepository } from '@/models/course-regular-periods.entity'
+import {
+  CourseActivitiesOrderEntity,
+  CourseActivitiesOrderRepository,
+} from '@/models/course-activities-order.entity'
 import { Course } from '@/models/courses.entity'
 import { CoursesRepository } from '@/models/courses.repository'
 import { CustomMessageEntity, CustomMessageRepository } from '@/models/custom-message.entity'
@@ -83,6 +88,7 @@ import {
   EnrollCourseRepository,
 } from '@/models/enroll-courses.repository'
 import { InstitutionGallery } from '@/models/institution-gallery.entity'
+import { InstitutionGalleryRepository } from '@/models/institution-gallery.repository'
 import { Institution } from '@/models/institutions.entity'
 import { InstitutionsRepository } from '@/models/institutions.repository'
 
@@ -135,6 +141,8 @@ import { Site } from '@/models/site.entity'
 import { SitesRepository } from '@/models/sites.repository'
 import { StripeConnect } from '@/models/stripe-connect.entity'
 import { StripeConnectRepository } from '@/models/stripe-connect.repository'
+import { StripeProductPricesEntity } from '@/models/stripe-product-prices.entity'
+import { StripeProductPricesRepository } from '@/models/stripe-product-prices.repository'
 import { StudentForm } from '@/models/student-form.entity'
 import { StudentLesson } from '@/models/student-lesson.entity'
 import { StudentLessonRepository } from '@/models/student-lesson.repository'
@@ -243,6 +251,7 @@ export const getAllEntities = () => [
   SiteGallery,
   Site,
   StripeConnect,
+  StripeProductPricesEntity,
   StudentSchedule,
   Transaction,
   UserRole,
@@ -300,7 +309,9 @@ export const getAllRepositories = () => [
   UserRolesRepository,
   SitesRepository,
   InstitutionsRepository,
+  InstitutionGalleryRepository,
   StripeConnectRepository,
+  StripeProductPricesRepository,
   ClassRepository,
   ClassLessonRepository,
   ClassPriceOptionRepository,
@@ -373,6 +384,7 @@ export const getAllServices = () => [
   SitesService,
   InstitutionsService,
   StripeConnectService,
+  StripeProductPricesService,
   ClassService,
   ClassPriceOptionService,
   CouponsService,

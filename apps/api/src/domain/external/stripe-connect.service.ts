@@ -37,6 +37,8 @@ import {
   PaymentMethod,
   PromotionType as PromotionTypeEnum,
   StripeCheckoutSessionType,
+  StripePriceInterval,
+  StripePriceSessionType,
 } from '@/models/enums/'
 import {
   CheckoutStatus,
@@ -48,7 +50,6 @@ import {
 import { Institution } from '@/models/institutions.entity'
 import { InstitutionsRepository } from '@/models/institutions.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
-import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { SettingSiteRepository } from '@/models/setting-site.repository'
 import { StripeConnect } from '@/models/stripe-connect.entity'
@@ -87,7 +88,6 @@ export class StripeConnectService {
     private readonly emailService: EmailService,
     private settingSiteRepository: SettingSiteRepository,
     private readonly invoicePromotionUsedRepository: InvoicePromotionUsedRepository,
-    private readonly gaMeasurementService: GaMeasurementService,
     private readonly settingSiteService: SettingSiteService,
     private readonly usersRepository: UsersRepository,
     private readonly stripeProductPricesService: StripeProductPricesService,
