@@ -5,6 +5,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NestInterceptor,
+  PayloadTooLargeException,
   Type,
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
@@ -153,7 +154,11 @@ export function StorageImageUploadInterceptor(
         }
         return handlerObservable
       } catch (error) {
-        throw new BadRequestException(error.message)
+        const err = error as any
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          throw new PayloadTooLargeException('FILE_SIZE_EXCEEDS_LIMIT')
+        }
+        throw new BadRequestException(err.message)
       }
     }
 
