@@ -119,7 +119,7 @@
     "NO_STUDENT_SCHEDULES_FOUND": "未找到下個月的學生課程",
     "NOT_AUTHENTICATE": "您沒有權限，請重新整理頁面或嘗試登入。",
     "PARAMETER_IS_REQUIRED": "參數是必需的",
-    "PAYLOAD_TOO_LARGE": "您上傳的文件名稱: {{name}} 太大，請重試。",
+    "PAYLOAD_TOO_LARGE": "您上傳的文件名稱: {{name}} 超過10MB，請重試。",
     "PERIOD_NOT_FOUND": "未找到時段",
     "QUOTA_STUDENTS_ACTIVE_EXCEED": "學生人數已超出配額",
     "required": "此欄位為必填項目。請填寫。",

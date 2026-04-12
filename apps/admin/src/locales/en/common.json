@@ -125,7 +125,7 @@
     "NO_STUDENT_SCHEDULES_FOUND": "No student schedules found for the next month",
     "NOT_AUTHENTICATE": "You do not have the access to this action. Please refresh the page or try logging in again.",
     "PARAMETER_IS_REQUIRED": "Parameter is required",
-    "PAYLOAD_TOO_LARGE": "The file name: {{name}} you uploaded exceeds 5MB. Please try again.",
+    "PAYLOAD_TOO_LARGE": "The file name: {{name}} you uploaded exceeds 10MB. Please try again.",
     "PERIOD_NOT_FOUND": "Period not found",
     "QUOTA_STUDENTS_ACTIVE_EXCEED": "The number of students active exceeds the quota.",
     "required": "This field is required. Please fill it in.",
