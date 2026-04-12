@@ -4,16 +4,16 @@ import { useNavigate } from 'react-router-dom'
 import DatePicker from 'react-datepicker'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { LuCalendar } from 'react-icons/lu'
+import { LuCalendar, LuChevronLeft, LuChevronRight } from 'react-icons/lu'
 import { useRecoilState, useRecoilValue } from 'recoil'
 
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import ModalDialog from '@/components/ui/ModalDialog'
-import { FEATURE_FLAG } from '@/constants/featureFlags'
 import { DEFAULT_CURRENCY } from '@/constants/invoices'
 import useInvoiceCampaignData from '@/hooks/useInvoiceCampaignData'
 import { useSendingCampaign } from '@/hooks/useSendingCampaign'
+import useSiteData from '@/hooks/useSiteData'
 import { schoolState } from '@/stores/schoolData'
 import { siteState } from '@/stores/siteData'
 import {
@@ -29,17 +29,20 @@ import {
 } from '@/stores/studentInvoice.store'
 import {
   AppliedPromotion,
-  InvoiceCampaignDetailDto,
   InvoiceCampaignDto,
-  InvoiceSplit,
-  InvoiceSplitType,
   RecipientDto,
   SendingResponse,
 } from '@/types/studentInvoice.type'
-import { InvoiceCampaign } from '@/types/templateManagement'
+import {
+  BulkSendDocumentStatus,
+  InvoiceCampaign,
+} from '@/types/templateManagement'
+import { formatCurrency } from '@/utils/currency'
 import {
   buildInvoiceCampaignData,
+  calculateTotalDiscount,
   createCombinedInvoice,
+  formatTotalPriceInvoice,
 } from '@/utils/invoice-campaign.utils'
 
 import ApplyCreditBalance from '../components/CourseAssigment/Invoice/ApplyCreditBalance'
@@ -47,24 +50,24 @@ import { InvoiceEditDialogProvider } from '../components/CourseAssigment/Invoice
 import InvoiceDiscount from '../components/CourseAssigment/Invoice/InvoiceDiscount'
 import InvoiceRemark from '../components/CourseAssigment/Invoice/InvoiceRemark'
 import SelectedCourseTable from '../components/CourseAssigment/Invoice/SelectedCourseTable'
-import SplitInvoice from '../components/CourseAssigment/Invoice/SplitInvoice'
 import InvoiceDeliveryMethods from '../components/SendInvoice/InvoiceDeliveryMethods'
 import InvoiceRecipients from '../components/SendInvoice/InvoiceRecipients'
 
 import 'react-datepicker/dist/react-datepicker.css'
 
-// Shared sub-component: payment date + course/lesson table
-const PaymentDateAndCourses = () => {
+// ─── Step 1a: Combined mode — edit discounts, credits, remarks ────────────────
+
+const CombinedEditStep = (): JSX.Element => {
   const { t } = useTranslation(['invoiceCampaign'])
   const currentActiveStudent = useRecoilValue(currentActiveStudentState)
   const currentActiveParent = useRecoilValue(currentActiveParentState)
-  const invoiceCampaign = useRecoilValue(invoiceCampaignState)
+  const campaignState = useRecoilValue(invoiceCampaignState)
   const [invoiceStudents, setInvoiceStudents] =
     useRecoilState(invoiceStudentState)
   const currentClasses = useRecoilValue(
     invoiceClassesSelector({
       userAliasId: currentActiveStudent?.id ?? null,
-      parentId: invoiceCampaign?.isCombined
+      parentId: campaignState?.isCombined
         ? currentActiveParent?.id ?? null
         : null,
     })
@@ -86,8 +89,113 @@ const PaymentDateAndCourses = () => {
   }
 
   return (
-    <>
-      <div className="flex items-center gap-2 mb-4">
+    <div className="space-y-6">
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <LuCalendar className="text-gray-500 shrink-0" size={16} />
+          <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
+            {t('editor.paymentDate')}
+          </span>
+          <DatePicker
+            selected={paymentDate}
+            dateFormat="MMMM d, yyyy"
+            className="h-9 rounded-md border text-sm border-gray-300 px-3 w-full"
+            onChange={handlePaymentDateChange}
+            isClearable
+            placeholderText={t('editor.selectPaymentDate') as string}
+          />
+        </div>
+        <Card className="p-4 shadow-none border-gray-300">
+          <SelectedCourseTable currentClasses={currentClasses} />
+        </Card>
+      </div>
+      <InvoiceDiscount />
+      <ApplyCreditBalance />
+      <InvoiceRemark />
+    </div>
+  )
+}
+
+// ─── Step 1b: Individual mode — per-student paginated preview ────────────────
+
+const IndividualPreviewStep = (): JSX.Element => {
+  const { t } = useTranslation(['invoiceCampaign'])
+  const { currentSite } = useSiteData()
+  const currency = currentSite?.currency ?? DEFAULT_CURRENCY
+  const [invoiceStudents, setInvoiceStudents] =
+    useRecoilState(invoiceStudentState)
+  const allClasses = useRecoilValue(invoiceClassesState)
+
+  const [pageIndex, setPageIndex] = useState(0)
+  const student = invoiceStudents[pageIndex]
+  const total = invoiceStudents.length
+
+  const studentClasses = useMemo(
+    () => allClasses.filter(c => c.studentItem.id === student?.id),
+    [allClasses, student]
+  )
+
+  const paymentDate = useMemo(
+    () => (student?.paymentDate ? new Date(student.paymentDate) : null),
+    [student]
+  )
+
+  const handlePaymentDateChange = (date: Date | null) => {
+    if (!student) return
+    setInvoiceStudents(prev =>
+      prev.map(s => (s.id === student.id ? { ...s, paymentDate: date } : s))
+    )
+  }
+
+  const summary = useMemo(() => {
+    if (!student) return null
+    const gross = formatTotalPriceInvoice(studentClasses, currency)
+    const discount = calculateTotalDiscount(
+      gross.totalPrice,
+      student.appliedPromotions ?? []
+    )
+    const usedBal = student.usedBalance ?? 0
+    return {
+      totalGross: gross.totalPrice,
+      totalDiscount: discount.totalDiscount,
+      additionalFee: discount.additionalFee ?? 0,
+      usedBalance: usedBal,
+      total: Math.max(0, discount.priceAfterDiscount - usedBal),
+    }
+  }, [student, studentClasses, currency])
+
+  if (!student || !summary) return <></>
+
+  return (
+    <div className="space-y-4">
+      {/* Student pagination header */}
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => setPageIndex(i => Math.max(0, i - 1))}
+          disabled={pageIndex === 0}
+          className="p-1 rounded hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <LuChevronLeft size={20} />
+        </button>
+        <div className="text-center">
+          <p className="text-sm font-semibold text-gray-900">{student.name}</p>
+          <p className="text-xs text-gray-500">
+            {pageIndex + 1} / {total}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setPageIndex(i => Math.min(total - 1, i + 1))}
+          disabled={pageIndex === total - 1}
+          className="p-1 rounded hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <LuChevronRight size={20} />
+        </button>
+      </div>
+
+      {/* Payment date */}
+      <div className="flex items-center gap-2">
         <LuCalendar className="text-gray-500 shrink-0" size={16} />
         <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
           {t('editor.paymentDate')}
@@ -101,14 +209,64 @@ const PaymentDateAndCourses = () => {
           placeholderText={t('editor.selectPaymentDate') as string}
         />
       </div>
+
+      {/* Per-student course table + price breakdown */}
       <Card className="p-4 shadow-none border-gray-300">
-        <SelectedCourseTable currentClasses={currentClasses} />
+        <SelectedCourseTable currentClasses={studentClasses} hideTotals />
+        <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-gray-600">
+              {t('editor.invoicePreview.subTotal')}
+            </span>
+            <span className="font-medium text-blue-600">
+              {formatCurrency(summary.totalGross, currency)}
+            </span>
+          </div>
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-gray-600">
+              {t('editor.invoicePreview.discount')}
+            </span>
+            <span className="font-medium text-red-600">
+              {`-${formatCurrency(summary.totalDiscount, currency)}`}
+            </span>
+          </div>
+          {summary.additionalFee > 0 && (
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-gray-600">
+                {t('editor.invoicePreview.additionalFee')}
+              </span>
+              <span className="font-medium text-blue-600">
+                {`+${formatCurrency(summary.additionalFee, currency)}`}
+              </span>
+            </div>
+          )}
+          {summary.usedBalance > 0 && (
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-gray-600">
+                {t('editor.invoicePreview.creditApplied')}
+              </span>
+              <span className="font-medium text-red-600">
+                {`-${formatCurrency(summary.usedBalance, currency)}`}
+              </span>
+            </div>
+          )}
+          <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+            <span className="font-semibold text-gray-900">
+              {t('editor.invoicePreview.total')}
+            </span>
+            <span className="font-bold text-blue-600">
+              {formatCurrency(summary.total, currency)}
+            </span>
+          </div>
+        </div>
       </Card>
-    </>
+    </div>
   )
 }
 
-const DialogSendInvoice = () => {
+// ─── Main dialog ──────────────────────────────────────────────────────────────
+
+const DialogSendInvoice = (): JSX.Element => {
   const invoiceCampaign = useRecoilValue(invoiceCampaignState)
   const navigate = useNavigate()
   const { currentSchool } = useRecoilValue(schoolState)
@@ -120,53 +278,61 @@ const DialogSendInvoice = () => {
   const parent = useRecoilValue(currentActiveParentState)
   const { t } = useTranslation(['invoiceCampaign', 'common'])
   const [isOpen, setIsOpen] = useState(true)
-
-  const isCombined = invoiceCampaign?.isCombined ?? false
-  const totalSteps = isCombined ? 2 : 1
   const [currentStep, setCurrentStep] = useState(1)
 
-  // --- Data building ---
-  const childs = useMemo(() => {
-    return listStudents
-      .filter(
-        student =>
-          student.childOfUserAliasId === parent?.id ||
-          !student.childOfUserAliasId
-      )
-      .map(student => ({
-        ...student,
-        phone: student.user?.phone ?? student.phone,
-        enrollMetaId:
-          allStudents.find(d => d.id === student.id)?.enrollMetaId ?? '',
-      }))
-  }, [listStudents, allStudents, parent])
+  const isCombined = invoiceCampaign?.isCombined ?? false
+  const isCompleted =
+    invoiceCampaign?.status === BulkSendDocumentStatus.COMPLETED
 
-  const invoiceCampaigns = useMemo(() => {
-    return buildInvoiceCampaignData(
-      currentSchool?.id || 0,
-      currentSite?.id || 0,
-      currentSite?.currency || DEFAULT_CURRENCY,
-      allStudents,
-      allClasses,
-      allSessions
-    )
-  }, [allClasses, allSessions, allStudents, currentSchool, currentSite])
+  // ─── Data ─────────────────────────────────────────────────────────────────
+
+  const childs = useMemo(
+    () =>
+      listStudents
+        .filter(
+          student =>
+            student.childOfUserAliasId === parent?.id ||
+            !student.childOfUserAliasId
+        )
+        .map(student => ({
+          ...student,
+          phone: student.user?.phone ?? student.phone,
+          enrollMetaId:
+            allStudents.find(d => d.id === student.id)?.enrollMetaId ?? '',
+        })),
+    [listStudents, allStudents, parent]
+  )
+
+  const invoiceCampaigns = useMemo(
+    () =>
+      buildInvoiceCampaignData(
+        currentSchool?.id || 0,
+        currentSite?.id || 0,
+        currentSite?.currency || DEFAULT_CURRENCY,
+        allStudents,
+        allClasses,
+        allSessions
+      ),
+    [allClasses, allSessions, allStudents, currentSchool, currentSite]
+  )
 
   const appliedPromotions = useRecoilValue(appliedPromotionsState)
-  const serializedAppliedPromotions = useMemo(() => {
-    return (appliedPromotions ?? []).map(promotion => {
-      const { id, ...rest } = promotion
-      if (typeof id === 'number') return { ...rest, id }
-      return rest
-    })
-  }, [appliedPromotions])
+  const serializedAppliedPromotions = useMemo(
+    () =>
+      (appliedPromotions ?? []).map(promotion => {
+        const { id, ...rest } = promotion
+        return typeof id === 'number' ? { ...rest, id } : rest
+      }),
+    [appliedPromotions]
+  )
 
   const newCombinedInvoice = useMemo(() => {
     if (!parent) return undefined
     return createCombinedInvoice(invoiceCampaigns, parent, childs)
   }, [invoiceCampaigns, parent, childs])
 
-  // --- Form ---
+  // ─── Form ──────────────────────────────────────────────────────────────────
+
   const form = useForm<InvoiceCampaignDto>({
     defaultValues: invoiceCampaign || {
       title: '',
@@ -185,27 +351,30 @@ const DialogSendInvoice = () => {
 
   useEffect(() => {
     if (isCombined && invoiceCampaign && newCombinedInvoice) {
-      form.reset({
-        ...invoiceCampaign,
-        combinedInvoice: newCombinedInvoice,
-      })
+      form.reset({ ...invoiceCampaign, combinedInvoice: newCombinedInvoice })
     }
   }, [invoiceCampaign, form, newCombinedInvoice, isCombined])
 
   useEffect(() => {
+    if (!isCombined && invoiceCampaign) {
+      form.reset({ ...invoiceCampaign, invoices: invoiceCampaigns })
+    }
+  }, [invoiceCampaign, form, invoiceCampaigns, isCombined])
+
+  useEffect(() => {
     if (!isCombined) {
-      const invoices = buildInvoiceCampaignData(
-        currentSchool?.id || 0,
-        currentSite?.id || 0,
-        currentSite?.currency || DEFAULT_CURRENCY,
-        allStudents,
-        allClasses,
-        allSessions
+      form.setValue(
+        'invoices',
+        buildInvoiceCampaignData(
+          currentSchool?.id || 0,
+          currentSite?.id || 0,
+          currentSite?.currency || DEFAULT_CURRENCY,
+          allStudents,
+          allClasses,
+          allSessions
+        ),
+        { shouldDirty: true, shouldTouch: true }
       )
-      form.setValue('invoices', invoices, {
-        shouldDirty: true,
-        shouldTouch: true,
-      })
     }
   }, [
     form,
@@ -217,28 +386,30 @@ const DialogSendInvoice = () => {
     isCombined,
   ])
 
-  useEffect(() => {
-    if (!isCombined && invoiceCampaign) {
-      form.reset({ ...invoiceCampaign, invoices: invoiceCampaigns })
-    }
-  }, [invoiceCampaign, form, invoiceCampaigns, isCombined])
+  // ─── Send logic ────────────────────────────────────────────────────────────
 
-  // --- Send logic ---
   const {
     useSendInvoiceCampaign,
     useCreateInvoiceCampaign,
     useUpdateInvoiceCampaign,
+    useEditAndResendCampaign,
   } = useInvoiceCampaignData()
   const { startEvent } = useSendingCampaign()
 
+  const onSendSuccess = (res: SendingResponse) => {
+    setIsOpen(false)
+    startEvent(res.document as InvoiceCampaign)
+    navigate(
+      `/invoice-templates/editor/sending-progress?documentId=${res.document?.id}`
+    )
+  }
+
   const { mutateAsync: sendCampaign, isLoading: isSending } =
-    useSendInvoiceCampaign((res: SendingResponse) => {
-      setIsOpen(false)
-      startEvent(res.document as InvoiceCampaign)
-      navigate(
-        `/invoice-templates/editor/sending-progress?documentId=${res.document?.id}`
-      )
-    })
+    useSendInvoiceCampaign(onSendSuccess)
+
+  // Separate mutation for completed (edited) campaigns — preserves amountPaid
+  const { mutateAsync: editAndResend, isLoading: isEditResending } =
+    useEditAndResendCampaign(onSendSuccess)
 
   const recipients = useMemo(() => {
     if (isCombined) {
@@ -286,22 +457,30 @@ const DialogSendInvoice = () => {
     useUpdateInvoiceCampaign(invoiceCampaign?.id, sendInvoiceAfterAction)
 
   const handleSubmit: SubmitHandler<InvoiceCampaignDto> = async data => {
+    // Guard: only allow submission from step 2 to prevent accidental triggers
+    // (e.g. Enter key in DatePicker firing the form's onSubmit)
+    if (currentStep !== 2) return
     const invoices = buildInvoicesPayload()
     if (invoices.length === 0) return
 
-    if (invoiceCampaign?.id) {
-      await updateCampaign({ ...data, invoices })
-    } else {
-      await createCampaign({
+    if (isCompleted && invoiceCampaign?.id) {
+      // Completed campaign: use the dedicated edit-and-resend route so
+      // amountPaid is preserved and the edit path stays separate from creation.
+      await editAndResend({
         ...data,
-        isDraft: false,
+        id: invoiceCampaign.id,
         invoices,
         recipients,
       })
+    } else if (invoiceCampaign?.id) {
+      await updateCampaign({ ...data, invoices })
+    } else {
+      await createCampaign({ ...data, isDraft: false, invoices, recipients })
     }
   }
 
-  // --- Navigation ---
+  // ─── Navigation ────────────────────────────────────────────────────────────
+
   const onBack = () => {
     setIsOpen(false)
     navigate(
@@ -311,106 +490,30 @@ const DialogSendInvoice = () => {
     )
   }
 
-  const handleNext = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1)
-    } else {
-      handleSubmit(form.getValues())
-    }
-  }
+  // ─── Validation ────────────────────────────────────────────────────────────
 
-  // --- Validation ---
   const isEmailEnabled = form.watch('sendViaEmail')
   const isWhatsappEnabled = form.watch('sendViaWhatsapp')
   const combinedInvoice = form.watch('combinedInvoice')
-  const invoices = form.watch('invoices')
   const whatsappContent = form.watch('whatsappContent')
   // eslint-disable-next-line
   const isContentValid =
     !isEmailEnabled || !isWhatsappEnabled || whatsappContent?.trim()
 
-  const isSingleInvoice = useMemo(
-    () => invoices?.length === 1 || isCombined,
-    [invoices, isCombined]
-  )
+  const isStep1Valid = isCombined ? !!combinedInvoice : true
+  const isStep2Valid = !!isContentValid
 
-  const isValidInstallments = useMemo(() => {
-    const invoice = isCombined ? combinedInvoice : invoices?.at(0)
-    if (!invoice) return true
-    if (invoice.splitType === 'single') return true
-    const totalPercentage =
-      invoice.splitItems?.reduce(
-        (acc, item) => acc + (item.percentage || 0),
-        0
-      ) || 0
-    return (
-      totalPercentage === 100 &&
-      invoice.splitItems?.every(item => item.percentage && item.percentage > 0)
-    )
-  }, [isCombined, combinedInvoice, invoices])
-
-  const isStepValid = useMemo(() => {
-    if (isCombined) {
-      // Step 1: edit invoice
-      if (currentStep === 1) return !!combinedInvoice
-      // Step 2: delivery
-      if (currentStep === 2) return isContentValid && isValidInstallments
-    }
-    // Multiple: single step (delivery)
-    return isContentValid && isValidInstallments
-  }, [
-    isCombined,
-    currentStep,
-    combinedInvoice,
-    isContentValid,
-    isValidInstallments,
-  ])
-
-  // --- Split invoice handlers ---
-  const handleSplitTypeChange = (type: InvoiceSplitType) => {
-    if (isCombined) {
-      const inv = form.getValues('combinedInvoice')
-      if (!inv) return
-      form.setValue(
-        'combinedInvoice' as any,
-        { ...inv, splitType: type },
-        {
-          shouldDirty: true,
-          shouldTouch: true,
-        }
-      )
+  const handleNext = () => {
+    if (currentStep === 1) {
+      setCurrentStep(2)
     } else {
-      const inv = form.getValues('invoices')?.at(0)
-      if (!inv) return
-      inv.splitType = type
-      form.setValue('invoices', [inv] as InvoiceCampaignDetailDto[], {
-        shouldDirty: true,
-        shouldTouch: true,
-      })
+      form.handleSubmit(handleSubmit)()
     }
   }
 
-  const handleInstallmentsChange = (splits: InvoiceSplit[]) => {
-    if (isCombined) {
-      const inv = form.getValues('combinedInvoice')
-      if (!inv) return
-      inv.splitItems = splits
-      form.setValue('combinedInvoice', inv, {
-        shouldDirty: true,
-        shouldTouch: true,
-      })
-    } else {
-      const inv = form.getValues('invoices')?.at(0)
-      if (!inv) return
-      inv.splitItems = splits
-      form.setValue('invoices', [inv] as InvoiceCampaignDetailDto[], {
-        shouldDirty: true,
-        shouldTouch: true,
-      })
-    }
-  }
-
-  const isLastStep = currentStep === totalSteps
+  const step1Label = isCombined
+    ? t('invoiceCampaign:editor.send.steps.step1Title')
+    : t('invoiceCampaign:editor.send.steps.step1Preview')
 
   return (
     <ModalDialog
@@ -431,73 +534,54 @@ const DialogSendInvoice = () => {
             {t('common:action.cancel')}
           </Button>
           <Button
-            type={isLastStep ? 'submit' : 'button'}
-            onClick={isLastStep ? undefined : handleNext}
-            disabled={!isStepValid}
-            loading={isCreating || isSending || isUpdating}
+            type="button"
+            onClick={handleNext}
+            disabled={currentStep === 1 ? !isStep1Valid : !isStep2Valid}
+            loading={isCreating || isSending || isUpdating || isEditResending}
           >
-            {isLastStep
-              ? isEmailEnabled || isWhatsappEnabled
-                ? t('invoiceCampaign:editor.send.sendButton')
-                : t('invoiceCampaign:editor.send.createButton')
-              : t('invoiceCampaign:editor.send.nextStep')}
+            {currentStep === 1
+              ? t('invoiceCampaign:editor.send.nextStep')
+              : getSendButtonLabel(
+                  isEmailEnabled,
+                  isWhatsappEnabled,
+                  t('invoiceCampaign:editor.send.sendButton'),
+                  t('invoiceCampaign:editor.send.createButton')
+                )}
           </Button>
         </>
       }
       isFixedHeader
       footerClassName="px-8"
     >
-      {/* Step indicator (only for combined/single mode with 2 steps) */}
-      {isCombined && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div
-              className={`h-1 flex-1 rounded ${
-                currentStep >= 1 ? 'bg-blue-600' : 'bg-gray-200'
-              }`}
-            />
-            <div
-              className={`h-1 flex-1 rounded ${
-                currentStep >= 2 ? 'bg-blue-600' : 'bg-gray-200'
-              }`}
-            />
-          </div>
-          <p className="text-sm text-gray-600 text-center">
-            {currentStep === 1 &&
-              t('invoiceCampaign:editor.send.steps.step1Title')}
-            {currentStep === 2 &&
-              t('invoiceCampaign:editor.send.steps.step2SendNotification')}
-          </p>
+      {/* Step indicator */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <div
+            className={`h-1 flex-1 rounded ${
+              currentStep >= 1 ? 'bg-blue-600' : 'bg-gray-200'
+            }`}
+          />
+          <div
+            className={`h-1 flex-1 rounded ${
+              currentStep >= 2 ? 'bg-blue-600' : 'bg-gray-200'
+            }`}
+          />
         </div>
-      )}
+        <p className="text-sm text-gray-600 text-center">
+          {currentStep === 1
+            ? step1Label
+            : t('invoiceCampaign:editor.send.steps.step2SendNotification')}
+        </p>
+      </div>
 
-      {/* Combined mode step 1: Edit invoice (discounts, credits, lessons) */}
-      {isCombined && currentStep === 1 && (
-        <div className="space-y-6">
-          <PaymentDateAndCourses />
-          <InvoiceDiscount />
-          <ApplyCreditBalance />
-          <InvoiceRemark />
-        </div>
-      )}
+      {/* Step 1: Edit (combined) or Preview (individual) */}
+      {currentStep === 1 &&
+        (isCombined ? <CombinedEditStep /> : <IndividualPreviewStep />)}
 
-      {/* Delivery step (step 2 for combined, step 1 for multiple) */}
-      {currentStep === totalSteps && (
+      {/* Step 2: Delivery + recipients — always identical */}
+      {currentStep === 2 && (
         <div className="space-y-6">
-          {!isCombined && <PaymentDateAndCourses />}
           <InvoiceDeliveryMethods />
-          {isSingleInvoice &&
-            FEATURE_FLAG.SPLIT_INVOICE_FOR_MULTIPLE_STUDENTS && (
-              <SplitInvoice
-                invoice={
-                  (isCombined
-                    ? combinedInvoice
-                    : invoices?.at(0)) as InvoiceCampaignDetailDto
-                }
-                onChangeSplitType={handleSplitTypeChange}
-                onChangeInstallments={handleInstallmentsChange}
-              />
-            )}
           <InvoiceRecipients />
         </div>
       )}
@@ -505,7 +589,14 @@ const DialogSendInvoice = () => {
   )
 }
 
-const DialogSendInvoiceWrapper = () => {
+const getSendButtonLabel = (
+  isEmailEnabled: boolean,
+  isWhatsappEnabled: boolean,
+  sendLabel: string,
+  createLabel: string
+): string => (isEmailEnabled || isWhatsappEnabled ? sendLabel : createLabel)
+
+const DialogSendInvoiceWrapper = (): JSX.Element => {
   return (
     <InvoiceEditDialogProvider>
       <DialogSendInvoice />

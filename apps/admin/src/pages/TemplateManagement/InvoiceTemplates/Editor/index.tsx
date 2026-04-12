@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Outlet, useNavigate, useSearchParams } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
@@ -12,7 +12,6 @@ import {
 } from 'recoil'
 
 import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Inputs/Input'
 import SegmentedSwitch from '@/components/ui/SegmentedSwitch'
 import {
   Tooltip,
@@ -27,6 +26,7 @@ import useInvoiceCampaignData from '@/hooks/useInvoiceCampaignData'
 import { useSendingCampaign } from '@/hooks/useSendingCampaign'
 import useStudentInvoice from '@/hooks/useStudentInvoice'
 import ContentLayout from '@/layouts/ContentLayout'
+import ConfirmSendPaymentProof from '@/pages/PaymentProofTable/components/ConfirmSendPaymentProof'
 import { schoolState } from '@/stores/schoolData'
 import { siteState } from '@/stores/siteData'
 import {
@@ -43,6 +43,8 @@ import {
 import { BundleDiscount } from '@/types/bundleDiscounts'
 import type { Classes } from '@/types/classes'
 import { ClassTypeEnum, PriceType } from '@/types/course'
+import { PaymentProofTableItem } from '@/types/enrollCourse'
+import { SendPaymentActions } from '@/types/paymentProof'
 import { PriceOption } from '@/types/regularClass'
 import {
   type InvoiceCampaignDetailDto,
@@ -52,7 +54,10 @@ import {
   InvoiceSplitType,
   type InvoiceStudent,
 } from '@/types/studentInvoice.type'
-import type { InvoiceCampaign } from '@/types/templateManagement'
+import {
+  BulkSendDocumentStatus,
+  type InvoiceCampaign,
+} from '@/types/templateManagement'
 import dayjs from '@/utils/dayjs'
 import {
   buildInvoiceCampaignData,
@@ -62,6 +67,7 @@ import {
 
 import CourseAssignment from './CourseAssignment'
 import { InvoiceEditorProvider } from './InvoiceEditorContext'
+import LessonDataLoader from './LessonDataLoader'
 import PackageDiscountAutoApplyAll from './PackageDiscountAutoApplyAll'
 
 const InvoiceEditor = (): JSX.Element => {
@@ -112,14 +118,18 @@ const InvoiceEditor = (): JSX.Element => {
   )
   const resetInvoiceCampaign = useResetRecoilState(invoiceCampaignState)
 
-  const determineClassPrice = (priceOption: PriceOption | undefined) => {
-    if (!priceOption) return 0
-    const { amount, numberOfLessons, priceType } = priceOption
-    let amountNum = Number(amount)
-    if (priceType !== PriceType.PER_LESSON) {
-      amountNum = Number(amount) / (numberOfLessons || 1)
-    }
-    return Number.isFinite(amountNum) ? amountNum : 0
+  // Snapshot of loaded state — used to detect which student invoices were actually edited
+  type StudentSnap = {
+    classIds: number[]
+    sessionCount: number
+    paymentDate: Date | null
+    invoiceRemark: string
+  }
+  const snapshotRef = useRef<Map<number, StudentSnap> | null>(null)
+
+  const determineClassPrice = (cls?: Classes) => {
+    const amount = cls?.tuition != null ? Number(cls.tuition) : 0
+    return Number.isFinite(amount) ? amount : 0
   }
 
   const initializeCampaignData = useCallback(
@@ -129,6 +139,7 @@ const InvoiceEditor = (): JSX.Element => {
         title: invoiceCampaign.title,
         isCombined: invoiceCampaign.isCombined,
         isDraft: invoiceCampaign.isDraft,
+        status: invoiceCampaign.status,
         sendViaEmail: invoiceCampaign.sendViaEmail,
         emailSubject: invoiceCampaign.emailSubject,
         emailBody: invoiceCampaign.emailBody,
@@ -143,7 +154,11 @@ const InvoiceEditor = (): JSX.Element => {
       }
       if (invoiceCampaign.metadata) {
         const { invoices } = invoiceCampaign.metadata
+        const actualInvoices = invoiceCampaign.invoices ?? []
         const students = (invoices ?? []).map(invoice => {
+          const matchedActualInvoice = actualInvoices.find(
+            ai => ai.userAlias?.id === invoice.userAliasId
+          )
           const formatApliedPromotions = (invoice?.discounts ?? []).map(
             appliedItem => {
               const promotionData = allPromotions?.find(
@@ -199,14 +214,29 @@ const InvoiceEditor = (): JSX.Element => {
             childOfUserAliasId: invoice?.childOfUserAliasId ?? null,
             isStudentParent: studentData?.isStudentParent ?? false,
             isSendToParent,
+            total: 0,
             paymentDate: invoice.paymentDate
               ? new Date(invoice.paymentDate)
               : null,
+            invoicePromotionsUsed:
+              matchedActualInvoice?.invoicePromotionsUsed ?? [],
+            subTotal: matchedActualInvoice
+              ? Number(matchedActualInvoice.payAmount || 0) +
+                Number(matchedActualInvoice.usedBalance || 0) +
+                Number(matchedActualInvoice.discountAmount || 0) -
+                Number(matchedActualInvoice.additionalFee || 0)
+              : Number(invoice.total || 0),
+            discountAmount: matchedActualInvoice
+              ? Number(matchedActualInvoice.discountAmount || 0)
+              : undefined,
+            additionalFee: matchedActualInvoice
+              ? Number(matchedActualInvoice.additionalFee || 0)
+              : undefined,
           } as InvoiceStudent
         })
         setAllStudents(students)
-        setAllClasses(
-          (invoices ?? []).flatMap(invoice =>
+        const computedClasses: InvoiceClassType[] = (invoices ?? []).flatMap(
+          invoice =>
             (invoice.classes ?? []).map(cl => {
               const cls = classes.find(item => item.id === cl.classId)
               const priceOption = cls?.priceOptions?.find(
@@ -231,8 +261,8 @@ const InvoiceEditor = (): JSX.Element => {
                 studentItem: students.find(d => d.id === invoice.userAliasId),
               } as InvoiceClassType
             })
-          )
         )
+        setAllClasses(computedClasses)
         const sessions = (invoices ?? []).flatMap(
           inv =>
             inv.classes
@@ -325,6 +355,22 @@ const InvoiceEditor = (): JSX.Element => {
               .filter(Boolean) as InvoiceSessionType[]
         )
         setAllSessions(sessions)
+
+        // Record the loaded state so saveCampaign can detect which students changed
+        const snap = new Map<number, StudentSnap>()
+        students.forEach(student => {
+          snap.set(student.id, {
+            classIds: computedClasses
+              .filter(c => c.studentItem?.id === student.id)
+              .map(c => c.classId)
+              .sort((a, b) => a - b),
+            sessionCount: sessions.filter(s => s.studentItem?.id === student.id)
+              .length,
+            paymentDate: student.paymentDate ?? null,
+            invoiceRemark: student.invoiceRemark ?? '',
+          })
+        })
+        snapshotRef.current = snap
       }
     },
     [
@@ -337,13 +383,57 @@ const InvoiceEditor = (): JSX.Element => {
       studentList,
     ]
   )
+  const getDirtyStudentIds = (): Set<number> => {
+    const snapshot = snapshotRef.current
+    if (!snapshot) return new Set(allStudents.map(s => s.id))
+
+    const dirtyIds = allStudents
+      .filter(student => {
+        const snap = snapshot.get(student.id)
+        if (!snap) return true
+
+        const currentClassIds = allClasses
+          .filter(c => c.studentItem?.id === student.id)
+          .map(c => c.classId)
+          .sort((a, b) => a - b)
+        if (
+          currentClassIds.length !== snap.classIds.length ||
+          currentClassIds.some((id, i) => id !== snap.classIds[i])
+        )
+          return true
+
+        const currentSessionCount = allSessions.filter(
+          s => s.studentItem?.id === student.id
+        ).length
+        if (currentSessionCount !== snap.sessionCount) return true
+
+        if (student.paymentDate?.getTime() !== snap.paymentDate?.getTime())
+          return true
+
+        if ((student.invoiceRemark ?? '') !== snap.invoiceRemark) return true
+
+        return false
+      })
+      .map(s => s.id)
+
+    return new Set(dirtyIds)
+  }
+
   const saveCampaign = async () => {
+    let studentsToSave = allStudents
+
+    if (isEditMode && snapshotRef.current) {
+      const dirtyIds = getDirtyStudentIds()
+      studentsToSave = allStudents.filter(s => dirtyIds.has(s.id))
+      if (studentsToSave.length === 0) return
+    }
+
     const invoiceCampaigns: InvoiceCampaignDetailDto[] =
       buildInvoiceCampaignData(
         currentSchool?.id ?? 0,
         currentSite?.id ?? 0,
         currentSite?.currency || DEFAULT_CURRENCY,
-        allStudents,
+        studentsToSave,
         allClasses,
         allSessions
       )
@@ -442,9 +532,54 @@ const InvoiceEditor = (): JSX.Element => {
     setInvoiceCampaign,
   ])
 
+  const isCompleted =
+    invoiceCampaign?.status === BulkSendDocumentStatus.COMPLETED
+
+  const [isWhatsappModalOpen, setIsWhatsappModalOpen] = useState(false)
+
+  const whatsappRows = useMemo<PaymentProofTableItem[]>(() => {
+    if (!isCompleted || !invoiceCampaign?.invoices) return []
+    return invoiceCampaign.invoices
+      .filter(inv => inv.proofToken)
+      .map(inv => {
+        const firstEnroll = inv.enrollCourses?.[0]
+        return {
+          id: inv.id,
+          proofToken: inv.proofToken,
+          institutionId: inv.institutionId ?? 0,
+          userId: inv.userId ?? 0,
+          userAlias: {
+            id: inv.userAlias?.id ?? 0,
+            name: firstEnroll?.name ?? '',
+            email: firstEnroll?.email ?? '',
+            userId: inv.userId ?? 0,
+          },
+          sendWhatsapp: {
+            phone: firstEnroll?.phone ?? '',
+            email: firstEnroll?.email ?? '',
+            name: firstEnroll?.name ?? '',
+          },
+        } as unknown as PaymentProofTableItem
+      })
+  }, [isCompleted, invoiceCampaign?.invoices])
+
   const isDisabledActions = useMemo(() => {
     return isCreating || isUpdating
   }, [isCreating, isUpdating])
+
+  const handleSendInvoices = () => {
+    let endPath = 'send-multiple'
+    if (existingInvoiceCampaign?.isCombined) {
+      endPath = 'send'
+    }
+    if (invoiceCampaign?.jobId && !isCompleted) {
+      endPath = 'sending-progress'
+    }
+    navigate(
+      `/invoice-templates/editor/${endPath}` +
+        `?documentId=${searchParams.get('documentId') || ''}`
+    )
+  }
 
   const parentIds = useMemo(() => {
     // This should add the user's itself ID too
@@ -475,6 +610,7 @@ const InvoiceEditor = (): JSX.Element => {
   useEffect(() => {
     setInvoiceCampaign(prev => {
       if (!prev) return null
+      if (prev.isCombined === isOneSingleParent) return prev
       return {
         ...prev,
         isCombined: isOneSingleParent,
@@ -503,20 +639,6 @@ const InvoiceEditor = (): JSX.Element => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allSessions])
-
-  const onChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newTitle = event.target.value
-      .replace(/\s{2,}/g, ' ')
-      .replace(/^\s+/, '')
-    setInvoiceCampaign(prev => {
-      if (!prev) return null
-      return {
-        ...prev,
-        title: newTitle ?? prev.title,
-        isCombined: prev.isCombined ?? false,
-      }
-    })
-  }
 
   const onChangeMode = (value: boolean) => {
     setAppliedPromotions([])
@@ -547,6 +669,7 @@ const InvoiceEditor = (): JSX.Element => {
 
   return (
     <InvoiceEditorProvider>
+      <LessonDataLoader />
       <PackageDiscountAutoApplyAll />
       <ContentLayout
         headerBackButton={{
@@ -556,25 +679,18 @@ const InvoiceEditor = (): JSX.Element => {
         headerClassName="px-4 md:flex-row flex-col"
         leftHeader={
           <>
-            <Input
-              id="name"
-              placeholder={t(
-                'invoiceCampaign:studentCard.invoiceCampaignName'
-              ).toString()}
-              value={existingInvoiceCampaign?.title ?? ''}
-              onChange={onChangeName}
-              disabled={!existingInvoiceCampaign}
-            />
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <SegmentedSwitch
-                    disabled={!isOneSingleParent}
+                    disabled={!isOneSingleParent || isCompleted}
                     className="min-w-fit"
                     value={existingInvoiceCampaign?.isCombined ?? false}
                     onChange={onChangeMode}
-                    trueLabel={t('invoiceCampaign:editor.single') as string}
-                    falseLabel={t('invoiceCampaign:editor.multiple') as string}
+                    trueLabel={t('invoiceCampaign:editor.combined') as string}
+                    falseLabel={
+                      t('invoiceCampaign:editor.individual') as string
+                    }
                   />
                 </TooltipTrigger>
                 {!isOneSingleParent && (
@@ -593,7 +709,24 @@ const InvoiceEditor = (): JSX.Element => {
           </>
         }
         rightHeader={
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            {isCompleted && (
+              <div className="flex items-center gap-2">
+                <span className="rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
+                  {t('invoiceCampaign:editor.editMode')}
+                </span>
+                {existingInvoiceCampaign?.invoiceIds?.[0] && (
+                  <a
+                    href={`/application/edit?id=${existingInvoiceCampaign.invoiceIds[0]}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-600 underline hover:text-blue-800"
+                  >
+                    #{existingInvoiceCampaign.invoiceIds[0]}
+                  </a>
+                )}
+              </div>
+            )}
             {/* <Button
               variant="outline"
               iconBefore={<LuEye aria-hidden="true" />}
@@ -607,7 +740,7 @@ const InvoiceEditor = (): JSX.Element => {
             >
               {t('invoiceCampaign:editor.previewAllInvoices')}
             </Button> */}
-            {allStudents.length > 0 && (
+            {allStudents.length > 0 && !isCompleted && (
               <Button
                 iconBefore={<AiOutlineSave />}
                 variant="primary-outline"
@@ -619,23 +752,23 @@ const InvoiceEditor = (): JSX.Element => {
               </Button>
             )}
 
+            {isCompleted && (
+              <Button
+                variant="outline"
+                iconBefore={<LuSend />}
+                disabled={whatsappRows.length === 0}
+                onClick={() => setIsWhatsappModalOpen(true)}
+              >
+                {t('editor.send.sendViaWhatsApp', { ns: 'invoiceCampaign' })}
+              </Button>
+            )}
+
             <Button
               variant="default"
               iconBefore={<LuSend />}
               disabled={allStudents.length === 0 || isDisabledActions}
-              onClick={() => {
-                let endPath = 'send-multiple'
-                if (existingInvoiceCampaign?.isCombined) {
-                  endPath = 'send'
-                }
-                if (invoiceCampaign?.jobId) {
-                  endPath = 'sending-progress'
-                }
-                navigate(
-                  `/invoice-templates/editor/${endPath}` +
-                    `?documentId=${searchParams.get('documentId') || ''}`
-                )
-              }}
+              loading={isCreating || isUpdating}
+              onClick={handleSendInvoices}
             >
               {t('invoiceCampaign:editor.sendInvoices')}
             </Button>
@@ -646,6 +779,14 @@ const InvoiceEditor = (): JSX.Element => {
         <CourseAssignment />
         <Outlet />
       </ContentLayout>
+      {isWhatsappModalOpen && (
+        <ConfirmSendPaymentProof
+          action={SendPaymentActions.RESEND_PAYMENT_REMINDER}
+          selectedRows={whatsappRows}
+          isOpen={isWhatsappModalOpen}
+          onClose={() => setIsWhatsappModalOpen(false)}
+        />
+      )}
     </InvoiceEditorProvider>
   )
 }

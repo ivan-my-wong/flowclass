@@ -78,21 +78,21 @@ const PackageDiscountCard = ({
           <IconButton
             icon={<EyeOpenIcon />}
             onClick={onDetail}
-            title={t('common:action.viewDetail')}
+            title={t('common:action.viewDetail') as string}
           />
         )}
         {onEdit && (
           <IconButton
             icon={<Pencil1Icon />}
             onClick={onEdit}
-            title={t('common:action.edit')}
+            title={t('common:action.edit') as string}
           />
         )}
         {onDelete && (
           <IconButton
             icon={<TrashIcon />}
             onClick={onDelete}
-            title={t('common:action.delete')}
+            title={t('common:action.delete') as string}
           />
         )}
       </div>

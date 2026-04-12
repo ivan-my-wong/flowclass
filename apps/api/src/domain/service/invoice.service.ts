@@ -270,7 +270,7 @@ export class InvoiceService {
         originalFee,
         numOfLesson: pricingInfo.numberOfLesson,
         payAmount: hasPresetPayAmount ? previousInvoice.payAmount : pricingInfo.paymentAmount,
-        amountPaid: hasPresetPayAmount ? previousInvoice.payAmount : pricingInfo.paymentAmount,
+        amountPaid: 0,
         discountAmount: pricingInfo.totalDiscount,
         discounts: pricingInfo.discountInfo,
         paymentState: PaymentStatus.PENDING,
@@ -383,9 +383,7 @@ export class InvoiceService {
         course: {
           classes: true,
         },
-        promotionUsed: {
-          coupon: true,
-        },
+        invoicePromotionsUsed: true,
       },
       select: {
         studentSchedules: {
@@ -510,9 +508,8 @@ export class InvoiceService {
         course: {
           classes: true,
         },
-        promotionUsed: {
-          coupon: true,
-        },
+        invoicePromotionsUsed: true,
+        paymentEvidence: true,
       },
       select: {
         course: {
@@ -582,9 +579,7 @@ export class InvoiceService {
           firstStudentLesson: true,
         },
         course: true,
-        promotionUsed: {
-          coupon: true,
-        },
+        invoicePromotionsUsed: true,
       },
     })
     if (!found) {
@@ -615,9 +610,7 @@ export class InvoiceService {
           firstStudentLesson: true,
         },
         course: true,
-        promotionUsed: {
-          coupon: true,
-        },
+        invoicePromotionsUsed: true,
       },
     })
 
@@ -643,9 +636,7 @@ export class InvoiceService {
           firstStudentLesson: true,
         },
         course: true,
-        promotionUsed: {
-          coupon: true,
-        },
+        invoicePromotionsUsed: true,
       },
     })
     if (!found) {
@@ -667,7 +658,9 @@ export class InvoiceService {
       throw new NotFoundException(InvoiceErrorMessage.INVOICE_NOT_FOUND)
     }
     invoice.paymentState = state
-    invoice.amountPaid = invoice.payAmount ?? 0
+    if (state === PaymentStatus.PAID) {
+      invoice.amountPaid = invoice.payAmount ?? 0
+    }
     // invoice.approvedBy = approvedBy;
     // invoice.approverId = approverId;
     return await this.invoiceRepository.save(invoice)
@@ -728,9 +721,7 @@ export class InvoiceService {
         course: true,
       },
       childInvoices: true,
-      promotionUsed: {
-        coupon: true,
-      },
+      invoicePromotionsUsed: true,
     }
 
     const select: FindOptionsSelect<Invoice> = {
@@ -788,15 +779,7 @@ export class InvoiceService {
         id: true,
         status: true,
       },
-      promotionUsed: {
-        id: true,
-        coupon: {
-          id: true,
-          code: true,
-          discountType: true,
-          amount: true,
-        },
-      },
+      invoicePromotionsUsed: true,
       userAlias: {
         id: true,
         userId: true,
@@ -868,9 +851,7 @@ export class InvoiceService {
       },
       // course: true,
       childInvoices: true,
-      promotionUsed: {
-        coupon: true,
-      },
+      invoicePromotionsUsed: true,
     }
 
     const invoice = await this.invoiceRepository.findOne({

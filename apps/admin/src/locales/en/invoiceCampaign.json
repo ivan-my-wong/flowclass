@@ -52,8 +52,8 @@
   "editor": {
     "addAllLessonsOfCurrentSchedule": "Add All Lessons of Current Schedule",
     "addCourse": "Add Course",
-    "single": "Single Invoice",
-    "multiple": "Multiple Invoices",
+    "combined": "Combined Invoice",
+    "individual": "Individual Invoices",
     "combineInvoiceTooltip": "All users must belong to the same family group in order to combine the invoice",
     "addCourseFromList": "Add Courses from the list",
     "addCourseWithSchedule": "Add Course with Schedule",
@@ -184,6 +184,9 @@
     "regularV2periodLabel": "Period {{period}}",
     "removeSession": "Remove Session",
     "saveCampaign": "Save Campaign",
+    "editMode": "Edit Mode",
+    "editAndSendInvoices": "Edit and Send Invoice",
+    "viewOnly": "View Only",
     "searchStudents": "Search Students",
     "selectClass": "Select Class",
     "selectedLessons": "Selected Lessons",
@@ -192,6 +195,21 @@
     "selectStudentToViewCourse": "Select a student to view assigned courses",
     "send": {
       "allDone": "All Done!",
+      "allDoneWhatsApp": "Invoices created — you can now send via WhatsApp",
+      "waitingForInvoices": "Waiting for invoices to be created...",
+      "table": {
+        "name": "Student",
+        "amount": "Amount",
+        "status": "Status",
+        "completed": "completed"
+      },
+      "status": {
+        "sent": "Sent",
+        "created": "Created",
+        "failed": "Failed",
+        "processing": "Processing",
+        "pending": "Pending"
+      },
       "nextStep": "Next Step",
       "contentPlaceholder": "Hi [studentName],\n\nPlease find your invoice attached.\n\nBest regards,\n[schoolName]",
       "contentRequired": "Content is required",
@@ -205,6 +223,7 @@
       "processingInvoicesDesc": "Please wait while we create and send your invoices",
       "createButton": "Create Invoices",
       "sendButton": "Send Invoices",
+      "sendViaWhatsApp": "Send via WhatsApp",
       "sending": "Sending",
       "sendProgress": "Sending invoices...",
       "sendSingleButton": "Send Invoice",
@@ -225,6 +244,7 @@
       "whatsappPlaceholder": "Hi [studentName],\n\nPlease find your invoice attached.\n\nBest regards,\n[schoolName]",
       "steps": {
         "step1Title": "Step 1: Select Discounts & Credits",
+        "step1Preview": "Step 1: Preview Invoices",
         "step2PaymentInstallments": "Step 2: Select Payment Installments",
         "step2SendNotification": "Step 2: Send Notification",
         "billTo": "Bill to"
@@ -394,6 +414,7 @@
     "title": "Untitled Campaign"
   },
   "noInvoices": "No invoice campaigns created yet",
+  "untitledCampaign": "Untitled Campaign",
   "resend": {
     "confirmDetailBelow": "Please confirm the details below",
     "previewInvoice": "Preview Invoice",

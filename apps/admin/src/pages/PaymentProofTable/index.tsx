@@ -495,9 +495,9 @@ const PaymentProofPage = (): JSX.Element => {
       },
       cellClass: '!flex !items-center',
       cellStyle: ({ value }: { value: string }) => {
-        let color = 'var(--color-text-subtle)'
-        if (value === PaymentState.PENDING || value === PaymentState.UNPAID) {
-          color = 'var(--color-warn)'
+        let color = String(theme.colors.textSubtle)
+        if (value === PaymentState.PENDING) {
+          color = String(theme.colors.warn)
         } else if (value === PaymentState.CRITICAL) {
           color = 'var(--color-tertiary)'
         }
@@ -671,7 +671,6 @@ const PaymentProofPage = (): JSX.Element => {
     },
     {
       headerName: t('student:promotionUsed') as string,
-      field: 'promotionUsed',
       cellRenderer: ({ data }: ICellRendererParams<PaymentProofTableItem>) => {
         const currency = siteData.currentSite?.currency ?? ''
         return <PromotionCell currency={currency} data={data} t={t} />
@@ -935,7 +934,7 @@ const PaymentProofPage = (): JSX.Element => {
             hasCheckboxSelection
             rowData={filteredStudentList}
             useUrlSearch
-            columns={courseStudentTable}
+            columns={courseStudentTable ?? []}
             isLoading={isLoadingStudentList || isFetchingStudentList}
             gridRef={gridRef}
             inputRef={inputRef}

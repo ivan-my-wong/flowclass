@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { plainToInstance } from 'class-transformer'
 import { randomUUID } from 'crypto'
 import { utcToZonedTime } from 'date-fns-tz'
-import * as dayjs from 'dayjs'
+import dayjs from 'dayjs'
 import Stripe from 'stripe'
 import { Between, FindOptionsOrder, FindOptionsWhere, ILike, In, Repository } from 'typeorm'
 import { Transactional } from 'typeorm-transactional'
@@ -61,8 +61,6 @@ import { ClassPriceOption } from '@/models/class-price-options.entity'
 import { ClassEntity } from '@/models/classes.entity'
 import { ClassRepository } from '@/models/classes.repository'
 import { Coupon } from '@/models/coupons.entity'
-import { CoursePromotionUsed } from '@/models/course-promotion-used.entity'
-import { CoursePromotionUsedRepository } from '@/models/course-promotion-used.repository'
 import { Course, CustomField } from '@/models/courses.entity'
 import {
   ClassAdminNewRegistrationEmailParams,
@@ -84,8 +82,7 @@ import {
   AdditionalFeeConditions,
   ClassTypeEnum,
   PaymentMethod,
-  PriceType,
-  PromotionType,
+  PromotionType as PromotionTypeEnum,
   RecordLogType,
   STRIPE_CURRENCY,
   StripeCheckoutSessionType,
@@ -100,6 +97,7 @@ import {
 } from '@/models/enums/status'
 import { InstitutionsRepository } from '@/models/institutions.repository'
 import { Invoice } from '@/models/invoice.entity'
+import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
 import { LocationRoom } from '@/models/location-room.entity'
 import { RecordLog } from '@/models/record-log.entity'
@@ -180,7 +178,7 @@ export class EnrollCoursesService {
   constructor(
     private readonly enrollCourseRepository: EnrollCourseRepository,
     private readonly enrollClassMappingRepository: EnrollClassMappingRepository,
-    private readonly coursePromotionUsedRepository: CoursePromotionUsedRepository,
+    private readonly invoicePromotionUsedRepository: InvoicePromotionUsedRepository,
     private readonly transactionRepository: TransactionRepository,
     private readonly classLessonService: ClassLessonService,
     private readonly invoiceRepository: InvoiceRepository,
@@ -875,7 +873,7 @@ export class EnrollCoursesService {
     const successfulAccounts: StudentEnrollCourseAlias[] = listStudentAccount
       .filter((result) => result.status === 'fulfilled')
       // eslint-disable-next-line no-undef
-      .map((result: PromiseFulfilledResult<StudentEnrollCourseAlias>) => result.value)
+      .map((result) => (result as PromiseFulfilledResult<StudentEnrollCourseAlias>).value)
 
     const failedAccounts = listStudentAccount
       .filter((result) => result.status === 'rejected')
@@ -1123,7 +1121,7 @@ export class EnrollCoursesService {
       ...pricingInfoWithAdditionalFee,
       priceType: pickedClass.priceType,
       discountInfo: isTrialLesson
-        ? [pricingInfoWithAdditionalFee.discountInfo, PromotionType.TRIAL_LESSON]
+        ? [pricingInfoWithAdditionalFee.discountInfo, PromotionTypeEnum.TRIAL_LESSON]
             .filter(Boolean)
             .join(',')
         : pricingInfoWithAdditionalFee.discountInfo,
@@ -1152,7 +1150,7 @@ export class EnrollCoursesService {
       numberOfLesson: lessonCount,
       feePerLesson: meta.lessonPrice / lessonCount,
       originalFee: meta.lessonPrice,
-      discountInfo: isTrialLesson ? PromotionType.TRIAL_LESSON : '',
+      discountInfo: isTrialLesson ? PromotionTypeEnum.TRIAL_LESSON : '',
       couponDiscount: 0,
       additionalFee: 0,
       directDiscount: 0,
@@ -2381,9 +2379,9 @@ export class EnrollCoursesService {
       this.emitEnrollSseEvent({
         jobId,
         status: EnrollCourseSteps.FAILED,
-        error: error.message,
+        error: (error as any).message,
       })
-      const isCustomisedEnrollment = isCustomised || error.message.includes('customised')
+      const isCustomisedEnrollment = isCustomised || (error as any).message.includes('customised')
       if (isCustomisedEnrollment) {
         // Re throw the error
         throw error
@@ -2872,10 +2870,10 @@ export class EnrollCoursesService {
     try {
       await this.jwtService.verify(token, { ...this.jwtOption })
     } catch (error) {
-      if (error.name === 'TokenExpiredError') {
+      if ((error as any).name === 'TokenExpiredError') {
         throw AuthorizationException.tokenExpiredException()
       }
-      throw AuthorizationException.tokenInvalidException(error.message)
+      throw AuthorizationException.tokenInvalidException((error as any).message)
     }
 
     const invoice = await this.invoiceRepository.findOne({
@@ -2902,15 +2900,16 @@ export class EnrollCoursesService {
     return plainToInstance(StudentEnrollCourseResponse, found)
   }
 
-  async findPromotion(enrolId: number): Promise<CoursePromotionUsed> {
-    const found = await this.coursePromotionUsedRepository.findOne({
-      where: { enrollId: enrolId },
-    })
-    if (!found) {
+  async findPromotion(enrolId: number): Promise<any> {
+    const enrollCourse = await this.enrollCourseRepository.findOneBy({ id: enrolId })
+    if (!enrollCourse) {
       throw new NotFoundException(EnrollCourseErrorMessage.ENROLL_COURSE_NOT_FOUND)
     }
-
-    return plainToInstance(CoursePromotionUsed, found)
+    const found = await this.invoicePromotionUsedRepository.findOneBy({
+      invoiceId: enrollCourse.invoiceId,
+      promotionType: PromotionTypeEnum.COUPON_DISCOUNT,
+    })
+    return found ?? null
   }
 
   async beforePayment(dto: StudentConfirmEnrollDto, course: Course) {

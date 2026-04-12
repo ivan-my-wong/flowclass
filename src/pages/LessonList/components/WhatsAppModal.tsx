@@ -10,7 +10,6 @@ import {
   DialogTitle,
 } from '@/components/ui/Dialog'
 import { WHATSAPP_TEMPLATES } from '@/constants/whatsapp'
-import useCustomMessageData from '@/hooks/useCustomMessageData'
 
 export type WhatsAppRecipient = {
   studentId: number
@@ -47,19 +46,11 @@ const substituteVariables = (
 const WhatsAppModal = ({ open, onClose, recipients }: Props): JSX.Element => {
   const { t } = useTranslation()
 
-  const { useFetchCustomMessageData } = useCustomMessageData()
-  const { data: customMessagesData } = useFetchCustomMessageData()
-
-  const templates: TemplateOption[] = [
-    ...(customMessagesData?.data ?? [])
-      .filter(m => m.whatsappNotification)
-      .map(m => ({ id: `saved-${m.id}`, label: m.name, content: m.content })),
-    ...WHATSAPP_TEMPLATES.map(tpl => ({
-      id: tpl.id,
-      label: tpl.label,
-      content: tpl.build({ studentName: '{{studentName}}' }),
-    })),
-  ]
+  const templates: TemplateOption[] = WHATSAPP_TEMPLATES.map(tpl => ({
+    id: tpl.id,
+    label: tpl.label,
+    content: tpl.build({ studentName: '{{studentName}}' }),
+  }))
 
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
   const [messageBody, setMessageBody] = useState<string>('')

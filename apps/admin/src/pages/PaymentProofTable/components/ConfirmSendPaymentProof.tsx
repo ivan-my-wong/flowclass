@@ -239,10 +239,10 @@ const ConfirmSendPaymentProof = ({
         item => {
           let parent: StudentEnrolmentRecord | null = null
           if (item.childOfUserAliasId) {
-            parent =
+            const found =
               studentList.find(p => p.id === item.childOfUserAliasId) ?? null
-            if (parent) {
-              parent.phone = parent?.user.phone
+            if (found) {
+              parent = { ...found, phone: found.user?.phone ?? found.phone }
             }
           }
           return {

@@ -30,7 +30,9 @@ export const filterPaymentProof = (
   // const endDate = dayjs(chartDate.endDate).endOf('day')
 
   return courseStudentList.filter(item => {
-    const coupon = item.promotionUsed?.coupon?.code
+    const coupon = item.invoicePromotionsUsed?.find(
+      p => p.promotionType === 'COUPON_DISCOUNT'
+    )?.name
     const additionalFee = Number(item.additionalFee ?? 0)
     const isPromotionMatches =
       !selectedPromotion?.length ||

@@ -14,11 +14,8 @@ import {
   PopoverTrigger,
 } from '@/components/ui/Popover'
 import useSiteData from '@/hooks/useSiteData'
-import {
-  invoiceSessionState,
-  isInvoiceExistOnCampaignSelector,
-} from '@/stores/studentInvoice.store'
-import { ClassTypeEnum, PriceType } from '@/types/course'
+import { invoiceSessionState } from '@/stores/studentInvoice.store'
+import { ClassTypeEnum } from '@/types/course'
 import { InvoiceClassType } from '@/types/studentInvoice.type'
 import { formatCurrency } from '@/utils/currency'
 import dayjs from '@/utils/dayjs'
@@ -41,7 +38,6 @@ const SelectedInvoiceCourse: React.FC<Props> = ({
 
   const siteData = useSiteData()
   const { t } = useTranslation(['invoiceCampaign'])
-  const isInvoiceExist = useRecoilValue(isInvoiceExistOnCampaignSelector)
   const allInvoiceSessions = useRecoilValue(invoiceSessionState)
 
   const sessionList = useMemo(() => {
@@ -96,20 +92,18 @@ const SelectedInvoiceCourse: React.FC<Props> = ({
             )} */}
           </div>
         </div>
-        {!isInvoiceExist && (
-          <div className="ml-auto flex gap-3">
-            {courseItem.type !== ClassTypeEnum.subscription && (
-              <FiEdit
-                className="text-blue-500 hover:text-blue-700 cursor-pointer transition-colors"
-                onClick={onEditClassLessons}
-              />
-            )}
-            <FaRegTrashAlt
-              className="text-red-500 hover:text-red-700 cursor-pointer transition-colors"
-              onClick={() => onRemoveClass()}
+        <div className="ml-auto flex gap-3">
+          {courseItem.type !== ClassTypeEnum.subscription && (
+            <FiEdit
+              className="text-blue-500 hover:text-blue-700 cursor-pointer transition-colors"
+              onClick={onEditClassLessons}
             />
-          </div>
-        )}
+          )}
+          <FaRegTrashAlt
+            className="text-red-500 hover:text-red-700 cursor-pointer transition-colors"
+            onClick={() => onRemoveClass()}
+          />
+        </div>
       </div>
       <div
         className="text-sm text-gray-500 mb-1"
@@ -178,19 +172,18 @@ const SelectedInvoiceCourse: React.FC<Props> = ({
           </Popover>
         )}
       </div>
-      <div className="space-y-2">
+      {/* <div className="space-y-2">
         <ClassInfoItem
           icon={<FiMessageSquare />}
           label={t('invoice.invoiceRemark.title')}
         />
         <Input
           value={courseItem.remark}
-          disabled={!!isInvoiceExist}
           onChange={e => onRemarkChange(e.target.value)}
           className="border-gray-200"
           placeholder={t('invoice.invoiceRemark.placeholder') as string}
         />
-      </div>
+      </div> */}
     </div>
   )
 }

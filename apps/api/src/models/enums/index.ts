@@ -225,6 +225,7 @@ export enum PromotionType {
   COUPON_DISCOUNT = 'COUPON_DISCOUNT',
   RECURRING_DISCOUNT = 'RECURRING_DISCOUNT',
   TRIAL_LESSON = 'TRIAL_LESSON',
+  PACKAGE_DISCOUNT = 'PACKAGE_DISCOUNT',
 }
 
 export enum DiscountType {
@@ -316,6 +317,10 @@ export enum TextVersion {
 export enum StudentPrimaryIdentifier {
   EMAIL = 'email',
   PHONE = 'phone',
+}
+
+export enum GaMeasurementEventName {
+  PURCHASE = 'purchase',
 }
 
 export * from './status'

@@ -39,6 +39,7 @@ import {
   InvoiceSplitType,
   PromotionTypeItem,
 } from '@/types/studentInvoice.type'
+import { BulkSendDocumentStatus } from '@/types/templateManagement'
 import { formatCurrency } from '@/utils/currency'
 import {
   calculateTotalDiscount,
@@ -75,13 +76,10 @@ type DeductionAmount = {
 
 type DiscountCalculation = {
   totalDiscount: number
-  totalDiscountLabel: string
   discountAmounts: number[]
   discountAmountsByPromoId: Record<string | number, number>
   priceAfterDiscount: number
-  priceAfterDiscountLabel: string
   additionalFee?: number
-  additionalFeeLabel?: string
 }
 
 type UsedBalanced = {
@@ -582,13 +580,24 @@ export const InvoiceEditDialogProvider = ({
   )
 
   const calculatedDiscount: DiscountCalculation = useMemo(() => {
-    const currentPrice = totalPrice?.totalPrice || 0
+    // Fall back to subTotal so discounts compute correctly before the totalPrice
+    // sync effect runs (e.g. on initial render in edit mode)
+    const currentPrice =
+      totalPrice?.totalPrice || currentActiveStudent?.subTotal || 0
 
-    // Filter applied promotions to only include those belonging to the current student
+    // Filter applied promotions to only include those belonging to the current student.
+    // On first render the global appliedPromotionsState may not be populated yet
+    // (the sync effect fires after render), so fall back to the student's own stored
+    // promotions so the discount calculation is correct from the start.
     const isCombined = invoiceCampaign?.isCombined ?? false
     const currentClassIds = new Set(currentClasses.map(c => c.classId))
 
-    const studentPromotions = appliedPromotions.filter(item => {
+    const promotionsSource =
+      appliedPromotions.length > 0
+        ? appliedPromotions
+        : currentActiveStudent?.appliedPromotions ?? []
+
+    const studentPromotions = promotionsSource.filter(item => {
       // Package discounts are class-scoped: match by classId rather than studentId
       if (item.type === PromotionTypeItem.PACKAGE) {
         return item.classId != null && currentClassIds.has(item.classId)
@@ -599,17 +608,42 @@ export const InvoiceEditDialogProvider = ({
       return item.studentId === currentActiveStudent?.id
     })
 
-    return calculateTotalDiscount(
-      currentPrice,
-      studentPromotions,
-      siteData.currency
-    )
+    // For COMPLETED campaigns, use the stored DB columns as ground truth rather
+    // than re-computing from appliedPromotions. For editable campaigns (even
+    // when linked to an actual invoice), always compute from current promotions
+    // so user edits (adding/removing discounts) are reflected immediately.
+    // Use stored DB columns only for completed campaigns where the user hasn't
+    // actively changed any promotions. Once appliedPromotions is non-empty, the
+    // user is editing live — compute from those instead.
+    const isCompleted =
+      invoiceCampaign?.status === BulkSendDocumentStatus.COMPLETED
+    if (
+      isCompleted &&
+      currentActiveStudent?.discountAmount !== undefined &&
+      appliedPromotions.length === 0
+    ) {
+      const computed = calculateTotalDiscount(currentPrice, studentPromotions)
+      const storedDiscount = currentActiveStudent.discountAmount
+      const storedAdditionalFee = currentActiveStudent.additionalFee ?? 0
+      return {
+        ...computed,
+        totalDiscount: storedDiscount,
+        additionalFee: storedAdditionalFee,
+        priceAfterDiscount: currentPrice - storedDiscount + storedAdditionalFee,
+      }
+    }
+
+    return calculateTotalDiscount(currentPrice, studentPromotions)
   }, [
     appliedPromotions,
+    currentActiveStudent?.appliedPromotions,
+    currentActiveStudent?.discountAmount,
+    currentActiveStudent?.additionalFee,
     currentClasses,
-    siteData.currency,
     totalPrice?.totalPrice,
+    currentActiveStudent?.subTotal,
     invoiceCampaign?.isCombined,
+    invoiceCampaign?.status,
     currentActiveParent?.id,
     currentActiveStudent?.id,
   ])
@@ -688,37 +722,61 @@ export const InvoiceEditDialogProvider = ({
     }
   }, [finalPrice])
 
+  // Sync form fields when the active student switches (keyed on ID only).
+  // getBalance/getParentBalance are NOT deps here — they depend on the full
+  // currentActiveStudent object and would make this effect unstable.
+  // Balance fetching is handled in the separate effect below.
   useEffect(() => {
     if (currentActiveStudent) {
       const {
         invoiceRemark,
-        appliedPromotions: studentAppliedPromotions,
         invoiceSplitType,
         isPayByCredit: isInvoicePayByCredit,
         invoiceSplitItems,
+        subTotal,
       } = currentActiveStudent
+
+      // Read appliedPromotions from invoiceStudentState (canonical store) rather than
+      // currentActiveStudentState, which may be stale if PackageDiscountAutoApplyAll
+      // updated invoiceStudentState after the last currentActiveStudentState write.
+      const latestStudent = listInvoiceStudents.find(
+        s => s.id === currentActiveStudent.id
+      )
+      const studentAppliedPromotions =
+        latestStudent?.appliedPromotions ??
+        currentActiveStudent.appliedPromotions
+
       setRemark(invoiceRemark)
       setAppliedPromotions(studentAppliedPromotions)
       setInvoiceSplitType(invoiceSplitType)
       setPayByCredit(isInvoicePayByCredit ?? true)
-      if (currentActiveParent) {
-        getParentBalance()
-      } else {
-        getBalance()
-      }
       if (invoiceSplitType === 'custom-split' && invoiceSplitItems) {
         setInvoiceSplitItems(invoiceSplitItems)
       } else {
         setInvoiceSplitItems([generateDefaultInvoiceInstallment()])
       }
+      // In edit mode, initialize totalPrice from the stored gross amount
+      // to avoid showing $0 before currentClasses is populated
+      if (subTotal && subTotal > 0) {
+        setTotalPrice({
+          totalPrice: subTotal,
+          totalPriceLabel: formatCurrency(subTotal, currency),
+        })
+      }
     }
-  }, [
-    currentActiveStudent,
-    currentActiveParent,
-    getBalance,
-    getParentBalance,
-    setAppliedPromotions,
-  ])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentActiveStudent?.id, setAppliedPromotions])
+
+  // Fetch balance separately, keyed on IDs only to stay stable.
+  useEffect(() => {
+    if (!currentActiveStudent) return
+    if (currentActiveParent) {
+      getParentBalance()
+    } else {
+      getBalance()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentActiveStudent?.id, currentActiveParent?.id])
 
   // Sync-back: persist appliedPromotions changes to invoiceStudentState
   // so discount edits survive dialog close/reopen and student switching

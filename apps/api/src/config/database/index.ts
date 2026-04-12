@@ -43,7 +43,6 @@ import { SettingSiteService } from '@/domain/service/setting-site.service'
 import { SettingSocialService } from '@/domain/service/setting-social.service'
 import { SettingWebpageInstitutionService } from '@/domain/service/setting-webpage-institution.service'
 import { SitesService } from '@/domain/service/sites.service'
-import { StripeProductPricesService } from '@/domain/service/stripe-product-prices.service'
 import { StudentOnbService } from '@/domain/service/student-onboard.service'
 import { StudentScheduleService } from '@/domain/service/student-schedule.service'
 import { TrialLessonService } from '@/domain/service/trial-lesson.service'
@@ -71,12 +70,6 @@ import { CommonFormRepository } from '@/models/common-form.repository'
 import { Coupon } from '@/models/coupons.entity'
 import { CouponsRepository } from '@/models/coupons.repository'
 import {
-  CourseActivitiesOrderEntity,
-  CourseActivitiesOrderRepository,
-} from '@/models/course-activities-order.entity'
-import { CoursePromotionUsed } from '@/models/course-promotion-used.entity'
-import { CoursePromotionUsedRepository } from '@/models/course-promotion-used.repository'
-import {
   RecurringSchedules,
   RecurringSchedulesRepository,
 } from '@/models/course-recurring-schedules.entity'
@@ -90,7 +83,6 @@ import {
   EnrollCourseRepository,
 } from '@/models/enroll-courses.repository'
 import { InstitutionGallery } from '@/models/institution-gallery.entity'
-import { InstitutionGalleryRepository } from '@/models/institution-gallery.repository'
 import { Institution } from '@/models/institutions.entity'
 import { InstitutionsRepository } from '@/models/institutions.repository'
 
@@ -104,6 +96,8 @@ import {
 import { InviteMember } from '@/models/invite-member.entity'
 import { InviteMembersRepository } from '@/models/invite-members.repository'
 import { Invoice } from '@/models/invoice.entity'
+import { InvoicePromotionUsed } from '@/models/invoice-promotion-used.entity'
+import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
 import { LessonQuestion } from '@/models/lesson-question.entity'
 import { LessonQuestionRepository } from '@/models/lesson-question.repository'
@@ -141,8 +135,6 @@ import { Site } from '@/models/site.entity'
 import { SitesRepository } from '@/models/sites.repository'
 import { StripeConnect } from '@/models/stripe-connect.entity'
 import { StripeConnectRepository } from '@/models/stripe-connect.repository'
-import { StripeProductPricesEntity } from '@/models/stripe-product-prices.entity'
-import { StripeProductPricesRepository } from '@/models/stripe-product-prices.repository'
 import { StudentForm } from '@/models/student-form.entity'
 import { StudentLesson } from '@/models/student-lesson.entity'
 import { StudentLessonRepository } from '@/models/student-lesson.repository'
@@ -228,7 +220,6 @@ export const getAllEntities = () => [
   ClassPriceOption,
   CommentEntity,
   Coupon,
-  CoursePromotionUsed,
   Course,
   EnrollClassMapping,
   EnrollCourse,
@@ -236,6 +227,7 @@ export const getAllEntities = () => [
   Institution,
   InviteMember,
   Invoice,
+  InvoicePromotionUsed,
   RegularPeriods,
   PasswordResetToken,
   PaymentEvidence,
@@ -312,6 +304,7 @@ export const getAllRepositories = () => [
   ClassRepository,
   ClassLessonRepository,
   ClassPriceOptionRepository,
+  CourseActivitiesOrderRepository,
   TrialLessonRepository,
   ClassTrialLessonRepository,
   CouponsRepository,
@@ -333,9 +326,7 @@ export const getAllRepositories = () => [
   TransactionRepository,
   PaymentEvidenceRepository,
   InvoiceRepository,
-  CoursePromotionUsedRepository,
-  InstitutionGalleryRepository,
-  CourseActivitiesOrderRepository,
+  InvoicePromotionUsedRepository,
   BundleDiscountsRepository,
   PackageDiscountsRepository,
   RecurringSchedulesRepository,

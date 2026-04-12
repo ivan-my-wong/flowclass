@@ -357,7 +357,7 @@ const useStudentMetrics = (
                   return (
                     checkDateBetween(new Date(invoice.createdAt), chartDate) &&
                     [
-                      PaymentState.UNPAID,
+                      PaymentState.PENDING,
                       PaymentState.PENDING,
                       PaymentState.SUBMITTED,
                     ].includes(invoice.paymentState)

@@ -19,6 +19,12 @@ const PaymentStatusCell = ({ value }: PaymentStatusCellProps) => {
             return t('student:statusCritical')
           case PaymentState.SUBMITTED:
             return t('student:statusUploaded')
+          case PaymentState.PARTIALLY_PAID:
+            return (
+              <span className="text-amber-600 font-medium">
+                {t('student:statusPartiallyPaid')}
+              </span>
+            )
           default:
             return t('student:statusUnPaid')
         }

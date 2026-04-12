@@ -76,7 +76,7 @@ const CreatePackageDiscountForm = ({
           value={formData.name}
           onChange={e => updateFormData({ name: e.target.value })}
           className="w-full"
-          placeholder={t('promotion:packageDiscount.form.namePlaceholder')}
+          placeholder={t('promotion:packageDiscount.form.namePlaceholder') as string}
         />
       </Box>
 
@@ -125,7 +125,7 @@ const CreatePackageDiscountForm = ({
           value={classSearch}
           onChange={e => setClassSearch(e.target.value)}
           className="w-full"
-          placeholder={t('promotion:packageDiscount.form.searchClasses')}
+          placeholder={t('promotion:packageDiscount.form.searchClasses') as string}
         />
 
         {/* Select all visible checkbox */}

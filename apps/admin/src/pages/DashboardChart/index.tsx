@@ -321,11 +321,9 @@ const Dashboard = (): JSX.Element => {
         if (invoice.paymentState === PaymentState.PAID) {
           totalRevenueCurrent += invoiceAmount
         } else if (
-          [
-            PaymentState.UNPAID,
-            PaymentState.PENDING,
-            PaymentState.SUBMITTED,
-          ].includes(invoice.paymentState)
+          [PaymentState.PENDING, PaymentState.SUBMITTED].includes(
+            invoice.paymentState
+          )
         ) {
           unpaidRevenueCurrent += invoiceAmount
         } else if (invoice.paymentState === PaymentState.CRITICAL) {
@@ -338,11 +336,9 @@ const Dashboard = (): JSX.Element => {
         if (invoice.paymentState === PaymentState.PAID) {
           totalRevenuePrevious += invoiceAmount
         } else if (
-          [
-            PaymentState.UNPAID,
-            PaymentState.PENDING,
-            PaymentState.SUBMITTED,
-          ].includes(invoice.paymentState)
+          [PaymentState.PENDING, PaymentState.SUBMITTED].includes(
+            invoice.paymentState
+          )
         ) {
           unpaidRevenuePrevious += invoiceAmount
         } else if (invoice.paymentState === PaymentState.CRITICAL) {

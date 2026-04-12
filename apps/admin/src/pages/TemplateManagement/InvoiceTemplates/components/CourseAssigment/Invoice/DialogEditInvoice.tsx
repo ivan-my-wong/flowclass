@@ -138,10 +138,14 @@ const DialogEditInvoice: React.FC<Props> = ({
         <DialogBody>
           <div className="flex items-center gap-2 mb-4">
             <LuCalendar className="text-gray-500 shrink-0" size={16} />
-            <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
+            <label
+              htmlFor="dialog-payment-date"
+              className="text-sm font-medium text-gray-700 whitespace-nowrap"
+            >
               {t('editor.paymentDate')}
             </label>
             <DatePicker
+              id="dialog-payment-date"
               selected={
                 currentActiveStudent?.paymentDate
                   ? new Date(currentActiveStudent.paymentDate)

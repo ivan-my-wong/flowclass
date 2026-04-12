@@ -80,6 +80,10 @@ export type SingleStudentCrmRecordEnrolledClassesInvoice = {
   proofToken?: string
   remark?: string | null
   documentCampaignId?: number | null
+  /** userId of the admin/instructor who created this invoice */
+  createdBy?: number | null
+  /** User who created this invoice — populated when backend joins the users table */
+  createdByUser?: { id: number; email: string } | null
 }
 
 export type SingleStudentCrmRecordEnrolledClassesStudentSchedule = {

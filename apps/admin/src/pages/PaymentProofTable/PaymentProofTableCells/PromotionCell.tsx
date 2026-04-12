@@ -14,16 +14,18 @@ export const PromotionCell: React.FC<PromotionCellProps> = ({
   currency,
   t,
 }) => {
-  const coupon = data?.promotionUsed?.coupon
+  const couponPromotion = data?.invoicePromotionsUsed?.find(
+    p => p.promotionType === 'COUPON_DISCOUNT'
+  )
   const additionalFee = Number(data?.additionalFee ?? 0)
 
-  if (!coupon && !additionalFee) return null
+  if (!couponPromotion && !additionalFee) return null
 
   return (
     <div className="text-sm list-disc">
-      {coupon && (
+      {couponPromotion && (
         <p>
-          {t('promotion:titles.couponCode')}: {coupon.code},{' '}
+          {t('promotion:titles.couponCode')}: {couponPromotion.name},{' '}
           {formatCurrency(Number(data?.discountAmount), currency)}{' '}
           {t('student:paymentProof.discounted')}
         </p>

@@ -327,6 +327,7 @@ export class StudentOnbService {
       .leftJoinAndSelect('enrollCourse.studentSchedule', 'studentSchedule')
       .leftJoinAndSelect('studentSchedule.class', 'class')
       .leftJoinAndSelect('enrollCourse.invoice', 'invoice')
+      .leftJoinAndSelect('invoice.createdByUser', 'createdByUser')
       .leftJoinAndSelect('userAlias.studentForms', 'studentForms')
       .leftJoinAndSelect('studentSchedule.studentLessons', 'studentLessons')
       .where('userAlias.institutionId = :institutionId', { institutionId: params.institutionId })
@@ -384,6 +385,10 @@ export class StudentOnbService {
         'invoice.createdAt',
         'invoice.updatedAt',
         'invoice.usedBalance',
+        'invoice.createdBy',
+
+        'createdByUser.id',
+        'createdByUser.email',
 
         'course.id',
         'course.name',

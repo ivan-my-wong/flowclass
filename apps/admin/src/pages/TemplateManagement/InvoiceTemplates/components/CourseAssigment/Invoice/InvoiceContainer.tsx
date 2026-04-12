@@ -7,6 +7,7 @@ import { LuPhoneCall, LuUser } from 'react-icons/lu'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 
 import { Button } from '@/components/ui/Button'
+import useSiteData from '@/hooks/useSiteData'
 import {
   currentActiveParentState,
   currentActiveStudentState,
@@ -17,6 +18,7 @@ import {
   studentListState,
 } from '@/stores/studentInvoice.store'
 import type { InvoiceClassType } from '@/types/studentInvoice.type'
+import { formatCurrency } from '@/utils/currency'
 import { formatPhoneNumber } from '@/utils/misc'
 
 import NoItemPlaceholder from '../../../Editor/NoItemPlaceholder'
@@ -28,7 +30,8 @@ import SelectedInvoiceCourse from './SelectedInvoiceCourse'
 
 const InvoiceContainer = (): JSX.Element => {
   const { t } = useTranslation(['invoiceCampaign'])
-  const isInvoiceExist = useRecoilValue(isInvoiceExistOnCampaignSelector)
+  const { currentSite } = useSiteData()
+  const currency = currentSite?.currency ?? 'HKD'
   const currentActiveStudent = useRecoilValue(currentActiveStudentState)
   const currentActiveParent = useRecoilValue(currentActiveParentState)
   const invoiceCampaign = useRecoilValue(invoiceCampaignState)
@@ -42,6 +45,7 @@ const InvoiceContainer = (): JSX.Element => {
   }, [allClasses, currentActiveStudent])
   const { totalPrice, calculatedDiscount, finalPrice, usedBalance } =
     useContextInvoiceEditDialog()
+
   const [isOpenDialogEdit, setOpenDialogEdit] = useState<boolean>(false)
   const [isOpenConfirm, setOpenConfirm] = useState<boolean>(false)
 
@@ -141,17 +145,23 @@ const InvoiceContainer = (): JSX.Element => {
                 {t('editor.invoicePreview.discount')}
               </p>
               <p className="text-red-600">
-                {calculatedDiscount?.totalDiscountLabel}
+                {`-${formatCurrency(
+                  calculatedDiscount?.totalDiscount ?? 0,
+                  currency
+                )}`}
               </p>
             </div>
 
-            {!!calculatedDiscount?.additionalFeeLabel && (
+            {(calculatedDiscount?.additionalFee ?? 0) > 0 && (
               <div className="flex justify-between items-center font-semibold">
                 <p className="text-gray-900">
                   {t('editor.invoicePreview.additionalFee')}
                 </p>
                 <p className="text-blue-600">
-                  {calculatedDiscount?.additionalFeeLabel}
+                  {`+${formatCurrency(
+                    calculatedDiscount?.additionalFee ?? 0,
+                    currency
+                  )}`}
                 </p>
               </div>
             )}
@@ -187,15 +197,13 @@ const InvoiceContainer = (): JSX.Element => {
               </p>
               <p className="text-blue-600">{finalPrice?.currentLabel}</p>
             </div>
-            {!isInvoiceExist && (
-              <Button
-                className="w-full mt-4"
-                iconBefore={<IoDocumentTextOutline aria-hidden="true" />}
-                onClick={() => setOpenDialogEdit(true)}
-              >
-                {t('editor.editIndividualInvoice')}
-              </Button>
-            )}
+            <Button
+              className="w-full mt-4"
+              iconBefore={<IoDocumentTextOutline aria-hidden="true" />}
+              onClick={() => setOpenDialogEdit(true)}
+            >
+              {t('editor.editIndividualInvoice')}
+            </Button>
           </div>
         )}
       </>

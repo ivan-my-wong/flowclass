@@ -1,5 +1,5 @@
 import { studentLinksBaseUrl } from '@/constants/enrollmentFormFieldNames'
-import { API_BASE_URL } from '@/lib/config'
+import { API_BASE_URL, getBaseUrl } from '@/lib/config'
 import { Site } from '@/stores/siteData'
 import { Invoice, PaymentProofTableItem } from '@/types/enrollCourse'
 import { School } from '@/types/school'
@@ -32,6 +32,8 @@ export const getMediaFileUrl = (key: string | undefined) => {
 
   return `${baseUrl}/media/file/${encodedKey}`
 }
+
+export const getCmsOrigin = (): string => getBaseUrl()
 
 export const generatePaymentLink = (
   invoice: PaymentProofTableItem | Invoice | null,

@@ -31,11 +31,13 @@ type Props = {
   invoice: InvoiceCampaignDetailDto
   onChangeSplitType?: (type: InvoiceSplitType) => void
   onChangeInstallments?: (splits: InvoiceSplit[]) => void
+  readOnly?: boolean
 }
 const SplitInvoice: FC<Props> = ({
   invoice,
   onChangeSplitType,
   onChangeInstallments,
+  readOnly = false,
 }): JSX.Element => {
   const { t } = useTranslation('invoiceCampaign')
   const siteData = useSiteData()
@@ -177,6 +179,7 @@ const SplitInvoice: FC<Props> = ({
             onChangeSplitType?.(e as InvoiceSplitType)
             changeSplitItems(e as InvoiceSplitType)
           }}
+          disabled={readOnly}
         />
       </div>
       {invoice.splitType === 'custom-split' && (

@@ -5,12 +5,16 @@ import { DefaultTFuncReturn, t } from 'i18next'
 import { BiReceipt } from 'react-icons/bi'
 import { LuPenSquare } from 'react-icons/lu'
 import { TiEye } from 'react-icons/ti'
+import { useMutation } from 'react-query'
+import { toast } from 'sonner'
 
+import { updateAmountPaid, updateInvoicePaymentState } from '@/api/student'
 import LoadingButton from '@/components/Buttons/LoadingButton'
 import Box from '@/components/Containers/Box'
 import PaymentEvidenceReceiptPopup from '@/components/Popups/PaymentEvidenceReceiptPopup'
 import Text from '@/components/Texts/Text'
-import { ButtonVariant } from '@/components/ui/Button'
+import { Button, ButtonVariant } from '@/components/ui/Button'
+import ModalDialog from '@/components/ui/ModalDialog'
 import {
   PaymentEvidenceState,
   PaymentMethodsEnum,
@@ -18,6 +22,25 @@ import {
 } from '@/constants/payment'
 
 import { IPaymentReceiptCellProps } from './types'
+
+// Payment states the admin can manually assign when no receipt is uploaded
+const MANUAL_STATE_OPTIONS: Array<{
+  state: PaymentState
+  labelKey: string
+}> = [
+  { state: PaymentState.PAID, labelKey: 'student:paymentProof.approved' },
+  {
+    state: PaymentState.PARTIALLY_PAID,
+    labelKey: 'student:statusPartiallyPaid',
+  },
+  {
+    state: PaymentState.SUBMITTED,
+    labelKey: 'student:paymentProof.paymentStatusOptions.awaitingReviewProof',
+  },
+  { state: PaymentState.PENDING, labelKey: 'student:statusUnPaid' },
+  { state: PaymentState.REJECTED, labelKey: 'student:paymentProof.rejected' },
+  { state: PaymentState.REFUNDED, labelKey: 'student:statusRefunded' },
+]
 
 export const PaymentReceiptStatusCell = ({
   params,
@@ -34,6 +57,7 @@ export const PaymentReceiptStatusCell = ({
     paymentState: _paymentState,
     paymentMethod,
     paymentEvidence: uploadedEvidence,
+    payAmount,
   } = params
 
   const [uploadPaymentEvidenceStatus, setUploadPaymentEvidenceStatus] =
@@ -42,6 +66,8 @@ export const PaymentReceiptStatusCell = ({
     )
 
   const [paymentState, setPaymentState] = useState<PaymentState>(_paymentState)
+  const [isManualModalOpen, setIsManualModalOpen] = useState(false)
+  const [isPaidConfirmOpen, setIsPaidConfirmOpen] = useState(false)
 
   const isNeedToCheck = useMemo(() => {
     if (paymentMethod === PaymentMethodsEnum.PAY_NOW) return false
@@ -52,24 +78,73 @@ export const PaymentReceiptStatusCell = ({
     if (paymentState === PaymentState.PAID) {
       return t('student:paymentProof.confirmed')
     }
-
     if (paymentState === PaymentState.SUBMITTED) {
       return t('student:statusUploaded')
     }
-
     return t('student:paymentProof.updatePaymentStatus')
   }, [paymentState])
+
+  const { mutate: applyState, isLoading: isApplyingState } = useMutation(
+    (state: PaymentState) =>
+      updateInvoicePaymentState({
+        invoiceId: id,
+        siteId,
+        institutionId,
+        paymentState: state,
+      }),
+    {
+      onSuccess: (_data, state) => {
+        setPaymentState(state)
+        setIsManualModalOpen(false)
+        refetch?.()
+        onPaymentStateUpdate?.()
+      },
+      onError: () => {
+        toast.error(t('common:error.unexpectedError'))
+      },
+    }
+  )
+
+  const { mutate: confirmMarkAsPaid, isLoading: isMarkingAsPaid } = useMutation(
+    async () => {
+      const amount = Number(payAmount ?? 0)
+      await updateAmountPaid(institutionId, {
+        invoiceId: id,
+        amountPaid: amount,
+      })
+      await updateInvoicePaymentState({
+        invoiceId: id,
+        siteId,
+        institutionId,
+        paymentState: PaymentState.PAID,
+      })
+    },
+    {
+      onSuccess: () => {
+        setPaymentState(PaymentState.PAID)
+        setIsPaidConfirmOpen(false)
+        setIsManualModalOpen(false)
+        refetch?.()
+        onPaymentStateUpdate?.()
+      },
+      onError: () => {
+        toast.error(t('common:error.unexpectedError'))
+      },
+    }
+  )
+
+  const handleStateClick = (state: PaymentState) => {
+    if (state === PaymentState.PAID) {
+      setIsPaidConfirmOpen(true)
+    } else {
+      applyState(state)
+    }
+  }
 
   const renderTrigger =
     (buttonText: string, isDisabled = false, variant = 'subtle') =>
     (isLoading: boolean) => {
-      let icon
-      if (uploadedEvidence) {
-        icon = <TiEye />
-      } else {
-        icon = <LuPenSquare />
-      }
-
+      const icon = uploadedEvidence ? <TiEye /> : <LuPenSquare />
       return (
         <LoadingButton
           isLoading={isLoading}
@@ -84,9 +159,9 @@ export const PaymentReceiptStatusCell = ({
       )
     }
 
-  const handleUpdatePyamentState = (paymentState: PaymentState) => {
+  const handleUpdatePaymentState = (state: PaymentState) => {
     refetch?.()
-    setPaymentState(paymentState)
+    setPaymentState(state)
     onPaymentStateUpdate?.()
   }
 
@@ -113,7 +188,7 @@ export const PaymentReceiptStatusCell = ({
         options.variant
       )}
       setUploadPaymentEvidenceStatus={setUploadPaymentEvidenceStatus}
-      setPaymentState={handleUpdatePyamentState}
+      setPaymentState={handleUpdatePaymentState}
     />
   )
 
@@ -154,17 +229,79 @@ export const PaymentReceiptStatusCell = ({
     )
   }
 
+  // No receipt uploaded — show direct state-setting buttons in a modal
   if (!uploadedEvidence && isNeedToCheck) {
     return (
       <Box css={{ paddingTop: '$1' }} justify="flex-start">
-        {renderPaymentPopup({
-          description: t(
-            'student:paymentProof.paymentProofWithoutReceiptDesc'
-          ) as string,
-          title: t('student:paymentProof.paymentProofWithoutReceipt'),
-          buttonText: statusText,
-          variant: 'link',
-        })}
+        <LoadingButton
+          isLoading={false}
+          variant="link"
+          size="sm"
+          iconAfter={<LuPenSquare />}
+          dataTestId="payment-receipt-status-cell"
+          onClick={() => setIsManualModalOpen(true)}
+        >
+          <Text css={{ display: 'block' }}>
+            {t('student:paymentProof.updatePaymentStatus')}
+          </Text>
+        </LoadingButton>
+
+        <ModalDialog
+          open={isManualModalOpen}
+          onOpenChange={setIsManualModalOpen}
+          title={t('student:paymentProof.paymentProofWithoutReceipt') as string}
+          className="max-w-sm"
+        >
+          <p className="text-sm text-gray-500 mb-4 px-1">
+            {t('student:paymentProof.paymentProofWithoutReceiptDesc')}
+          </p>
+          <div className="flex flex-col gap-3 px-1 pb-2">
+            {MANUAL_STATE_OPTIONS.map(({ state, labelKey }) => (
+              <Button
+                key={state}
+                variant="outline"
+                className="w-full justify-center py-2"
+                loading={isApplyingState}
+                onClick={() => handleStateClick(state)}
+              >
+                {t(labelKey)}
+              </Button>
+            ))}
+          </div>
+        </ModalDialog>
+
+        <ModalDialog
+          open={isPaidConfirmOpen}
+          onOpenChange={setIsPaidConfirmOpen}
+          title={t('student:paymentProof.approved') as string}
+          className="max-w-sm"
+          footer={
+            <>
+              <Button
+                variant="outline"
+                onClick={() => setIsPaidConfirmOpen(false)}
+              >
+                {t('common:action.cancel')}
+              </Button>
+              <Button
+                variant="default"
+                loading={isMarkingAsPaid}
+                onClick={() => confirmMarkAsPaid()}
+              >
+                {t('common:action.confirm')}
+              </Button>
+            </>
+          }
+        >
+          <p className="text-sm text-gray-600 px-1">
+            {t('student:paymentProof.confirmMarkAsPaidDesc', {
+              amount: payAmount ?? 0,
+              defaultValue:
+                `The amount paid will be set to ${payAmount ?? 0}.` +
+                ' The invoice will be marked as fully paid.',
+            })}
+          </p>
+        </ModalDialog>
       </Box>
     )
   }

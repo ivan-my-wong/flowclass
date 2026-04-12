@@ -22,15 +22,17 @@ import {
 import { DocumentCampaignRecipientsRepository } from '@/models/document-campaign-recipients.repository'
 import { DocumentCampaignRepository } from '@/models/document-campaign.repository'
 import { Invoice } from '@/models/invoice.entity'
+import { InvoicePromotionUsed } from '@/models/invoice-promotion-used.entity'
+import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
-import * as PDFDocument from 'pdfkit'
+import PDFDocument from 'pdfkit'
 
 import { ObjectStorageProvider } from '@/config/storage/object-storage.provider'
 import { DocumentCampaign, DocumentCampaignStatus } from '@/models/document-campaign.entity'
 import { DocumentTemplateType } from '@/models/document-template.entity'
 import { UserAlias } from '@/models/user-aliases.entity'
-import * as dayjs from 'dayjs'
+import dayjs from 'dayjs'
 import 'dayjs/plugin/timezone'
 import { NodemailerEmailTransport } from '@/domain/external/email-transport.provider'
 
@@ -56,7 +58,7 @@ import {
   FeeModeType,
   PaymentMethod,
   PaymentStatus,
-  PriceType,
+  PromotionType as PromotionTypeEnum,
 } from '@/models/enums'
 
 import { SendPaymentActions } from '@/application/admin/payment-evidence/dto/confirm-state-payment-evidence.dto'
@@ -203,7 +205,8 @@ export class InvoiceCampaignService {
     private readonly objectStorageProvider: ObjectStorageProvider,
     private readonly whatsappWebService: WhatsappWebService,
     private readonly creditManagementService: CreditManagementService,
-    private readonly sitesRepository: SitesRepository
+    private readonly sitesRepository: SitesRepository,
+    private readonly invoicePromotionUsedRepository: InvoicePromotionUsedRepository
   ) {
     this.emailTransport = new NodemailerEmailTransport()
     this.jwtOption = {
@@ -219,7 +222,6 @@ export class InvoiceCampaignService {
     const where: FindOptionsWhere<DocumentCampaign> = {
       institutionId,
       type: DocumentTemplateType.INVOICE,
-      isSentOnly: false,
     }
     if (filter?.status && filter.status !== 'all') {
       where.status = filter.status as DocumentCampaignStatus
@@ -306,7 +308,8 @@ export class InvoiceCampaignService {
     institutionId: number,
     invoiceIds: number[],
     jobId: string,
-    processingData?: SendingInvoiceData[]
+    processingData?: SendingInvoiceData[],
+    createdByUserId?: number
   ): Promise<{
     invoicesResult: Invoice[]
     processingData: SendingInvoiceData[]
@@ -350,7 +353,8 @@ export class InvoiceCampaignService {
           service,
           jobId,
           invoiceIds,
-          processingData
+          processingData,
+          createdByUserId
         )
         this.logger.log(`Invoice created for Student: ${service.name}`)
         parentInvoice = pInvoice
@@ -372,7 +376,7 @@ export class InvoiceCampaignService {
           await this.documentCampaignRepository.save(document)
         }
       } catch (err) {
-        error = err
+        error = err as Error
         console.log(err)
         throw err
       }
@@ -387,6 +391,11 @@ export class InvoiceCampaignService {
           amount: (parentInvoice?.payAmount || 0).toString(),
           status: error ? SendingCampaignStatus.FAILED : SendingCampaignStatus.CREATED,
           message: error ? error.message : null,
+          invoiceId: parentInvoice.id,
+          proofToken: parentInvoice.proofToken,
+          userAliasId: parentInvoice.userAliasId,
+          userId: parentInvoice.userId,
+          institutionId: parentInvoice.institutionId,
         }
       }
       this.emitSendCampaignSseEvent({
@@ -453,6 +462,7 @@ export class InvoiceCampaignService {
       course: true,
       userAlias: true,
       user: true,
+      invoicePromotionsUsed: true,
       // enrollCourse: enrollCourseRelations,
     }
     if (withEnrollCourse) {
@@ -546,11 +556,44 @@ export class InvoiceCampaignService {
   async sendInvoiceSynchronous(
     documentCampaignId: number,
     institutionId: number,
-    dto: SendInvoiceDto
+    dto: SendInvoiceDto,
+    createdByUserId: number
   ) {
     const jobId = randomUUID()
     const documentCampaign = await this.getOneInvoiceCampaign(documentCampaignId, institutionId)
-    this.sendInvoices(documentCampaign, institutionId, dto, jobId)
+    this.sendInvoices(documentCampaign, institutionId, dto, jobId, createdByUserId)
+
+    return {
+      jobId,
+      document: documentCampaign,
+    }
+  }
+
+  /**
+   * Edit and re-send an already-sent invoice campaign.
+   *
+   * Unlike `sendInvoiceSynchronous` (which is used for first-time sends),
+   * this method validates that the campaign already has linked invoice records
+   * (invoiceIds). Those existing invoices are updated in-place, preserving
+   * the original `amountPaid` and setting `paymentState` to PARTIALLY_PAID
+   * when the new total exceeds what was already collected.
+   */
+  async editAndResendInvoiceCampaign(
+    documentCampaignId: number,
+    institutionId: number,
+    dto: SendInvoiceDto,
+    createdByUserId: number
+  ) {
+    const documentCampaign = await this.getOneInvoiceCampaign(documentCampaignId, institutionId)
+
+    if (!documentCampaign.invoiceIds?.length) {
+      throw new NotFoundException(
+        `Campaign ${documentCampaignId} has no existing invoices. Use /send-campaign for the initial send.`
+      )
+    }
+
+    const jobId = randomUUID()
+    this.sendInvoices(documentCampaign, institutionId, dto, jobId, createdByUserId)
 
     return {
       jobId,
@@ -562,7 +605,8 @@ export class InvoiceCampaignService {
     documentCampaign: DocumentCampaign,
     institutionId: number,
     dto: SendInvoiceDto,
-    jobId?: string
+    jobId?: string,
+    createdByUserId?: number
   ) {
     let processingData = []
     // Reset
@@ -600,7 +644,8 @@ export class InvoiceCampaignService {
             institutionId,
             invoiceIds,
             jobId,
-            processingData
+            processingData,
+            createdByUserId
           )
         processingData = data
         documentCampaign.invoiceIds = resInvoices.map((invoice) => invoice.id)
@@ -631,9 +676,14 @@ export class InvoiceCampaignService {
           continue
         }
 
-        // If this is combined invoice, we will send the parent invoice
+        // Match invoice by userAliasId first, then fall back to matching by userId or email
+        // to handle cases where userAlias lookup returns a different alias than the one on the invoice
         const invoice = invoices.find((inv) => {
-          return inv.userAliasId === userAlias.id
+          if (inv.userAliasId === userAlias.id) return true
+          if (inv.userAlias?.userId && inv.userAlias.userId === userAlias.userId) return true
+          if (inv.userAlias?.user?.email && inv.userAlias.user.email === recipient.email)
+            return true
+          return false
         })
 
         // ✅ Invoice should always exist if invoices were created successfully
@@ -807,10 +857,10 @@ export class InvoiceCampaignService {
       }
     } catch (error) {
       this.logger.error(
-        `Failed to send invoice for user ${userAlias.name}: ${error.message}`,
-        error.stack
+        `Failed to send invoice for user ${userAlias.name}: ${(error as any).message}`,
+        (error as any).stack
       )
-      result.error = error.message
+      result.error = (error as any).message
     }
     await this.documentCampaignRepository.update(
       {
@@ -868,7 +918,8 @@ export class InvoiceCampaignService {
     invoice: InvoiceItem,
     jobId: string,
     invoiceIds?: number[],
-    processingData?: SendingInvoiceData[]
+    processingData?: SendingInvoiceData[],
+    createdByUserId?: number
   ): Promise<{ invoice: Invoice; processingData: SendingInvoiceData[] }> {
     const institution = await this.institutionRepository.findOne({
       where: { id: institutionId },
@@ -902,7 +953,7 @@ export class InvoiceCampaignService {
           amount: (invoice.total || 0).toString(),
           invoiceNumber: undefined, // Will not be set since invoice creation failed
           status: SendingCampaignStatus.FAILED,
-          message: error.message,
+          message: (error as any).message,
         }
       }
       this.emitSendCampaignSseEvent({
@@ -1049,6 +1100,8 @@ export class InvoiceCampaignService {
     let enrollCourseInstances: EnrollCourse[] = []
     let tempInvoice: Invoice | null = null
     if (invoiceIds && invoiceIds.length > 0) {
+      // UPDATE path: find the existing invoice to preserve payment data,
+      // but create fresh enrollCourses from the DTO (same as the new-invoice branch)
       tempInvoice = await this.invoiceRepository.findOne({
         where: {
           id: In(invoiceIds || []),
@@ -1066,8 +1119,9 @@ export class InvoiceCampaignService {
         },
       })
       if (!tempInvoice) throw new NotFoundException('Invoice not found')
-      enrollCourseInstances = tempInvoice.enrollCourses
-    } else {
+      // Do NOT reuse tempInvoice.enrollCourses — fall through to create fresh ones
+    }
+    if (!tempInvoice || enrollCourseInstances.length === 0) {
       if (isCombined) {
         enrollCourseInstances = await this.createEnrollCourseInstances(
           institutionId,
@@ -1177,7 +1231,7 @@ export class InvoiceCampaignService {
           payAmount: calculatedAmount,
           dueDate: splitItem.dueDate,
           proofToken: token,
-          status: PaymentStatus.PENDING,
+          paymentState: PaymentStatus.PENDING,
           paymentMethod: PaymentMethod.PAY_LATER,
           splitType: invoice.splitType,
           userAliasId: userAlias.id,
@@ -1284,6 +1338,9 @@ export class InvoiceCampaignService {
     if (invoice.paymentDate) {
       invoiceResult.paymentDate = new Date(invoice.paymentDate)
     }
+    if (createdByUserId) {
+      invoiceResult.createdBy = createdByUserId
+    }
     let newInvoice = await this.invoiceRepository.save(invoiceResult)
     newInvoice.institution = institution
     // When creating bundle discounts, always ensure discountType is FIXED_AMOUNT (not PERCENTAGE)
@@ -1308,14 +1365,52 @@ export class InvoiceCampaignService {
       newInvoice.currency = currency
     }
     const parentUserAliasId = userAlias.childOfUserAliasId ?? userAlias.id
-    if (invoice.isPayByCredit && parentUserAliasId) {
-      const parentUserAlias = await this.userAliasRepository.findOneById(parentUserAliasId)
-      if (parentUserAlias && (tempInvoice?.usedBalance ?? 0) <= 0) {
-        newInvoice = await this.payByCredit(institutionId, parentUserAliasId, newInvoice)
+    // Use amountPaid > 0 rather than paymentState === PAID so that
+    // PARTIALLY_PAID invoices are also protected — any collected amount
+    // must be preserved unconditionally once an invoice exists.
+    const collectedAmount = tempInvoice?.amountPaid ?? 0
+    const hasCollectedPayment = !!tempInvoice && collectedAmount > 0
+    if (hasCollectedPayment) {
+      // Editing an invoice that has been at least partially paid:
+      // lock amountPaid and derive paymentState from the new total.
+      newInvoice.amountPaid = collectedAmount
+      if (payAmount > collectedAmount) {
+        // New total exceeds what was collected → still owes a balance
+        newInvoice.paymentState = PaymentStatus.PARTIALLY_PAID
+      } else {
+        // New total <= amount collected → fully settled; credit the excess
+        newInvoice.paymentState = PaymentStatus.PAID
+        const excess = collectedAmount - payAmount
+        if (excess > 0) {
+          const refundUserAliasId = userAlias.childOfUserAliasId ?? userAlias.id
+          await this.creditManagementService.addCredit(institutionId, {
+            institutionId,
+            amount: excess,
+            userAliasId: refundUserAliasId,
+            sourceType: CreditSourceType.REFUND,
+            description: `Credit refund from invoice adjustment #${newInvoice.id ?? ''}`,
+          })
+        }
+      }
+      // Never apply payByCredit on an invoice that already has a collected amount
+    } else {
+      // New invoice or existing invoice with zero collected: normal flow
+      newInvoice.paymentState = PaymentStatus.PENDING
+      if (invoice.isPayByCredit && parentUserAliasId) {
+        const parentUserAlias = await this.userAliasRepository.findOneById(parentUserAliasId)
+        if (parentUserAlias && (tempInvoice?.usedBalance ?? 0) <= 0) {
+          newInvoice = await this.payByCredit(institutionId, parentUserAliasId, newInvoice)
+        }
       }
     }
     newInvoice.userAliasId = userAlias.id
     await this.invoiceRepository.save(newInvoice)
+    await this.saveInvoicePromotionsUsed(
+      newInvoice.id,
+      invoice.siteId,
+      institutionId,
+      invoice.discounts ?? []
+    )
     if (userAlias.id) {
       const reminderData = await this.enrollCourseService.prepareReminderData(
         institutionId,
@@ -1351,6 +1446,39 @@ export class InvoiceCampaignService {
       invoice: newInvoice,
       processingData,
     }
+  }
+
+  private readonly dtoToModelPromotionType: Record<string, PromotionTypeEnum> = {
+    [PromotionType.BUNDLE]: PromotionTypeEnum.BUNDLE_DISCOUNT,
+    [PromotionType.COUPON]: PromotionTypeEnum.COUPON_DISCOUNT,
+    [PromotionType.MANUAL]: PromotionTypeEnum.DIRECT_DISCOUNT,
+    [PromotionType.REFERRAL]: PromotionTypeEnum.DIRECT_DISCOUNT,
+    [PromotionType.PACKAGE]: PromotionTypeEnum.PACKAGE_DISCOUNT,
+  }
+
+  private async saveInvoicePromotionsUsed(
+    invoiceId: number,
+    siteId: number,
+    institutionId: number,
+    discounts: DiscountInvoices[]
+  ): Promise<void> {
+    // Delete existing records for this invoice (upsert pattern for edit mode re-saves)
+    await this.invoicePromotionUsedRepository.delete({ invoiceId })
+
+    if (!discounts.length) return
+
+    const records: Partial<InvoicePromotionUsed>[] = discounts.map((discount) => ({
+      invoiceId,
+      siteId,
+      institutionId,
+      promotionType:
+        this.dtoToModelPromotionType[discount.type] ?? PromotionTypeEnum.DIRECT_DISCOUNT,
+      promotionId: typeof discount.id === 'number' ? discount.id : null,
+      name: discount.name ?? null,
+      amount: discount.amount,
+    }))
+
+    await this.invoicePromotionUsedRepository.save(records as InvoicePromotionUsed[])
   }
 
   async createEnrollCourseInstances(
@@ -1397,7 +1525,7 @@ export class InvoiceCampaignService {
 
   async payByCredit(institutionId: number, parentUserAliasId: number, invoice: Invoice) {
     const credit = await this.creditManagementService.getBalance(institutionId, parentUserAliasId)
-    if (credit) {
+    if (credit && credit.balance > 0) {
       try {
         const remainingPayment = credit.balance - invoice.payAmount
         let creditToBeUsed = invoice.payAmount
@@ -1417,7 +1545,7 @@ export class InvoiceCampaignService {
         invoice.payAmount = Math.max(0, invoice.payAmount - invoice.usedBalance)
         invoice.paymentState =
           invoice.payAmount <= 0 ? PaymentStatus.PAID : PaymentStatus.PARTIALLY_PAID
-        invoice.amountPaid = invoice.payAmount ?? 0
+        invoice.amountPaid = 0
       } catch (error) {
         this.logger.error('Error deducting credit:', error)
       }
@@ -1759,9 +1887,9 @@ export class InvoiceCampaignService {
       this.logger.log(`Email sent successfully to ${userAlias.name} (${userAlias.email})`)
       if (documentRecipient) documentRecipient.status = DocumentCampaignRecipientsStatus.DELIVERED
     } catch (err) {
-      this.logger.error('sendEmail', JSON.stringify(err.body))
+      this.logger.error('sendEmail', JSON.stringify((err as any).body))
       if (documentRecipient) documentRecipient.status = DocumentCampaignRecipientsStatus.FAILED
-      result.error = err.body
+      result.error = (err as any).body
       throw err
     } finally {
       if (documentRecipient) await this.documentRecipientRepository.save(documentRecipient)

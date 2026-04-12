@@ -211,11 +211,14 @@ export const formatCsvData = (
         : obj.statistics.totalPaidRevenueNum
     }
 
-    if (obj.promotionUsed && obj.promotionUsed.coupon) {
+    const couponPromotion = obj.invoicePromotionsUsed?.find(
+      p => p.promotionType === 'COUPON_DISCOUNT'
+    )
+    if (couponPromotion) {
       csvData.promotionUsed = `${t('promotion:titles.couponCode')}: ${
-        obj.promotionUsed.coupon.code
+        couponPromotion.name ?? ''
       }, -${formatCurrency(
-        Number(obj.promotionUsed.coupon.amount),
+        Number(couponPromotion.amount),
         obj.currency ?? firstEnrollCourse?.currency ?? ''
       )}`
     }

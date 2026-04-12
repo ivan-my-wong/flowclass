@@ -156,7 +156,7 @@ const EditPackageDiscount = (): JSX.Element => {
           classes={classSelectorOptions}
           onSubmit={() => setConfirmUpdate(true)}
           isEditing
-          submitButtonText={t('common:action.update')}
+          submitButtonText={t('common:action.update') as string}
         />
       </Box>
 

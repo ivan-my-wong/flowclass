@@ -7,6 +7,7 @@ import {
   createInvoiceCampaign,
   deleteInvoiceCampaign,
   duplicateInvoiceCampaign,
+  editAndResendInvoiceCampaign,
   fetchDetailInvoiceCampaign,
   fetchInvoiceCampaigns,
   fetchInvoicePdf,
@@ -123,6 +124,32 @@ const useInvoiceCampaignData = () => {
     })
   }
 
+  /** Re-send a completed campaign. Preserves amountPaid on the existing invoices. */
+  const useEditAndResendCampaign = (
+    onSuccess?: (res: SendingResponse) => void
+  ) => {
+    return useMutation({
+      mutationFn: (data: InvoiceCampaignDto) =>
+        editAndResendInvoiceCampaign(
+          currentSchoolId,
+          (data?.id || 0).toString(),
+          data
+        ),
+      onSuccess: (res: SendingResponse) => {
+        queryClient.invalidateQueries([
+          'invoiceCampaigns',
+          currentSchoolId,
+          res.document.id,
+        ])
+        toast.success(t('invoiceCampaign:editor.send.sendProgress'))
+        onSuccess?.(res)
+      },
+      onError: error => {
+        handleApiError({ error, t })
+      },
+    })
+  }
+
   const useDuplicateInvoiceCampaign = (
     onSuccess?: (invoiceCampaign: InvoiceCampaign) => void
   ) => {
@@ -191,6 +218,7 @@ const useInvoiceCampaignData = () => {
     useFetchDetailInvoiceCampaign,
     useUpdateInvoiceCampaign,
     useSendInvoiceCampaign,
+    useEditAndResendCampaign,
     useDuplicateInvoiceCampaign,
     useDeleteInvoiceCampaign,
     useResendInvoiceRecipient,

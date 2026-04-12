@@ -1,41 +1,31 @@
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
-import { LuChevronLeft, LuCopy, LuDownload } from 'react-icons/lu'
-import { useQueryClient } from 'react-query'
-import { useRecoilState } from 'recoil'
+import { LuCopy, LuDownload, LuPencil } from 'react-icons/lu'
+import { useRecoilValue } from 'recoil'
 import { toast } from 'sonner'
 
 import { fetchInvoicePdf } from '@/api/invoiceCampaign'
 import SkeletonLoader from '@/components/Loaders/SkeletonLoader'
-import Heading from '@/components/Texts/Heading'
 import { Button } from '@/components/ui/Button'
-import { QUERY_KEY } from '@/constants/queryKey'
 import usePaymentEvidenceData from '@/hooks/usePaymentEvidenceData'
-import useSchoolData from '@/hooks/useSchoolData'
-import useSiteData from '@/hooks/useSiteData'
 import ContentLayout from '@/layouts/ContentLayout'
-import { studentState } from '@/stores/studentData'
+import { schoolState } from '@/stores/schoolData'
+import { siteState } from '@/stores/siteData'
 import { PaymentProofTableItem } from '@/types/enrollCourse'
 import { generatePaymentLink } from '@/utils/generate-link.utils'
 
-import CreateTeachingService from '../StudentDetail/components/createTeachingService'
-
-import AdditionalQuestions from './components/Editor/AdditionalQuestions'
 import ApplicationInfo from './components/Editor/ApplicationInfo'
 import InvoiceItems from './components/Editor/InvoiceItems'
 import PaymentStatus from './components/Editor/PaymentStatus'
 
 const EditPaymentProof = (): JSX.Element => {
-  const { t } = useTranslation(['student', 'common'])
+  const { t } = useTranslation(['student', 'common', 'invoiceCampaign'])
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
 
-  const { schoolData } = useSchoolData()
-  const { currentSchool } = schoolData
-  const { siteData } = useSiteData()
-  const { currentSite } = siteData
+  const { currentSchool } = useRecoilValue(schoolState)
+  const { currentSite } = useRecoilValue(siteState)
 
   const { search } = useLocation()
   const invoiceData = useMemo(() => {
@@ -55,17 +45,12 @@ const EditPaymentProof = (): JSX.Element => {
     } as unknown as PaymentProofTableItem
   }, [search])
 
-  const [studentData, setStudentData] = useRecoilState(studentState)
-  const {
-    tableDrawers: { isOpenAssignCourse },
-  } = studentData
   const { useFetchStudentSingleInvoice } = usePaymentEvidenceData()
   const { data: detailInvoice, refetch } = useFetchStudentSingleInvoice(
     invoiceData?.id ?? 0
   )
 
   const firstEnrollCourse = detailInvoice?.enrollCourses?.[0]
-
   const coursePath = firstEnrollCourse?.course?.path
 
   const paymentLink = useMemo(() => {
@@ -77,19 +62,22 @@ const EditPaymentProof = (): JSX.Element => {
     )
   }, [detailInvoice, coursePath, currentSchool, currentSite])
 
-  const getTeachingService = useCallback(async () => {
-    await queryClient.invalidateQueries([
-      QUERY_KEY.teachingService.getTeachingServiceByInvoiceIdKey,
-      invoiceData?.id,
-    ])
-  }, [queryClient, invoiceData])
-
   const downloadPdf = async () => {
     const result = await fetchInvoicePdf(
       invoiceData?.institutionId ?? 0,
       invoiceData?.id ?? 0
     )
     window.open(result, '_blank')
+  }
+
+  const handleAdvancedEdit = () => {
+    if (!detailInvoice?.documentCampaignId) {
+      toast.error(t('student:paymentProof.action.noCampaign'))
+      return
+    }
+    navigate(
+      `/invoice-templates/editor?documentId=${detailInvoice.documentCampaignId}`
+    )
   }
 
   if (!invoiceData || !detailInvoice) {
@@ -108,40 +96,22 @@ const EditPaymentProof = (): JSX.Element => {
           </div>
         }
       >
-        <div className="w-full p-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="w-full md:w-4/12 space-y-4">
-              <SkeletonLoader height="300px" width="100%" />
-              <SkeletonLoader height="200px" width="100%" />
-            </div>
-            <div className="w-full md:w-8/12 space-y-4">
-              <SkeletonLoader height="250px" width="100%" />
-              <SkeletonLoader height="400px" width="100%" />
-            </div>
-          </div>
-        </div>
+        <div className="w-full h-screen bg-gray-50" />
       </ContentLayout>
     )
   }
 
   return (
     <ContentLayout
+      headerBackButton={{
+        mode: 'back',
+        action: () => navigate('/application'),
+      }}
+      headerClassName="px-4 md:flex-row flex-col"
       leftHeader={
-        <>
-          <Button
-            variant="ghost"
-            iconBefore={<LuChevronLeft />}
-            className="text-blue-500"
-            onClick={() => navigate('/application')}
-          >
-            {t('common:action.back')}
-          </Button>
-          <Heading>
-            {t('student:paymentProof.invoiceNumber', {
-              id: invoiceData.id,
-            })}
-          </Heading>
-        </>
+        <span className="font-semibold text-gray-800">
+          {t('student:paymentProof.invoiceNumber', { id: invoiceData.id })}
+        </span>
       }
       rightHeader={
         <div className="flex gap-2">
@@ -154,6 +124,7 @@ const EditPaymentProof = (): JSX.Element => {
             {t('student:paymentProof.action.downloadPDF')}
           </Button>
           <Button
+            variant="ghost"
             iconBefore={<LuCopy />}
             onClick={() => {
               navigator.clipboard.writeText(paymentLink)
@@ -162,41 +133,26 @@ const EditPaymentProof = (): JSX.Element => {
           >
             {t('student:paymentProof.action.copyLink')}
           </Button>
+          <Button
+            variant="primary-outline"
+            iconBefore={<LuPencil />}
+            onClick={handleAdvancedEdit}
+          >
+            {t('student:paymentProof.action.advancedEdit')}
+          </Button>
         </div>
       }
+      mainClassName="bg-gray-50"
     >
-      <div className="w-full p-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="w-full md:w-4/12 space-y-4">
-            <ApplicationInfo invoiceData={detailInvoice} refetch={refetch} />
-            <AdditionalQuestions
-              invoiceData={detailInvoice}
-              refetch={refetch}
-            />
-          </div>
-          <div className="w-full md:w-8/12 space-y-4">
-            <PaymentStatus invoiceData={detailInvoice} refetch={refetch} />
-            <InvoiceItems invoiceData={detailInvoice} />
-          </div>
+      <div className="flex gap-4 px-4 py-6 items-start w-full">
+        <div className="w-80 shrink-0">
+          <ApplicationInfo invoiceData={detailInvoice} refetch={refetch} />
+        </div>
+        <div className="flex-1 min-w-0 space-y-4">
+          <PaymentStatus invoiceData={detailInvoice} refetch={refetch} />
+          <InvoiceItems invoiceData={detailInvoice} />
         </div>
       </div>
-
-      <CreateTeachingService
-        open={isOpenAssignCourse}
-        handleClose={() => {
-          setStudentData(prev => ({
-            ...prev,
-            tableDrawers: {
-              ...studentData.tableDrawers,
-              isOpenAssignCourse: false,
-            },
-          }))
-          const queryParams = new URLSearchParams(search)
-          navigate(`/application/edit?${queryParams.toString()}`)
-          refetch()
-          getTeachingService()
-        }}
-      />
     </ContentLayout>
   )
 }

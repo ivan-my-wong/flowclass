@@ -1,15 +1,21 @@
+import { useState } from 'react'
+
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { LuCheckCircle, LuUser } from 'react-icons/lu'
+import { LuCheckCircle, LuSend } from 'react-icons/lu'
 
+import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
-import { DEFAULT_CURRENCY } from '@/constants/invoices'
-import useSiteData from '@/hooks/useSiteData'
+import ConfirmSendPaymentProof from '@/pages/PaymentProofTable/components/ConfirmSendPaymentProof'
+import {
+  PaymentProofTableEnrollCourse,
+  PaymentProofTableItem,
+} from '@/types/enrollCourse'
+import { SendPaymentActions } from '@/types/paymentProof'
 import {
   SendingCampaignStatus,
   SendingInvoiceData,
 } from '@/types/studentInvoice.type'
-import { formatCurrency } from '@/utils/currency'
 import { formatPhoneNumber } from '@/utils/misc'
 
 interface CompleteStepProps {
@@ -22,7 +28,7 @@ export function CompleteStep({
   totalCount,
 }: CompleteStepProps): JSX.Element {
   const { t } = useTranslation(['invoiceCampaign'])
-  const { currentSite } = useSiteData()
+  const [isSendModalOpen, setIsSendModalOpen] = useState(false)
 
   // Show all invoices that were created (not just ones to be sent)
   // Include invoices with status CREATED, SENT, or those that have invoiceNumber
@@ -114,12 +120,6 @@ export function CompleteStep({
                           </p>
                         </div>
                       </div>
-                      {/* <div className="text-2xl font-bold text-green-600">
-                        {formatCurrency(
-                          +(invoice.amount ?? '0'),
-                          currentSite?.currency ?? DEFAULT_CURRENCY
-                        )}
-                      </div> */}
                     </div>
                   </CardContent>
                 </Card>
@@ -127,6 +127,46 @@ export function CompleteStep({
             ))}
           </div>
         </div>
+
+        <div className="flex justify-center">
+          <Button
+            iconBefore={<LuSend />}
+            variant="outline"
+            onClick={() => setIsSendModalOpen(true)}
+          >
+            {t('editor.send.sendViaWhatsApp')}
+          </Button>
+        </div>
+
+        {isSendModalOpen && (
+          <ConfirmSendPaymentProof
+            action={SendPaymentActions.RESEND_PAYMENT_REMINDER}
+            selectedRows={createdInvoices
+              .filter(inv => inv.invoiceId && inv.proofToken)
+              .map(
+                inv =>
+                  ({
+                    id: inv.invoiceId!,
+                    proofToken: inv.proofToken!,
+                    institutionId: inv.institutionId ?? 0,
+                    userId: inv.userId ?? 0,
+                    userAlias: {
+                      id: inv.userAliasId ?? 0,
+                      name: inv.name,
+                      email: inv.email,
+                      userId: inv.userId ?? 0,
+                    },
+                    sendWhatsapp: {
+                      phone: inv.phone,
+                      email: inv.email,
+                      name: inv.name,
+                    },
+                  } as unknown as PaymentProofTableItem)
+              )}
+            isOpen={isSendModalOpen}
+            onClose={() => setIsSendModalOpen(false)}
+          />
+        )}
       </motion.div>
     </div>
   )

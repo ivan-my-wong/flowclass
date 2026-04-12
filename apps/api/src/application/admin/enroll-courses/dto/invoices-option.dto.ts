@@ -97,10 +97,7 @@ export const SELECT_INVOICE_FIELDS_EXAMPLE = {
     id: true,
     status: true,
   },
-  promotionUsed: {
-    id: true,
-    coupon: true,
-  },
+  invoicePromotionsUsed: true,
   splitItems: true,
 }
 export class InvoicesOptionDto extends PageOptionsDto {

@@ -36,7 +36,6 @@ import { CloudWatchLoggerProvider } from '@/config/loggers/cloudwatch-nestjs.pro
 import { ObjectStorageProvider } from '@/config/storage/object-storage.provider'
 import { UploadedStorageFile } from '@/config/storage/storage-image-upload-interceptor'
 import { EmailService } from '@/domain/external/email.service'
-import { WhatsappService } from '@/domain/external/whatsapp.service'
 import { StudentScheduleService } from '@/domain/service/student-schedule.service'
 import { AuthorizationException } from '@/exceptions/authorization.exception'
 import { EnrollCourseErrorMessage } from '@/exceptions/error-message/course'
@@ -44,15 +43,18 @@ import { InstitutionErrorMessage } from '@/exceptions/error-message/institution'
 import { InvoiceErrorMessage } from '@/exceptions/error-message/invoice'
 import { PaymentEvidenceErrorMessage } from '@/exceptions/error-message/payment-evidence'
 import { SiteErrorMessage } from '@/exceptions/error-message/site'
-import { WhatsappTemplateErrorMessage } from '@/exceptions/error-message/whatsapp-template'
-import { CoursePromotionUsedRepository } from '@/models/course-promotion-used.repository'
+import { UserErrorMessage } from '@/exceptions/error-message/user'
 import { Course } from '@/models/courses.entity'
 import { CoursesRepository } from '@/models/courses.repository'
 import { CreditSourceType } from '@/models/credit-transactions.entity'
 import { ClassAdminPaymentSubmittedEmailParams } from '@/models/custom-types/email-params'
 import { EnrollCourse } from '@/models/enroll-courses.entity'
 import { EnrollCourseRepository } from '@/models/enroll-courses.repository'
-import { PaymentMethod } from '@/models/enums/'
+import {
+  GaMeasurementEventName,
+  PaymentMethod,
+  PromotionType as PromotionTypeEnum,
+} from '@/models/enums/'
 import {
   CheckoutStatus,
   EnrollConfirmStatus,
@@ -64,6 +66,8 @@ import { Institution } from '@/models/institutions.entity'
 import { InstitutionsRepository } from '@/models/institutions.repository'
 import { Invoice } from '@/models/invoice.entity'
 import { InvoiceRepository } from '@/models/invoice.repository'
+import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
+import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { NotificationStatus } from '@/models/notification-record.entity'
 import { PaymentEvidence } from '@/models/payment-evidence.entity'
 import { PaymentEvidenceRepository } from '@/models/payment-evidence.repository'
@@ -77,7 +81,6 @@ import { TransactionRepository } from '@/models/transaction.repository'
 import { User } from '@/models/user.entity'
 import { UserAliasesRepository } from '@/models/user-aliases.repository'
 import { UsersRepository } from '@/models/users.repository'
-import { WhatsappTemplateRepository } from '@/models/whatsapp-template.entity'
 import { buildSuccessPaymentLink, buildUploadReceiptLink } from '@/utils/payment-link.utils'
 import { replaceContentVariables, shallow } from '@/utils/shallow.utils'
 import {
@@ -123,16 +126,14 @@ export class PaymentEvidenceService {
     private readonly studentLessonRepository: StudentLessonRepository,
     private readonly logger: CloudWatchLoggerProvider,
     private readonly invoiceRepository: InvoiceRepository,
-    private readonly coursePromotionUsedRepository: CoursePromotionUsedRepository,
-    private readonly whatsappTemplateRepository: WhatsappTemplateRepository,
-    private readonly whatsappService: WhatsappService,
-    private readonly customMessageService: CustomMessageService,
-    private readonly whatsappWebService: WhatsappWebService,
+    private readonly invoicePromotionUsedRepository: InvoicePromotionUsedRepository,
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
     private readonly notificationRecordService: NotificationRecordService,
     private readonly studentNotifSettingService: StudentNotifSettingService,
-    private readonly requestTimeChangeRepository: RequestTimeChangeRepository
+    private readonly requestTimeChangeRepository: RequestTimeChangeRepository,
+    private readonly customMessageService: CustomMessageService,
+    private readonly whatsappWebService: WhatsappWebService
   ) {
     this.jwtOption = {
       secret: process.env.JWT_SECRET,
@@ -746,22 +747,88 @@ export class PaymentEvidenceService {
     enrollCourse: EnrollCourse,
     user: User
   ) {
-    const promotionUsed = await this.coursePromotionUsedRepository.findOne({
-      where: { invoiceId: invoice.id },
-      relations: { coupon: true },
+    const invoicePromoUsed = await this.invoicePromotionUsedRepository.findOneBy({
+      invoiceId: invoice.id,
+      promotionType: PromotionTypeEnum.COUPON_DISCOUNT,
     })
 
-    if (promotionUsed && promotionUsed.coupon) {
-      // Update the promotion used status to confirmed
-      await this.couponsService.updatePromotionHistory({
-        coupon: promotionUsed.coupon,
-        course,
-        enrollId: enrollCourse.id,
-        invoiceId: invoice.id,
-        student: user,
-        status: PromotionUsedStatus.CONFIRMED,
+    if (invoicePromoUsed && invoicePromoUsed.usedStatus !== PromotionUsedStatus.CONFIRMED) {
+      await this.invoicePromotionUsedRepository.save({
+        ...invoicePromoUsed,
+        usedStatus: PromotionUsedStatus.CONFIRMED,
       })
     }
+
+    try {
+      // Get the time zone from the setting
+      const timeZone = await this.settingSiteService.getTimeZone(siteId)
+
+      // Send the Google Analytics measurement
+      await this.sendGoogleAnalyticsMeasurement(
+        enrollCourse,
+        transaction,
+        invoice,
+        user,
+        invoicePromoUsed?.promotionId,
+        timeZone
+      )
+    } catch (err) {
+      // Log the error
+      this.logger.error(UserErrorMessage.WEB_ANALYTICS_CANNOT_BE_SENT, err.stack)
+    }
+  }
+
+  /**
+   * Send the Google Analytics measurement for the purchase event
+   * @param enrollCourse The enroll course object
+   * @param transaction The transaction object
+   * @param invoice The invoice object
+   * @param user The user object
+   * @param promotionUsed The promotion used object
+   * @param timeZone The time zone of the institution
+   */
+  async sendGoogleAnalyticsMeasurement(
+    enrollCourse: EnrollCourse,
+    transaction: Transaction,
+    invoice: Invoice,
+    user: User,
+    couponId?: number,
+    timeZone?: string
+  ): Promise<void> {
+    // Send the Google Analytics measurement for the purchase event
+    this.gaMeasurementService.sendToWebGa({
+      userId: enrollCourse.userId,
+      clientId: invoice.proofToken,
+      events: [
+        {
+          name: GaMeasurementEventName.PURCHASE,
+          params: {
+            value: enrollCourse.paymentAmount,
+            transaction_id: transaction.id,
+            currency: enrollCourse.currency,
+            courseId: enrollCourse.courseId,
+            schoolId: enrollCourse.institutionId,
+            paymentMethod: PaymentMethod.PAY_NOW,
+            coupon: couponId ?? undefined,
+            timeZone,
+            items: [
+              {
+                item_id: enrollCourse.courseId,
+                item_name: enrollCourse.preferredName,
+                discount: invoice.discountAmount,
+                price: enrollCourse.paymentAmount,
+                currency: enrollCourse.currency,
+                coupon: couponId ?? undefined,
+              },
+            ],
+          },
+        },
+      ],
+      userProperties: {
+        email: enrollCourse.preferredEmail,
+        firebaseId: user.firebaseId,
+      },
+    })
   }
 
   @Transactional()
@@ -874,7 +941,7 @@ export class PaymentEvidenceService {
       throw new NotFoundException(EnrollCourseErrorMessage.ENROLL_COURSE_NOT_FOUND)
     }
     invoice.paymentState = PaymentStatus.REJECTED
-    invoice.amountPaid = invoice.payAmount ?? 0
+    invoice.amountPaid = 0
 
     //get course info
     const course =
@@ -1161,8 +1228,8 @@ export class PaymentEvidenceService {
       studentLessonId: In(studentLessons.map((lesson) => lesson.id)),
     })
 
-    // Find used coupon
-    await this.coursePromotionUsedRepository.softDelete({
+    // Delete promotion records for this invoice
+    await this.invoicePromotionUsedRepository.softDelete({
       invoiceId: invoice.id,
     })
     try {
@@ -1247,7 +1314,9 @@ export class PaymentEvidenceService {
     // update invoice's payment state
     const invoiceRepository = this.invoiceService.getRepository()
     invoice.paymentState = status
-    invoice.amountPaid = invoice.payAmount ?? 0
+    if (status === PaymentStatus.PAID) {
+      invoice.amountPaid = invoice.payAmount ?? 0
+    }
     invoice.reviewed = reviewed
     invoice.approvedBy = `${user.firstName} ${user.lastName}`
     invoice.approverId = user.id
@@ -1302,12 +1371,12 @@ export class PaymentEvidenceService {
       if (parentInvoice) {
         if (isAllPaid) {
           parentInvoice.paymentState = PaymentStatus.PAID
+          parentInvoice.amountPaid = parentInvoice.payAmount ?? 0
         } else if (isAnyPaid) {
           parentInvoice.paymentState = PaymentStatus.PARTIALLY_PAID
         } else {
-          parentInvoice.paymentState = PaymentStatus.UNPAID
+          parentInvoice.paymentState = PaymentStatus.PENDING
         }
-        parentInvoice.amountPaid = parentInvoice.payAmount ?? 0
         await invoiceRepository.save(parentInvoice)
       }
     }

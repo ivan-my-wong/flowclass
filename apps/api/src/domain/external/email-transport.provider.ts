@@ -29,7 +29,6 @@ export type APIResponse = {
   body?: unknown
 }
 
-
 export class SenderEntity {
   constructor(public readonly email: string, public readonly name?: string) {}
 }
@@ -168,7 +167,10 @@ export class NodemailerEmailTransport {
     return context
   }
 
-  private renderTemplate(templateName: string | undefined, context: Record<string, string>): string {
+  private renderTemplate(
+    templateName: string | undefined,
+    context: Record<string, string>
+  ): string {
     if (templateName) {
       const baseDir = path.join(__dirname, '../../common/email-templates')
       for (const ext of ['.hbs', '.html']) {

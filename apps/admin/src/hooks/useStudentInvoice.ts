@@ -22,6 +22,7 @@ import { QUERY_KEY } from '@/constants/queryKey'
 import { schoolState } from '@/stores/schoolData'
 import { siteState } from '@/stores/siteData'
 import { BundleDiscount, CheckEligibleDto } from '@/types/bundleDiscounts'
+import { PackageDiscount } from '@/types/packageDiscounts'
 import { StudentEnrolmentRecord } from '@/types/student'
 import {
   BundleDiscountAvailabilityResponse,
@@ -36,7 +37,11 @@ interface HookResult {
   useGetAllStudents: () => UseQueryResult<StudentEnrolmentRecord[]>
 
   useGetAllPromotions: () => UseQueryResult<
-    (PossiblePromotionsType | BundleDiscount)[],
+    (
+      | PossiblePromotionsType
+      | BundleDiscount
+      | (PackageDiscount & { promotionType: PromotionTypeItem })
+    )[],
     ApiError
   >
 

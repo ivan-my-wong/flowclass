@@ -522,7 +522,7 @@ class InvoiceWorker {
     const institution = invoice.institution
     institution.site = invoice.site
     const { billingNextDate, repeatFormat } = enrollCourse
-    if ([PaymentStatus.UNPAID, PaymentStatus.PENDING].includes(invoice.paymentState)) {
+    if ([PaymentStatus.PENDING].includes(invoice.paymentState)) {
       return
     }
     const applicants = await this.userRepository.findBy({

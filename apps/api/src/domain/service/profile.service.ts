@@ -399,9 +399,7 @@ export class ProfileService {
             },
           },
         },
-        promotionUsed: {
-          coupon: true,
-        },
+        invoicePromotionsUsed: true,
       },
       order: { createdAt: 'DESC' },
     })
@@ -504,7 +502,8 @@ export class ProfileService {
             },
           }))
         }),
-        promotion: i.promotionUsed?.coupon,
+        promotion:
+          i.invoicePromotionsUsed?.find((p) => p.promotionType === 'COUPON_DISCOUNT') ?? null,
         paymentDate,
         user: {
           email: i.userAlias?.email,

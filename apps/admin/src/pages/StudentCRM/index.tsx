@@ -18,6 +18,7 @@ import { useRecoilState, useRecoilValue } from 'recoil'
 
 import ApiError, { handleApiError } from '@/api/errors/apiError'
 import { getAllStudentsOfInstitutionNew } from '@/api/student'
+import ChartDatePicker from '@/components/DatePickers/ChartDatePicker'
 import DropdownMenu, {
   DropDownMenuItemType,
 } from '@/components/DropDownMenus/DropDownMenu'
@@ -546,6 +547,7 @@ const StudentDatabase = (): JSX.Element => {
             </div>
           )
         },
+        cellClass: '!flex !items-center',
       },
       {
         field: 'user.email',
@@ -565,6 +567,7 @@ const StudentDatabase = (): JSX.Element => {
             row.student.phone || row.student.user?.phone || ''
           )
         },
+        cellClass: '!flex !items-center',
       },
       {
         colId: 'email',
@@ -597,6 +600,29 @@ const StudentDatabase = (): JSX.Element => {
             </div>
           )
         },
+        cellClass: '!flex !items-center',
+      },
+      {
+        colId: 'createdByEmail',
+        headerName:
+          (t('student:column.createdByEmail') as string) || 'Created By',
+        width: 200,
+        minWidth: 160,
+        filter: false,
+        valueGetter: (params: ValueGetterParams) =>
+          (params.data as TableRowType).student.id,
+        spanRows: true,
+        cellRenderer: (params: ICellRendererParams) => {
+          const row = params.data as TableRowType
+          const emails = new Set<string>()
+          ;(row.student.enrollCourses ?? []).forEach(ec => {
+            const inv = ec.invoice ?? ec.invoices?.[0]
+            if (inv?.createdByUser?.email) emails.add(inv.createdByUser.email)
+          })
+          const label = emails.size > 0 ? [...emails].join(', ') : '—'
+          return <span className="text-sm">{label}</span>
+        },
+        cellClass: '!flex !items-center',
       },
       {
         colId: 'numClasses',
@@ -608,6 +634,7 @@ const StudentDatabase = (): JSX.Element => {
         valueGetter: (params: ValueGetterParams) =>
           (params.data as TableRowType).student.id,
         spanRows: true,
+        cellClass: '!flex !items-center',
         cellRenderer: (params: ICellRendererParams) => {
           const row = params.data as TableRowType
           const currentMonth = dayjs().format('YYYY-MM')
@@ -913,7 +940,7 @@ const StudentDatabase = (): JSX.Element => {
               </Button>
             </>
           </ProtectedComponent>
-        </div>
+        </>
       )}
     </Box>
   )
@@ -933,7 +960,7 @@ const StudentDatabase = (): JSX.Element => {
       label: t('teachingService:paymentStatus.submitted'),
     },
     {
-      value: PaymentState.UNPAID,
+      value: PaymentState.PENDING,
       label: t('teachingService:paymentStatus.unpaid'),
     },
   ]
