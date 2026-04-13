@@ -29,23 +29,23 @@ Flowclass ships with a full suite of modules out of the box:
 
 ## Screenshots
 
-![Flowclass dashboard](https://flowclass.io/wp-content/uploads/ezgif-2-d9fde3e8f2.jpg)
+![Course detail page](docs/screenshots/course-detail-web.png)
 
-![Automation flow](https://flowclass.io/wp-content/uploads/Imageautomation-flow.png)
+![Admin dashboard](docs/screenshots/admin-dashboard.png)
 
-<!-- Local screenshots — drop files into docs/screenshots/ and uncomment:
-![Dashboard](docs/screenshots/dashboard.png)
-![Student CRM](docs/screenshots/student-crm.png)
-![Scheduling](docs/screenshots/scheduling.png)
-![Invoicing](docs/screenshots/invoicing.png)
-![Payments](docs/screenshots/payments.png)
-![Enrolment](docs/screenshots/enrolment.png)
-![Promotions](docs/screenshots/promotions.png)
-![Notifications](docs/screenshots/notifications.png)
-![Public school page](docs/screenshots/web-school.png)
--->
+![Course page — responsive](docs/screenshots/course-page-responsive.png)
 
-> Add your own captures to [`docs/screenshots/`](docs/screenshots/) and uncomment the lines above.
+![Promotions & bundle discounts](docs/screenshots/promotions-admin.png)
+
+![Teaching sessions & booking](docs/screenshots/teaching-sessions-booking.png)
+
+![SEO structured data](docs/screenshots/seo-structured-data.png)
+
+![Teaching sessions — add](docs/screenshots/teaching-sessions-add.png)
+
+![Teaching sessions — edit with recurring schedule](docs/screenshots/teaching-sessions-edit-schedule.png)
+
+![Enrolment checkout & payment](docs/screenshots/enrolment-checkout.png)
 
 ## Self-hosting
 
