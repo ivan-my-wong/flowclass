@@ -80,13 +80,10 @@ export const getDomainFromReq = async (req: GetServerSidePropsContext['req']) =>
   // just to check if the header is correct, will remove in next update
   const hostHeader = req.headers.host || (req.headers[':authority'] as string)
 
-  if (
-    (req.headers.host?.includes('localhost') || req.headers.host?.includes('192.168.')) &&
-    (process.env.NEXT_ENV === 'development' ||
-      process.env.NEXT_ENV === 'staging' ||
-      process.env.NEXT_ENV === 'local')
-  ) {
-    return process.env.TEST_DOMAIN
+  if (req.headers.host?.includes('localhost') || req.headers.host?.includes('192.168.')) {
+    // For local dev: use TEST_DOMAIN if set, otherwise use the host header directly
+    // Set TEST_DOMAIN in .env to the site URL registered in your admin (e.g. localhost:3001)
+    return process.env.TEST_DOMAIN || hostHeader
   }
 
   try {

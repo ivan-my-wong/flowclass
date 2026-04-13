@@ -11,7 +11,7 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { randomUUID } from 'crypto'
 import { existsSync, mkdirSync } from 'fs'
 import { diskStorage } from 'multer'
-import path from 'path'
+import * as path from 'path'
 import { Observable } from 'rxjs'
 
 import { InstitutionErrorMessage } from '@/exceptions/error-message/institution'
@@ -60,8 +60,10 @@ export function StorageImageUploadInterceptor(
     async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
       try {
         const request = context.switchToHttp().getRequest()
-        const siteId = request?.site?.id.toString()
-        const institutionId = request?.institution?.id.toString()
+        const siteId = (request?.site?.id ?? request?.query?.siteId)?.toString()
+        const institutionId = (
+          request?.institution?.id ?? request?.query?.institutionId
+        )?.toString()
         const userId = request?.query.userId
 
         let filePath = ''
@@ -144,12 +146,12 @@ export function StorageImageUploadInterceptor(
           },
         }))()
 
-        ;(await interceptor.intercept(context, next)) as Observable<any>
+        const handlerObservable = await interceptor.intercept(context, next)
         const uploadedFile = request.file as UploadedStorageFile
         if (uploadedFile?.filename) {
           uploadedFile.key = `${filePath}/${uploadedFile.filename}`.replace(/\\/g, '/')
         }
-        return next.handle()
+        return handlerObservable
       } catch (error) {
         throw new BadRequestException(error.message)
       }

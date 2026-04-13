@@ -2,7 +2,7 @@ import { Controller, Get, Param, Res } from '@nestjs/common'
 import { ApiNotFoundResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Response } from 'express'
 import { existsSync } from 'fs'
-import path from 'path'
+import * as path from 'path'
 
 import { FileNotFoundException } from '@/exceptions/media.exception'
 

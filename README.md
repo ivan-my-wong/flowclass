@@ -1,24 +1,67 @@
-# Flowclass Open Source Monorepo
+# Flowclass
 
-Flowclass is organized as a minimal `pnpm` workspaces monorepo for simple local development and open-source collaboration.
+> For full product details, screenshots, and customer stories, visit **[flowclass.io](https://flowclass.io)**.
 
-## Links
+Flowclass is an open-source operations platform built for education businesses — tutorial centres, training academies, and small-to-medium schools that need more than a spreadsheet but less than an enterprise ERP.
 
-- **Website:** [flowclass.io](https://flowclass.io)
-- **Documentation:** [flowclass.io/docs](https://flowclass.io/docs)
+## Our Story
 
-## Documentation & Guide
+We spent two years building Flowclass as a SaaS product — a single platform for small to medium education companies and tutorial centres to automate their payments, scheduling, and student management.
 
-Full documentation is available at **[flowclass.io/docs](https://flowclass.io/docs)**, including:
+Over time, we realised that every education business runs differently. A music school works nothing like a coding bootcamp. A tutoring centre has workflows that a language school would never recognise. A SaaS with fixed opinions on how things should work just isn't scalable across that kind of diversity.
 
-- **Getting started** — environment setup, first run, and configuration
-- **Architecture overview** — how the web, API, and admin apps fit together
-- **Self-hosting guide** — deploying with Docker and configuring your environment
-- **Contributing guide** — code style, branching, and PR process
+So we pivoted. We moved to an enterprise model — per-contract, customised on top of our core Flowclass software — and focused on building a platform flexible enough to fit each client's actual operations. We still host Flowclass for our clients, but all future development happens here, in the open, with the community.
 
-For the fastest path from zero to a running instance, start with the [Getting Started](https://flowclass.io/docs) guide before working through the sections below.
+The goal is simple: build the operations system that fits every education business.
 
-## Quick start
+## What's Included
+
+Flowclass ships with a full suite of modules out of the box:
+
+- **Class types** — regular, recurring, and flexible schedule types to match how you actually run classes
+- **Application platform** — student enrolment flows with custom fields and approval stages
+- **Online payment integration** — Stripe-powered payments with receipt upload and verification
+- **Invoicing** — generate, track, and manage invoices per student or class
+- **Student CRM** — full student records, enrolment history, and communication log
+- **Promotions** — coupons, package discounts, and more
+- **Email notifications** — automated emails triggered by enrolments, payments, and reminders
+- **And much more** — reporting, materials, scheduling, and integrations
+
+## Screenshots
+
+![Flowclass dashboard](https://flowclass.io/wp-content/uploads/ezgif-2-d9fde3e8f2.jpg)
+
+![Automation flow](https://flowclass.io/wp-content/uploads/Imageautomation-flow.png)
+
+<!-- Local screenshots — drop files into docs/screenshots/ and uncomment:
+![Dashboard](docs/screenshots/dashboard.png)
+![Student CRM](docs/screenshots/student-crm.png)
+![Scheduling](docs/screenshots/scheduling.png)
+![Invoicing](docs/screenshots/invoicing.png)
+![Payments](docs/screenshots/payments.png)
+![Enrolment](docs/screenshots/enrolment.png)
+![Promotions](docs/screenshots/promotions.png)
+![Notifications](docs/screenshots/notifications.png)
+![Public school page](docs/screenshots/web-school.png)
+-->
+
+> Add your own captures to [`docs/screenshots/`](docs/screenshots/) and uncomment the lines above.
+
+## Self-hosting
+
+Anyone can run Flowclass on a single 8 GB instance with Docker installed:
+
+```bash
+git clone https://github.com/your-org/flowclass-open-source
+cd flowclass-open-source
+pnpm start
+```
+
+That's it. The start script handles Docker, dependencies, and all three apps (web, API, admin).
+
+---
+
+## Quick Start
 
 PostgreSQL is required and must run via Docker. Use the start script to run the entire application:
 
@@ -47,12 +90,12 @@ Edit `.env` with your database credentials and any other required values.
 
 ## Ports
 
-| App        | Port | URL                   |
-|------------|------|------------------------|
-| API        | 3100 | http://localhost:3100  |
-| CloudBeaver| 3101 | http://localhost:3101  |
-| Admin      | 3000 | http://localhost:3000  |
-| Web        | 3001 | http://localhost:3001  |
+| App         | Port | URL                    |
+|-------------|------|------------------------|
+| API         | 3100 | http://localhost:3100  |
+| CloudBeaver | 3101 | http://localhost:3101  |
+| Admin       | 3000 | http://localhost:3000  |
+| Web         | 3001 | http://localhost:3001  |
 
 ## CloudBeaver (Database Management)
 
@@ -68,7 +111,7 @@ CloudBeaver provides a web UI for managing the PostgreSQL database. Run `pnpm st
    - **Username:** `postgres`
    - **Password:** `postgres`
 
-## Common commands
+## Common Commands
 
 ```bash
 pnpm start        # Run entire app (Docker + install + dev)
@@ -82,6 +125,53 @@ pnpm type-check
 pnpm test
 pnpm evaluate:functionality
 ```
+
+## Docker Deployment
+
+```bash
+docker compose up --build
+```
+
+This Docker setup runs:
+
+- `postgres` for the primary database (data persists in a Docker volume named `postgres-data`)
+- `cloudbeaver` at http://localhost:3101 for database management (see [CloudBeaver](#cloudbeaver-database-management) above)
+- `api` on `http://localhost:3100`
+- `admin` on `http://localhost:3000`
+- `web` on `http://localhost:3001`
+
+Uploaded media is stored in a Docker named volume `media-data` (mounted at `/workspace/uploads` in the API container) and served by the API (`/media/file/*`). CloudBeaver data (connections, settings) persists in `cloudbeaver-data`. Data persists across container restarts. No S3 bucket is required.
+
+## Manual Setup
+
+If you prefer to run services manually instead of `pnpm start`:
+
+```bash
+docker compose up postgres smtp cloudbeaver -d
+pnpm install
+cp .env.example .env
+pnpm dev
+```
+
+## Open-Source Mode Defaults
+
+This repository is configured for open-source distribution:
+
+- subscription/paywall flows are disabled in this open-source build
+- no production secrets are stored in source control
+- environment variables must be provided via the root `.env` file (copy from `.env.example`)
+
+## Workspace Layout
+
+- `apps/web` — Next.js frontend
+- `apps/api` — Nest.js backend
+- `apps/admin` — Vite + React admin app
+
+## Prerequisites
+
+- **Node.js 24** (use `nvm use` or `fnm use` if you have `.nvmrc` / `.node-version`)
+- **pnpm** (>=10)
+- **Docker** (for PostgreSQL and SMTP)
 
 ## Contributing
 
@@ -97,49 +187,13 @@ pnpm evaluate:functionality
 
 ---
 
-## Docker deployment
+## Documentation & Guide
 
-```bash
-docker compose up --build
-```
+Full documentation is available at **[flowclass.io/docs](https://flowclass.io/docs)**, including:
 
-This Docker setup runs:
+- **Getting started** — environment setup, first run, and configuration
+- **Architecture overview** — how the web, API, and admin apps fit together
+- **Self-hosting guide** — deploying with Docker and configuring your environment
+- **Contributing guide** — code style, branching, and PR process
 
-- `postgres` for the primary database (data persists in a Docker volume named `postgres-data`),
-- `cloudbeaver` at http://localhost:3101 for database management (see [CloudBeaver (Database Management)](#cloudbeaver-database-management) above)
-- `api` on `http://localhost:3100`,
-- `admin` on `http://localhost:3000`,
-- `web` on `http://localhost:3001`.
-
-Uploaded media is stored in a Docker named volume `media-data` (mounted at `/workspace/uploads` in the API container) and served by the API (`/media/file/*`). CloudBeaver data (connections, settings) persists in `cloudbeaver-data`. Data persists across container restarts. No S3 bucket is required.
-
-## Manual setup
-
-If you prefer to run services manually instead of `pnpm start`:
-
-```bash
-docker compose up postgres smtp cloudbeaver -d
-pnpm install
-cp .env.example .env
-pnpm dev
-```
-
-## Open-source mode defaults
-
-This repository is configured for open-source distribution:
-
-- subscription/paywall flows are disabled in this open-source build,
-- no production secrets are stored in source control,
-- environment variables must be provided via the root `.env` file (copy from `.env.example`).
-
-## Workspace layout
-
-- `apps/web` - Next.js frontend
-- `apps/api` - Nest.js backend
-- `apps/admin` - Vite + React admin app
-
-## Prerequisites
-
-- **Node.js 24** (use `nvm use` or `fnm use` if you have `.nvmrc` / `.node-version`)
-- **pnpm** (>=10)
-- **Docker** (for PostgreSQL and SMTP)
+For the fastest path from zero to a running instance, start with the [Getting Started](https://flowclass.io/docs) guide before working through the sections below.

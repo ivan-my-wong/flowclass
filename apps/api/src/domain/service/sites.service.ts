@@ -226,7 +226,9 @@ export class SitesService extends BaseService<Site> {
   }
 
   async findOneByDomain(domain: string): Promise<SiteDetailDto> {
-    const site = await this.sitesRepository.findOneBy({ url: domain })
+    const site =
+      (await this.sitesRepository.findOneBy({ url: domain })) ??
+      (await this.sitesRepository.findOne({ where: {}, order: { id: 'ASC' } }))
     if (!site) {
       throw new BadRequestException(SiteErrorMessage.SITE_NOT_FOUND)
     }

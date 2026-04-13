@@ -8,7 +8,7 @@ import { JwtService, JwtSignOptions } from '@nestjs/jwt'
 import { plainToInstance } from 'class-transformer'
 import { isUUID } from 'class-validator'
 import { randomUUID } from 'crypto'
-import path from 'path'
+import * as path from 'path'
 import { EntityNotFoundError, FindOptionsOrder, FindOptionsWhere, In, IsNull, Not } from 'typeorm'
 import { Transactional } from 'typeorm-transactional'
 
@@ -302,9 +302,11 @@ export class PaymentEvidenceService {
       },
     })
 
+    const fileKey = file?.key ?? null
+
     if (paymentEvidenceInstance) {
       // update image and status
-      paymentEvidenceInstance.image = file.key
+      if (fileKey) paymentEvidenceInstance.image = fileKey
       paymentEvidenceInstance.status = PaymentEvidenceStatus.PROCESSING
     } else {
       paymentEvidenceInstance = this.paymentEvidenceRepository.create({
@@ -313,7 +315,7 @@ export class PaymentEvidenceService {
         userId: enrollCourseInstance.userId,
         enrollCourseId: enrollId,
         invoiceId: invoice.id,
-        image: file.key,
+        image: fileKey,
         status: PaymentEvidenceStatus.PROCESSING,
       })
     }
@@ -325,9 +327,13 @@ export class PaymentEvidenceService {
       paymentState: PaymentStatus.SUBMITTED,
     })
 
-    const imageBuffer = await this.objectStorageProvider.getObjectBuffer(file.key)
+    const imageBuffer = fileKey
+      ? await this.objectStorageProvider.getObjectBuffer(fileKey)
+      : null
 
-    const imageObjectAccessUrl = await this.objectStorageProvider.getObjectAccessUrl(file.key)
+    const imageObjectAccessUrl = fileKey
+      ? await this.objectStorageProvider.getObjectAccessUrl(fileKey)
+      : null
 
     const multipleClassMapping = enrollCourseInstance.multipleClassMapping ?? []
     const location = multipleClassMapping.map((o) => o.class?.locationRoom?.name ?? '')
@@ -351,7 +357,7 @@ export class PaymentEvidenceService {
       paymentMethod: invoice.paymentMethod,
       paymentStatus: PaymentEvidenceStatus.PROCESSING,
       enrolId: enrollCourseInstance.id.toString(),
-      filename: file.key,
+      filename: fileKey,
       file: imageBuffer,
       transactionId: paymentEvidence.id.toString(),
       paymentReceipt: imageObjectAccessUrl,

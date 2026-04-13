@@ -890,10 +890,26 @@ export class StripeConnectService {
     const stripeConnect = await this.stripeConnectRepository.findOneBy({
       institutionId,
     })
-    const stripeAccountRetrieve = await this.stripe.accounts.retrieve(stripeConnect.stripeAccountId)
-    if (!stripeAccountRetrieve || !stripeAccountRetrieve.payouts_enabled) {
+
+    if (!stripeConnect || !stripeConnect.stripeAccountId || !this.stripe) {
+      return plainToInstance(StripeConnect, {
+        institutionId,
+        status: IntegrationConnectStatus.NOTFOUND,
+        enabled: false,
+      })
+    }
+
+    try {
+      const stripeAccountRetrieve = await this.stripe.accounts.retrieve(
+        stripeConnect.stripeAccountId
+      )
+      if (!stripeAccountRetrieve || !stripeAccountRetrieve.payouts_enabled) {
+        stripeConnect.status = IntegrationConnectStatus.NOTFOUND
+      }
+    } catch {
       stripeConnect.status = IntegrationConnectStatus.NOTFOUND
     }
+
     return plainToInstance(StripeConnect, stripeConnect)
   }
 

@@ -102,10 +102,13 @@ export class EmailParams {
 
 export class NodemailerEmailTransport {
   public readonly email: { send: (params: EmailParams) => Promise<APIResponse> }
-  private readonly transporter: Transporter
+  private readonly smtpTransporter: Transporter
+  private readonly sendmailTransporter: Transporter
+  // null = not yet tested, true = SMTP OK, false = SMTP unavailable (use sendmail)
+  private smtpAvailable: boolean | null = null
 
   constructor() {
-    this.transporter = nodemailer.createTransport({
+    this.smtpTransporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'localhost',
       port: parseInt(process.env.SMTP_PORT || '1025', 10),
       secure: (process.env.SMTP_SECURE || 'false') === 'true',
@@ -113,11 +116,33 @@ export class NodemailerEmailTransport {
         process.env.SMTP_USER && process.env.SMTP_PASS
           ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
           : undefined,
+      connectionTimeout: 3000,
+      greetingTimeout: 3000,
     })
+
+    this.sendmailTransporter = nodemailer.createTransport({
+      sendmail: true,
+      newline: 'unix',
+      path: process.env.SENDMAIL_PATH || '/usr/sbin/sendmail',
+    } as any)
 
     this.email = {
       send: async (params: EmailParams) => this.send(params),
     }
+  }
+
+  private async resolveTransporter(): Promise<Transporter> {
+    if (this.smtpAvailable === null) {
+      try {
+        await this.smtpTransporter.verify()
+        this.smtpAvailable = true
+        console.log('[Email] SMTP connection verified — using SMTP transport')
+      } catch {
+        this.smtpAvailable = false
+        console.warn('[Email] SMTP unavailable — falling back to sendmail transport')
+      }
+    }
+    return this.smtpAvailable ? this.smtpTransporter : this.sendmailTransporter
   }
 
   private async send(params: EmailParams): Promise<APIResponse> {
@@ -125,11 +150,12 @@ export class NodemailerEmailTransport {
       return { statusCode: 400, body: { message: 'Invalid email params' } }
     }
 
+    const transporter = await this.resolveTransporter()
     const firstRecipient = params.to[0]
     const context = this.resolveTemplateContext(firstRecipient.email, params)
     const html = params.html || this.renderTemplate(params.templateId, context)
 
-    const result: any = await this.transporter.sendMail({
+    const result: any = await transporter.sendMail({
       from: this.formatSender(params.from),
       to: params.to.map((recipient) => this.formatSender(recipient)).join(', '),
       replyTo: params.replyTo ? this.formatSender(params.replyTo) : undefined,

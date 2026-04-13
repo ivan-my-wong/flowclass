@@ -7,7 +7,7 @@ import {
 import { instanceToPlain, plainToInstance } from 'class-transformer'
 import * as crypto from 'crypto'
 import { pick } from 'lodash'
-import path from 'path'
+import * as path from 'path'
 import { FindOptionsOrder, FindOptionsWhere, ILike, In, ObjectLiteral } from 'typeorm'
 import { Transactional } from 'typeorm-transactional'
 
@@ -265,7 +265,9 @@ export class InstitutionsService extends BaseService<Institution> {
   }
 
   async findOneByUrl(domain: string, url?: string) {
-    const site = await this.sitesRepository.findOneBy({ url: domain })
+    const site =
+      (await this.sitesRepository.findOneBy({ url: domain })) ??
+      (await this.sitesRepository.findOne({ where: {}, order: { id: 'ASC' } }))
 
     if (!site) {
       throw new BadRequestException(SiteErrorMessage.SITE_NOT_FOUND)
@@ -289,7 +291,8 @@ export class InstitutionsService extends BaseService<Institution> {
       }
 
       if (url && url !== '') {
-        institution = institutionList.find((school) => school.url === url)
+        // Fall back to the first institution if the URL doesn't match any school
+        institution = institutionList.find((school) => school.url === url) ?? institutionList[0]
       } else {
         // Return the default institution of the site by taking the first one that is created
         institution = institutionList[0]

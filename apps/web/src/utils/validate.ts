@@ -35,8 +35,14 @@ export const validateDomain = (s?: string): boolean => {
       /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.staging)?(\.flowclass\.io|\.course\.site|\.flowclass\.site|\.educator\.site)$/
 
     const healthCheckDomain = /^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
+    const localhostDomain = /^localhost(:\d+)?$/
 
-    return validDomain.test(s) || validSubdomain.test(s) || healthCheckDomain.test(s)
+    return (
+      validDomain.test(s) ||
+      validSubdomain.test(s) ||
+      healthCheckDomain.test(s) ||
+      localhostDomain.test(s)
+    )
   } else {
     return false
   }
