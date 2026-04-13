@@ -2,9 +2,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
 
-import Box from '@/components/Containers/Box'
-import Text from '@/components/Texts/Text'
-import { PromotionType } from '@/types/coupon'
+import { cn } from '@/utils/cn'
 
 type PromotionCardProps = {
   icon: string
@@ -27,30 +25,24 @@ const PromotionCard: React.FC<PromotionCardProps> = ({
   const navigate = useNavigate()
 
   return (
-    <Box
+    <div
       data-testid={`promotion-${title.toLowerCase().replace(' ', '-')}`}
-      direction="column"
-      responsive
-      css={{
-        backgroundColor: '$backgroundLayer2',
-        borderRadius: '$1',
-        gap: '$2',
-        width: '47%', // Set default width to 50%
-        height: '250px',
-        filter: disabled ? 'grayscale(100%)' : 'none',
-        transition: 'background-color 0.3s ease-in-out',
-        '&:hover': {
-          backgroundColor: disabled ? '$backgroundLayer2' : '$backgroundLayer3',
-          cursor: disabled ? 'default' : 'pointer',
-        },
-        '@media (min-width: 768px)': {
-          // Apply styles for screens 768px and larger (desktop)
-          width: '24%', // Set width to 200px on desktop
-        },
-      }}
-      padding="medium"
+      className={cn(
+        'flex flex-col items-center justify-start gap-2 rounded-lg p-4',
+        'w-[47%] md:w-[24%] h-[250px]',
+        'bg-background-layer-2 transition-colors duration-300',
+        disabled
+          ? 'grayscale cursor-default'
+          : 'cursor-pointer hover:bg-background-layer-3'
+      )}
+      role="button"
+      tabIndex={disabled ? -1 : 0}
       onClick={() => {
-        if (!disabled) {
+        if (!disabled) navigate(url)
+      }}
+      onKeyDown={e => {
+        if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault()
           navigate(url)
         }
       }}
@@ -58,42 +50,25 @@ const PromotionCard: React.FC<PromotionCardProps> = ({
       <img
         src={icon}
         alt=""
-        style={{ width: '100px', height: '100px' }}
+        className="w-[100px] h-[100px] object-contain"
         draggable={false}
       />
 
-      <Text
-        align="center"
-        css={{
-          fontSize: '$mediumLarge',
-          color: disabled ? '$textDisabled' : '$text',
-          fontWeight: 600,
-          marginTop: '$4',
-        }}
+      <p
+        className={cn(
+          'text-base font-semibold text-center mt-4',
+          disabled ? 'text-text-disabled' : 'text-text'
+        )}
       >
         {title}
-      </Text>
+      </p>
 
       {!disabled ? (
-        <Text
-          css={{
-            fontSize: '$mediumLarge',
-            marginTop: '$2',
-          }}
-        >
-          {numOfPromotion}
-        </Text>
+        <p className="text-base mt-2 text-text">{numOfPromotion}</p>
       ) : (
-        <Text
-          css={{
-            fontSize: '$medium',
-            color: disabled ? '$textDisabled' : '$text',
-          }}
-        >
-          {t('promotion:comingSoon')}
-        </Text>
+        <p className="text-sm text-text-disabled">{t('promotion:comingSoon')}</p>
       )}
-    </Box>
+    </div>
   )
 }
 

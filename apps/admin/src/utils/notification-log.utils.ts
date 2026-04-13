@@ -22,12 +22,6 @@ export const filterNotifications = (
   }
   return notifications
     .filter(item => {
-      const isAutomationFlowMatches =
-        notificationAutomationFlow.length > 0
-          ? notificationAutomationFlow.some(
-              data => data.value === item.automationFlow?.id
-            )
-          : true
       const isWhatsappTemplateMatches =
         notificationWhatsappTemplate.length > 0
           ? notificationWhatsappTemplate.some(

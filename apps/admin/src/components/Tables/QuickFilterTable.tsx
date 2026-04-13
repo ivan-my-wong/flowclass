@@ -1,6 +1,7 @@
 import {
   ComponentPropsWithoutRef,
   RefObject,
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -156,11 +157,6 @@ const QuickFilterTable: React.FC<TableProps> = ({
       minWidth: columnMinWidth,
     }
   }, [columnMinWidth])
-
-  const checkboxColumnDef = useMemo(
-    () => ({ ...createCheckboxColumnDef(), ...checkboxColumnOverrides }),
-    [checkboxColumnOverrides]
-  )
 
   const processedColumns = useMemo(() => {
     return columns.map(column => {

@@ -495,9 +495,9 @@ const PaymentProofPage = (): JSX.Element => {
       },
       cellClass: '!flex !items-center',
       cellStyle: ({ value }: { value: string }) => {
-        let color = String(theme.colors.textSubtle)
+        let color = 'var(--color-text-subtle)'
         if (value === PaymentState.PENDING) {
-          color = String(theme.colors.warn)
+          color = 'var(--color-warn)'
         } else if (value === PaymentState.CRITICAL) {
           color = 'var(--color-tertiary)'
         }
@@ -529,6 +529,11 @@ const PaymentProofPage = (): JSX.Element => {
           <PaymentReceiptStatusCell
             params={value.data}
             paymentEvidenceList={paymentEvidenceList}
+            onPaymentStateUpdate={() => {
+              refreshData()
+              refetch()
+            }}
+            refetch={refetch}
           />
         ) : null
       },

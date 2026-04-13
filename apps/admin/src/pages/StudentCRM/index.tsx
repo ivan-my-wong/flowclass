@@ -4,8 +4,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
   ColDef,
   ColumnMovedEvent,
+  GetQuickFilterTextParams,
   ICellRendererParams,
   IRowNode,
+  ValueGetterParams,
 } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import { utcToZonedTime } from 'date-fns-tz'
@@ -42,7 +44,6 @@ import {
 import { STALE_TIME } from '@/constants/common'
 import { PaymentState } from '@/constants/payment'
 import { QUERY_KEY } from '@/constants/queryKey'
-import selectorOptions from '@/constants/selectorOptions'
 import useCheckPermissionAndQuota from '@/hooks/useCheckPermissionAndQuota'
 import useCourseData from '@/hooks/useCourseData'
 import useDynamicHeight from '@/hooks/useDynamicHeight'
@@ -147,8 +148,6 @@ const rearrangeColumnsByOrder = (
 const StudentDatabase = (): JSX.Element => {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { matchModeItems } = selectorOptions()
-  const operatorRef = useRef<LabelSelectorRef>(null)
   const gridRef = useRef<AgGridReact<StudentEnrolmentRecord>>(null)
 
   const [schoolData] = useRecoilState(schoolState)
@@ -191,6 +190,13 @@ const StudentDatabase = (): JSX.Element => {
     startDate: startDate || formatDateRelativeToToday(7),
     endDate: endDate || formatDateRelativeToToday(0),
   })
+  const [paymentViewChartDate, setPaymentViewChartDate] = useState<ChartDate>({
+    startDate: dayjs().startOf('month').format('YYYY-MM-DD'),
+    endDate: dayjs().endOf('month').format('YYYY-MM-DD'),
+  })
+  const handlePaymentViewMonthChange = (date: ChartDate) => {
+    setPaymentViewChartDate(date)
+  }
   const [filteredStudentList, setFilteredStudentList] = useState<
     StudentEnrolmentRecord[]
   >([])
@@ -200,7 +206,6 @@ const StudentDatabase = (): JSX.Element => {
     importCSVModalHandle.current?.handleOpenChange?.()
   }
   const statusRef = useRef<LabelSelectorRef>(null)
-  const courseRef = useRef<LabelSelectorRef>(null)
   const classRef = useRef<LabelSelectorRef>(null)
 
   const [selectedPaymentStatus, setSelectedPaymentStatus] =
@@ -500,8 +505,8 @@ const StudentDatabase = (): JSX.Element => {
         filter: false,
         headerName: t('student:column.phone').toString(),
         width: 140,
-        valueGetter: (params: any) => {
-          const studentData: StudentEnrolmentRecord = params?.data
+        valueGetter: (params: ValueGetterParams) => {
+          const studentData: StudentEnrolmentRecord = params.data
           return studentData.phone || studentData.user?.phone
         },
 
@@ -521,7 +526,7 @@ const StudentDatabase = (): JSX.Element => {
             </div>
           )
         },
-        getQuickFilterText: (params: any) => {
+        getQuickFilterText: (params: GetQuickFilterTextParams) => {
           const data = params.data as StudentEnrolmentRecord
           return data.phone || data.user?.phone || ''
         },
@@ -550,47 +555,24 @@ const StudentDatabase = (): JSX.Element => {
         cellClass: '!flex !items-center',
       },
       {
-        field: 'user.email',
-        filter: false,
-        valueGetter: (params: ValueGetterParams) =>
-          (params.data as TableRowType).student.id,
-        spanRows: true,
-        getQuickFilterText: (params: GetQuickFilterTextParams) => {
-          const row = params.data as TableRowType
-          return formatPhoneNumber(
-            row.student.phone || row.student.user?.phone || ''
-          )
-        },
-        cellRenderer: (params: ICellRendererParams) => {
-          const row = params.data as TableRowType
-          return formatPhoneNumber(
-            row.student.phone || row.student.user?.phone || ''
-          )
-        },
-        cellClass: '!flex !items-center',
-      },
-      {
         colId: 'email',
         headerName: (t('student:column.email') as string) || '',
         width: 200,
         minWidth: 180,
         filter: false,
         valueGetter: (params: ValueGetterParams) =>
-          (params.data as TableRowType).student.id,
+          (params.data as StudentEnrolmentRecord).id,
         spanRows: true,
         getQuickFilterText: (params: GetQuickFilterTextParams) => {
-          const row = params.data as TableRowType
-          return [
-            row.student.email || row.student.user?.email || '',
-            row.student.secondaryEmail || '',
-          ]
+          const row = params.data as StudentEnrolmentRecord
+          return [row.email || row.user?.email || '', row.secondaryEmail || '']
             .filter(Boolean)
             .join(' ')
         },
         cellRenderer: (params: ICellRendererParams) => {
-          const row = params.data as TableRowType
-          const primary = row.student.email || row.student.user?.email || '-'
-          const secondary = row.student.secondaryEmail
+          const row = params.data as StudentEnrolmentRecord
+          const primary = row.email || row.user?.email || '-'
+          const secondary = row.secondaryEmail
           return (
             <div className="flex flex-col gap-0.5">
               <span>{primary}</span>
@@ -610,12 +592,12 @@ const StudentDatabase = (): JSX.Element => {
         minWidth: 160,
         filter: false,
         valueGetter: (params: ValueGetterParams) =>
-          (params.data as TableRowType).student.id,
+          (params.data as StudentEnrolmentRecord).id,
         spanRows: true,
         cellRenderer: (params: ICellRendererParams) => {
-          const row = params.data as TableRowType
+          const row = params.data as StudentEnrolmentRecord
           const emails = new Set<string>()
-          ;(row.student.enrollCourses ?? []).forEach(ec => {
+          ;(row.enrollCourses ?? []).forEach(ec => {
             const inv = ec.invoice ?? ec.invoices?.[0]
             if (inv?.createdByUser?.email) emails.add(inv.createdByUser.email)
           })
@@ -632,14 +614,14 @@ const StudentDatabase = (): JSX.Element => {
         minWidth: 80,
         filter: false,
         valueGetter: (params: ValueGetterParams) =>
-          (params.data as TableRowType).student.id,
+          (params.data as StudentEnrolmentRecord).id,
         spanRows: true,
         cellClass: '!flex !items-center',
         cellRenderer: (params: ICellRendererParams) => {
-          const row = params.data as TableRowType
+          const row = params.data as StudentEnrolmentRecord
           const currentMonth = dayjs().format('YYYY-MM')
           const count =
-            row.student.enrollCourses?.filter(
+            row.enrollCourses?.filter(
               o =>
                 o.course &&
                 o.studentSchedule?.some(schedule =>
@@ -657,8 +639,8 @@ const StudentDatabase = (): JSX.Element => {
         colId: 'classLabel',
         headerName: t('student:column.teachingServiceEnrolled') as string,
         width: 220,
-        valueGetter: (params: any) => {
-          const studentData: StudentEnrolmentRecord = params?.data
+        valueGetter: (params: ValueGetterParams) => {
+          const studentData: StudentEnrolmentRecord = params.data
           return studentData.email || studentData.user?.email
         },
 
@@ -679,7 +661,7 @@ const StudentDatabase = (): JSX.Element => {
         headerName: t('student:column.teachingServiceEnrolled').toString(),
         filter: false,
         sortable: false,
-        getQuickFilterText: (params: any) => {
+        getQuickFilterText: (params: GetQuickFilterTextParams) => {
           const data = params.data as StudentEnrolmentRecord
 
           const enrollCourses = (data?.enrollCourses || [])?.filter(o => {
@@ -781,7 +763,7 @@ const StudentDatabase = (): JSX.Element => {
             <div className="text-sm flex items-center px-2 py-4">{value}</div>
           )
         },
-        getQuickFilterText: (params: any) => {
+        getQuickFilterText: (params: GetQuickFilterTextParams) => {
           const data = params.data as StudentEnrolmentRecord
           const { isMerged } = data as any
           const { mergedStudents } = data as any
@@ -970,28 +952,7 @@ const StudentDatabase = (): JSX.Element => {
       studentData: StudentEnrolmentRecord[],
       filters: FilterParams
     ): StudentEnrolmentRecord[] => {
-      let result = studentData
-
-      if (filters.search && filters.search.trim()) {
-        const searchLower = filters.search.trim().toLowerCase()
-        result = result.filter(student => {
-          const name = student.name || ''
-          const email = student.email || student.user?.email || ''
-          const phone = student.phone || student.user?.phone || ''
-          const studentId = student.studentId ?? ''
-          const id = String(student.id ?? '')
-          return (
-            name.toLowerCase().includes(searchLower) ||
-            email.toLowerCase().includes(searchLower) ||
-            phone.toLowerCase().includes(searchLower) ||
-            formatPhoneNumber(phone).toLowerCase().includes(searchLower) ||
-            studentId.toLowerCase().includes(searchLower) ||
-            id.includes(searchLower)
-          )
-        })
-      }
-
-      const filteredList = result.filter(({ enrollCourses, user }) => {
+      const filteredList = studentData.filter(({ enrollCourses, user }) => {
         const hasMatchingCourseId =
           (filters.selectedCourse.length === 0 &&
             filters.selectedClass.length === 0) ||

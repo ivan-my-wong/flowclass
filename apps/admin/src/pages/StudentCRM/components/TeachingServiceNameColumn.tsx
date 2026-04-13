@@ -43,7 +43,6 @@ const TeachingServiceNameColumn = ({
     <>
       {filteredRecurrClasses.length === 1 ? (
         <div className="box-row-full py-2 justify-start items-start">
-          {remark}
           <Badge variant="success">
             <GiNewShoot size="15" />
             {t('teachingService:firstEnrolStatus.newStudent')}
@@ -55,8 +54,7 @@ const TeachingServiceNameColumn = ({
           className="box-row-full py-2 justify-start"
           data-testid="remark-button"
         >
-          {remark}
-          <span>{value}</span>
+          {nameNode}
         </div>
       )}
     </>

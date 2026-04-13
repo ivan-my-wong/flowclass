@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import { t } from 'i18next'
 import { BiChevronDown, BiChevronRight } from 'react-icons/bi'
 
+import { Button } from '@/components/ui/Button'
 import { useDropoutStudents } from '@/hooks/useStatisticsData'
 
 interface StudentClassRowProps {
@@ -53,17 +54,18 @@ export const StudentClassRow = ({
     <React.Fragment key={classItem.classId}>
       <tr className="border-b border-gray-200 hover:bg-gray-50">
         <td className="py-3 px-4">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => onToggle(classItem.classId)}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 h-7 w-7"
           >
             {isExpanded ? (
               <BiChevronDown className="w-5 h-5" />
             ) : (
               <BiChevronRight className="w-5 h-5" />
             )}
-          </button>
+          </Button>
         </td>
         <td className="py-3 px-4 text-sm text-gray-900 font-medium">
           {classItem.courseName}

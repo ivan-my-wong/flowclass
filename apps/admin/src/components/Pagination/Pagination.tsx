@@ -34,6 +34,8 @@ const PaginatedItems = ({
   meta,
   pageButtonProps,
   children,
+  itemWrapperClassName,
+  isBottomPagination,
   ...props
 }: PaginatedItemsProps &
   React.ComponentPropsWithoutRef<'div'>): JSX.Element => {
@@ -49,7 +51,7 @@ const PaginatedItems = ({
       <div
         className={cn({
           'flex flex-col w-full': true,
-          'flex-col-reverse': props.isBottomPagination,
+          'flex-col-reverse': isBottomPagination,
         })}
       >
         <div className="w-full flex justify-center items-center py-2 [&_ul]:flex-wrap [&_ul]:list-none [&_ul]:p-0 [&_ul]:m-0 [&_ul]:flex [&_ul]:justify-center [&_ul]:gap-4 [&_ul]:items-center [&_.selected]:font-bold">
@@ -83,7 +85,7 @@ const PaginatedItems = ({
             renderOnZeroPageCount={null}
           />
         </div>
-        <div className={cn('w-full', props.itemWrapperClassName)}>
+        <div className={cn('w-full', itemWrapperClassName)}>
           {children}
         </div>
       </div>
