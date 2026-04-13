@@ -1,7 +1,5 @@
 # Flowclass
 
-> For full product details, screenshots, and customer stories, visit **[flowclass.io](https://flowclass.io)**.
-
 Flowclass is an open-source operations platform built for education businesses — tutorial centres, training academies, and small-to-medium schools that need more than a spreadsheet but less than an enterprise ERP.
 
 ## Our Story
@@ -29,23 +27,21 @@ Flowclass ships with a full suite of modules out of the box:
 
 ## Screenshots
 
-![Course detail page](docs/screenshots/course-detail-web.png)
+![School homepage with student login](docs/screenshots/school-homepage-student-login.png)
 
-![Admin dashboard](docs/screenshots/admin-dashboard.png)
+![Enrolment — payment summary & promo code](docs/screenshots/enrolment-checkout-payment-summary.png)
 
-![Course page — responsive](docs/screenshots/course-page-responsive.png)
+![Enrolment — upload payment receipt](docs/screenshots/enrolment-checkout-upload-receipt.png)
 
-![Promotions & bundle discounts](docs/screenshots/promotions-admin.png)
+![Enrolment — Stripe online payment](docs/screenshots/enrolment-checkout-stripe-payment.png)
 
-![Teaching sessions & booking](docs/screenshots/teaching-sessions-booking.png)
+![Enrolment — application confirmed](docs/screenshots/enrolment-application-confirmed.png)
 
-![SEO structured data](docs/screenshots/seo-structured-data.png)
+![Enrolment confirmation email](docs/screenshots/enrolment-confirmation-email.png)
 
-![Teaching sessions — add](docs/screenshots/teaching-sessions-add.png)
+![Student portal — lesson schedule](docs/screenshots/student-portal-lesson-schedule.png)
 
-![Teaching sessions — edit with recurring schedule](docs/screenshots/teaching-sessions-edit-schedule.png)
-
-![Enrolment checkout & payment](docs/screenshots/enrolment-checkout.png)
+![Student portal — request time change](docs/screenshots/student-portal-request-time-change.png)
 
 ## Self-hosting
 
@@ -197,3 +193,5 @@ Full documentation is available at **[flowclass.io/docs](https://flowclass.io/do
 - **Contributing guide** — code style, branching, and PR process
 
 For the fastest path from zero to a running instance, start with the [Getting Started](https://flowclass.io/docs) guide before working through the sections below.
+
+> For full product details, screenshots, and customer stories, visit **[flowclass.io](https://flowclass.io)**.
