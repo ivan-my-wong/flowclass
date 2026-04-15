@@ -96,10 +96,7 @@ const BasicSetting = ({ fieldIndex }: BasicSettingProps): JSX.Element => {
     },
   })
 
-  const { currentCourse } = useClassData()
-  const currentClass = useMemo(() => {
-    return currentCourse?.classes[fieldIndex]
-  }, [currentCourse, fieldIndex])
+  useClassData()
   const { courseEnrolUrl } = useCourseData()
   const classId = useWatch({
     control: localForm.control,
