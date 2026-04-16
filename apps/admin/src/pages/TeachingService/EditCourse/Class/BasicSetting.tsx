@@ -101,7 +101,11 @@ const BasicSetting = ({ fieldIndex }: BasicSettingProps): JSX.Element => {
     return currentCourse?.classes[fieldIndex]
   }, [currentCourse, fieldIndex])
   const { courseEnrolUrl } = useCourseData()
-  const classId = currentClass?.id
+  const classId = useWatch({
+    control: localForm.control,
+    name: 'dataId',
+    defaultValue: form.getValues(`classes.${fieldIndex}.dataId`),
+  })
   const priceType = useWatch({ control: localForm.control, name: 'priceType' })
   const tuition = useWatch({ control: localForm.control, name: 'tuition' })
   const isFree = useWatch({ control: localForm.control, name: 'isFree' })
