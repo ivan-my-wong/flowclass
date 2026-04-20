@@ -34,11 +34,10 @@ import { CreateCheckoutSessionReturnType } from '@/models/custom-types/stripe'
 import { EnrollCourse } from '@/models/enroll-courses.entity'
 import { EnrollCourseRepository } from '@/models/enroll-courses.repository'
 import {
+  GaMeasurementEventName,
   PaymentMethod,
   PromotionType as PromotionTypeEnum,
   StripeCheckoutSessionType,
-  StripePriceInterval,
-  StripePriceSessionType,
 } from '@/models/enums/'
 import {
   CheckoutStatus,

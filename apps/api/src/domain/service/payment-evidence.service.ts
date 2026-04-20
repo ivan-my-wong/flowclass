@@ -52,6 +52,7 @@ import { ClassAdminPaymentSubmittedEmailParams } from '@/models/custom-types/ema
 import { EnrollCourse } from '@/models/enroll-courses.entity'
 import { EnrollCourseRepository } from '@/models/enroll-courses.repository'
 import {
+  GaMeasurementEventName,
   PaymentMethod,
   PromotionType as PromotionTypeEnum,
 } from '@/models/enums/'
