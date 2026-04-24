@@ -677,12 +677,24 @@ export class InvoiceCampaignService {
           continue
         }
 
-        const { userAlias, user } = await this.userService.findUserByStudentPrimaryIdentifier({
-          firstName: recipient.name,
-          email: recipient.email,
-          phone: recipient.phone,
-          institutionId,
-        })
+        let userAlias: any = null
+        let user: any = null
+        if (recipient.userAliasId) {
+          userAlias = await this.userAliasRepository.findOne({
+            where: { id: recipient.userAliasId },
+            relations: { user: true },
+          })
+          user = userAlias?.user ?? null
+        } else {
+          const result = await this.userService.findUserByStudentPrimaryIdentifier({
+            firstName: recipient.name,
+            email: recipient.email,
+            phone: recipient.phone,
+            institutionId,
+          })
+          userAlias = result?.userAlias ?? null
+          user = result?.user ?? null
+        }
 
         if (!userAlias) {
           this.logger.log('User alias not found for recipient: ' + recipient.email)

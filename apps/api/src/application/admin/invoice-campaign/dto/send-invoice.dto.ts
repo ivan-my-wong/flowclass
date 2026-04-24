@@ -80,6 +80,11 @@ export class WhatsAppTemplateDto {
 }
 
 export class RecipientDto {
+  @ApiPropertyOptional({ example: 123, description: 'UserAlias ID — when provided, used for direct lookup instead of name/email/phone search' })
+  @IsOptional()
+  @IsNumber()
+  userAliasId?: number
+
   @ApiProperty({ example: 'John' })
   @IsString()
   name: string
