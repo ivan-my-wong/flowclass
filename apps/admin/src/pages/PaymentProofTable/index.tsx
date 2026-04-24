@@ -439,7 +439,11 @@ const PaymentProofPage = (): JSX.Element => {
     },
     {
       headerName: t('student:userName') as string,
-      field: 'userAlias.name',
+      valueGetter: params =>
+        params.data?.enrollCourses?.[0]?.preferredName ||
+        params.data?.enrollCourses?.[0]?.name ||
+        params.data?.userAlias?.name ||
+        '',
       filter: true,
       width: 180,
       cellRenderer: (data: ICellRendererParams) => {

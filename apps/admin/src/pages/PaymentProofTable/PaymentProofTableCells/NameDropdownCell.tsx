@@ -12,9 +12,15 @@ const NameDropdownCell = ({ data }: { data: PaymentProofTableItem }) => {
     return null
   }
   const { phone } = data.userAlias.user ?? {}
-  const { name, email } = data.userAlias
+  const { email } = data.userAlias
 
   const { userId, id: aliasId } = data.userAlias ?? { id: 0, userId: 0 }
+
+  const firstEnrollCourse = data.enrollCourses?.[0]
+  const displayName =
+    firstEnrollCourse?.preferredName ||
+    firstEnrollCourse?.name ||
+    data.userAlias.name
 
   const items = [
     { label: 'student:phone', value: phone },
@@ -23,7 +29,7 @@ const NameDropdownCell = ({ data }: { data: PaymentProofTableItem }) => {
 
   return (
     <Box direction="row" gap="sm" align="center" className="my-1">
-      <DropDownCell mainText={name} items={items} />
+      <DropDownCell mainText={displayName} items={items} />
       <LuExternalLink
         className="cursor-pointer hover:text-primary"
         onClick={() => {
