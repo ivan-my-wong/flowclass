@@ -379,24 +379,35 @@ export class InvoiceCampaignService {
       } catch (err) {
         error = err as Error
         console.log(err)
-        throw err
       }
-      // ✅ Always set invoiceNumber after invoice creation - parentInvoice should always exist if createNewInvoice succeeds
-      if (findIndex !== undefined && findIndex >= 0 && processingData) {
-        if (!parentInvoice) {
-          throw new Error(`Invoice creation failed for ${service.name} but no error was thrown`)
+      if (error || !parentInvoice) {
+        if (findIndex !== undefined && findIndex >= 0 && processingData) {
+          processingData[findIndex] = {
+            ...processingData[findIndex],
+            invoiceNumber: undefined,
+            status: SendingCampaignStatus.FAILED,
+            message: error?.message ?? 'Invoice creation failed',
+          }
         }
+        this.emitSendCampaignSseEvent({
+          jobId,
+          step: SendCampaignSteps.CREATING_INVOICES,
+          data: processingData,
+        })
+        continue
+      }
+      if (findIndex !== undefined && findIndex >= 0 && processingData) {
         processingData[findIndex] = {
           ...processingData[findIndex],
-          invoiceNumber: `INV#${parentInvoice.id}`, // ✅ Always set invoice number - no fallback to 'N/A'
+          invoiceNumber: `INV#${parentInvoice.id}`,
           amount: (parentInvoice?.payAmount || 0).toString(),
-          status: error ? SendingCampaignStatus.FAILED : SendingCampaignStatus.CREATED,
           message: error ? error.message : null,
           invoiceId: parentInvoice.id,
           proofToken: parentInvoice.proofToken,
           userAliasId: parentInvoice.userAliasId,
           userId: parentInvoice.userId,
           institutionId: parentInvoice.institutionId,
+          status: SendingCampaignStatus.CREATED,
         }
       }
       this.emitSendCampaignSseEvent({
@@ -610,6 +621,7 @@ export class InvoiceCampaignService {
     createdByUserId?: number
   ) {
     let processingData = []
+    let atLeastOneSent = false
     // Reset
     this.mapStudentCreateEnrollCourse = new Map()
     // Implement your business logic here, e.g., send invoices for the campaign
@@ -744,6 +756,8 @@ export class InvoiceCampaignService {
         )
         if (result.error) {
           this.logger.error(result.error)
+        } else {
+          atLeastOneSent = true
         }
 
         const index = processingData.findIndex((item) => item.email === recipient.email)
@@ -752,7 +766,7 @@ export class InvoiceCampaignService {
             ...processingData[index],
             name: userAlias.name,
             phone: userAlias.user?.phone ?? user.phone,
-            invoiceNumber: `INV#${invoice.id}`, // ✅ Invoice always exists here - no fallback to 'N/A'
+            invoiceNumber: `INV#${invoice.id}`,
             amount: (invoice?.payAmount || 0).toString(),
             status: result.error ? SendingCampaignStatus.FAILED : SendingCampaignStatus.SENT,
             message: result.error ? String(result.error) : 'Successfully',
@@ -783,7 +797,7 @@ export class InvoiceCampaignService {
         id: documentCampaign.id,
       },
       {
-        status: DocumentCampaignStatus.COMPLETED,
+        status: atLeastOneSent ? DocumentCampaignStatus.SENT : DocumentCampaignStatus.FAILED,
       }
     )
   }
@@ -1999,7 +2013,7 @@ export class InvoiceCampaignService {
           .font('NotoSansTC')
           .text('Date of issue', 40, 140)
           .font('NotoSansTC')
-          .text(dayjs().tz(timeZoneId).format('MMMM D, YYYY'), 150, 140)
+          .text(dayjs(invoice.createdAt).tz(timeZoneId).format('MMMM D, YYYY'), 150, 140)
 
         // Company address
         doc
