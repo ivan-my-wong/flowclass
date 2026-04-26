@@ -369,6 +369,10 @@ export class ProfileService {
       where: { ...(user.activeUserAliasId ? { id: user.activeUserAliasId } : { userId: user.id }) },
     })
 
+    if (!userAlias) {
+      return []
+    }
+
     const aliasIds: number[] = [childrenId ? childrenId : userAlias.id]
     if (userAlias.isStudentParent && !childrenId) {
       const childrenAlias = await this.usersAliasRepository.find({

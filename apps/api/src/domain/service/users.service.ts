@@ -60,6 +60,7 @@ import {
   IsNull,
   Not,
   ObjectLiteral,
+  QueryFailedError,
 } from 'typeorm'
 
 @Injectable()
@@ -413,7 +414,17 @@ export class UsersService extends BaseService<User> {
       registerAccountDto.email = newEmail
     }
 
-    return await this.usersRepository.save(this.usersRepository.create(registerAccountDto))
+    try {
+      return await this.usersRepository.save(this.usersRepository.create(registerAccountDto))
+    } catch (err) {
+      if (err instanceof QueryFailedError && (err as any).code === '23505') {
+        const existing = await this.usersRepository.findOneBy({
+          phone: ILike(transformPhone(registerAccountDto.phone)),
+        })
+        if (existing) return existing
+      }
+      throw err
+    }
   }
 
   async createStudentRelatedEntitiesWithExistingUser(

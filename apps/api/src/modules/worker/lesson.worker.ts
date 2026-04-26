@@ -56,7 +56,7 @@ class LessonWorker {
   ): Promise<any> {
     // For testing purpose
     // const remindedAt = dayjs('2024-09-26T23:26:25.152Z').toDate()
-    const institution = await this.institutionRepository.findOneById(institutionId)
+    const institution = await this.institutionRepository.findOne({ where: { id: institutionId } })
     const userOwnerOfInstitution = await this.usersService.getUserOwnerOfInstitution(institutionId)
     if (!institution || !userOwnerOfInstitution || !institution.phone) {
       return []
