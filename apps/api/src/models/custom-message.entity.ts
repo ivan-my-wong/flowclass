@@ -16,6 +16,9 @@ export class CustomMessageEntity extends BaseEntity {
   @Column({ name: 'content', nullable: true })
   content: string
 
+  @Column({ name: 'repeater_format', type: 'text', nullable: true })
+  repeaterFormat?: string
+
   @Column({ name: 'name', type: 'varchar', nullable: true, default: '' })
   name: string
 

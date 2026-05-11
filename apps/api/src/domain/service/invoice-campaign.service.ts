@@ -263,7 +263,13 @@ export class InvoiceCampaignService {
           studentSchedule: {
             studentLessons: true,
           },
+          // Required for grouping the PDF's items table by student on
+          // combined invoices (one invoice ↔ many students).
+          userAlias: true,
         },
+        // Per-discount breakdown for the PDF summary — mirrors what
+        // DialogSendInvoice's AppliedDiscount section renders.
+        invoicePromotionsUsed: true,
         user: true,
         institution: true,
         userAlias: true,
@@ -445,7 +451,7 @@ export class InvoiceCampaignService {
       invoices: [],
     }
     if (documentCampaign.invoiceIds)
-      invoiceCampaign.invoices = await this.getInvoicesByIds(documentCampaign.invoiceIds)
+      invoiceCampaign.invoices = await this.getInvoicesByIds(documentCampaign.invoiceIds, true)
     else invoiceCampaign.invoices = []
     return invoiceCampaign
   }
@@ -1010,30 +1016,32 @@ export class InvoiceCampaignService {
       const childStudents = []
 
       for (const child of invoice.childs) {
-        const childUserAlias = await this.userService.findUserByStudentPrimaryIdentifier({
-          firstName: child.name,
-          email: child.email,
-          phone: child.phone,
-          institutionId,
+        // Resolve each child by user-alias id directly. Looking up by
+        // (name, email, phone) collapses siblings who share parent contact
+        // info onto the same alias, causing both enroll-courses to be
+        // attributed to a single student.
+        const childUserAlias = await this.userAliasRepository.findOne({
+          where: { id: child.id, institutionId },
+          relations: { user: true },
         })
         if (!childUserAlias) {
-          throw new NotFoundException(`User alias not found for email ${child.email}`)
+          throw new NotFoundException(`User alias not found for child id ${child.id}`)
         }
         const token = this.jwtService.sign(
           {
-            email: childUserAlias.userAlias.email,
+            email: childUserAlias.email,
           },
           this.jwtOption
         )
         childStudents.push({
-          email: childUserAlias.userAlias.email,
+          email: childUserAlias.email,
           phone: childUserAlias.user.phone,
-          name: childUserAlias.userAlias.name,
+          name: childUserAlias.name,
           token,
           studentAccount: childUserAlias.user,
-          userAliasId: childUserAlias?.userAlias?.id,
-          userAlias: childUserAlias?.userAlias,
-          userId: childUserAlias?.user?.id,
+          userAliasId: childUserAlias.id,
+          userAlias: childUserAlias,
+          userId: childUserAlias.user?.id,
         })
       }
       studentData = childStudents
@@ -1513,32 +1521,34 @@ export class InvoiceCampaignService {
   ) {
     const enrollCourseInstances: EnrollCourse[] = []
     for (const child of invoice.childs) {
-      const childUserAlias = await this.userService.findUserByStudentPrimaryIdentifier({
-        firstName: child.name,
-        email: child.email,
-        phone: child.phone,
-        institutionId,
+      // Resolve each child by user-alias id. The previous (name, email,
+      // phone) lookup collapses siblings who share parent contact info onto
+      // the same alias, which then makes both enroll-course rows reference
+      // a single student.
+      const childUserAlias = await this.userAliasRepository.findOne({
+        where: { id: child.id, institutionId },
+        relations: { user: true },
       })
       if (!childUserAlias) {
-        throw new NotFoundException(`User alias not found for email ${child.email}`)
+        throw new NotFoundException(`User alias not found for child id ${child.id}`)
       }
       const studentData = {
-        name: child.name,
-        email: child.email,
-        phone: child.phone,
+        name: childUserAlias.name,
+        email: childUserAlias.email,
+        phone: childUserAlias.user?.phone,
       }
 
       const enrollCourseInstance = this.createEnrollCourse(
         studentData,
         multipleClassInfo,
         multipleClassTotalPrice,
-        childUserAlias.userAlias,
+        childUserAlias,
         token,
         siteId,
         institutionId
       )
       enrollCourseInstance.courseId = invoice.classes.find(
-        (d) => d.userAliasId === childUserAlias.userAlias.id
+        (d) => d.userAliasId === childUserAlias.id
       )?.courseId
       enrollCourseInstances.push(enrollCourseInstance)
     }
@@ -2079,114 +2089,186 @@ export class InvoiceCampaignService {
 
         doc.moveTo(40, tableHeaderBottom).lineTo(555, tableHeaderBottom).stroke()
 
-        // Table row: description
+        // Table rows — grouped by student. Mirrors SelectedCourseTable in
+        // DialogSendInvoice: each student gets a header row, then a row per
+        // class (with lessons listed), then a per-student subtotal row.
         let y = tableHeaderBottom + 15
-        // enrollIntos = enrollIntos.concat(
-        //   invoice.childInvoices.flatMap((inv) => inv.enrollCourse?.enrollInto || [])
-        // )
-        const enrollCourses = invoice.enrollCourses
+        const enrollCourses = invoice.enrollCourses ?? []
+        const courseNameX = 40
+        const courseNameWidth = 260
+        const courseNameOptions = { width: courseNameWidth, align: 'left' as const }
+        const currencyLabel = invoice.site?.currency?.toUpperCase() ?? ''
+
+        type StudentBucket = {
+          key: string
+          name: string
+          rows: Array<{
+            desc: string
+            lessonCount: number
+            unitPrice: number
+            amount: number
+          }>
+          subtotal: number
+        }
+
+        // Bucket key prefers the enrollCourse's own userAlias (true on combined
+        // invoices). Falls back to enrollCourse.name and finally to the invoice's
+        // payer name so single-student legacy invoices still render correctly.
+        const buckets: StudentBucket[] = []
+        const bucketByKey = new Map<string, StudentBucket>()
         for (const enrollCourse of enrollCourses) {
-          // ✅ Increase description column width to fit time slots on one line
-          const courseNameWidth = 260
-          const courseNameX = 40
-          const courseNameOptions = { width: courseNameWidth, align: 'left' as const }
-          doc.font('NotoSansTC')
+          const studentName =
+            enrollCourse.userAlias?.name ||
+            enrollCourse.name ||
+            invoice.userAlias?.name ||
+            invoice.payBy ||
+            'Student'
+          const bucketKey = String(enrollCourse.userAlias?.id ?? `name:${studentName}`)
+          let bucket = bucketByKey.get(bucketKey)
+          if (!bucket) {
+            bucket = { key: bucketKey, name: studentName, rows: [], subtotal: 0 }
+            bucketByKey.set(bucketKey, bucket)
+            buckets.push(bucket)
+          }
 
-          // ✅ Get studentSchedules from enrollCourse (not invoice)
           const enrollCourseSchedules = enrollCourse.studentSchedule || []
-
-          // ✅ Track index for each enrollCourse's enrollIntos
           let scheduleIndex = 0
           for (const enrollInto of enrollCourse.enrollInto) {
             const { courseName, secondLevelName, ...rest } = enrollInto
-            // ✅ Use scheduleIndex to properly match studentSchedule with enrollInto
             const studentSchedule = enrollCourseSchedules[scheduleIndex]
 
-            // ✅ Build description with class name
-            let desc = `${enrollCourse.name} - ${courseName} - ${secondLevelName}`
-
-            // ✅ Add lessons list under the class name if available
-            // ✅ Use shorter date format to fit on one line: YYYY/MM/DD HH:mm
+            let desc = `${courseName} - ${secondLevelName}`
             if (studentSchedule?.studentLessons?.length) {
               const lessonsText = studentSchedule.studentLessons
                 .map((o) => {
-                  if (o.startTime) {
-                    const startDate = dayjs(o.startTime).tz(timeZoneId).format('YYYY/MM/DD')
-                    const startTime = dayjs(o.startTime).tz(timeZoneId).format('HH:mm A')
-                    return `  • ${startDate} ${startTime}`
-                  }
-                  return ''
+                  if (!o.startTime) return ''
+                  const startDate = dayjs(o.startTime).tz(timeZoneId).format('YYYY/MM/DD')
+                  const startTime = dayjs(o.startTime).tz(timeZoneId).format('HH:mm A')
+                  return `  • ${startDate} ${startTime}`
                 })
                 .filter((text) => text !== '')
                 .join('\n')
-              if (lessonsText) {
-                desc += `\n${lessonsText}`
-              }
+              if (lessonsText) desc += `\n${lessonsText}`
             }
-
-            // Calculate text height including lessons
-            const courseNameTextHeight = doc.heightOfString(desc, {
-              ...courseNameOptions,
-            })
-
-            // Check if we need a new page before drawing this row
-            y = checkPageBreak(courseNameTextHeight + 10, y)
-
-            // If we're at the top of a new page, redraw table header
-            if (y === margin) {
-              y = drawTableHeader(y)
-            }
-
-            const courseNameY = y
-
-            // ✅ Draw description text
-            doc.text(desc, courseNameX, courseNameY, courseNameOptions)
 
             const lessonCount = Math.max(1, Number(rest?.lessonCount) || 1)
-
-            // ✅ Calculate amount first
-            const amount =
-              rest.priceType === PriceType.PER_LESSON ? (rest.price || 0) * lessonCount : rest.price
-
-            // ✅ Calculate unit price as amount divided by quantity
+            const amount = (rest.price || 0) * lessonCount
             const unitPrice = amount / lessonCount
 
-            // ✅ Align prices with the top of the description (courseNameY) instead of y
-            // ✅ This reduces space above the price columns
+            bucket.rows.push({ desc, lessonCount, unitPrice, amount })
+            bucket.subtotal += amount
+            scheduleIndex++
+          }
+        }
+
+        // Render each bucket
+        for (const bucket of buckets) {
+          // Student header row — like the gray section header in SelectedCourseTable
+          y = checkPageBreak(24, y)
+          if (y === margin) y = drawTableHeader(y)
+          doc
+            .fontSize(11)
+            .font('NotoSansTC')
+            .fillColor('black')
+            .rect(40, y - 4, 515, 20)
+            .fillOpacity(0.06)
+            .fill('#000')
+            .fillOpacity(1)
+            .fillColor('black')
+            .text(bucket.name, 46, y, { width: 500, align: 'left' })
+          y += 22
+
+          for (const row of bucket.rows) {
+            const rowHeight = doc.heightOfString(row.desc, courseNameOptions)
+            y = checkPageBreak(rowHeight + 10, y)
+            if (y === margin) y = drawTableHeader(y)
+
+            const rowY = y
             doc
               .font('NotoSansTC')
-              .text(lessonCount.toString(), 335, courseNameY, {
+              .fillColor('black')
+              .text(row.desc, courseNameX, rowY, courseNameOptions)
+              .text(row.lessonCount.toString(), 335, rowY, {
                 width: 50,
                 align: 'center',
               })
-              .text(
-                `${invoice.site?.currency.toUpperCase()}${Number(unitPrice).toFixed(2)}`,
-                380,
-                courseNameY,
-                {
-                  width: 80,
-                  align: 'right',
-                }
-              )
-              .text(
-                `${invoice.site?.currency.toUpperCase()}${Number(amount).toFixed(2)}`,
-                480,
-                courseNameY,
-                {
-                  width: 75,
-                  align: 'right',
-                }
-              )
+              .text(`${currencyLabel}${Number(row.unitPrice).toFixed(2)}`, 380, rowY, {
+                width: 80,
+                align: 'right',
+              })
+              .text(`${currencyLabel}${Number(row.amount).toFixed(2)}`, 480, rowY, {
+                width: 75,
+                align: 'right',
+              })
+            y += rowHeight + 10
+          }
 
-            // ✅ Increment scheduleIndex for next enrollInto
-            scheduleIndex++
-            // ✅ Use actual text height for spacing
-            y += courseNameTextHeight + 10
+          // Per-student subtotal row (only when more than one student — for
+          // single-student invoices this would duplicate the grand-total below).
+          if (buckets.length > 1) {
+            y = checkPageBreak(22, y)
+            doc
+              .moveTo(40, y - 2)
+              .lineTo(555, y - 2)
+              .strokeColor('#ddd')
+              .stroke()
+            doc
+              .fontSize(10)
+              .font('NotoSansTC')
+              .fillColor('#555')
+              .text('Subtotal', 380, y + 2, { width: 80, align: 'right' })
+              .text(`${currencyLabel}${Number(bucket.subtotal).toFixed(2)}`, 480, y + 2, {
+                width: 75,
+                align: 'right',
+              })
+              .fillColor('black')
+            y += 22
           }
         }
+        // Per-discount breakdown — mirrors AppliedDiscount in DialogSendInvoice
+        // by listing every applied promotion with its calculated dollar amount.
+        // Prefer the audit trail (invoicePromotionsUsed); fall back to the
+        // configured adminDiscounts list, then to a single aggregate line so
+        // legacy invoices without either still show their discount total.
+        type SummaryLine = { name: string; amount: number; isFee: boolean }
+        const summaryLines: SummaryLine[] = []
+        const promotionsUsed = invoice.invoicePromotionsUsed ?? []
+        const adminDiscountsList = invoice.adminDiscounts ?? []
+        if (promotionsUsed.length > 0) {
+          for (const p of promotionsUsed) {
+            // adminDiscounts holds the feeType (add vs subtract); look it up by
+            // promotion id so we can render '+' for fees and '-' for discounts.
+            const configured = adminDiscountsList.find((d) => d.id === p.promotionId)
+            summaryLines.push({
+              name: p.name || 'Discount',
+              amount: Math.abs(Number(p.amount ?? 0)),
+              isFee: configured?.feeType === FeeModeType.ADD_FEE,
+            })
+          }
+        } else if (adminDiscountsList.length > 0) {
+          for (const d of adminDiscountsList) {
+            summaryLines.push({
+              name: d.name || (d.feeType === FeeModeType.ADD_FEE ? 'Additional Fee' : 'Discount'),
+              amount: Math.abs(Number(d.amount ?? 0)),
+              isFee: d.feeType === FeeModeType.ADD_FEE,
+            })
+          }
+        } else if (Number(invoice.discountAmount ?? 0) > 0) {
+          summaryLines.push({
+            name: 'Total Discount',
+            amount: Number(invoice.discountAmount ?? 0),
+            isFee: false,
+          })
+        }
+
         // ✅ Add gap and separator before summary table
-        // Check if summary table fits on current page, add new page if needed
-        const summaryTableHeight = 150 // Approximate height for summary section
+        // Height = subtotal (18) + per-discount lines + optional additional-fee
+        // line + optional credit + optional installment + total row (22) + pad.
+        const summaryTableHeight =
+          60 +
+          summaryLines.length * 18 +
+          (invoice.usedBalance > 0 ? 18 : 0) +
+          (invoiceInstallment ? 18 : 0)
         y = checkPageBreak(summaryTableHeight, y)
         y += 25
         // Draw separator line to separate items table from summary table
@@ -2195,7 +2277,7 @@ export class InvoiceCampaignService {
 
         // ✅ Summary table - separate from items table
         const summaryTableStartY = y
-        const additionalFee = invoice.adminDiscounts.find((d) => d.feeType === FeeModeType.ADD_FEE)
+        const additionalFee = adminDiscountsList.find((d) => d.feeType === FeeModeType.ADD_FEE)
 
         // Summary table header (optional, or just start with subtotal)
         let summaryY = summaryTableStartY
@@ -2214,23 +2296,33 @@ export class InvoiceCampaignService {
             }
           )
 
-        summaryY += 18
-        doc
-          .text('Total Discount', 380, summaryY, { width: 80, align: 'right' })
-          .text(
-            `-${invoice.site?.currency.toUpperCase()}${Number(invoice.discountAmount ?? 0).toFixed(
-              2
-            )}`,
-            480,
-            summaryY,
-            {
-              width: 75,
-              align: 'right',
-            }
-          )
+        for (const line of summaryLines) {
+          summaryY += 18
+          const sign = line.isFee ? '+' : '-'
+          doc
+            .fontSize(11)
+            .font('NotoSansTC')
+            .text(line.name, 200, summaryY, { width: 260, align: 'right' })
+            .text(
+              `${sign}${invoice.site?.currency.toUpperCase()}${Number(line.amount).toFixed(2)}`,
+              480,
+              summaryY,
+              {
+                width: 75,
+                align: 'right',
+              }
+            )
+        }
 
-        // ✅ Always show additional fees if they exist (not just if additionalFee object exists)
-        if (invoice.additionalFee && invoice.additionalFee > 0) {
+        // When the per-discount loop didn't already account for an aggregate
+        // additionalFee column on the invoice, render it explicitly so the
+        // visible total still reconciles.
+        const additionalFeeAlreadyListed = summaryLines.some((l) => l.isFee)
+        if (
+          !additionalFeeAlreadyListed &&
+          invoice.additionalFee &&
+          Number(invoice.additionalFee) > 0
+        ) {
           summaryY += 18
           const additionalFeeName = additionalFee?.name || 'Additional Fee'
           doc

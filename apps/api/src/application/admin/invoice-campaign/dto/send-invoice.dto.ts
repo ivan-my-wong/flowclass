@@ -80,7 +80,11 @@ export class WhatsAppTemplateDto {
 }
 
 export class RecipientDto {
-  @ApiPropertyOptional({ example: 123, description: 'UserAlias ID — when provided, used for direct lookup instead of name/email/phone search' })
+  @ApiPropertyOptional({
+    example: 123,
+    description:
+      'UserAlias ID — when provided, used for direct lookup instead of name/email/phone search',
+  })
   @IsOptional()
   @IsNumber()
   userAliasId?: number
@@ -497,15 +501,6 @@ export class InvoiceCampaignDto {
   @ValidateIf((o) => o.sendViaEmail)
   @IsOptional()
   emailBody?: string
-
-  @ApiPropertyOptional({
-    type: String,
-    example: 'Dear [Name],\n\n this is your invoice for [Course Name]!',
-  })
-  @IsOptional()
-  @IsString()
-  @ValidateIf((o) => o.sendViaWhatsapp)
-  whatsappContent?: string
 }
 
 export class SendInvoiceBaseDto {

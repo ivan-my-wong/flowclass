@@ -848,6 +848,10 @@ export class InvoiceService {
       userAlias: true,
       enrollCourses: {
         course: true,
+        // Each enrollCourse can carry its own userAlias on combined invoices
+        // (one invoice ↔ many students). Loading it lets the frontend edit
+        // each student's contact info independently of the buyer's alias.
+        userAlias: true,
       },
       // course: true,
       childInvoices: true,

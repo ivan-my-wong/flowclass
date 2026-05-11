@@ -113,6 +113,15 @@ export class CreateCustomMessageDTO {
   content: string
 
   @ApiProperty({
+    description: 'Per-iteration template used to expand {{courseItems}} / {{lessonItems}}',
+    example: '{{courseIndex}}) {{courseName}} - HK$ {{coursePrice}}',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  repeaterFormat?: string
+
+  @ApiProperty({
     description: 'The type of the custom message',
     enum: SupportedType,
     example: SupportedType.CREATE_INVOICE,

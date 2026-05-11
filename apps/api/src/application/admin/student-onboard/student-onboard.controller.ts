@@ -75,6 +75,7 @@ import {
   GetEnrolledLessonsDto,
   GetStudentDetailResponseDto,
   GetStudentFormFieldsDto,
+  GetTeachingServiceByInvoiceDto,
   GetTeachingServiceOptDto,
   ImportStuDto,
   MergeStudentDto,
@@ -318,7 +319,7 @@ export class StudentOnbController {
   @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER, Role.INSTRUCTOR)
   @UseGuards(RolesGuard)
   @RequireParams(RequireParam.INSTITUTION_ID)
-  async getTeachingService(@Query() params: StudentOnbDetailtByAliasIdDto) {
+  async getTeachingService(@Query() params: GetTeachingServiceByInvoiceDto) {
     const result = await this.studentOnboardService.getTeachingService(params)
     return new ApiResult().success(result)
   }

@@ -636,9 +636,12 @@ export class ClassLessonService {
     const studentLessons = studentLessonsByLesson
       .filter((student: StudentLesson) => !!student?.user?.aliases)
       .map((student: StudentLesson) => {
-        const aliases = student.user.aliases.find((d) => {
-          return d.name === student.enrollCourse?.preferredName
-        })
+        // Match by the enrollCourse's canonical userAliasId — name matching
+        // collapses multiple aliases of the same user onto one bucket when
+        // their preferredName resolves to the same alias.
+        const aliases =
+          student.user.aliases.find((d) => d.id === student.enrollCourse?.userAliasId) ??
+          student.user.aliases.find((d) => d.name === student.enrollCourse?.preferredName)
 
         const payments = student.studentSchedule?.invoice
         const result = {

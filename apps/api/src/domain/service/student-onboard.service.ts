@@ -22,6 +22,7 @@ import {
   ImportStuDto,
   ImportStuResponseDto,
   StudentAllLessonsReponseDto,
+  GetTeachingServiceByInvoiceDto,
   StudentAttendanceDataResponse,
   StudentChangeLessonDto,
   StudentChangeLessonOptDto,
@@ -902,7 +903,23 @@ export class StudentOnbService {
       ...instanceToInstance(user, {
         excludePrefixes: ['__'],
       }),
-      studentInfo,
+      studentInfo: {
+        userAliasId: userAlias.id,
+        userAlias: {
+          id: userAlias.id,
+          name: userAlias.name,
+          email: userAlias.email,
+          studentId: userAlias.studentId,
+          userId: userAlias.userId,
+          secondaryEmail: userAlias.secondaryEmail ?? null,
+          // Surfaced so the student-detail UI can derive parent-ness. An alias
+          // with a non-null childOfUserAliasId is a *child* (a student); only
+          // aliases with no parent reference are the billing-account parent.
+          // This is the source of truth — the standalone isStudentParent flag
+          // can drift if it's set incorrectly during creation/import.
+          childOfUserAliasId: userAlias.childOfUserAliasId ?? null,
+        },
+      },
       isOnlyUserAlias,
     }
   }
@@ -1205,17 +1222,18 @@ export class StudentOnbService {
     return await this.userRepository.update({ id: user.id }, { status: params.status })
   }
 
-  async getTeachingService(params: StudentOnbDetailtByAliasIdDto) {
-    // Build where clause conditionally - only filter by invoiceId if provided
+  async getTeachingService(params: GetTeachingServiceByInvoiceDto) {
+    // invoiceId already uniquely identifies the invoice — applying a userAliasId
+    // filter on top of it would exclude combined invoices whose enrollCourses
+    // belong to multiple aliases. Only fall back to userAliasId scoping when no
+    // invoiceId is supplied (e.g. the student-detail page).
     const whereClause: any = {
       institutionId: params.institutionId,
-      // applicants: Raw((alias) => `${alias} @> to_jsonb(${params.userId})::jsonb`),
-      userAliasId: params.userAliasId,
     }
-    
-    // Only filter by invoiceId if it's provided
     if (params.invoiceId) {
       whereClause.id = params.invoiceId
+    } else if (params.userAliasId) {
+      whereClause.userAliasId = params.userAliasId
     }
 
     const getAllClasses = await this.invoiceRepository.find({

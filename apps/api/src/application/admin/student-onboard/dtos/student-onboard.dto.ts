@@ -145,7 +145,14 @@ export class GetStudentDetailResponseDto extends PartialType(User) {
     type: UserAlias,
   })
   @Expose()
-  studentInfo?: UserAlias
+  studentInfo?: {
+    userAlias?: Pick<
+      UserAlias,
+      'id' | 'name' | 'email' | 'studentId' | 'userId' | 'secondaryEmail' | 'childOfUserAliasId'
+    >
+    userAliasId?: number
+    [key: string]: unknown
+  } | null
 
   @ApiPropertyOptional({
     description: 'See if the user has user aliases in other institutions',
@@ -232,6 +239,22 @@ export class StudentOnbDetailtByAliasIdDto extends StudentOnbDetailtDto {
   @ApiProperty({
     example: 1,
   })
+  @IsOptional()
+  @IsNumber()
+  invoiceId?: number
+}
+
+// Used by the invoice-scoped teaching-service endpoint where the invoice itself
+// constrains the result set. Either invoiceId or userAliasId must be supplied;
+// when invoiceId is provided, every enrollCourse on the invoice is returned
+// regardless of which alias it belongs to (combined invoices ↔ many students).
+export class GetTeachingServiceByInvoiceDto extends StudentOnbDetailtDto {
+  @ApiProperty({ example: 1, required: false })
+  @IsOptional()
+  @IsNumber()
+  userAliasId?: number
+
+  @ApiProperty({ example: 1, required: false })
   @IsOptional()
   @IsNumber()
   invoiceId?: number
