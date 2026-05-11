@@ -143,30 +143,6 @@ export class InvoiceCampaignController {
     )
   }
 
-  @Patch(':documentId/edit-and-resend')
-  @ApiOperation({
-    summary: 'Edit and re-send a completed invoice campaign, preserving the original amountPaid',
-  })
-  @RequireParams(RequireParam.INSTITUTION_ID)
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
-  @UseGuards(RolesGuard, RequireParamsGuard)
-  @ApiBody({ type: SendInvoiceDto })
-  @ApiResponse({ status: HttpStatus.ACCEPTED, description: 'Invoice updated and re-sent successfully' })
-  @HttpCode(HttpStatus.ACCEPTED)
-  async editAndResendInvoice(
-    @Query('institutionId', ParseIntPipe) institutionId: number,
-    @Param('documentId', ParseIntPipe) documentId: number,
-    @Body() payload: SendInvoiceDto,
-    @CurrentUser() currentUser: User
-  ): Promise<{ jobId: string }> {
-    return this.invoiceCampaignService.editAndResendInvoiceCampaign(
-      documentId,
-      institutionId,
-      payload,
-      currentUser.id
-    )
-  }
-
   @Get(':documentId/detail')
   @ApiOperation({ summary: 'Get invoice campaign details' })
   @RequireParams(RequireParam.INSTITUTION_ID)

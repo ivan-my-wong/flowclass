@@ -94,6 +94,7 @@ export type FilterParams = {
   startDate: string
   endDate: string
   selectedClass: MultiValue<SelectItemValuesProps>
+  search?: string | null
 }
 
 const selectorStyles = (): StylesConfig => ({
@@ -952,7 +953,31 @@ const StudentDatabase = (): JSX.Element => {
       studentData: StudentEnrolmentRecord[],
       filters: FilterParams
     ): StudentEnrolmentRecord[] => {
-      const filteredList = studentData.filter(({ enrollCourses, user }) => {
+      let result = studentData
+
+      if (filters.search && filters.search.trim()) {
+        const searchLower = filters.search.trim().toLowerCase()
+        const searchDigitsOnly = searchLower.replace(/\D/g, '')
+        result = result.filter(student => {
+          const name = student.name || ''
+          const email = student.email || student.user?.email || ''
+          const phone = student.phone || student.user?.phone || ''
+          const phoneDigitsOnly = phone.replace(/\D/g, '')
+          const studentId = student.studentId ?? ''
+          const id = String(student.id ?? '')
+          return (
+            name.toLowerCase().includes(searchLower) ||
+            email.toLowerCase().includes(searchLower) ||
+            phone.toLowerCase().includes(searchLower) ||
+            formatPhoneNumber(phone).toLowerCase().includes(searchLower) ||
+            (searchDigitsOnly.length > 0 && phoneDigitsOnly.includes(searchDigitsOnly)) ||
+            studentId.toLowerCase().includes(searchLower) ||
+            id.includes(searchLower)
+          )
+        })
+      }
+
+      const filteredList = result.filter(({ enrollCourses, user }) => {
         const hasMatchingCourseId =
           (filters.selectedCourse.length === 0 &&
             filters.selectedClass.length === 0) ||

@@ -8,7 +8,17 @@ import dayjs from '@/utils/dayjs'
 
 import { deepCopy } from './shallow'
 
-const PREVIEW_PERIOD_COUNT = 5
+const PREVIEW_MONTHS = 24
+
+const getDefaultPeriodCount = (unit: string, every: number): number => {
+  const daysPerUnit: Record<string, number> = {
+    [RepeatUnit.days]: 1,
+    [RepeatUnit.weeks]: 7,
+    [RepeatUnit.months]: 30,
+  }
+  const daysPerPeriod = (daysPerUnit[unit] ?? 7) * every
+  return Math.ceil((PREVIEW_MONTHS * 30) / daysPerPeriod)
+}
 
 export type PeriodDateArray = {
   startDate: string
@@ -66,11 +76,11 @@ export const getRegularClassSchedules = (
     }
   }
 
-  // Use periodRepeatCount if available, otherwise fall back to PREVIEW_PERIOD_COUNT
+  // Use periodRepeatCount if available, otherwise generate enough periods to cover 24 months
   const maxPeriods =
     periodRepeatCount && periodRepeatCount > 0
       ? periodRepeatCount
-      : PREVIEW_PERIOD_COUNT
+      : getDefaultPeriodCount(scheduleUnit, scheduleEvery)
 
   for (let i = 0; i < maxPeriods; i++) {
     periodDates.push({
