@@ -3,8 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
 import { IoMdAdd } from 'react-icons/io'
-import { LuCalculator, LuCheck, LuMapPin, LuUser2 } from 'react-icons/lu'
-
+import { LuCalculator, LuCheck, LuClock, LuMapPin, LuUser2 } from 'react-icons/lu'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import useSiteData from '@/hooks/useSiteData'
@@ -14,6 +13,7 @@ import { PriceOption } from '@/types/regularClass'
 import { InvoiceStudent } from '@/types/studentInvoice.type'
 import { cn } from '@/utils/cn'
 import { formatCurrency } from '@/utils/currency'
+import dayjs from '@/utils/dayjs'
 
 import ClassInfoItem from './ClassInfoItem'
 
@@ -30,7 +30,25 @@ const CourseItem = ({
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { t } = useTranslation('invoiceCampaign')
-  const siteData = useSiteData()
+  const { currency } = useSiteData()
+  const formatMultiOptionPrice = useCallback(
+    (options: PriceOption[]): string => {
+      const amounts = options
+        .filter(option => !option.isFreeOfCharge)
+        .map(option => Number(option.amount))
+        .filter(amount => !Number.isNaN(amount))
+
+      if (amounts.length === 0) return t('courseAssignment.free')
+
+      const min = Math.min(...amounts)
+      const max = Math.max(...amounts)
+      return min === max
+        ? formatCurrency(min, currency)
+        : `${formatCurrency(min, currency)} – ${formatCurrency(max, currency)}`
+    },
+    [currency, t]
+  )
+
   const price = useMemo(() => {
     const values = {
       priceLabel: t('courseAssignment.free'),
@@ -40,11 +58,11 @@ const CourseItem = ({
 
     const { priceType, priceOptions } = classItem
     if (classItem.priceType === PriceType.MULTIPLE_OPTIONS) {
-      values.priceLabel = formatPrice(priceOptions)
+      values.priceLabel = formatMultiOptionPrice(priceOptions)
     } else {
       const { amount } = classItem.priceOptions[0]
       if (amount) {
-        values.priceLabel = formatCurrency(Number(amount), siteData.currency)
+        values.priceLabel = formatCurrency(Number(amount), currency)
       }
     }
     switch (priceType) {
@@ -62,7 +80,7 @@ const CourseItem = ({
         break
     }
     return values
-  }, [classItem, formatPrice, siteData.currency, t])
+  }, [classItem, formatMultiOptionPrice, currency, t])
 
   return (
     <div
@@ -106,6 +124,20 @@ const CourseItem = ({
             )}
           </div>
         )}
+        {classItem.regularScheduleV2?.periodsV2?.length ? (
+          <div className="flex flex-wrap gap-1 mt-1">
+            {classItem.regularScheduleV2.periodsV2.map(period => (
+              <span
+                key={period.id}
+                className="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full"
+              >
+                <LuClock size={10} />
+                {dayjs(period.startTime).format('HH:mm')} –{' '}
+                {dayjs(period.endTime).format('HH:mm')}
+              </span>
+            ))}
+          </div>
+        ) : null}
       </div>
       <div className="text-right w-fit shrink-0">
         <div className="text-lg font-bold mb-3">{price.priceLabel}</div>

@@ -556,6 +556,26 @@ const StudentDatabase = (): JSX.Element => {
         cellClass: '!flex !items-center',
       },
       {
+        colId: 'phone',
+        headerName: (t('student:column.phone') as string) || '',
+        width: 130,
+        minWidth: 120,
+        filter: false,
+        valueGetter: (params: ValueGetterParams) =>
+          (params.data as StudentEnrolmentRecord).id,
+        spanRows: true,
+        getQuickFilterText: (params: GetQuickFilterTextParams) => {
+          const row = params.data as StudentEnrolmentRecord
+          const phone = row.phone || row.user?.phone || ''
+          return `${formatPhoneNumber(phone)} ${phone.replace(/\D/g, '')}`
+        },
+        cellRenderer: (params: ICellRendererParams) => {
+          const row = params.data as StudentEnrolmentRecord
+          return formatPhoneNumber(row.phone || row.user?.phone || '')
+        },
+        cellClass: '!flex !items-center',
+      },
+      {
         colId: 'email',
         headerName: (t('student:column.email') as string) || '',
         width: 200,
