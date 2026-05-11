@@ -401,13 +401,8 @@ export class InvoiceCampaignService {
           ...processingData[findIndex],
           invoiceNumber: `INV#${parentInvoice.id}`,
           amount: (parentInvoice?.payAmount || 0).toString(),
-          message: error ? error.message : null,
-          invoiceId: parentInvoice.id,
-          proofToken: parentInvoice.proofToken,
-          userAliasId: parentInvoice.userAliasId,
-          userId: parentInvoice.userId,
-          institutionId: parentInvoice.institutionId,
           status: SendingCampaignStatus.CREATED,
+          message: null,
         }
       }
       this.emitSendCampaignSseEvent({
