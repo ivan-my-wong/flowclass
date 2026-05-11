@@ -147,7 +147,7 @@ export const invoiceSessionState = atom<InvoiceSessionType[]>({
 
 // Maps classId → all available lessons for that class (used for package discount auto-apply)
 export const availableLessonsByClassState = atom<
-  Record<number, { id: number; date: string }[]>
+  Record<number, { id: number; date: string; period?: number }[]>
 >({
   key: ATOM_KEY.AvailableLessonsByClassState,
   default: {},

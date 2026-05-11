@@ -645,7 +645,7 @@ export function initializeInvoiceData(
  */
 export const isPackageDiscountQualified = (
   selectedSessions: InvoiceSessionType[],
-  availableLessons: { id: number; date: string }[],
+  availableLessons: { id: number; date: string; period?: number }[],
   classId: number
 ): { qualified: boolean; qualifiedMonths: string[]; lessonCount: number } => {
   // Filter selected sessions for this class
@@ -657,34 +657,68 @@ export const isPackageDiscountQualified = (
     return { qualified: false, qualifiedMonths: [], lessonCount: 0 }
   }
 
-  // Group available lessons by YYYY-MM
+  const hasPeriodInfo = availableLessons.some(l => l.period != null)
+
+  if (hasPeriodInfo) {
+    // Period-aware check: for each (period, month) group in selected sessions,
+    // verify all available lessons in that exact period+month are selected.
+    // This prevents cross-period false negatives in multi-period classes.
+    const selectedByPeriodMonth = new Map<string, Set<number>>()
+    classSelectedSessions.forEach(session => {
+      const period = session.period ?? 0
+      const month = session.date.substring(0, 7)
+      const key = `${period}:${month}`
+      if (!selectedByPeriodMonth.has(key)) selectedByPeriodMonth.set(key, new Set())
+      selectedByPeriodMonth.get(key)!.add(session.id)
+    })
+
+    const availableByPeriodMonth = new Map<string, Set<number>>()
+    availableLessons.forEach(lesson => {
+      if (lesson.period == null) return
+      const month = lesson.date.substring(0, 7)
+      const key = `${lesson.period}:${month}`
+      if (!availableByPeriodMonth.has(key)) availableByPeriodMonth.set(key, new Set())
+      availableByPeriodMonth.get(key)!.add(lesson.id)
+    })
+
+    const qualifiedMonths: string[] = []
+    let totalLessonCount = 0
+
+    selectedByPeriodMonth.forEach((selectedIds, key) => {
+      const availableIds = availableByPeriodMonth.get(key)
+      if (!availableIds || availableIds.size === 0) return
+      const allSelected = [...availableIds].every(id => selectedIds.has(id))
+      if (allSelected) {
+        const month = key.split(':')[1]
+        if (!qualifiedMonths.includes(month)) qualifiedMonths.push(month)
+        totalLessonCount += availableIds.size
+      }
+    })
+
+    return { qualified: qualifiedMonths.length > 0, qualifiedMonths, lessonCount: totalLessonCount }
+  }
+
+  // Fallback: period-unaware (original logic for backward compat)
   const availableByMonth: Record<string, Set<number>> = {}
   availableLessons.forEach(lesson => {
-    const month = lesson.date.substring(0, 7) // YYYY-MM
-    if (!availableByMonth[month]) {
-      availableByMonth[month] = new Set()
-    }
+    const month = lesson.date.substring(0, 7)
+    if (!availableByMonth[month]) availableByMonth[month] = new Set()
     availableByMonth[month].add(lesson.id)
   })
 
-  // Group selected sessions by YYYY-MM
   const selectedByMonth: Record<string, Set<number>> = {}
   classSelectedSessions.forEach(session => {
-    const month = session.date.substring(0, 7) // YYYY-MM
-    if (!selectedByMonth[month]) {
-      selectedByMonth[month] = new Set()
-    }
+    const month = session.date.substring(0, 7)
+    if (!selectedByMonth[month]) selectedByMonth[month] = new Set()
     selectedByMonth[month].add(session.id)
   })
 
-  // Check each month: are all available lessons selected?
   const qualifiedMonths: string[] = []
   let totalLessonCount = 0
 
   Object.entries(availableByMonth).forEach(([month, availableIds]) => {
     const selectedIds = selectedByMonth[month]
     if (!selectedIds) return
-
     const allSelected = [...availableIds].every(id => selectedIds.has(id))
     if (allSelected && availableIds.size > 0) {
       qualifiedMonths.push(month)

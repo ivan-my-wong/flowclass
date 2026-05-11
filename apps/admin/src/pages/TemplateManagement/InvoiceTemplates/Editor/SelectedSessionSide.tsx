@@ -79,6 +79,7 @@ const SelectedSessionSide = (): JSX.Element => {
         [classData.id]: lessonsData.lessons.map(lesson => ({
           id: lesson.id,
           date: lesson.date,
+          period: lesson.period,
         })),
       }))
     }

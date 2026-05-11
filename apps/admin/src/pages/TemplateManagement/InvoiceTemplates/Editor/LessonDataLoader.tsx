@@ -34,7 +34,7 @@ const ClassLessonDataLoader = ({ classId }: { classId: number }): null => {
     if (lessonsData?.lessons) {
       setAvailableLessonsByClass(prev => ({
         ...prev,
-        [classId]: lessonsData.lessons.map(l => ({ id: l.id, date: l.date })),
+        [classId]: lessonsData.lessons.map(l => ({ id: l.id, date: l.date, period: l.period })),
       }))
     }
   }, [lessonsData?.lessons, classId, setAvailableLessonsByClass])

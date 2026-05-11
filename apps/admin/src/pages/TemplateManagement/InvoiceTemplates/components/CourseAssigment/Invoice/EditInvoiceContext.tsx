@@ -736,9 +736,10 @@ export const InvoiceEditDialogProvider = ({
       } else {
         setInvoiceSplitItems([generateDefaultInvoiceInstallment()])
       }
-      // In edit mode, initialize totalPrice from the stored gross amount
-      // to avoid showing $0 before currentClasses is populated
-      if (subTotal && subTotal > 0) {
+      // In edit mode, initialize totalPrice from the stored gross amount only
+      // when classes haven't loaded yet — prevents overwriting a correct value
+      // computed by the currentClasses effect (which runs earlier in the same render).
+      if (subTotal && subTotal > 0 && currentClasses.length === 0) {
         setTotalPrice({
           totalPrice: subTotal,
           totalPriceLabel: formatCurrency(subTotal, currency),

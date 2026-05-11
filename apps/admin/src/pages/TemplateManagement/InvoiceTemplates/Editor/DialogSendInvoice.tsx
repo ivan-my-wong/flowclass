@@ -415,19 +415,37 @@ const DialogSendInvoice = (): JSX.Element => {
     if (isCombined) {
       return [
         {
+          userAliasId: parent?.id,
           name: parent?.name ?? '',
-          email: parent?.email !== '' ? parent?.email : undefined,
-          phone: parent?.phone,
+          email: parent?.email || undefined,
+          phone: parent?.phone ?? '',
           isSendToParent: false,
         } as RecipientDto,
       ]
     }
-    return allStudents.map(student => ({
-      name: student.name,
-      email: student.email !== '' ? student.email : undefined,
-      phone: student.phone,
-      isSendToParent: student.isSendToParent,
-    }))
+    return allStudents.flatMap(student => {
+      const isSendToStudent = student.isSendToStudent ?? !student.isSendToParent
+      const entries: RecipientDto[] = []
+      if (isSendToStudent) {
+        entries.push({
+          userAliasId: student.id,
+          name: student.name,
+          email: student.email || undefined,
+          phone: student.phone ?? '',
+          isSendToParent: false,
+        })
+      }
+      if (student.isSendToParent) {
+        entries.push({
+          userAliasId: student.id,
+          name: student.name,
+          email: student.email || undefined,
+          phone: student.phone ?? '',
+          isSendToParent: true,
+        })
+      }
+      return entries
+    })
   }, [isCombined, parent, allStudents])
 
   const buildInvoicesPayload = () => {

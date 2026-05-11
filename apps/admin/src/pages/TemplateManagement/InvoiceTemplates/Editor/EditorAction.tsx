@@ -56,12 +56,11 @@ const EditorAction = (): JSX.Element => {
 
   // Populate available lessons for package discount auto-apply
   const populateAvailableLessons = (classId: number) => {
-    if (regularV2Lessons && regularV2Lessons.length > 0) {
-      setAvailableLessonsByClass(prev => ({
-        ...prev,
-        [classId]: regularV2Lessons.map(l => ({ id: l.id, date: l.date })),
-      }))
-    }
+    if (!regularV2Lessons?.length) return
+    setAvailableLessonsByClass(prev => ({
+      ...prev,
+      [classId]: regularV2Lessons.map(l => ({ id: l.id, date: l.date, period: l.period })),
+    }))
   }
 
   // Helper function to get class info for a session (multi-class support)

@@ -43,15 +43,16 @@ const SendCellRenderer: FC<ICellRendererParams<RecipientRow>> = ({ data }) => {
   if (!data) return null
 
   if (data.kind === 'student') {
-    const isSendToParent =
-      allStudents.find(s => s.id === data.student.id)?.isSendToParent ?? false
+    const student = allStudents.find(s => s.id === data.student.id)
+    const isSendToStudent =
+      student?.isSendToStudent ?? !(student?.isSendToParent ?? false)
     return (
       <Switch
-        checked={!isSendToParent}
+        checked={isSendToStudent}
         onCheckedChange={checked => {
           setAllInvoiceStudents(prev =>
             prev.map(s =>
-              s.id === data.student.id ? { ...s, isSendToParent: !checked } : s
+              s.id === data.student.id ? { ...s, isSendToStudent: checked } : s
             )
           )
         }}
@@ -84,7 +85,7 @@ const TotalCellRenderer: FC<ICellRendererParams<RecipientRow>> = ({ data }) => {
     getInvoiceOfStudentSelector({ userAliasId, isCombined })
   )
 
-  if (!data || data.kind === 'parent' || isCombined) {
+  if (!data || data.kind === 'parent') {
     return <span className="text-gray-400">-</span>
   }
   if (invoiceOfStudent == null || !currentSite?.currency) {

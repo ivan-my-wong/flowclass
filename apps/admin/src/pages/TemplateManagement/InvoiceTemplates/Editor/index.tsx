@@ -46,7 +46,7 @@ import type { Classes } from '@/types/classes'
 import { ClassTypeEnum, PriceType } from '@/types/course'
 import { PaymentProofTableItem } from '@/types/enrollCourse'
 import { SendPaymentActions } from '@/types/paymentProof'
-import { PriceOption } from '@/types/regularClass'
+import { StudentEnrolmentRecord } from '@/types/student'
 import {
   type InvoiceCampaignDetailDto,
   InvoiceCampaignDto,
@@ -358,6 +358,28 @@ const InvoiceEditor = (): JSX.Element => {
         )
         setAllSessions(sessions)
 
+        // For combined campaigns, the parent's userAlias lives on the actual DB invoice,
+        // not in the metadata — populate currentActiveParent directly from it.
+        if (invoiceCampaign.isCombined && actualInvoices.length > 0) {
+          const parentAlias = actualInvoices[0].userAlias
+          if (parentAlias) {
+            setCurrentActiveParent({
+              id: parentAlias.id,
+              userId: parentAlias.userId,
+              name: parentAlias.name,
+              email: parentAlias.email,
+              phone: parentAlias.user?.phone ?? '',
+              user: {
+                id: parentAlias.userId,
+                phone: parentAlias.user?.phone ?? '',
+              },
+              isStudentParent: parentAlias.isStudentParent,
+              childOfUserAliasId: parentAlias.childOfUserAliasId ?? null,
+              usedBalance: 0,
+            } as unknown as StudentEnrolmentRecord)
+          }
+        }
+
         // Record the loaded state so saveCampaign can detect which students changed
         const snap = new Map<number, StudentSnap>()
         students.forEach(student => {
@@ -611,6 +633,9 @@ const InvoiceEditor = (): JSX.Element => {
   }, [parent, setCurrentActiveParent])
 
   useEffect(() => {
+    // In edit mode, isCombined is set from the DB in initializeCampaignData.
+    // Only auto-set it in create mode; otherwise the user's saved setting is overridden.
+    if (isEditMode) return
     setInvoiceCampaign(prev => {
       if (!prev) return null
       if (prev.isCombined === isOneSingleParent) return prev
@@ -619,7 +644,7 @@ const InvoiceEditor = (): JSX.Element => {
         isCombined: isOneSingleParent,
       }
     })
-  }, [isOneSingleParent, setInvoiceCampaign])
+  }, [isOneSingleParent, isEditMode, setInvoiceCampaign])
 
   useEffect(() => {
     if (allStudents.length === 0 || allSessions.length === 0) return

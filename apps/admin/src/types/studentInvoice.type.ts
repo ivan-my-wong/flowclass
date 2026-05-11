@@ -56,6 +56,7 @@ export type InvoiceStudent = {
   invoiceSplitType: InvoiceSplitType
   invoiceSplitItems: InvoiceSplit[]
   isSendToParent: boolean
+  isSendToStudent?: boolean
   isPayByCredit: boolean
   usedBalance: number
   isStudentParent: boolean
@@ -285,6 +286,7 @@ export type InvoiceCampaignDetailDto = {
 }
 
 export interface RecipientDto {
+  userAliasId?: number
   name: string
   email?: string
   phone: string

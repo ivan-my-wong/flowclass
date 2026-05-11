@@ -94,12 +94,9 @@ const CourseItem = ({
           <h4 className="text-lg font-semibold text-gray-900">
             {classItem.name}
           </h4>
-          <Badge className="ml-3 px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-            {classItem.type}
-          </Badge>
         </div>
-        <span className="text-xs text-gray-500 mt-1">ID: {classItem.id}</span>
         <p className="text-sm">{classItem.course?.name}</p>
+        <span className="text-xs text-gray-500 mt-1">ID: {classItem.id}</span>
         {(classItem?.locationRoom ||
           classItem.instructor ||
           price.priceTypeLabel) && (
@@ -116,28 +113,8 @@ const CourseItem = ({
                 icon={<LuUser2 aria-hidden="true" focusable="false" />}
               />
             )}
-            {price.priceTypeLabel && (
-              <ClassInfoItem
-                label={price.priceTypeLabel}
-                icon={<LuCalculator aria-hidden="true" focusable="false" />}
-              />
-            )}
           </div>
         )}
-        {classItem.regularScheduleV2?.periodsV2?.length ? (
-          <div className="flex flex-wrap gap-1 mt-1">
-            {classItem.regularScheduleV2.periodsV2.map(period => (
-              <span
-                key={period.id}
-                className="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full"
-              >
-                <LuClock size={10} />
-                {dayjs(period.startTime).format('HH:mm')} –{' '}
-                {dayjs(period.endTime).format('HH:mm')}
-              </span>
-            ))}
-          </div>
-        ) : null}
       </div>
       <div className="text-right w-fit shrink-0">
         <div className="text-lg font-bold mb-3">{price.priceLabel}</div>
