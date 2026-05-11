@@ -201,28 +201,9 @@ export const InvoiceEditDialogProvider = ({
   const currency = siteData?.currency ?? DEFAULT_CURRENCY
 
   useEffect(() => {
-    if (
-      invoiceCampaign?.combinedInvoice?.total &&
-      invoiceCampaign?.isCombined
-    ) {
-      setTotalPrice({
-        totalPrice: invoiceCampaign.combinedInvoice.total,
-        totalPriceLabel: formatCurrency(
-          invoiceCampaign.combinedInvoice.total,
-          currency
-        ),
-      })
-      return
-    }
-
     const computedTotalPrice = formatTotalPriceInvoice(currentClasses, currency)
     setTotalPrice(computedTotalPrice)
-  }, [
-    invoiceCampaign?.combinedInvoice?.total,
-    currentClasses,
-    currency,
-    invoiceCampaign?.isCombined,
-  ])
+  }, [currentClasses, currency])
 
   const getBalance = useCallback(() => {
     if (currentActiveStudent) {
@@ -784,17 +765,29 @@ export const InvoiceEditDialogProvider = ({
     if (!currentActiveStudent) return
     const isCombined = invoiceCampaign?.isCombined ?? false
 
-    // Filter to this student's promotions only
-    const studentPromotions = appliedPromotions.filter(item => {
-      if (isCombined) return item.parentId === currentActiveParent?.id
-      return item.studentId === currentActiveStudent?.id
-    })
-
-    // Check if the student's stored promotions differ from the global state
     const storedStudent = listInvoiceStudents.find(
       s => s.id === currentActiveStudent.id
     )
     const storedPromotions = storedStudent?.appliedPromotions ?? []
+
+    // Package discounts are class-scoped (parentId: null) and managed exclusively
+    // by PackageDiscountAutoApplyAll — preserve them from storage so combined-mode
+    // sync (which filters by parentId) does not strip them on every write.
+    const storedPackagePromotions = storedPromotions.filter(
+      p => p.type === PromotionTypeItem.PACKAGE
+    )
+
+    // Sync non-package promotions from the global appliedPromotionsState
+    const nonPackageFromState = appliedPromotions.filter(item => {
+      if (item.type === PromotionTypeItem.PACKAGE) return false
+      if (isCombined) return item.parentId === currentActiveParent?.id
+      return item.studentId === currentActiveStudent?.id
+    })
+
+    const studentPromotions = [
+      ...storedPackagePromotions,
+      ...nonPackageFromState,
+    ]
 
     // Compare by ID + amount to detect both addition/removal and value changes
     const storedKey = storedPromotions

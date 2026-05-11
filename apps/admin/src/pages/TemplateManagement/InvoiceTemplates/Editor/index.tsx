@@ -23,6 +23,7 @@ import { defaultStudentInvoiceConfig } from '@/constants/invoiceCampaign.constan
 import { DEFAULT_CURRENCY } from '@/constants/invoices'
 import useClassData from '@/hooks/useClassData'
 import useInvoiceCampaignData from '@/hooks/useInvoiceCampaignData'
+import { useRecalculateAllPromotions } from '@/hooks/useRecalculateAllPromotions'
 import { useSendingCampaign } from '@/hooks/useSendingCampaign'
 import useStudentInvoice from '@/hooks/useStudentInvoice'
 import ContentLayout from '@/layouts/ContentLayout'
@@ -109,6 +110,7 @@ const InvoiceEditor = (): JSX.Element => {
   const [allSessions, setAllSessions] = useRecoilState(invoiceSessionState)
   const setCurrentActiveStudent = useSetRecoilState(currentActiveStudentState)
   const setAppliedPromotions = useSetRecoilState(appliedPromotionsState)
+  const { recalculateAll } = useRecalculateAllPromotions()
 
   const resetAllStudents = useResetRecoilState(invoiceStudentState)
   const resetAllClasses = useResetRecoilState(invoiceClassesState)
@@ -568,6 +570,7 @@ const InvoiceEditor = (): JSX.Element => {
   }, [isCreating, isUpdating])
 
   const handleSendInvoices = () => {
+    recalculateAll()
     let endPath = 'send-multiple'
     if (existingInvoiceCampaign?.isCombined) {
       endPath = 'send'

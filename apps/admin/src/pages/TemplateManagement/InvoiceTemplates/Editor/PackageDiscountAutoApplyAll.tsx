@@ -47,9 +47,12 @@ const PackageDiscountAutoApplyAll = (): null => {
   const setAppliedPromotions = useSetRecoilState(appliedPromotionsState)
   const hasToastedRef = useRef(false)
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const studentIdsKey = allStudents.map(s => s.id).join(',')
+
   useEffect(() => {
     const packagePromotions = (allPromotions ?? []).filter(
-      (promo: any) =>
+      promo =>
         'promotionType' in promo &&
         promo.promotionType === PromotionTypeItem.PACKAGE
     ) as unknown as PackageDiscount[]
@@ -209,7 +212,7 @@ const PackageDiscountAutoApplyAll = (): null => {
         if (updatedActive && updatedActive !== currentActiveStudent) {
           setCurrentActiveStudent(updatedActive)
           // Also sync the global appliedPromotionsState used by the discount UI
-          setAppliedPromotions(updatedActive.appliedPromotions)
+          setAppliedPromotions(updatedActive.appliedPromotions ?? [])
         }
       }
 
@@ -226,7 +229,7 @@ const PackageDiscountAutoApplyAll = (): null => {
     availableLessonsByClass,
     // Use length + a hash of student IDs to avoid running on every appliedPromotions change
     // (which would cause infinite loops) but still re-run when students are added/removed
-    allStudents.map(s => s.id).join(','),
+    studentIdsKey,
   ])
 
   return null
