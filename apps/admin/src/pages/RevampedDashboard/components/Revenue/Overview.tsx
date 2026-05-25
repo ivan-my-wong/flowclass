@@ -316,11 +316,11 @@ const ExpandableRow = ({
 
   const getStatusBadgeClass = (status: string) => {
     const statusMap: Record<string, string> = {
-      COMPLETED: 'bg-green-100 text-green-700',
-      SCHEDULED: 'bg-blue-100 text-blue-700',
-      CANCELLED: 'bg-red-100 text-red-700',
+      COMPLETED: 'bg-success-subtle text-success',
+      SCHEDULED: 'bg-background-primary-subtle text-primary',
+      CANCELLED: 'bg-rose-100 text-warn',
     }
-    return statusMap[status] || 'bg-gray-100 text-gray-700'
+    return statusMap[status] || 'bg-gray-100 text-text-subtle'
   }
 
   return (
@@ -328,8 +328,9 @@ const ExpandableRow = ({
       <tr className="border-b border-gray-200 hover:bg-gray-50">
         <td className="py-3 px-4">
           <Button
+            variant="ghost"
+            size="icon"
             onClick={() => onToggle(lesson.id)}
-            className="text-gray-400 hover:text-gray-600"
             iconAfter={
               isExpanded ? (
                 <BiChevronDown className="w-5 h-5" />
@@ -371,7 +372,8 @@ const ExpandableRow = ({
         </td>
         <td className="py-3 px-4">
           <Button
-            className="text-gray-400 hover:text-gray-600"
+            variant="ghost"
+            size="icon"
             iconAfter={<FiMoreHorizontal className="w-5 h-5" />}
           />
         </td>

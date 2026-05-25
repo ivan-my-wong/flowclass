@@ -86,7 +86,7 @@
       "alert": "再添加 {{qty}} 門課程即可享受此折扣。此折扣不會顯示在您的發票上",
       "current": "當前",
       "noQualified": "不符合套餐折扣條件",
-      "promoText": "購買 {{qty}}+ 門課程享受 {{amount}}% 折扣",
+      "promoText": "購買 {{qty}}+ 門課程享受 {{amount}} 折扣",
       "qtyCourses": "{{qty}} 門課程",
       "required": "需要"
     },
@@ -193,6 +193,7 @@
     "perSession": "每課時",
     "previewAllInvoices": "預覽所有發票",
     "recipients": "學生 ({{count}})",
+    "recipientsColumn": "學生人數",
     "recurringPayment": "定期付款",
     "removeSession": "移除課堂",
     "saveCampaign": "儲存發票",
@@ -235,6 +236,8 @@
       "processingInvoicesDesc": "請等待我們創建您的發票",
       "createButton": "創建發票",
       "sendButton": "發送發票",
+      "updateButton": "更新發票",
+      "updateAndSendButton": "更新並發送",
       "sendViaWhatsApp": "透過 WhatsApp 發送",
       "sending": "發送中",
       "sendProgress": "正在創建發票...",
@@ -264,6 +267,8 @@
     "sendCountInvoices": "發送 {{count}} 張發票",
     "sendInvoiceDocuments": "發送發票文檔",
     "sendInvoices": "創建發票",
+    "updateInvoice": "更新發票",
+    "invoiceUpdated": "發票已成功更新",
     "sessionsSelected": "已選擇 {{count}} 課時",
     "combined": "合併發票",
     "studentSelect": {
@@ -368,13 +373,16 @@
       "paymentAmountDone": "已付款金額：",
       "coursesSignedUp": "已報名課程：",
       "coursesNeededToReachBundle": "達到套餐折扣所需課程：",
-      "bundleDiscountEligible": "✓ 符合套餐折扣資格",
+      "coursesNeeded_one": "還需 {{count}} 門課程才符合資格",
+      "coursesNeeded_other": "還需 {{count}} 門課程才符合資格",
+      "bundleDiscountEligible": "符合套餐折扣資格",
       "coursesUsed": "使用的課程：",
       "discountBreakdown": "折扣明細：",
       "currentInvoiceDiscount": "當前發票折扣：",
       "retroactiveDiscount": "追溯折扣（過往付款）：",
       "appliedToCourses": "應用於課程：",
       "applicable": "適用",
+      "applied": "已套用",
       "amountSaved": "節省金額："
     },
     "editInvoice": "編輯發票",
@@ -444,6 +452,12 @@
     "studentSelection": "學生選擇",
     "undoneRemoveAllStudents": "此操作無法撤銷！",
     "warningRemoveAllStudents": "移除所有學生將移除所有與他們相關的班別在當前的發票中。"
+  },
+  "invoices": "張發票",
+  "noResults": "找不到發票群組",
+  "status": {
+    "draft": "草稿",
+    "sent": "已發送"
   },
   "title": "發票",
   "viewRecipients": "查看學生"

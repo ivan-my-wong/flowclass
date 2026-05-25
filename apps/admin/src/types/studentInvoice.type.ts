@@ -416,3 +416,9 @@ export type ResendInvoiceDto = {
 export type SendInvoiceDirectlyDto = SendInvoiceBaseDto & {
   invoiceId: number
 }
+
+export type SyncEnrollCoursesDiffItemDto = {
+  invoiceId: number
+  addedClasses?: MetaRef[]
+  removedClassIds?: number[]
+}

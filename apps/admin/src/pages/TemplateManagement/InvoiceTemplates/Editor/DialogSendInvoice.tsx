@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import DatePicker from 'react-datepicker'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -388,12 +388,22 @@ const DialogSendInvoice = (): JSX.Element => {
 
   // ─── Send logic ────────────────────────────────────────────────────────────
 
+  const [searchParams] = useSearchParams()
+  const documentId = searchParams.get('documentId') ?? undefined
+
   const {
     useSendInvoiceCampaign,
     useCreateInvoiceCampaign,
     useUpdateInvoiceCampaign,
     useEditAndResendCampaign,
+    useFetchDetailInvoiceCampaign,
+    useSyncEnrollCourses,
   } = useInvoiceCampaignData()
+
+  const { data: fetchedCampaign } = useFetchDetailInvoiceCampaign(documentId, {
+    enabled: !!invoiceCampaign?.id,
+  })
+  const { mutateAsync: syncEnrollCoursesDiff } = useSyncEnrollCourses(documentId)
   const { startEvent } = useSendingCampaign()
 
   const onSendSuccess = (res: SendingResponse) => {
@@ -491,7 +501,7 @@ const DialogSendInvoice = (): JSX.Element => {
         recipients,
       })
     } else if (invoiceCampaign?.id) {
-      await updateCampaign({ ...data, invoices })
+      await updateCampaign({ ...data, invoices, recipients })
     } else {
       await createCampaign({ ...data, isDraft: false, invoices, recipients })
     }
@@ -521,12 +531,67 @@ const DialogSendInvoice = (): JSX.Element => {
   const isStep1Valid = isCombined ? !!combinedInvoice : true
   const isStep2Valid = !!isContentValid
 
-  const handleNext = () => {
-    if (currentStep === 1) {
-      setCurrentStep(2)
-    } else {
-      form.handleSubmit(handleSubmit)()
+  const handleSendClick = async () => {
+    if (
+      !isCombined &&
+      invoiceCampaign?.id &&
+      fetchedCampaign?.invoices?.length
+    ) {
+      const diffs = invoiceCampaigns
+        .map(desired => {
+          const invoice = fetchedCampaign.invoices.find(
+            inv => inv.userAlias?.id === desired.userAliasId
+          )
+          if (!invoice) return null
+
+          const existingClassIds = new Set<number>(
+            (invoice.enrollCourses ?? []).flatMap(ec =>
+              (ec.multipleClassMapping ?? [])
+                .map(
+                  m =>
+                    m.classId ??
+                    (m as unknown as { class?: { id: number } }).class?.id
+                )
+                .filter((id): id is number => !!id)
+            )
+          )
+
+          const desiredClassIds = new Set(
+            desired.classes
+              .map(c => c.classId)
+              .filter((id): id is number => !!id)
+          )
+
+          const addedClasses = desired.classes.filter(
+            c => c.classId && !existingClassIds.has(c.classId)
+          )
+          const removedClassIds = Array.from(existingClassIds).filter(
+            id => !desiredClassIds.has(id)
+          )
+
+          if (!addedClasses.length && !removedClassIds.length) return null
+          return { invoiceId: invoice.id!, addedClasses, removedClassIds }
+        })
+        .filter(
+          (
+            d
+          ): d is {
+            invoiceId: number
+            addedClasses: (typeof invoiceCampaigns)[number]['classes']
+            removedClassIds: number[]
+          } => d !== null
+        )
+
+      if (diffs.length > 0) {
+        try {
+          await syncEnrollCoursesDiff(diffs)
+        } catch {
+          // Non-fatal: send pipeline still applies full class list from metadata
+        }
+      }
     }
+
+    form.handleSubmit(handleSubmit)()
   }
 
   const step1Label = isCombined
@@ -557,14 +622,20 @@ const DialogSendInvoice = (): JSX.Element => {
             disabled={currentStep === 1 ? !isStep1Valid : !isStep2Valid}
             loading={isCreating || isSending || isUpdating || isEditResending}
           >
-            {currentStep === 1
-              ? t('invoiceCampaign:editor.send.nextStep')
-              : getSendButtonLabel(
-                  isEmailEnabled,
-                  isWhatsappEnabled,
-                  t('invoiceCampaign:editor.send.sendButton'),
-                  t('invoiceCampaign:editor.send.createButton')
-                )}
+            {getSendButtonLabel(
+              isEmailEnabled,
+              !!invoiceCampaign?.id,
+              isCompleted,
+              {
+                send: t('invoiceCampaign:editor.send.sendButton'),
+                create: t('invoiceCampaign:editor.send.createButton'),
+                update: t('invoiceCampaign:editor.send.updateButton'),
+                updateAndSend: t(
+                  'invoiceCampaign:editor.send.updateAndSendButton'
+                ),
+                resend: t('invoiceCampaign:resend.resendButton'),
+              }
+            )}
           </Button>
         </>
       }
@@ -609,10 +680,20 @@ const DialogSendInvoice = (): JSX.Element => {
 
 const getSendButtonLabel = (
   isEmailEnabled: boolean,
-  isWhatsappEnabled: boolean,
-  sendLabel: string,
-  createLabel: string
-): string => (isEmailEnabled || isWhatsappEnabled ? sendLabel : createLabel)
+  isEditMode: boolean,
+  isCompleted: boolean,
+  labels: {
+    send: string
+    create: string
+    update: string
+    updateAndSend: string
+    resend: string
+  }
+): string => {
+  if (isCompleted && isEditMode) return labels.resend
+  if (isEditMode) return isEmailEnabled ? labels.updateAndSend : labels.update
+  return isEmailEnabled ? labels.send : labels.create
+}
 
 const DialogSendInvoiceWrapper = (): JSX.Element => {
   return (

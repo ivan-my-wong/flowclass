@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { IRowNode } from 'ag-grid-community'
@@ -6,6 +6,7 @@ import { AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { FaCheckCircle } from 'react-icons/fa'
 import { IoBook } from 'react-icons/io5'
+import { LuFilePlus } from 'react-icons/lu'
 import { MdDelete } from 'react-icons/md'
 import { useMutation, useQueryClient } from 'react-query'
 import { useRecoilState } from 'recoil'
@@ -27,6 +28,8 @@ import {
   TypeDeleteStudentParams,
 } from '@/types/student'
 import { BulkAssignCourseType } from '@/types/studentAddTeachingService'
+
+import AddToInvoiceCampaignModal from './AddToInvoiceCampaignModal'
 
 type IProps = {
   selectedRows: IRowNode<StudentEnrolmentRecord>[]
@@ -80,6 +83,17 @@ const SelectionActionBulk = (params: IProps): JSX.Element => {
 
   const { confirmState, openConfirm, closeConfirm, setLoading } =
     useGlobalConfirm(isLoading)
+
+  const [isAddToCampaignOpen, setIsAddToCampaignOpen] = useState(false)
+
+  const selectedStudentIds = useMemo(
+    () =>
+      selectedRows
+        .map(row => row.data?.id ?? 0)
+        .filter(Boolean)
+        .sort((a, b) => a - b),
+    [selectedRows]
+  )
 
   return (
     <AnimatePresence>
@@ -182,6 +196,14 @@ const SelectionActionBulk = (params: IProps): JSX.Element => {
                   {t('student:button.assignInvoice')}
                 </LoadingButton>
 
+                <LoadingButton
+                  iconBefore={<LuFilePlus />}
+                  isLoading={false}
+                  onClick={() => setIsAddToCampaignOpen(true)}
+                >
+                  {t('student:button.addToExistingInvoiceCampaign')}
+                </LoadingButton>
+
                 {isBulkAssignCourseDisabled && (
                   <p className="text-sm max-w-64">
                     {t('student:button.cannotAssignMoreThanFiveCourses')}
@@ -192,6 +214,12 @@ const SelectionActionBulk = (params: IProps): JSX.Element => {
           />
         </div>
       )}
+
+      <AddToInvoiceCampaignModal
+        open={isAddToCampaignOpen}
+        onClose={() => setIsAddToCampaignOpen(false)}
+        studentIds={selectedStudentIds}
+      />
     </AnimatePresence>
   )
 }

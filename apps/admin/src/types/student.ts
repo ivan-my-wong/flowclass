@@ -164,6 +164,7 @@ export type CreateStudentProps = {
 export type TypeCreateStudent = {
   name: string
   email?: string
+  secondaryEmail?: string
   phone: string
   institutionId: number
   siteId: number

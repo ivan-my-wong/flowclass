@@ -15,6 +15,7 @@ import {
   type SearchParams,
   sendInvoiceCampaign,
   sendInvoiceDirectly,
+  syncEnrollCourses,
   updateInvoiceCampaign,
 } from '@/api/invoiceCampaign'
 import type {
@@ -22,6 +23,7 @@ import type {
   ResendInvoiceDto,
   SendingResponse,
   SendInvoiceDirectlyDto,
+  SyncEnrollCoursesDiffItemDto,
 } from '@/types/studentInvoice.type'
 import type { InvoiceCampaign } from '@/types/templateManagement'
 
@@ -199,6 +201,16 @@ const useInvoiceCampaignData = () => {
       },
     })
   }
+  const useSyncEnrollCourses = (documentId?: string | number) => {
+    return useMutation({
+      mutationFn: (diffs: SyncEnrollCoursesDiffItemDto[]) =>
+        syncEnrollCourses(currentSchoolId, documentId as string, diffs),
+      onError: error => {
+        handleApiError({ error, t })
+      },
+    })
+  }
+
   const useSendInvoiceDirectly = (onSuccess?: () => void) => {
     return useMutation({
       mutationFn: (dto: SendInvoiceDirectlyDto) =>
@@ -224,6 +236,7 @@ const useInvoiceCampaignData = () => {
     useResendInvoiceRecipient,
     useFetchInvoicePdf,
     useSendInvoiceDirectly,
+    useSyncEnrollCourses,
   }
 }
 export default useInvoiceCampaignData

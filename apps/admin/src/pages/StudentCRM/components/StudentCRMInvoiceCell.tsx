@@ -18,10 +18,9 @@ import { handleStatusPayment } from './TeachingServiceEnrolledRow'
 
 type Props = {
   invoice: SingleStudentCrmRecordEnrolledClassesInvoice | null
-  amountText: string
 }
 
-const StudentCRMInvoiceCell = ({ invoice, amountText }: Props): JSX.Element => {
+const StudentCRMInvoiceCell = ({ invoice }: Props): JSX.Element => {
   const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [remark, setRemark] = useState(invoice?.remark ?? '')
@@ -58,9 +57,6 @@ const StudentCRMInvoiceCell = ({ invoice, amountText }: Props): JSX.Element => {
     <>
       <div className="flex items-center gap-2 w-full min-h-[72px] py-1 flex-wrap">
         {paymentStatus}
-        <span className="tabular-nums font-medium text-sm shrink-0">
-          {amountText}
-        </span>
         {invoice && (
           <>
             <p className="text-[11px] text-gray-500 truncate min-w-0 flex-1">

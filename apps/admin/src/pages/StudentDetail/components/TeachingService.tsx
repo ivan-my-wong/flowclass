@@ -242,6 +242,7 @@ const TeachingService = ({
 
         <div className="flex items-center gap-2">
           <ChartDatePicker
+            mode="month"
             chartDate={
               dateFilter.startDate && dateFilter.endDate
                 ? dateFilter

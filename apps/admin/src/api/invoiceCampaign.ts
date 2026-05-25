@@ -3,6 +3,7 @@ import type {
   ResendInvoiceDto,
   SendingResponse,
   SendInvoiceDirectlyDto,
+  SyncEnrollCoursesDiffItemDto,
 } from '@/types/studentInvoice.type'
 import type { InvoiceCampaign } from '@/types/templateManagement'
 
@@ -145,6 +146,18 @@ export const sendInvoiceDirectly = async (
       institutionId,
     },
     data: dto,
+  })
+}
+
+export const syncEnrollCourses = async (
+  institutionId: number,
+  documentId: string | number,
+  diffs: SyncEnrollCoursesDiffItemDto[]
+): Promise<void> => {
+  await apiClient.patch({
+    url: `/admin/invoice-campaign/${documentId}/sync-enroll-courses`,
+    params: { institutionId },
+    data: { diffs },
   })
 }
 

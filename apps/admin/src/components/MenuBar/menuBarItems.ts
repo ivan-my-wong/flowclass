@@ -119,17 +119,6 @@ const menuItems: MenuItem[] = [
   },
 
   {
-    label: FeatureMenu.PaymentCampaign,
-    icon: LuAppWindow,
-    path: '/invoice-templates',
-    permissions: [
-      UserRole.MasterAdmin,
-      UserRole.SchoolAdmin,
-      UserRole.SiteAdmin,
-    ],
-  },
-
-  {
     label: 'headings.schedule',
     icon: LuRocket,
     path: '#',

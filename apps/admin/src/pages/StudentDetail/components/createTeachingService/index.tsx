@@ -75,6 +75,7 @@ export type InputFields = {
 export type CreateStudentAndAddLessonInputFields = InputFields & {
   alias: string
   email: string
+  secondaryEmail?: string
   phone: string
 }
 

@@ -67,6 +67,8 @@
   "button": {
     "approve": "核准",
     "assignCourse": "分配課程",
+    "addToExistingInvoiceCampaign": "加入現有發票群組",
+    "addToExistingInvoice": "選擇現有發票",
     "assignInvoice": "創立發票",
     "cannotAssignMoreThanFiveCourses": "由於伺服器負載問題，您一次最多只能分配50個課程。我們將在未來改進這一功能。",
     "reject": "拒絕",

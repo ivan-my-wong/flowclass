@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
@@ -9,8 +9,12 @@ import { toast } from 'sonner'
 import { fetchInvoicePdf } from '@/api/invoiceCampaign'
 import SkeletonLoader from '@/components/Loaders/SkeletonLoader'
 import { Button } from '@/components/ui/Button'
+import { studentLinksBaseUrl } from '@/constants/enrollmentFormFieldNames'
 import usePaymentEvidenceData from '@/hooks/usePaymentEvidenceData'
 import ContentLayout from '@/layouts/ContentLayout'
+import WhatsAppModal, {
+  WhatsAppRecipient,
+} from '@/pages/LessonList/components/WhatsAppModal'
 import { schoolState } from '@/stores/schoolData'
 import { siteState } from '@/stores/siteData'
 import { PaymentProofTableItem } from '@/types/enrollCourse'
@@ -26,6 +30,9 @@ const EditPaymentProof = (): JSX.Element => {
 
   const { currentSchool } = useRecoilValue(schoolState)
   const { currentSite } = useRecoilValue(siteState)
+  const { schoolData } = useSchoolData()
+
+  const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false)
 
   const { search } = useLocation()
   const invoiceData = useMemo(() => {
@@ -61,6 +68,91 @@ const EditPaymentProof = (): JSX.Element => {
       currentSite
     )
   }, [detailInvoice, coursePath, currentSchool, currentSite])
+
+  // Build one WhatsApp recipient per unique userAlias on this invoice.
+  const whatsAppRecipients = useMemo((): WhatsAppRecipient[] => {
+    if (!detailInvoice) return []
+    const schoolId = schoolData.currentSchool?.id.toString() ?? '0'
+    const schoolUrl = schoolData.currentSchool?.url ?? ''
+    const schoolName = schoolData.currentSchool?.name ?? ''
+    const currency = detailInvoice.currency || 'HK$'
+    const paymentAmount = `${currency} ${Number(
+      detailInvoice.payAmount
+    ).toLocaleString()}`
+
+    // One entry per distinct userAlias; fall back to the invoice's own alias
+    // when an enrollCourse doesn't carry its own.
+    const aliasMap = new Map<
+      number,
+      { name: string; phone: string; email: string; enrollCourseId: number }
+    >()
+    ;(detailInvoice.enrollCourses ?? []).forEach(ec => {
+      const aliasId = ec.userAlias?.id ?? detailInvoice.userAlias?.id ?? 0
+      if (aliasMap.has(aliasId)) return
+      aliasMap.set(aliasId, {
+        name:
+          ec.userAlias?.name ||
+          ec.preferredName ||
+          ec.name ||
+          detailInvoice.userAlias?.name ||
+          '',
+        phone:
+          ec.preferredPhone ||
+          ec.phone ||
+          detailInvoice.userAlias?.user?.phone ||
+          '',
+        email:
+          ec.userAlias?.email ||
+          ec.preferredEmail ||
+          ec.email ||
+          detailInvoice.userAlias?.email ||
+          '',
+        enrollCourseId: ec.id,
+      })
+    })
+
+    // If no enrollCourses, fall back to the invoice's own userAlias.
+    if (aliasMap.size === 0) {
+      const ua = detailInvoice.userAlias
+      if (ua) {
+        aliasMap.set(ua.id, {
+          name: ua.name ?? '',
+          phone: ua.user?.phone ?? '',
+          email: ua.email ?? '',
+          enrollCourseId: 0,
+        })
+      }
+    }
+
+    return Array.from(aliasMap.entries()).map(
+      ([aliasId, { name, phone, email, enrollCourseId }]) => {
+        const linkParams = new URLSearchParams({
+          schoolId,
+          school: schoolUrl,
+          course: coursePath ?? '',
+          studentName: name,
+          enrolId: enrollCourseId?.toString() ?? '',
+          token: detailInvoice.proofToken ?? '',
+          institutionId: detailInvoice.institutionId?.toString() ?? schoolId,
+        })
+        const uploadPaymentUrl = `${getCmsOrigin()}${
+          studentLinksBaseUrl.uploadReceipt
+        }?${linkParams}`
+
+        return {
+          studentId: aliasId,
+          name,
+          phone,
+          email,
+          schoolName,
+          institutionName: schoolName,
+          paymentAmount,
+          payAmount: paymentAmount,
+          uploadPaymentUrl,
+        } satisfies WhatsAppRecipient
+      }
+    )
+  }, [detailInvoice, schoolData, coursePath])
 
   const downloadPdf = async () => {
     const result = await fetchInvoicePdf(
@@ -102,58 +194,73 @@ const EditPaymentProof = (): JSX.Element => {
   }
 
   return (
-    <ContentLayout
-      headerBackButton={{
-        mode: 'back',
-        action: () => navigate('/application'),
-      }}
-      headerClassName="px-4 md:flex-row flex-col"
-      leftHeader={
-        <span className="font-semibold text-gray-800">
-          {t('student:paymentProof.invoiceNumber', { id: invoiceData.id })}
-        </span>
-      }
-      rightHeader={
-        <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            iconBefore={<LuDownload />}
-            className="bg-blue-50 text-blue-500"
-            onClick={() => downloadPdf()}
-          >
-            {t('student:paymentProof.action.downloadPDF')}
-          </Button>
-          <Button
-            variant="ghost"
-            iconBefore={<LuCopy />}
-            onClick={() => {
-              navigator.clipboard.writeText(paymentLink)
-              toast.success(t('embed:code.linkCopied'))
-            }}
-          >
-            {t('student:paymentProof.action.copyLink')}
-          </Button>
-          <Button
-            variant="primary-outline"
-            iconBefore={<LuPencil />}
-            onClick={handleAdvancedEdit}
-          >
-            {t('student:paymentProof.action.advancedEdit')}
-          </Button>
+    <>
+      <ContentLayout
+        headerBackButton={{
+          mode: 'back',
+          action: () => navigate('/application'),
+        }}
+        headerClassName="px-4 md:flex-row flex-col"
+        leftHeader={
+          <span className="font-semibold text-gray-800">
+            {t('student:paymentProof.invoiceNumber', { id: invoiceData.id })}
+          </span>
+        }
+        rightHeader={
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              iconBefore={<LuMessageCircle />}
+              onClick={() => setIsWhatsAppOpen(true)}
+            >
+              {t('student:paymentProof.action.linkToWhatsApp')}
+            </Button>
+            <Button
+              variant="outline"
+              iconBefore={<LuDownload />}
+              onClick={() => downloadPdf()}
+            >
+              {t('student:paymentProof.action.downloadPDF')}
+            </Button>
+            <Button
+              variant="outline"
+              iconBefore={<LuCopy />}
+              onClick={() => {
+                navigator.clipboard.writeText(paymentLink)
+                toast.success(t('student:paymentProof.action.linkCopied'))
+              }}
+            >
+              {t('student:paymentProof.action.copyLink')}
+            </Button>
+            <Button
+              variant="outline"
+              iconBefore={<LuPencil />}
+              onClick={handleAdvancedEdit}
+            >
+              {t('student:paymentProof.action.advancedEdit')}
+            </Button>
+          </div>
+        }
+        mainClassName="bg-gray-50"
+      >
+        <div className="flex gap-4 px-4 py-6 items-start w-full">
+          <div className="w-80 shrink-0">
+            <ApplicationInfo invoiceData={detailInvoice} refetch={refetch} />
+          </div>
+          <div className="flex-1 min-w-0 space-y-4">
+            <PaymentStatus invoiceData={detailInvoice} refetch={refetch} />
+            <InvoiceItems invoiceData={detailInvoice} />
+          </div>
         </div>
-      }
-      mainClassName="bg-gray-50"
-    >
-      <div className="flex gap-4 px-4 py-6 items-start w-full">
-        <div className="w-80 shrink-0">
-          <ApplicationInfo invoiceData={detailInvoice} refetch={refetch} />
-        </div>
-        <div className="flex-1 min-w-0 space-y-4">
-          <PaymentStatus invoiceData={detailInvoice} refetch={refetch} />
-          <InvoiceItems invoiceData={detailInvoice} />
-        </div>
-      </div>
-    </ContentLayout>
+      </ContentLayout>
+
+      <WhatsAppModal
+        open={isWhatsAppOpen}
+        onClose={() => setIsWhatsAppOpen(false)}
+        recipients={whatsAppRecipients}
+        defaultTemplateType={SupportedType.CREATE_INVOICE}
+      />
+    </>
   )
 }
 

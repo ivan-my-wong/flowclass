@@ -262,10 +262,7 @@ const ListInvoices: FC<Props> = ({ onShowRecipients }) => {
         },
       },
       {
-        headerName: t('invoiceCampaign:recipients.title').replace(
-          'Campaign ',
-          ''
-        ),
+        headerName: t('invoiceCampaign:recipientsColumn') as string,
         field: 'recipients',
         width: 110,
         filter: false,

@@ -180,6 +180,7 @@
     "perSession": "Per Session",
     "previewAllInvoices": "Preview All Invoices",
     "recipients": "Recipients ({{count}})",
+    "recipientsColumn": "Recipients",
     "recurringPayment": "Recurring Payment",
     "regularV2periodLabel": "Period {{period}}",
     "removeSession": "Remove Session",
@@ -223,6 +224,8 @@
       "processingInvoicesDesc": "Please wait while we create and send your invoices",
       "createButton": "Create Invoices",
       "sendButton": "Send Invoices",
+      "updateButton": "Update Invoice",
+      "updateAndSendButton": "Update & Send",
       "sendViaWhatsApp": "Send via WhatsApp",
       "sending": "Sending",
       "sendProgress": "Sending invoices...",
@@ -253,6 +256,8 @@
     "sendCountInvoices": "Send {{count}} Invoices",
     "sendInvoiceDocuments": "Send Invoice Documents",
     "sendInvoices": "Send Invoices",
+    "updateInvoice": "Update Invoice",
+    "invoiceUpdated": "Invoice updated successfully",
     "sessionsSelected": "{{count}} lessons selected",
     "studentSelect": {
       "replaceAllStudent": "Add selected students ({{count}})",
@@ -357,6 +362,8 @@
       "paymentAmountDone": "Payment Amount Done:",
       "coursesSignedUp": "Courses Signed Up:",
       "coursesNeededToReachBundle": "Courses Needed to Reach Bundle:",
+      "coursesNeeded_one": "{{count}} more course needed to qualify",
+      "coursesNeeded_other": "{{count}} more courses needed to qualify",
       "bundleDiscountEligible": "✓ Bundle discount eligible",
       "coursesUsed": "Courses Used:",
       "discountBreakdown": "Discount Breakdown:",
@@ -364,6 +371,7 @@
       "retroactiveDiscount": "Retroactive Discount (Past Payments):",
       "appliedToCourses": "Applied to courses:",
       "applicable": "Applicable",
+      "applied": "Applied",
       "amountSaved": "Amount Saved:"
     },
     "editInvoice": "Edit Invoice",
@@ -439,6 +447,12 @@
     "studentSelection": "Student Selection",
     "undoneRemoveAllStudents": "This action cannot be undone!",
     "warningRemoveAllStudents": "Removing all students will remove all assigned class associated with them in the current invoice campaign."
+  },
+  "invoices": "invoices",
+  "noResults": "No invoice campaigns found",
+  "status": {
+    "draft": "Draft",
+    "sent": "Sent"
   },
   "title": "Invoice Campaigns",
   "viewRecipients": "View Recipients"

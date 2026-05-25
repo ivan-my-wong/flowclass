@@ -67,6 +67,8 @@
   "button": {
     "approve": "Approve",
     "assignCourse": "Assign Course",
+    "addToExistingInvoiceCampaign": "Add to Existing Invoice Campaign",
+    "addToExistingInvoice": "Select an Existing Invoice",
     "assignInvoice": "Assign Invoice",
     "cannotAssignMoreThanFiveCourses": "Due to server load issues, you can only assign up to 50 courses at a time. We will improve this in the future.",
     "reject": "Reject",

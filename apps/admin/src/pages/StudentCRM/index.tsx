@@ -69,9 +69,12 @@ import {
 } from '@/stores/userPermissionData'
 import { ChartDate } from '@/types/chartDate.type'
 import { FilterMatchMode } from '@/types/options'
-import { StudentEnrolmentRecord } from '@/types/student'
-import { getInitialChartDateRange } from '@/utils/chartjsSetup'
-import { convertCustomFieldToValue } from '@/utils/convert'
+import { PlanType } from '@/types/schoolSubscriptionPlan'
+import {
+  SingleStudentCrmRecordEnrolledClassesStudentSchedule,
+  SingleStudentCrmRecordEnrollCourse,
+  StudentEnrolmentRecord,
+} from '@/types/student'
 import { generateDataTestId } from '@/utils/data-testid.utils'
 import dayjs from '@/utils/dayjs'
 import { formatPhoneNumber, getRowId } from '@/utils/misc'
@@ -84,7 +87,7 @@ import CreateTeachingService from '../StudentDetail/components/createTeachingSer
 import ActionButton from './components/ActionButton'
 import BadgeParentStudent from './components/BadgeParentStudent'
 import SelectionActionBulk from './components/SelectionActionBulk'
-import TeachingServiceEnrolledColumn from './components/TeachingServiceEnrolledRow'
+import StudentCRMInvoiceCell from './components/StudentCRMInvoiceCell'
 import TeachingServiceNameColumn from './components/TeachingServiceNameColumn'
 import ExportCSV from './CSV/ExportCSV'
 
@@ -114,37 +117,6 @@ const selectorStyles = (): StylesConfig => ({
 
 const CUSTOM_COLUMN_COOKIE_KEY = 'student-crm-custom-columns'
 const COLUMN_ORDER_COOKIE_KEY = 'student-crm-table-column-order'
-
-// Helper to rearrange columns based on a saved order
-const rearrangeColumnsByOrder = (
-  columns: ColDef[],
-  order: string[]
-): ColDef[] => {
-  const colMap = new Map(columns.map(col => [col.field, col]))
-
-  const orderWithoutDuplicates = Array.from(order)
-
-  // Add any columns not in the cookie (e.g., new columns)
-  const remaining = columns.filter(
-    col => !orderWithoutDuplicates.includes(col.field as string)
-  )
-  const allColumns = [
-    ...(orderWithoutDuplicates
-      .map(field => colMap.get(field))
-      .filter(Boolean) as ColDef[]),
-    ...remaining,
-  ]
-
-  // Remove duplicates by 'field' key, keep first occurrence
-  const seen = new Set()
-  const uniqueColumns = allColumns.filter(col => {
-    if (seen.has(col.field)) return false
-    seen.add(col.field)
-    return true
-  })
-
-  return uniqueColumns
-}
 
 const StudentDatabase = (): JSX.Element => {
   const { t } = useTranslation()
@@ -437,8 +409,118 @@ const StudentDatabase = (): JSX.Element => {
     importCSVModalHandle.current?.handleOpenChange?.()
   }
 
-  const tableColumns: ColDef[] = useMemo(() => {
-    const baseColumns = [
+  /** Month columns for payment view: one column per month in the selected range */
+  const monthColumns = useMemo(() => {
+    const start = dayjs(paymentViewChartDate.startDate).startOf('month')
+    const end = dayjs(paymentViewChartDate.endDate).endOf('month')
+    const cols: { key: string; label: string }[] = []
+    let m = start
+    while (m.isBefore(end) || m.isSame(end, 'month')) {
+      cols.push({
+        key: m.format('YYYY-MM'),
+        label: m.format('MMM YYYY'),
+      })
+      m = m.add(1, 'month')
+    }
+    return cols
+  }, [paymentViewChartDate.startDate, paymentViewChartDate.endDate])
+
+  const handlePaymentViewMonthChange = useCallback((data: ChartDate) => {
+    setPaymentViewChartDate({
+      startDate: dayjs(data.startDate).startOf('month').toISOString(),
+      endDate: dayjs(data.endDate).endOf('month').toISOString(),
+    })
+  }, [])
+
+  type TableRowType = {
+    _rowId: string
+    student: StudentEnrolmentRecord
+    enrollCourse: SingleStudentCrmRecordEnrollCourse | null
+    schedule: SingleStudentCrmRecordEnrolledClassesStudentSchedule | null
+  }
+
+  const totalStudentPages = Math.max(
+    1,
+    Math.ceil(filteredStudentList.length / studentPageSize)
+  )
+
+  const paginatedStudentList = useMemo(
+    () =>
+      filteredStudentList.slice(
+        studentPage * studentPageSize,
+        (studentPage + 1) * studentPageSize
+      ),
+    [filteredStudentList, studentPage, studentPageSize]
+  )
+
+  const tableRows = useMemo((): TableRowType[] => {
+    const rangeStart = dayjs(paymentViewChartDate.startDate).startOf('day')
+    const rangeEnd = dayjs(paymentViewChartDate.endDate).endOf('day')
+    const rows: TableRowType[] = []
+    paginatedStudentList.forEach(student => {
+      let hasRows = false
+      ;(student.enrollCourses || [])
+        .filter(o => o.course)
+        .forEach(ec => {
+          // Expand to one row per schedule (class) so multi-class enrollments
+          // each get their own row instead of collapsing into one enrollCourse row.
+          const qualifyingSchedules = (ec.studentSchedule ?? []).filter(s => {
+            if (!s.class) return false
+            if (!s.studentLessons?.length) return true
+            return s.studentLessons.some(
+              l =>
+                l.endTime &&
+                dayjs(l.endTime).isAfter(rangeStart) &&
+                dayjs(l.endTime).isBefore(rangeEnd)
+            )
+          })
+          qualifyingSchedules.forEach(schedule => {
+            rows.push({
+              _rowId: `row-${student.id}-${ec.id}-${schedule.id}`,
+              student,
+              enrollCourse: ec,
+              schedule,
+            })
+            hasRows = true
+          })
+        })
+      if (!hasRows) {
+        rows.push({
+          _rowId: `row-${student.id}-none`,
+          student,
+          enrollCourse: null,
+          schedule: null,
+        })
+      }
+    })
+    return rows
+  }, [paginatedStudentList, paymentViewChartDate])
+
+  /** Selected rows for bulk actions (one entry per selected student), derived from grid selection */
+  const [selectedRowNodes, setSelectedRowNodes] = useState<
+    import('ag-grid-community').IRowNode[]
+  >([])
+
+  const selectedRows = useMemo(() => {
+    const studentMap = new Map<number, { data: StudentEnrolmentRecord }>()
+    selectedRowNodes.forEach(node => {
+      const row = node.data as TableRowType
+      if (row?.student) studentMap.set(row.student.id, { data: row.student })
+    })
+    return Array.from(studentMap.values())
+  }, [selectedRowNodes])
+
+  const onSelectionChanged = useCallback(() => {
+    setSelectedRowNodes(gridRef.current?.api.getSelectedNodes() ?? [])
+  }, [])
+
+  const handleClearSelection = useCallback(() => {
+    gridRef.current?.api.deselectAll()
+    setSelectedRowNodes([])
+  }, [])
+
+  const gridColumnDefs = useMemo((): ColDef[] => {
+    return [
       {
         colId: '_clusterKey',
         headerName: '_clusterKey',
@@ -595,11 +677,9 @@ const StudentDatabase = (): JSX.Element => {
           const primary = row.email || row.user?.email || '-'
           const secondary = row.secondaryEmail
           return (
-            <div className="flex flex-col gap-0.5">
-              <span>{primary}</span>
-              {secondary && (
-                <span className="text-[11px] text-gray-400">{secondary}</span>
-              )}
+            <div className="flex flex-col">
+              {primary}
+              {secondary && <span className="text-[11px]">{secondary}</span>}
             </div>
           )
         },
@@ -660,92 +740,17 @@ const StudentDatabase = (): JSX.Element => {
         colId: 'classLabel',
         headerName: t('student:column.teachingServiceEnrolled') as string,
         width: 220,
-        valueGetter: (params: ValueGetterParams) => {
-          const studentData: StudentEnrolmentRecord = params.data
-          return studentData.email || studentData.user?.email
-        },
-
-        cellRenderer: (data: ICellRendererParams) => {
-          const studentData: StudentEnrolmentRecord = data?.data
-
-          return (
-            <div className="text-sm min-h-[60px] flex items-center px-2">
-              {studentData.email || studentData.user?.email || ''}
-            </div>
-          )
-        },
-      },
-      {
-        field: 'class',
-        width: 400,
-        autoHeight: true,
-        headerName: t('student:column.teachingServiceEnrolled').toString(),
+        minWidth: 200,
         filter: false,
-        sortable: false,
-        getQuickFilterText: (params: GetQuickFilterTextParams) => {
-          const data = params.data as StudentEnrolmentRecord
-
-          const enrollCourses = (data?.enrollCourses || [])?.filter(o => {
-            return o.course && o.studentSchedule
-          })
-          return (enrollCourses ?? [])
-            .reduce<string[]>((acc, course) => {
-              const classNames =
-                course.studentSchedule
-                  ?.map(schedule => schedule.class?.name)
-                  .filter((name): name is string => Boolean(name)) ?? []
-              return course.course?.name
-                ? [...acc, ...classNames, course.course.name]
-                : [...acc, ...classNames]
-            }, [])
-            .join(' ')
-        },
-        cellRenderer: (props: ICellRendererParams) => {
-          const studentData: StudentEnrolmentRecord = props?.data
-
+        cellRenderer: (params: ICellRendererParams) => {
+          const row = params.data as TableRowType
+          if (!row.enrollCourse || !row.schedule) return <Text>-</Text>
           return (
-            <div className="min-h-[60px] flex items-start px-2 py-2">
-              <TeachingServiceEnrolledColumn enrolledStudent={studentData} />
-            </div>
-          )
-        },
-      },
-      {
-        field: 'user.updatedAt',
-        filter: false,
-        headerName: t('student:column.lastUpdated').toString(),
-        width: 220,
-        cellRenderer: (data: ICellRendererParams) => {
-          const studentData: StudentEnrolmentRecord = data?.data
-
-          const updatedAt = utcToZonedTime(
-            studentData?.user?.updatedAt ?? '',
-            timeZone ?? ''
-          )
-          return (
-            <div className="text-center min-h-[60px] flex items-center justify-center px-2">
-              {dayjs(updatedAt).format('YYYY-MM-DD hh:mm a')}
-            </div>
-          )
-        },
-      },
-      {
-        field: 'user.createdAt',
-        filter: false,
-        headerName: t('student:column.createdAt').toString(),
-        width: 220,
-        cellRenderer: (data: ICellRendererParams) => {
-          const studentData: StudentEnrolmentRecord = data?.data
-
-          const createdAt = utcToZonedTime(
-            studentData?.user?.createdAt ?? '',
-            timeZone ?? ''
-          )
-          return (
-            <div className="text-center flex items-center justify-center p-2">
-              {studentData?.user?.createdAt
-                ? dayjs(createdAt).format('YYYY-MM-DD hh:mm a')
-                : '-'}
+            <div className="flex flex-col py-0.5">
+              <span className="font-semibold text-sm">
+                {row.enrollCourse.course?.name}
+              </span>
+              <span className="text-sm">{row.schedule.class?.name ?? '-'}</span>
             </div>
           )
         },

@@ -318,7 +318,7 @@ const EnrollmentFormDetail = ({
                   option: correctField?.option ?? [],
                 }
               }
-              if (!completeCustomField?.id) return <></>
+              if (!completeCustomField?.id) return null
               return (
                 <FormFields
                   key={customField.id}
