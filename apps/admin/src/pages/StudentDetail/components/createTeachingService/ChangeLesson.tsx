@@ -25,12 +25,14 @@ import { Field, InputFields, LabelField, Loading } from '.'
 type Props = FormTeachingServiceProps & {
   headerBackButton: HeaderBackButtonStatus
   handleCloseAndClearData: () => void
+  onLessonChanged?: (newClassId: number) => void
 }
 
 const ChangeLesson = (props: Props) => {
   const {
     headerBackButton,
     handleCloseAndClearData,
+    onLessonChanged,
     currentDetail,
     form,
     classOpts,
@@ -104,6 +106,7 @@ const ChangeLesson = (props: Props) => {
     }
 
     await mutationChangeLesson.mutateAsync(params)
+    onLessonChanged?.(Number(data.classId))
     handleCloseAndClearData()
     reset()
   }

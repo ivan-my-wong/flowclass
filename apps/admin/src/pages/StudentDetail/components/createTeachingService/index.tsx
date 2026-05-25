@@ -340,6 +340,8 @@ const CreateTeachingService = ({
     }
 
     if (isChangeLesson) {
+      // Use local variable to avoid stale closure on the render-time `courseId`
+      const enrolCourseId = Number(currentEnrol?.courseId)
       const classId = Number(currentEnrol?.classId) ?? 0
       const recurringScheduleId = String(
         currentEnrol?.invoice?.invoiceId ??
@@ -352,7 +354,7 @@ const CreateTeachingService = ({
       if (!objOpts?.[courseId]) return
       setClassOpts(objOpts[courseId]?.classes)
 
-      const classData = objOpts[courseId].classes?.find(
+      const classData = objOpts[enrolCourseId].classes?.find(
         o => Number(o.value) === classId
       )
       if (!classData) return
@@ -369,26 +371,12 @@ const CreateTeachingService = ({
       setDateTimePickerOpts(dateTimeOptions)
 
       if (classData?.type === ClassTypeEnum.appointment) {
-        const dateTimeOptions = (periodOpts.map(o => o.data).flat() ||
+        const apptOptions = (periodOpts.map(o => o.data).flat() ||
           []) as string[]
-        setDateTimePickerOpts(dateTimeOptions)
+        setDateTimePickerOpts(apptOptions)
       }
 
-      // Set default date to closest future date
-      if (dateTimeOptions.length > 0) {
-        const closestFutureDate = findClosestFutureDate(dateTimeOptions)
-        if (closestFutureDate) {
-          setSelectDate(closestFutureDate)
-          // Find the corresponding dateTime string for the closest future date
-          const dateTimeStr = dateTimeOptions.find(dateTimeStr => {
-            const datePart = dateTimeStr.split(' ')[0]
-            return dayjs(datePart).isSame(dayjs(closestFutureDate), 'day')
-          })
-          if (dateTimeStr) {
-            setValue('classLessonDate', dateTimeStr)
-          }
-        }
-      }
+      if (dateTimeOptions.length > 0) pickDate(dateTimeOptions)
     }
   }, [currentEnrol, mode, open, objOpts, setValue, getValues])
 
@@ -470,6 +458,29 @@ const CreateTeachingService = ({
       }
     }
   }
+  // In changeLesson mode, auto-select the period and date that match the
+  // original lesson's start time so the admin doesn't need to scroll to find it.
+  // Returns true when a match is found and values are set.
+  const autoSelectOriginalDate = (periodOptions: TypeOpts[]): boolean => {
+    if (!isChangeLesson || !currentEnrol?.originalLessonStart) return false
+    const originalDateStr = dayjs(currentEnrol.originalLessonStart).format(
+      'YYYY-MM-DD'
+    )
+    const matchedPeriod = periodOptions.find(p =>
+      (p.data ?? []).some(dt => dt.split(' ')[0] === originalDateStr)
+    )
+    if (!matchedPeriod) return false
+    setValue('periodId', matchedPeriod.value ?? '')
+    const dtOptions = matchedPeriod.data ?? []
+    setDateTimePickerOpts(dtOptions)
+    const matchedDt = dtOptions.find(dt => dt.split(' ')[0] === originalDateStr)
+    if (matchedDt) {
+      setSelectDate(new Date(matchedDt.split(' ')[0]))
+      setValue('classLessonDate', matchedDt)
+    }
+    return true
+  }
+
   const onValueChangeSelectClass = (opt: string | undefined) => {
     if (opt) {
       const courseId = getValues('courseId')
@@ -523,7 +534,6 @@ const CreateTeachingService = ({
             data: lessonsByPeriod[idx + 1] ?? [],
           }
         })
-        setSelectDate(undefined)
         setPeriodOpts(builtPeriodOpts)
         setValue('periodId', '')
         setValue('classLessonDate', '')
@@ -558,7 +568,6 @@ const CreateTeachingService = ({
         })
       }
 
-      setSelectDate(undefined)
       setPeriodOpts(getPeriodOpts)
 
       setValue('periodId', '')
@@ -766,6 +775,7 @@ const CreateTeachingService = ({
   const defaultProps = {
     headerBackButton,
     handleCloseAndClearData,
+    onLessonChanged,
     currentDetail,
     form,
     isFreeLesson,

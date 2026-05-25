@@ -271,9 +271,6 @@ export type StudentLesson = {
 export type ClassLesson = {
   id: number
   courseName: string
-  // @deprecated use class instead
-  className: string
-
   class: string
   start: string // ISO 8601 date-time string
   end: string // ISO 8601 date-time string
@@ -343,6 +340,8 @@ export type TypeTeachingServiceDetail = {
   regularScheduleId?: number
   /** Period identifier for regular/workshop (v1) classes. */
   periodId?: number
+  /** ISO start time of the lesson being changed — used to pre-select the matching date. */
+  originalLessonStart?: string
 }
 
 export type TypeTeachingServiceEnrollCourse = Omit<

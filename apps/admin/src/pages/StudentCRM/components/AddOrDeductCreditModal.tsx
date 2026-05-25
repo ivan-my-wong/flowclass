@@ -29,6 +29,7 @@ type AddOrDeductCreditModalProps = {
 
 export type AddOrDeductCreditModalHandle = {
   handleOpenChange: () => void
+  openWithPreset: (amount: number, description: string) => void
 }
 
 const AddOrDeductCreditModal = forwardRef<
@@ -57,6 +58,12 @@ const AddOrDeductCreditModal = forwardRef<
 
   useImperativeHandle(ref, () => ({
     handleOpenChange,
+    openWithPreset: (presetAmt: number, description: string) => {
+      setMode('manual')
+      setAmount(presetAmt)
+      setReason(description)
+      setIsOpen(true)
+    },
   }))
 
   const {

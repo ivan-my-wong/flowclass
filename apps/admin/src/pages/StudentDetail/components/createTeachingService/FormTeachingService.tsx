@@ -55,6 +55,7 @@ const FormTeachingService = (
     onValueChangeSelectCourse,
     courseOpts,
     classesOptions,
+    classOpts,
     onValueChangeSelectClass,
     currentClassType,
     onValueChangeSelectPeriod,
@@ -330,125 +331,201 @@ const FormTeachingService = (
           </Box>
         </Box>
       )}
-      <Field data-testid="courseAndClass">
-        <div className="flex gap-1 items-center">
-          <LabelField className="flex gap-x-2">
-            {t('student:teachingService.chooseCourse')} /{' '}
-            {t('student:teachingService.chooseClass')}
-            {classesOptions.length <= 0 && (
-              <HoverCard>
-                <HoverCardTrigger>
-                  <LuBadgeInfo />
-                </HoverCardTrigger>
-                <HoverCardContent>
-                  <span>
-                    {t('teachingService:classUnavailableReasons.title')}
-                  </span>
-                  <ol className="pl-5 list-disc">
-                    {classUnavailableReasons.map(reason => (
-                      <li key={reason}>{t(reason)}</li>
-                    ))}
-                  </ol>
-                </HoverCardContent>
-              </HoverCard>
-            )}
-          </LabelField>
-          <span className="text-destructive">*</span>
-        </div>
-        <Controller
-          name="courseId"
-          control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange: onChangeCourseId } }) => (
-            <>
-              <CourseAndClassSingleSelector
-                key={`${getValues('courseId')}-${watchedClassId}`}
-                options={courseAndClassOptions}
-                value={currentValue ? [currentValue] : undefined}
-                isLoading={isLoadingCourseOptions}
-                onChange={(
-                  selected: readonly OptionProps[] | OptionProps | null
-                ) => {
-                  // Handle both array (when isMulti=true) and single value (when isMulti=false)
-                  // When isMulti=false, react-select passes a single value or null
-                  const selectedOption = Array.isArray(selected)
-                    ? selected?.[0] || null
-                    : selected
-
-                  if (!selectedOption) {
-                    // Clear both fields when nothing is selected
-                    onChangeCourseId('')
-                    setValue('classId', '')
-                    return
-                  }
-
-                  const selectedCourseId = selectedOption.courseId?.toString()
-                  const selectedClassId = selectedOption.value?.toString()
-
-                  // Check if course changed or needs to be set
-                  const currentCourseId = getValues('courseId')?.toString()
-                  const hasCourseChanged = currentCourseId !== selectedCourseId
-                  const needsCourseSet = !currentCourseId && selectedCourseId
-
-                  // Always ensure courseId is set in the form first
-                  // This is critical for onValueChangeSelectClass to work properly
-                  // Also ensure onValueChangeSelectCourse is called to initialize sourceSelected
-                  if (selectedCourseId) {
-                    const currentCourseIdInForm =
-                      getValues('courseId')?.toString()
-                    if (currentCourseIdInForm !== selectedCourseId) {
-                      // CourseId not set or different, update it
-                      onChangeCourseId(selectedCourseId)
-                      // Always call onValueChangeSelectCourse to ensure sourceSelected is initialized
-                      onValueChangeSelectCourse(selectedCourseId)
-                    } else if (needsCourseSet || !currentCourseIdInForm) {
-                      // Even if courseId matches, if it wasn't set before or this is first selection,
-                      // ensure onValueChangeSelectCourse is called to initialize sourceSelected
-                      onValueChangeSelectCourse(selectedCourseId)
-                    }
-                  }
-
-                  // Update classId field
-                  if (selectedClassId) {
-                    setValue('classId', selectedClassId)
-                    // Set loading state when class is selected and we need periods
-                    const selectedClass = courseAndClassOptions
-                      .flatMap(courseGroup => courseGroup.options)
-                      .find(cls => cls.value === Number(selectedClassId))
-                    const isNeedsPeriods =
-                      selectedClass?.type === ClassTypeEnum.regular ||
-                      selectedClass?.type === ClassTypeEnum.workshop
-                    if (isNeedsPeriods) {
-                      setIsLoadingPeriods(true)
-                    }
-                    // Call onValueChangeSelectClass synchronously
-                    // The parent component should handle the state updates properly
-                    onValueChangeSelectClass(selectedClassId)
-                  }
+      {mode === AddTeachingServiceMode.changeLesson ? (
+        <Field data-testid="courseAndClass">
+          {/* Course: pre-selected dropdown, freely changeable */}
+          <div className="flex gap-1 items-center">
+            <LabelField className="flex gap-x-2">
+              {t('student:teachingService.chooseCourse')}
+            </LabelField>
+            <span className="text-destructive">*</span>
+          </div>
+          <Controller
+            name="courseId"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <Select
+                value={value?.toString() ?? ''}
+                onValueChange={val => {
+                  onChange(val)
+                  onValueChangeSelectCourse(val)
+                  setValue('classId', '')
                 }}
-                isMulti={false}
-                width="100%"
-              />
-              {(errors.courseId?.type === 'required' ||
-                errors.classId?.type === 'required') && (
-                <ErrorField>
-                  {t('student:teachingService.requiredField')}
-                </ErrorField>
+              >
+                <SelectTrigger
+                  className={cn('w-full mb-2', error && 'border-destructive')}
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(courseOpts as CourseOpts[])
+                    .filter(o => o.value !== 'createNewCourse')
+                    .map(option => (
+                      <SelectItem
+                        key={String(option.value)}
+                        value={String(option.value)}
+                      >
+                        {String(option.label)}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+
+          {/* Class: scoped to the selected course's classes */}
+          <div className="flex gap-1 items-center">
+            <LabelField className="flex gap-x-2 mb-0">
+              {t('student:teachingService.chooseClass')}
+            </LabelField>
+            <span className="text-destructive">*</span>
+          </div>
+          <Controller
+            name="classId"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <>
+                <Select
+                  value={value?.toString() ?? ''}
+                  onValueChange={val => {
+                    onChange(val)
+                    onValueChangeSelectClass(val)
+                  }}
+                >
+                  <SelectTrigger
+                    className={cn('w-full', error && 'border-destructive')}
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(classOpts ?? [])
+                      .filter(o => o.value !== 'createNewClass')
+                      .map(option => (
+                        <SelectItem
+                          key={option.value}
+                          value={option.value?.toString() ?? ''}
+                        >
+                          {String(option.label)}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+                {(errors.courseId?.type === 'required' ||
+                  errors.classId?.type === 'required') && (
+                  <ErrorField>
+                    {t('student:teachingService.requiredField')}
+                  </ErrorField>
+                )}
+              </>
+            )}
+          />
+        </Field>
+      ) : (
+        <Field data-testid="courseAndClass">
+          <div className="flex gap-1 items-center">
+            <LabelField className="flex gap-x-2">
+              {t('student:teachingService.chooseCourse')} /{' '}
+              {t('student:teachingService.chooseClass')}
+              {classesOptions.length <= 0 && (
+                <HoverCard>
+                  <HoverCardTrigger>
+                    <LuBadgeInfo />
+                  </HoverCardTrigger>
+                  <HoverCardContent>
+                    <span>
+                      {t('teachingService:classUnavailableReasons.title')}
+                    </span>
+                    <ol className="pl-5 list-disc">
+                      {classUnavailableReasons.map(reason => (
+                        <li key={reason}>{t(reason)}</li>
+                      ))}
+                    </ol>
+                  </HoverCardContent>
+                </HoverCard>
               )}
-            </>
-          )}
-        />
-        <Controller
-          name="classId"
-          control={control}
-          rules={{
-            required: true,
-          }}
-          render={() => <></>}
-        />
-      </Field>
+            </LabelField>
+            <span className="text-destructive">*</span>
+          </div>
+          <Controller
+            name="courseId"
+            control={control}
+            rules={{
+              required: true,
+            }}
+            render={({ field: { onChange: onChangeCourseId } }) => (
+              <>
+                <CourseAndClassSingleSelector
+                  key={`${getValues('courseId')}-${watchedClassId}`}
+                  options={courseAndClassOptions}
+                  value={currentValue ? [currentValue] : undefined}
+                  isLoading={isLoadingCourseOptions}
+                  onChange={(
+                    selected: readonly OptionProps[] | OptionProps | null
+                  ) => {
+                    const selectedOption = Array.isArray(selected)
+                      ? selected?.[0] || null
+                      : selected
+
+                    if (!selectedOption) {
+                      onChangeCourseId('')
+                      setValue('classId', '')
+                      return
+                    }
+
+                    const selectedCourseId = selectedOption.courseId?.toString()
+                    const selectedClassId = selectedOption.value?.toString()
+
+                    const needsCourseSet = !getValues('courseId') && selectedCourseId
+
+                    if (selectedCourseId) {
+                      const currentCourseIdInForm =
+                        getValues('courseId')?.toString()
+                      if (currentCourseIdInForm !== selectedCourseId) {
+                        onChangeCourseId(selectedCourseId)
+                        onValueChangeSelectCourse(selectedCourseId)
+                      } else if (needsCourseSet || !currentCourseIdInForm) {
+                        onValueChangeSelectCourse(selectedCourseId)
+                      }
+                    }
+
+                    if (selectedClassId) {
+                      setValue('classId', selectedClassId)
+                      const selectedClass = courseAndClassOptions
+                        .flatMap(courseGroup => courseGroup.options)
+                        .find(cls => cls.value === Number(selectedClassId))
+                      const isNeedsPeriods =
+                        selectedClass?.type === ClassTypeEnum.regular ||
+                        selectedClass?.type === ClassTypeEnum.workshop
+                      if (isNeedsPeriods) {
+                        setIsLoadingPeriods(true)
+                      }
+                      onValueChangeSelectClass(selectedClassId)
+                    }
+                  }}
+                  isMulti={false}
+                  width="100%"
+                />
+                {(errors.courseId?.type === 'required' ||
+                  errors.classId?.type === 'required') && (
+                  <ErrorField>
+                    {t('student:teachingService.requiredField')}
+                  </ErrorField>
+                )}
+              </>
+            )}
+          />
+          <Controller
+            name="classId"
+            control={control}
+            rules={{
+              required: true,
+            }}
+            render={() => <></>}
+          />
+        </Field>
+      )}
       {!isSingleLessonMode && (
         <AlertBox
           content={t('student:teachingService.chooseClassDescription')}

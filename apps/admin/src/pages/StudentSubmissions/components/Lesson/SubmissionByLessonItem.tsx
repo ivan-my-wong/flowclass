@@ -42,7 +42,7 @@ const SubmissionByLessonItem: FC<Props> = ({ item, onRefetch }) => {
             </div>
             <div className="flex items-center">
               <LuDot size={18} />
-              <div>{item.className}</div>
+              <div>{item.class}</div>
             </div>
             <div className="flex items-center">
               <LuDot size={18} />
