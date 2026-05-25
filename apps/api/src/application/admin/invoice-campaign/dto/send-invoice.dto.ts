@@ -664,6 +664,33 @@ export class SendInvoiceDirectlyDto extends SendInvoiceBaseDto {
   invoiceId: number
 }
 
+export class SyncEnrollCoursesDiffItemDto {
+  @ApiProperty({ example: 1 })
+  @IsInt()
+  invoiceId: number
+
+  @ApiPropertyOptional({ type: [MetaRef] })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => MetaRef)
+  addedClasses?: MetaRef[]
+
+  @ApiPropertyOptional({ example: [1, 2] })
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  removedClassIds?: number[]
+}
+
+export class SyncEnrollCoursesDto {
+  @ApiProperty({ type: [SyncEnrollCoursesDiffItemDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => SyncEnrollCoursesDiffItemDto)
+  diffs: SyncEnrollCoursesDiffItemDto[]
+}
+
 export class PageParamsDto {
   @ApiPropertyOptional({ example: 'search', description: 'Search params' })
   @IsOptional()

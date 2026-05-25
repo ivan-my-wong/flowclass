@@ -1259,32 +1259,45 @@ export class StudentOnbService {
     const processedSubscriptionClasses = []
     getAllClasses.forEach((item) => {
       item.enrollCourses.forEach((enrollCourse) => {
-        let selectedClass = null
-        if (enrollCourse.multipleClassMapping) {
-          selectedClass = enrollCourse.multipleClassMapping.at(0)?.class
-        }
+        if (!enrollCourse.multipleClassMapping?.length) return
 
-        if (!selectedClass) return
+        // Collect all lessons for this enrollCourse. Prefer the directly-queried
+        // student_lesson rows (which carry classId). Fall back to the schedule
+        // relation but scope it to this enrollCourse so lessons don't bleed
+        // across students in combined invoices.
+        const enrollCourseItems = grouped[enrollCourse.id]?.length
+          ? grouped[enrollCourse.id]
+          : item.studentSchedules
+              .filter((s) => s.enrollCourseId === enrollCourse.id)
+              .flatMap((s) => s.studentLessons)
 
-        const lessons =
-          grouped[enrollCourse.id] ?? item.studentSchedules.flatMap((s) => s.studentLessons)
-        processedSubscriptionClasses.push({
-          courseId: item.courseId,
-          courseName: item.course.name,
-          courseImg: item.course.previewImageUrl,
-          classId: selectedClass.id,
-          className: selectedClass.name,
-          enrollCourseId: enrollCourse.id,
-          paymentState: item.paymentState,
-          billingStartDate: enrollCourse.billingStartDate,
-          billingEndDate: enrollCourse.billingEndDate,
-          billingNextDate: enrollCourse.billingNextDate,
-          paymentAmount: enrollCourse.paymentAmount,
-          invoiceId: item.id,
-          confirmState: enrollCourse.confirmState,
-          registrationForm: enrollCourse.registrationForm,
-          lessons,
-          classType: selectedClass.type,
+        // Emit one entry per class mapping so each class appears as its own
+        // row (previously only .at(0) was used, hiding additional classes).
+        enrollCourse.multipleClassMapping.forEach((mapping) => {
+          const mappedClass = mapping.class
+          if (!mappedClass) return
+
+          const classLessons = enrollCourseItems.filter(
+            (l) => l.classId === mappedClass.id
+          )
+          processedSubscriptionClasses.push({
+            courseId: item.courseId,
+            courseName: item.course.name,
+            courseImg: item.course.previewImageUrl,
+            classId: mappedClass.id,
+            className: mappedClass.name,
+            enrollCourseId: enrollCourse.id,
+            paymentState: item.paymentState,
+            billingStartDate: enrollCourse.billingStartDate,
+            billingEndDate: enrollCourse.billingEndDate,
+            billingNextDate: enrollCourse.billingNextDate,
+            paymentAmount: enrollCourse.paymentAmount,
+            invoiceId: item.id,
+            confirmState: enrollCourse.confirmState,
+            registrationForm: enrollCourse.registrationForm,
+            lessons: classLessons,
+            classType: mappedClass.type,
+          })
         })
       })
     })

@@ -627,6 +627,7 @@ export class ClassLessonService {
           enrollCourse: true,
           studentSchedule: { invoice: true },
           user: { aliases: true },
+          changeClassLesson: { locationRoom: true },
         },
         order: { userId: 'ASC' },
       }
@@ -662,6 +663,9 @@ export class ClassLessonService {
             paymentState: payments?.paymentState,
           },
           hasSharedVideo: student.hasSharedVideo,
+          changeLocationName: student.changeClassLesson?.locationRoom?.name ?? null,
+          changeLocationColorCode: student.changeClassLesson?.locationRoom?.colorCode ?? null,
+          changeLessonType: student.changeClassLesson?.lessonType ?? null,
         }
 
         const check = listStudents.some((o) => {

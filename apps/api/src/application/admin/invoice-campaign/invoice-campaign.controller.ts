@@ -41,6 +41,7 @@ import {
   ResendInvoiceDto,
   SendInvoiceDirectlyDto,
   SendInvoiceDto,
+  SyncEnrollCoursesDto,
 } from './dto/send-invoice.dto'
 
 @ApiTags('Invoice Campaign')
@@ -217,6 +218,26 @@ export class InvoiceCampaignController {
       throw new NotFoundException('Invoice campaign not found')
     }
     return duplicatedCampaign
+  }
+
+  @Patch(':documentId/sync-enroll-courses')
+  @ApiOperation({ summary: 'Sync enrollCourse class mappings from a diff (add/remove classes per invoice)' })
+  @RequireParams(RequireParam.INSTITUTION_ID)
+  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @UseGuards(RolesGuard, RequireParamsGuard)
+  @ApiBody({ type: SyncEnrollCoursesDto })
+  @ApiResponse({ status: HttpStatus.OK, description: 'EnrollCourses synced successfully' })
+  @HttpCode(HttpStatus.OK)
+  async syncEnrollCourses(
+    @Query('institutionId', ParseIntPipe) institutionId: number,
+    @Param('documentId', ParseIntPipe) documentId: number,
+    @Body() payload: SyncEnrollCoursesDto
+  ) {
+    await this.invoiceCampaignService.syncEnrollCoursesForCampaign(
+      documentId,
+      institutionId,
+      payload
+    )
   }
 
   @Delete(':documentId')

@@ -14,6 +14,7 @@ import {
   SendingInvoiceData,
   SendInvoiceDirectlyDto,
   SendInvoiceDto,
+  SyncEnrollCoursesDto,
 } from '@/application/admin/invoice-campaign/dto/send-invoice.dto'
 import {
   DocumentCampaignRecipientsStatus,
@@ -49,8 +50,8 @@ import { ClassRepository } from '@/models/classes.repository'
 import { Course } from '@/models/courses.entity'
 import { CreditSourceType } from '@/models/credit-transactions.entity'
 import { ReminderDataType, StudentEnrollCourseAlias } from '@/models/custom-types/enroll-course'
-import { EnrollCourse } from '@/models/enroll-courses.entity'
-import { EnrollCourseRepository } from '@/models/enroll-courses.repository'
+import { EnrollClassMapping, EnrollCourse } from '@/models/enroll-courses.entity'
+import { EnrollClassMappingRepository, EnrollCourseRepository } from '@/models/enroll-courses.repository'
 import {
   ClassTypeEnum,
   DiscountType,
@@ -192,6 +193,7 @@ export class InvoiceCampaignService {
     private readonly institutionRepository: InstitutionsRepository,
     private readonly enrollCourseService: EnrollCoursesService,
     private readonly enrollCourseRepository: EnrollCourseRepository,
+    private readonly enrollClassMappingRepository: EnrollClassMappingRepository,
     private readonly jwtService: JwtService,
     private readonly sseService: SSEService,
     private readonly courseService: CoursesService,
@@ -536,6 +538,50 @@ export class InvoiceCampaignService {
       }
     }
     return this.documentCampaignRepository.save(documentCampaign)
+  }
+
+  async syncEnrollCoursesForCampaign(
+    documentId: number,
+    institutionId: number,
+    dto: SyncEnrollCoursesDto
+  ) {
+    await this.getOneInvoiceCampaign(documentId, institutionId)
+
+    for (const diff of dto.diffs) {
+      const { invoiceId, addedClasses = [], removedClassIds = [] } = diff
+      if (!addedClasses.length && !removedClassIds.length) continue
+
+      const invoice = await this.invoiceRepository.findOne({
+        where: { id: invoiceId },
+        relations: { enrollCourses: { multipleClassMapping: true } },
+      })
+      if (!invoice?.enrollCourses?.length) continue
+
+      const enrollCourse = invoice.enrollCourses[0]
+
+      if (removedClassIds.length > 0) {
+        const mappingsToRemove = (enrollCourse.multipleClassMapping ?? []).filter(
+          m => removedClassIds.includes(m.classId)
+        )
+        for (const mapping of mappingsToRemove) {
+          await this.enrollClassMappingRepository.delete(mapping.id)
+        }
+      }
+
+      for (const cls of addedClasses) {
+        if (!cls.classId) continue
+        const alreadyMapped = (enrollCourse.multipleClassMapping ?? []).some(
+          m => m.classId === cls.classId
+        )
+        if (alreadyMapped) continue
+        const newMapping = this.enrollClassMappingRepository.create({
+          enrollCourseId: enrollCourse.id,
+          classId: cls.classId,
+          lessonPrice: cls.lessonPrice ?? 0,
+        } as Partial<EnrollClassMapping>)
+        await this.enrollClassMappingRepository.save(newMapping)
+      }
+    }
   }
 
   async createDocumentCampaignRecipients(
@@ -1194,6 +1240,20 @@ export class InvoiceCampaignService {
         student: true,
       },
     })
+    // UPDATE path: always re-link fresh enrollCourses to the existing invoice
+    // regardless of payment status. enrollCourses represent what is being invoiced
+    // (class list), while amountPaid is financial history — they update independently.
+    if (tempInvoice) {
+      const oldEnrollCourseIds = (tempInvoice.enrollCourses ?? []).map(ec => ec.id)
+      if (oldEnrollCourseIds.length > 0) {
+        await this.enrollCourseRepository.delete(oldEnrollCourseIds)
+      }
+      for (const ec of enrollCourses) {
+        ec.invoiceId = tempInvoice.id
+      }
+      enrollCourses = await this.enrollCourseRepository.save(enrollCourses)
+      tempInvoice.enrollCourses = enrollCourses
+    }
     // Handle split invoice creation based on splitType and splitItems
     let invoiceResult: Invoice
 
@@ -1313,11 +1373,18 @@ export class InvoiceCampaignService {
       institutionId,
     } as unknown as StudentCreateEnrollCourseDto
     let studentScheduleList: StudentLesson[][] = []
-    // find student lesson from invoice
+    // Only reuse existing schedules when they actually have lessons.
+    // Fresh enrollCourses (just created) have no lessons yet, so we fall
+    // through to createStudentScheduleFromEnrollClass to create them.
     if (tempInvoice && tempInvoice.enrollCourses.length) {
-      studentScheduleList = tempInvoice.enrollCourses.map((enrollCourse) =>
-        enrollCourse.studentSchedule.flatMap((studentSchedule) => studentSchedule.studentLessons)
+      const hasExistingLessons = tempInvoice.enrollCourses.some((ec) =>
+        (ec.studentSchedule ?? []).some((s) => (s.studentLessons ?? []).length > 0)
       )
+      if (hasExistingLessons) {
+        studentScheduleList = tempInvoice.enrollCourses.map((enrollCourse) =>
+          enrollCourse.studentSchedule.flatMap((studentSchedule) => studentSchedule.studentLessons)
+        )
+      }
     }
     if (studentScheduleList.length === 0) {
       for (const enrollCourse of enrollCourses) {
@@ -1344,6 +1411,20 @@ export class InvoiceCampaignService {
       }
     }
 
+    // UPDATE path: recalculate outstanding amount from the new class list.
+    // payAmount (outstanding) = max(0, newTotal − alreadyPaid).
+    // amountPaid is preserved on tempInvoice and never modified here.
+    if (tempInvoice) {
+      const alreadyPaid = tempInvoice.amountPaid ?? 0
+      invoiceResult.payAmount = Math.max(0, payAmount - alreadyPaid)
+      invoiceResult.discountAmount = discountAmount
+      invoiceResult.additionalFee = additionalFee
+      if (alreadyPaid > 0 && alreadyPaid >= payAmount) {
+        invoiceResult.paymentState = PaymentStatus.PAID
+      } else if (alreadyPaid > 0) {
+        invoiceResult.paymentState = PaymentStatus.PARTIALLY_PAID
+      }
+    }
     // multipleClassInfo.enrollCourse = enrollCourses
     invoiceResult.userAliasId = userAlias.id
     invoiceResult.documentCampaignId = documentId
