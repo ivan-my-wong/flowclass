@@ -13,7 +13,6 @@ import { ApiError, handleApiError } from '@/api/errors/apiError'
 import {
   addToParentGroup,
   changeParentGroup,
-  mergeStudent,
   checkImportStudentDataValid,
   getAllStudentsOfInstitutionNew,
   getCurrentStudentQrCodeAttendanceData,
@@ -24,6 +23,7 @@ import {
   getStudentNotification,
   getStudentsByCustomFieldFilter,
   getStudentsByPhone,
+  mergeStudent,
   mergeStudent,
   removeFromParentGroup,
   setParentAccount,

@@ -51,7 +51,10 @@ import { Course } from '@/models/courses.entity'
 import { CreditSourceType } from '@/models/credit-transactions.entity'
 import { ReminderDataType, StudentEnrollCourseAlias } from '@/models/custom-types/enroll-course'
 import { EnrollClassMapping, EnrollCourse } from '@/models/enroll-courses.entity'
-import { EnrollClassMappingRepository, EnrollCourseRepository } from '@/models/enroll-courses.repository'
+import {
+  EnrollClassMappingRepository,
+  EnrollCourseRepository,
+} from '@/models/enroll-courses.repository'
 import {
   ClassTypeEnum,
   DiscountType,
@@ -560,8 +563,8 @@ export class InvoiceCampaignService {
       const enrollCourse = invoice.enrollCourses[0]
 
       if (removedClassIds.length > 0) {
-        const mappingsToRemove = (enrollCourse.multipleClassMapping ?? []).filter(
-          m => removedClassIds.includes(m.classId)
+        const mappingsToRemove = (enrollCourse.multipleClassMapping ?? []).filter((m) =>
+          removedClassIds.includes(m.classId)
         )
         for (const mapping of mappingsToRemove) {
           await this.enrollClassMappingRepository.delete(mapping.id)
@@ -571,7 +574,7 @@ export class InvoiceCampaignService {
       for (const cls of addedClasses) {
         if (!cls.classId) continue
         const alreadyMapped = (enrollCourse.multipleClassMapping ?? []).some(
-          m => m.classId === cls.classId
+          (m) => m.classId === cls.classId
         )
         if (alreadyMapped) continue
         const newMapping = this.enrollClassMappingRepository.create({
@@ -1244,7 +1247,7 @@ export class InvoiceCampaignService {
     // regardless of payment status. enrollCourses represent what is being invoiced
     // (class list), while amountPaid is financial history — they update independently.
     if (tempInvoice) {
-      const oldEnrollCourseIds = (tempInvoice.enrollCourses ?? []).map(ec => ec.id)
+      const oldEnrollCourseIds = (tempInvoice.enrollCourses ?? []).map((ec) => ec.id)
       if (oldEnrollCourseIds.length > 0) {
         await this.enrollCourseRepository.delete(oldEnrollCourseIds)
       }

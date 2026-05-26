@@ -92,14 +92,18 @@ export function useRecalculateAllPromotions() {
                     p.classId === classId
                 )
               : undefined
-            const amount =
-              storedPromo != null
-                ? storedPromo.amount
-                : result.qualified
-                ? perLesson * result.lessonCount
-                : (student.invoicePromotionsUsed ?? []).find(
-                    u => u.promotionId === pd.id
-                  )?.amount ?? 0
+            const fallbackUsedAmount =
+              (student.invoicePromotionsUsed ?? []).find(
+                u => u.promotionId === pd.id
+              )?.amount ?? 0
+            let amount: number
+            if (storedPromo != null) {
+              amount = storedPromo.amount
+            } else if (result.qualified) {
+              amount = perLesson * result.lessonCount
+            } else {
+              amount = fallbackUsedAmount
+            }
 
             newPackageDiscounts.push({
               id: pd.id,

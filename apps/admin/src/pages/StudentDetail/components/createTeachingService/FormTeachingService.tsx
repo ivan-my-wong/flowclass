@@ -477,7 +477,8 @@ const FormTeachingService = (
                     const selectedCourseId = selectedOption.courseId?.toString()
                     const selectedClassId = selectedOption.value?.toString()
 
-                    const needsCourseSet = !getValues('courseId') && selectedCourseId
+                    const needsCourseSet =
+                      !getValues('courseId') && selectedCourseId
 
                     if (selectedCourseId) {
                       const currentCourseIdInForm =

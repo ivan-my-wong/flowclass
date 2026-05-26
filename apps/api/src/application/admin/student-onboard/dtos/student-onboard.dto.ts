@@ -148,7 +148,7 @@ export class GetStudentDetailResponseDto extends PartialType(User) {
   studentInfo?: {
     userAlias?: Pick<
       UserAlias,
-      'id' | 'name' | 'email' | 'studentId' | 'userId' | 'secondaryEmail' | 'childOfUserAliasId'
+      'id' | 'name' | 'email' | 'userId' | 'secondaryEmail' | 'childOfUserAliasId'
     >
     userAliasId?: number
     [key: string]: unknown

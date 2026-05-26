@@ -19,7 +19,6 @@ import Text from '../Texts/Text'
 import menuItems, { buildMenuItems } from './menuBarItems'
 import { siteMenuItems } from './menuBarSiteItems'
 
-
 const MenuBar: React.FC = () => {
   const { t } = useTranslation()
   const location = useLocation()

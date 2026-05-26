@@ -59,7 +59,10 @@ const PackageDiscountDetail = (): JSX.Element => {
   // Resolve class names for the applicable IDs
   const classMap = new Map(
     courseData.courses.flatMap(course =>
-      (course.classes ?? []).map(cls => [cls.id, `${cls.name} — ${course.name}`])
+      (course.classes ?? []).map(cls => [
+        cls.id,
+        `${cls.name} — ${course.name}`,
+      ])
     )
   )
 

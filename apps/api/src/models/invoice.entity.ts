@@ -18,6 +18,7 @@ import {
   InvoiceSplitType,
   SplitItem,
 } from '@/application/admin/invoice-campaign/dto/send-invoice.dto'
+import { ClassPriceOption } from '@/models/class-price-options.entity'
 import { Course } from '@/models/courses.entity'
 import { EnrollCourse } from '@/models/enroll-courses.entity'
 import { DiscountType, PaymentMethod } from '@/models/enums/'

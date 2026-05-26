@@ -51,11 +51,7 @@ import { CreditSourceType } from '@/models/credit-transactions.entity'
 import { ClassAdminPaymentSubmittedEmailParams } from '@/models/custom-types/email-params'
 import { EnrollCourse } from '@/models/enroll-courses.entity'
 import { EnrollCourseRepository } from '@/models/enroll-courses.repository'
-import {
-  GaMeasurementEventName,
-  PaymentMethod,
-  PromotionType as PromotionTypeEnum,
-} from '@/models/enums/'
+import { PaymentMethod, PromotionType as PromotionTypeEnum } from '@/models/enums/'
 import {
   CheckoutStatus,
   EnrollConfirmStatus,
@@ -328,9 +324,7 @@ export class PaymentEvidenceService {
       paymentState: PaymentStatus.SUBMITTED,
     })
 
-    const imageBuffer = fileKey
-      ? await this.objectStorageProvider.getObjectBuffer(fileKey)
-      : null
+    const imageBuffer = fileKey ? await this.objectStorageProvider.getObjectBuffer(fileKey) : null
 
     const imageObjectAccessUrl = fileKey
       ? await this.objectStorageProvider.getObjectAccessUrl(fileKey)

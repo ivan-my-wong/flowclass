@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
-import { LuCopy, LuDownload, LuPencil } from 'react-icons/lu'
+import { LuCopy, LuDownload, LuMessageCircle, LuPencil } from 'react-icons/lu'
 import { useRecoilValue } from 'recoil'
 import { toast } from 'sonner'
 
@@ -11,6 +11,7 @@ import SkeletonLoader from '@/components/Loaders/SkeletonLoader'
 import { Button } from '@/components/ui/Button'
 import { studentLinksBaseUrl } from '@/constants/enrollmentFormFieldNames'
 import usePaymentEvidenceData from '@/hooks/usePaymentEvidenceData'
+import useSchoolData from '@/hooks/useSchoolData'
 import ContentLayout from '@/layouts/ContentLayout'
 import WhatsAppModal, {
   WhatsAppRecipient,
@@ -18,7 +19,7 @@ import WhatsAppModal, {
 import { schoolState } from '@/stores/schoolData'
 import { siteState } from '@/stores/siteData'
 import { PaymentProofTableItem } from '@/types/enrollCourse'
-import { generatePaymentLink } from '@/utils/generate-link.utils'
+import { generatePaymentLink, getCmsOrigin } from '@/utils/generate-link.utils'
 
 import ApplicationInfo from './components/Editor/ApplicationInfo'
 import InvoiceItems from './components/Editor/InvoiceItems'

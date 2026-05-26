@@ -92,15 +92,30 @@ const EnrollCourseScheduleCell = ({
   return (
     <div className="flex items-center gap-1 overflow-hidden min-w-0 w-full">
       <div className="flex-shrink-0">{getCourseIcon(enroll.type)}</div>
-      <Popover trigger={
-        <div>
-          <OldButton variants="subtle" size="small" iconAfter={<RiArrowDropDownLine />}>
-            <Text css={{ display: 'block', color: '$text', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {enroll.courseName}
-            </Text>
-          </OldButton>
-        </div>
-      }>
+      <Popover
+        trigger={
+          <div>
+            <OldButton
+              variants="subtle"
+              size="small"
+              iconAfter={<RiArrowDropDownLine />}
+            >
+              <Text
+                css={{
+                  display: 'block',
+                  color: '$text',
+                  maxWidth: 160,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {enroll.courseName}
+              </Text>
+            </OldButton>
+          </div>
+        }
+      >
         {scheduleContent}
       </Popover>
       <span className="text-xs text-text-sub whitespace-nowrap overflow-hidden text-ellipsis min-w-0">

@@ -221,7 +221,9 @@ export class InvoiceCampaignController {
   }
 
   @Patch(':documentId/sync-enroll-courses')
-  @ApiOperation({ summary: 'Sync enrollCourse class mappings from a diff (add/remove classes per invoice)' })
+  @ApiOperation({
+    summary: 'Sync enrollCourse class mappings from a diff (add/remove classes per invoice)',
+  })
   @RequireParams(RequireParam.INSTITUTION_ID)
   @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
   @UseGuards(RolesGuard, RequireParamsGuard)

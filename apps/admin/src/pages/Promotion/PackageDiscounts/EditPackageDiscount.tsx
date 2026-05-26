@@ -44,7 +44,11 @@ const EditPackageDiscount = (): JSX.Element => {
     applicableClassIds: [],
   })
 
-  const { isLoading, isError, data: currentData } = useFetchPackageDiscountById(parsedId, data => {
+  const {
+    isLoading,
+    isError,
+    data: currentData,
+  } = useFetchPackageDiscountById(parsedId, data => {
     setFormData({
       name: data.name,
       amountPerLesson: data.amountPerLesson,

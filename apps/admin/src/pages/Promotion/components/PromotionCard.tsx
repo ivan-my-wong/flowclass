@@ -66,7 +66,9 @@ const PromotionCard: React.FC<PromotionCardProps> = ({
       {!disabled ? (
         <p className="text-base mt-2 text-text">{numOfPromotion}</p>
       ) : (
-        <p className="text-sm text-text-disabled">{t('promotion:comingSoon')}</p>
+        <p className="text-sm text-text-disabled">
+          {t('promotion:comingSoon')}
+        </p>
       )}
     </div>
   )

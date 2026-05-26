@@ -501,6 +501,15 @@ export class InvoiceCampaignDto {
   @ValidateIf((o) => o.sendViaEmail)
   @IsOptional()
   emailBody?: string
+
+  @ApiPropertyOptional({
+    type: String,
+    example: 'Dear [Name],\n\n this is your invoice for [Course Name]!',
+  })
+  @IsString()
+  @ValidateIf((o) => o.sendViaWhatsapp)
+  @IsOptional()
+  whatsappContent?: string
 }
 
 export class SendInvoiceBaseDto {

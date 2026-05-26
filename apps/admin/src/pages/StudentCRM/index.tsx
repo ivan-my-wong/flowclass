@@ -6,7 +6,6 @@ import {
   ColumnMovedEvent,
   GetQuickFilterTextParams,
   ICellRendererParams,
-  IRowNode,
   ValueGetterParams,
 } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
@@ -71,8 +70,8 @@ import { ChartDate } from '@/types/chartDate.type'
 import { FilterMatchMode } from '@/types/options'
 import { PlanType } from '@/types/schoolSubscriptionPlan'
 import {
-  SingleStudentCrmRecordEnrolledClassesStudentSchedule,
   SingleStudentCrmRecordEnrollCourse,
+  SingleStudentCrmRecordEnrolledClassesStudentSchedule,
   StudentEnrolmentRecord,
 } from '@/types/student'
 import { generateDataTestId } from '@/utils/data-testid.utils'
@@ -167,9 +166,6 @@ const StudentDatabase = (): JSX.Element => {
     startDate: dayjs().startOf('month').format('YYYY-MM-DD'),
     endDate: dayjs().endOf('month').format('YYYY-MM-DD'),
   })
-  const handlePaymentViewMonthChange = (date: ChartDate) => {
-    setPaymentViewChartDate(date)
-  }
   const [filteredStudentList, setFilteredStudentList] = useState<
     StudentEnrolmentRecord[]
   >([])
@@ -995,7 +991,8 @@ const StudentDatabase = (): JSX.Element => {
             email.toLowerCase().includes(searchLower) ||
             phone.toLowerCase().includes(searchLower) ||
             formatPhoneNumber(phone).toLowerCase().includes(searchLower) ||
-            (searchDigitsOnly.length > 0 && phoneDigitsOnly.includes(searchDigitsOnly)) ||
+            (searchDigitsOnly.length > 0 &&
+              phoneDigitsOnly.includes(searchDigitsOnly)) ||
             studentId.toLowerCase().includes(searchLower) ||
             id.includes(searchLower)
           )
@@ -1171,19 +1168,6 @@ const StudentDatabase = (): JSX.Element => {
   useEffect(() => {
     handleProcessData(studentList)
   }, [studentList])
-
-  const [selectedRows, setSelectedRows] = useState<
-    IRowNode<StudentEnrolmentRecord>[]
-  >([])
-
-  const onSelectionChanged = () => {
-    const selectedNodes = gridRef.current?.api.getSelectedNodes()
-    setSelectedRows(selectedNodes || [])
-  }
-  const handleClearSelection = () => {
-    gridRef.current?.api.deselectAll()
-    setSelectedRows([])
-  }
 
   const FilterCustomField = () => {
     return (

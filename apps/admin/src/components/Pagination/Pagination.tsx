@@ -85,9 +85,7 @@ const PaginatedItems = ({
             renderOnZeroPageCount={null}
           />
         </div>
-        <div className={cn('w-full', itemWrapperClassName)}>
-          {children}
-        </div>
+        <div className={cn('w-full', itemWrapperClassName)}>{children}</div>
       </div>
     </Box>
   )

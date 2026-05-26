@@ -59,7 +59,11 @@ const EditorAction = (): JSX.Element => {
     if (!regularV2Lessons?.length) return
     setAvailableLessonsByClass(prev => ({
       ...prev,
-      [classId]: regularV2Lessons.map(l => ({ id: l.id, date: l.date, period: l.period })),
+      [classId]: regularV2Lessons.map(l => ({
+        id: l.id,
+        date: l.date,
+        period: l.period,
+      })),
     }))
   }
 

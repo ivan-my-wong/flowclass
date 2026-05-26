@@ -42,15 +42,19 @@ const PackageDiscountForm = ({
     <div className="space-y-6 max-w-lg">
       {/* Name */}
       <div className="space-y-1">
-        <label className="text-sm font-medium text-gray-700">
+        <label
+          htmlFor="package-discount-name"
+          className="text-sm font-medium text-gray-700"
+        >
           {t('promotion:packageDiscount.form.name')}
         </label>
         <input
+          id="package-discount-name"
           type="text"
           className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-          placeholder={t(
-            'promotion:packageDiscount.form.namePlaceholder'
-          ) as string}
+          placeholder={
+            t('promotion:packageDiscount.form.namePlaceholder') as string
+          }
           value={formData.name}
           onChange={e => setFormData({ ...formData, name: e.target.value })}
         />
@@ -58,13 +62,17 @@ const PackageDiscountForm = ({
 
       {/* Amount per lesson */}
       <div className="space-y-1">
-        <label className="text-sm font-medium text-gray-700">
+        <label
+          htmlFor="package-discount-amount"
+          className="text-sm font-medium text-gray-700"
+        >
           {t('promotion:packageDiscount.form.amountPerLesson')}
         </label>
         <p className="text-xs text-gray-500">
           {t('promotion:packageDiscount.form.amountPerLessonHint')}
         </p>
         <input
+          id="package-discount-amount"
           type="number"
           min={0}
           step={0.01}
@@ -106,9 +114,9 @@ const PackageDiscountForm = ({
       {/* Class selector (only when !isAllClasses) */}
       {!formData.isAllClasses && (
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <p className="text-sm font-medium text-gray-700">
             {t('promotion:packageDiscount.form.selectClasses')}
-          </label>
+          </p>
           {classOptions.length === 0 ? (
             <p className="text-sm text-gray-400">
               {t('promotion:packageDiscount.form.noClassesAvailable')}
@@ -118,6 +126,7 @@ const PackageDiscountForm = ({
               {classOptions.map(cls => (
                 <label
                   key={cls.id}
+                  htmlFor={`package-discount-class-${cls.id}`}
                   className={cn(
                     'flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-gray-50 text-sm',
                     formData.applicableClassIds.includes(cls.id) &&
@@ -125,6 +134,7 @@ const PackageDiscountForm = ({
                   )}
                 >
                   <input
+                    id={`package-discount-class-${cls.id}`}
                     type="checkbox"
                     className="h-4 w-4 rounded border-gray-300 text-primary"
                     checked={formData.applicableClassIds.includes(cls.id)}

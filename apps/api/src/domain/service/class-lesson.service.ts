@@ -664,8 +664,8 @@ export class ClassLessonService {
           },
           hasSharedVideo: student.hasSharedVideo,
           changeLocationName: student.changeClassLesson?.locationRoom?.name ?? null,
-          changeLocationColorCode: student.changeClassLesson?.locationRoom?.colorCode ?? null,
-          changeLessonType: student.changeClassLesson?.lessonType ?? null,
+          changeLocationColorCode: null,
+          changeLessonType: null,
         }
 
         const check = listStudents.some((o) => {

@@ -403,7 +403,8 @@ const DialogSendInvoice = (): JSX.Element => {
   const { data: fetchedCampaign } = useFetchDetailInvoiceCampaign(documentId, {
     enabled: !!invoiceCampaign?.id,
   })
-  const { mutateAsync: syncEnrollCoursesDiff } = useSyncEnrollCourses(documentId)
+  const { mutateAsync: syncEnrollCoursesDiff } =
+    useSyncEnrollCourses(documentId)
   const { startEvent } = useSendingCampaign()
 
   const onSendSuccess = (res: SendingResponse) => {

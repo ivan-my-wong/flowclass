@@ -27,6 +27,7 @@ import { useRecalculateAllPromotions } from '@/hooks/useRecalculateAllPromotions
 import { useSendingCampaign } from '@/hooks/useSendingCampaign'
 import useStudentInvoice from '@/hooks/useStudentInvoice'
 import ContentLayout from '@/layouts/ContentLayout'
+import WhatsAppModal from '@/pages/LessonList/components/WhatsAppModal'
 import ConfirmSendPaymentProof from '@/pages/PaymentProofTable/components/ConfirmSendPaymentProof'
 import { schoolState } from '@/stores/schoolData'
 import { siteState } from '@/stores/siteData'
@@ -44,6 +45,7 @@ import {
 import { BundleDiscount } from '@/types/bundleDiscounts'
 import type { Classes } from '@/types/classes'
 import { ClassTypeEnum, PriceType } from '@/types/course'
+import { SupportedType } from '@/types/customMessage'
 import { PaymentProofTableItem } from '@/types/enrollCourse'
 import { SendPaymentActions } from '@/types/paymentProof'
 import { StudentEnrolmentRecord } from '@/types/student'
@@ -1036,7 +1038,8 @@ const InvoiceEditor = (): JSX.Element => {
             const last = studentSessions[studentSessions.length - 1]
             // DB payAmount is authoritative; fall back to reactive totals for
             // unsaved drafts where dbInvoice doesn't exist yet.
-            const totalPay = Number(dbInvoice?.payAmount) || Number(s.total || s.subTotal || 0)
+            const totalPay =
+              Number(dbInvoice?.payAmount) || Number(s.total || s.subTotal || 0)
             let periodLabel = ''
             if (first && last) {
               periodLabel = `${dayjs(first.startTime).format(

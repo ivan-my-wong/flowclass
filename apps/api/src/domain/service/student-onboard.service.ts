@@ -909,7 +909,6 @@ export class StudentOnbService {
           id: userAlias.id,
           name: userAlias.name,
           email: userAlias.email,
-          studentId: userAlias.studentId,
           userId: userAlias.userId,
           secondaryEmail: userAlias.secondaryEmail ?? null,
           // Surfaced so the student-detail UI can derive parent-ness. An alias
@@ -1096,14 +1095,6 @@ export class StudentOnbService {
         .update(Invoice)
         .set(invoiceUpdate)
         .where('user_alias_id = :sourceId', { sourceId: params.sourceUserAliasId })
-        .execute()
-
-      // 4. Reassign StudentMemo
-      await manager
-        .createQueryBuilder()
-        .update(StudentMemo)
-        .set({ userAliasId: params.targetUserAliasId })
-        .where('user_alias_id = :sourceId AND deleted_at IS NULL', { sourceId: params.sourceUserAliasId })
         .execute()
 
       // 5. Reassign CreditTransactions

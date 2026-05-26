@@ -474,13 +474,12 @@ const PaymentProofPage = (): JSX.Element => {
               courses: [],
             })
           const group = aliasMap.get(aliasId)!
-          const enrollIntoArray: EnrollIntoInfo[] = Array.isArray(
-            enrollCourse.enrollInto
-          )
-            ? enrollCourse.enrollInto
-            : enrollCourse.enrollInto
-            ? [enrollCourse.enrollInto]
-            : []
+          let enrollIntoArray: EnrollIntoInfo[] = []
+          if (Array.isArray(enrollCourse.enrollInto)) {
+            enrollIntoArray = enrollCourse.enrollInto
+          } else if (enrollCourse.enrollInto) {
+            enrollIntoArray = [enrollCourse.enrollInto]
+          }
           enrollIntoArray.forEach(enroll => {
             const schedules = studentSchedules.filter(
               s => s.enrollCourseId === enrollCourse.id
@@ -511,14 +510,16 @@ const PaymentProofPage = (): JSX.Element => {
                     </div>
                     {courses.length > 0 && (
                       <div className="flex flex-col gap-1 overflow-hidden min-w-0 flex-1">
-                        {courses.map(({ enroll, enrollCourse, schedules }, i) => (
-                          <EnrollCourseScheduleCell
-                            key={`${aliasId}-${enroll.courseName}-${enroll.secondLevelName}-${i}`}
-                            enrollCourse={enrollCourse}
-                            enroll={enroll}
-                            studentSchedules={schedules}
-                          />
-                        ))}
+                        {courses.map(
+                          ({ enroll, enrollCourse, schedules }, i) => (
+                            <EnrollCourseScheduleCell
+                              key={`${aliasId}-${enroll.courseName}-${enroll.secondLevelName}-${i}`}
+                              enrollCourse={enrollCourse}
+                              enroll={enroll}
+                              studentSchedules={schedules}
+                            />
+                          )
+                        )}
                       </div>
                     )}
                   </div>
@@ -534,11 +535,12 @@ const PaymentProofPage = (): JSX.Element => {
         if (!firstEnrollCourse) return ''
         const courseNames = (enrollCourses ?? [])
           .flatMap((ec: PaymentProofTableEnrollCourse) => {
-            const arr: EnrollIntoInfo[] = Array.isArray(ec.enrollInto)
-              ? ec.enrollInto
-              : ec.enrollInto
-              ? [ec.enrollInto]
-              : []
+            let arr: EnrollIntoInfo[] = []
+            if (Array.isArray(ec.enrollInto)) {
+              arr = ec.enrollInto
+            } else if (ec.enrollInto) {
+              arr = [ec.enrollInto]
+            }
             return arr.map(e => `${e.courseName} ${e.secondLevelName}`)
           })
           .join(' ')

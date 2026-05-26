@@ -8,6 +8,7 @@ import {
   LuCreditCard,
   LuEye,
   LuLink,
+  LuMerge,
   LuMessageSquare,
   LuPrinter,
   LuUserCheck,
@@ -54,7 +55,6 @@ import { generateDataTestId } from '@/utils/data-testid.utils'
 import AddToParentGroupModal, {
   AddToParentGroupModalHandle,
 } from './AddToParentGroupModal'
-import MergeStudentModal, { MergeStudentModalHandle } from './MergeStudentModal'
 import ChangeToNewFamilyGroupModal, {
   ChangeToNewFamilyGroupModalHandle,
 } from './ChangeToNewFamilyGroupModal'
@@ -62,6 +62,7 @@ import CreditBalanceModal, {
   CreditBalanceModalHandle,
 } from './CreditBalanceModal'
 import EditRemarksModal, { EditRemarksModalHandle } from './EditRemarksModal'
+import MergeStudentModal, { MergeStudentModalHandle } from './MergeStudentModal'
 import RemoveFromCurrentGroupModal, {
   RemoveFromCurrentGroupModalHandle,
 } from './RemoveFromCurrentGroupModal'
