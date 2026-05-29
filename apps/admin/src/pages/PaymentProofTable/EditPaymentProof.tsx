@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
 import { LuCopy, LuDownload, LuMessageCircle, LuPencil } from 'react-icons/lu'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { toast } from 'sonner'
 
 import { fetchInvoicePdf } from '@/api/invoiceCampaign'
@@ -16,8 +16,11 @@ import ContentLayout from '@/layouts/ContentLayout'
 import WhatsAppModal, {
   WhatsAppRecipient,
 } from '@/pages/LessonList/components/WhatsAppModal'
+import CreateTeachingService from '@/pages/StudentDetail/components/createTeachingService'
 import { schoolState } from '@/stores/schoolData'
 import { siteState } from '@/stores/siteData'
+import { studentState } from '@/stores/studentData'
+import { SupportedType } from '@/types/customMessage'
 import { PaymentProofTableItem } from '@/types/enrollCourse'
 import { generatePaymentLink, getCmsOrigin } from '@/utils/generate-link.utils'
 
@@ -32,6 +35,8 @@ const EditPaymentProof = (): JSX.Element => {
   const { currentSchool } = useRecoilValue(schoolState)
   const { currentSite } = useRecoilValue(siteState)
   const { schoolData } = useSchoolData()
+  const [studentData, setStudentData] = useRecoilState(studentState)
+  const isOpenAssignCourse = studentData.tableDrawers.isOpenAssignCourse
 
   const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false)
 
@@ -260,6 +265,19 @@ const EditPaymentProof = (): JSX.Element => {
         onClose={() => setIsWhatsAppOpen(false)}
         recipients={whatsAppRecipients}
         defaultTemplateType={SupportedType.CREATE_INVOICE}
+      />
+
+      <CreateTeachingService
+        open={isOpenAssignCourse}
+        handleClose={() => {
+          setStudentData(prev => ({
+            ...prev,
+            tableDrawers: {
+              ...prev.tableDrawers,
+              isOpenAssignCourse: false,
+            },
+          }))
+        }}
       />
     </>
   )

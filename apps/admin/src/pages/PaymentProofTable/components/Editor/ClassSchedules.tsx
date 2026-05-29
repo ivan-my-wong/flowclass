@@ -2,15 +2,21 @@ import { FC, useCallback, useMemo, useState } from 'react'
 
 import dayjs from 'dayjs'
 import { useTranslation } from 'react-i18next'
-import { FaTrash } from 'react-icons/fa'
-import { LuPlusSquare, LuTrash } from 'react-icons/lu'
+import { LuPencil, LuPlusSquare, LuTrash } from 'react-icons/lu'
 import { useQueryClient } from 'react-query'
 import { useRecoilState } from 'recoil'
 
-import ChangeIcon from '@/assets/svgs/teachingService/ChangeIcon'
 import IconButton from '@/components/Buttons/IconButton'
 import CustomedAlertDialog from '@/components/Popups/AlertDialog'
 import { Button } from '@/components/ui/Button'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/Table'
 import { QUERY_KEY } from '@/constants/queryKey'
 import useLessonDateTimeData from '@/hooks/useLessonDateTimeData'
 import useSiteData from '@/hooks/useSiteData'
@@ -45,7 +51,6 @@ const ClassSchedules: FC<Props> = ({
     null
   )
 
-  // Set default timezone once
   useMemo(() => {
     dayjs.tz.setDefault(timeZone)
   }, [timeZone])
@@ -85,19 +90,35 @@ const ClassSchedules: FC<Props> = ({
 
   const handleChangeLesson = useCallback(
     (lesson: any) => {
+      queryClient.invalidateQueries(QUERY_KEY.student.getStudentDetailKey)
       setStudentData(prev => ({
         ...prev,
-        currentEnrol: service,
+        currentEnrol: {
+          ...service,
+          invoices: [
+            {
+              invoiceId: invoiceData.id,
+              paymentState: invoiceData.paymentState,
+            },
+          ],
+        },
         currentStudent: student,
         tableDrawers: {
-          ...prev.tableDrawers,
+          ...studentData.tableDrawers,
           isOpenAssignCourse: true,
           assignCourseMode: AddTeachingServiceMode.changeLesson,
         },
         currentStudentLesson: lesson,
       }))
     },
-    [service, student, setStudentData]
+    [
+      service,
+      student,
+      invoiceData,
+      studentData.tableDrawers,
+      setStudentData,
+      queryClient,
+    ]
   )
 
   const handleDeleteTeachingService = async () => {
@@ -152,25 +173,106 @@ const ClassSchedules: FC<Props> = ({
         </div>
 
         {sortedServiceLessons.length > 0 && (
-          <div className="mt-2.5 w-full">
-            <div className="grid grid-cols-[1fr_126px] border border-[#808080]">
-              <div className="text-base font-normal text-black p-2.5">
-                {t('student:teachingService.lesson')}
-              </div>
-            </div>
+          <div className="mt-2 w-full">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-10 text-center">#</TableHead>
+                  <TableHead>{t('student:teachingService.lesson')}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sortedServiceLessons.map((lesson, idx) => {
+                  const isChangeDate = !!lesson.changeStartTime
+                  const startTime = getCurrentSiteTimeZoneDate(lesson.startTime)
+                  const endTime = getCurrentSiteTimeZoneDate(lesson.endTime)
+                  const changeStartTime = getCurrentSiteTimeZoneDate(
+                    lesson.changeStartTime
+                  )
+                  const changeEndTime = getCurrentSiteTimeZoneDate(
+                    lesson.changeEndTime
+                  )
 
-            {sortedServiceLessons.map((lesson, idx) => (
-              <LessonRow
-                key={`${lesson.id}-${idx}`}
-                lesson={lesson}
-                index={idx}
-                hasMultipleLessons={sortedServiceLessons.length > 1}
-                onDelete={handleDeleteLesson}
-                onChange={handleChangeLesson}
-                getCurrentSiteTimeZoneDate={getCurrentSiteTimeZoneDate}
-                t={t}
-              />
-            ))}
+                  return (
+                    <TableRow key={`${lesson.id}-${idx}`}>
+                      <TableCell className="w-10 text-center border-r border-gray-300 py-3 px-2">
+                        {idx + 1}
+                      </TableCell>
+                      <TableCell className="py-3 px-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4 flex-1">
+                            <div className="flex-2">
+                              <div
+                                className="text-sm"
+                                data-testid="lesson-time-slot"
+                              >
+                                {startTime &&
+                                  endTime &&
+                                  getLessonDateTime(
+                                    startTime.toString(),
+                                    endTime.toString(),
+                                    t
+                                  )}
+                              </div>
+                              {isChangeDate &&
+                                changeStartTime &&
+                                changeEndTime && (
+                                  <div className="text-xs text-gray-400 line-through">
+                                    {t('student:changedFrom')}{' '}
+                                    {getLessonDateTime(
+                                      changeStartTime.toString(),
+                                      changeEndTime.toString(),
+                                      t
+                                    )}
+                                  </div>
+                                )}
+                            </div>
+                            <div className="flex-1">
+                              {GetAttendanceStatusComponent(lesson.attendance)}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {sortedServiceLessons.length > 1 && (
+                              <IconButton
+                                icon={<LuTrash />}
+                                plain
+                                color="warn"
+                                onClick={() =>
+                                  handleDeleteLesson(Number(lesson.id))
+                                }
+                              />
+                            )}
+
+                            <Button
+                              variant="ghost"
+                              className="flex items-center gap-1 text-blue-500 hover:text-blue-600 p-0 h-auto"
+                              onClick={() => handleChangeLesson(lesson)}
+                              data-testid="changeLesson"
+                            >
+                              {isChangeDate ? (
+                                <div className="flex items-center gap-1">
+                                  <div className="text-base font-normal">
+                                    {t('student:editBtn')}
+                                  </div>
+                                </div>
+                              ) : (
+                                <>
+                                  <LuPencil className="w-4 h-4" />{' '}
+                                  <div className="text-base font-normal">
+                                    {t('student:changeBtn')}
+                                  </div>
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
           </div>
         )}
       </div>
@@ -201,108 +303,6 @@ const ClassSchedules: FC<Props> = ({
         onActionClick={handleDeleteTeachingService}
       />
     </>
-  )
-}
-
-// Separate component for lesson row to optimize re-renders
-const LessonRow: FC<{
-  lesson: any
-  index: number
-  hasMultipleLessons: boolean
-  onDelete: (lessonId: number) => void
-  onChange: (lesson: any) => void
-  getCurrentSiteTimeZoneDate: (date: any) => any
-  t: any
-}> = ({
-  lesson,
-  index,
-  hasMultipleLessons,
-  onDelete,
-  onChange,
-  getCurrentSiteTimeZoneDate,
-  t,
-}) => {
-  const changeDate = !!lesson.changeStartTime
-
-  const timeSlots = useMemo(() => {
-    const startTime = getCurrentSiteTimeZoneDate(lesson.startTime)
-    const endTime = getCurrentSiteTimeZoneDate(lesson.endTime)
-    const changeStartTime = getCurrentSiteTimeZoneDate(lesson.changeStartTime)
-    const changeEndTime = getCurrentSiteTimeZoneDate(lesson.changeEndTime)
-
-    return {
-      original:
-        changeDate && changeStartTime && changeEndTime
-          ? getLessonDateTime(changeStartTime.toString(), changeEndTime.toString(), t)
-          : '',
-      changed:
-        startTime && endTime
-          ? getLessonDateTime(startTime.toString(), endTime.toString(), t)
-          : '',
-    }
-  }, [lesson, getCurrentSiteTimeZoneDate, changeDate, t])
-
-  return (
-    <div className="grid grid-cols-[40px_1fr] border border-[#808080] border-t-0 h-auto min-h-[3rem]">
-      <div className="w-10 border-r border-[#808080] py-4 px-2.5 h-full text-center">
-        {index + 1}
-      </div>
-
-      <div className="box-responsive-full justify-between px-2">
-        <div className="box-responsive-full justify-start">
-          <div className="flex-2">
-            <div className="text-sm" data-testid="lesson-time-slot">
-              {timeSlots.original}
-            </div>
-            {timeSlots.changed && (
-              <div className="text-xs">
-                {t('student:changedTo')} {timeSlots.changed}
-              </div>
-            )}
-          </div>
-          <div className="flex-1">
-            {GetAttendanceStatusComponent(lesson.attendance)}
-          </div>
-        </div>
-
-        <div className="box-row-full w-fit">
-          {hasMultipleLessons && (
-            <IconButton
-              icon={<FaTrash />}
-              plain
-              color="warn"
-              onClick={() => onDelete(Number(lesson.id))}
-            />
-          )}
-
-          <div
-            role="button"
-            tabIndex={0}
-            className="flex items-center gap-1 cursor-pointer"
-            onClick={() => onChange(lesson)}
-            onKeyDown={e => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                onChange(lesson)
-              }
-            }}
-          >
-            {changeDate ? (
-              <span className="text-base font-normal text-[#5C95FF]">
-                {t('student:editBtn')}
-              </span>
-            ) : (
-              <>
-                <ChangeIcon />
-                <span className="text-base font-normal text-[#5C95FF]">
-                  {t('student:changeBtn')}
-                </span>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
   )
 }
 

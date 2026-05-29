@@ -306,8 +306,17 @@ const useLessonDateTimeData = () => {
       mutationFn: (data: any) => updateAttendance(data),
       onSuccess: async data => {
         if (data) {
-          await queryClient.invalidateQueries([
-            QUERY_KEY.course.getLessonDateTimeKey,
+          // Only invalidate non-matrix queries. The matrix useEffect rebuilds
+          // the entire students state from server data, which would overwrite
+          // locally-set attendances for other lessons. Local state is kept
+          // correct via the onChange -> setStatus callback in the cell.
+          await Promise.all([
+            queryClient.invalidateQueries([
+              QUERY_KEY.course.getLessonDateTimeKey,
+            ]),
+            queryClient.invalidateQueries([
+              QUERY_KEY.studentLesson.getListStudentLessonKey,
+            ]),
           ])
           toast.success(t('student:attendanceStatus.attendanceUpdated'))
         } else {
@@ -472,11 +481,11 @@ const useLessonDateTimeData = () => {
   ): UseMutationResult<
     void,
     ApiError,
-    { classLessonIds: number[]; hasSharedVideo: SharedVideoStatus }
+    { classLessonIds: number[]; hasSharedVideo: SharedVideoStatus; studentLessonIds?: number[] }
   > {
     return useMutation({
-      mutationFn: ({ classLessonIds, hasSharedVideo }) =>
-        bulkUpdateSharedVideo(classLessonIds, hasSharedVideo),
+      mutationFn: ({ classLessonIds, hasSharedVideo, studentLessonIds }) =>
+        bulkUpdateSharedVideo(classLessonIds, hasSharedVideo, studentLessonIds),
       onSuccess: () => {
         toast.success(t('lessonList:videoStatusUpdated'))
         onSuccess?.()

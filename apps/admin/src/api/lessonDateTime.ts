@@ -289,11 +289,12 @@ export const getListLessonMatrix = async (
 
 export const bulkUpdateSharedVideo = async (
   classLessonIds: number[],
-  hasSharedVideo: SharedVideoStatus
+  hasSharedVideo: SharedVideoStatus,
+  studentLessonIds?: number[]
 ): Promise<void> => {
   await apiClient.patch({
     needAuth: true,
     url: '/admin/class-lesson/bulk-update-shared-video',
-    data: { classLessonIds, hasSharedVideo },
+    data: { classLessonIds, hasSharedVideo, studentLessonIds },
   })
 }
