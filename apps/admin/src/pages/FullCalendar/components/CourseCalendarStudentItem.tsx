@@ -271,7 +271,6 @@ const StudentStatus = ({
         value: AttendanceStatus.PENDING,
         icon: <MdPending />,
         tooltip: t('lessonDateTime:attendanceStatus.pending') || '',
-        disabled: true,
         style: {
           pointerEvents: 'none',
           color: '$background',

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { t } from 'i18next'
@@ -108,6 +108,19 @@ const TeachingServiceItem = ({
 }: Props): React.ReactElement => {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+
+  const wasDrawerOpen = useRef(false)
+
+  useEffect(() => {
+    const isOpen = !!studentData.tableDrawers?.isOpenAssignCourse
+    if (wasDrawerOpen.current && !isOpen) {
+      queryClient.invalidateQueries(QUERY_KEY.student.getStudentDetailKey)
+      queryClient.invalidateQueries(
+        QUERY_KEY.teachingService.getTeachingServiceKey
+      )
+    }
+    wasDrawerOpen.current = isOpen
+  }, [studentData.tableDrawers?.isOpenAssignCourse, queryClient])
 
   // const [open, setOpen] = useState(false)
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
@@ -645,9 +658,6 @@ const TeachingServiceItem = ({
                                     variant="ghost"
                                     className="flex items-center gap-1 text-blue-500 hover:text-blue-600 p-0 h-auto"
                                     onClick={() => {
-                                      queryClient.invalidateQueries(
-                                        QUERY_KEY.student.getStudentDetailKey
-                                      )
                                       setStudentData(prev => ({
                                         ...prev,
                                         currentEnrol: {

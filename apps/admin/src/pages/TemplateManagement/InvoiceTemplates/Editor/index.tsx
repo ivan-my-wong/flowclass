@@ -19,6 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/Tooltip'
+import { FEATURE_FLAG } from '@/constants/featureFlags'
 import { defaultStudentInvoiceConfig } from '@/constants/invoiceCampaign.constant'
 import { DEFAULT_CURRENCY } from '@/constants/invoices'
 import useClassData from '@/hooks/useClassData'
@@ -759,7 +760,7 @@ const InvoiceEditor = (): JSX.Element => {
       <ContentLayout
         headerBackButton={{
           mode: 'back',
-          action: () => navigate('/invoice-templates'),
+          action: () => navigate(-1),
         }}
         headerClassName="px-4 md:flex-row flex-col"
         leftHeader={
@@ -825,17 +826,19 @@ const InvoiceEditor = (): JSX.Element => {
             >
               {t('invoiceCampaign:editor.previewAllInvoices')}
             </Button> */}
-            {allStudents.length > 0 && !isCompleted && (
-              <Button
-                iconBefore={<AiOutlineSave />}
-                variant="primary-outline"
-                loading={isCreating || isUpdating}
-                disabled={isDisabledActions}
-                onClick={saveCampaign}
-              >
-                {t('invoiceCampaign:editor.saveCampaign')}
-              </Button>
-            )}
+            {FEATURE_FLAG.SHOW_SAVE_INVOICE_CAMPAIGN_BUTTON &&
+              allStudents.length > 0 &&
+              !isCompleted && (
+                <Button
+                  iconBefore={<AiOutlineSave />}
+                  variant="primary-outline"
+                  loading={isCreating || isUpdating}
+                  disabled={isDisabledActions}
+                  onClick={saveCampaign}
+                >
+                  {t('invoiceCampaign:editor.saveCampaign')}
+                </Button>
+              )}
 
             {isCompleted && (
               <Button
