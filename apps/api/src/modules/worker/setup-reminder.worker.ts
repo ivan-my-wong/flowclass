@@ -122,8 +122,8 @@ export class SetupReminderWorker {
     // const location = addressObjectToString(institution.address)
     const userTimeZone = site.timeZone?.id || 'Asia/Hong_Kong'
 
-    const actualStartTime = item.changeStartTime ?? item.startTime
-    const location = item.class?.locationRoom?.address || ''
+    const actualStartTime = item.startTime
+    const location = item.class?.locationRoom?.name || ''
     const instructor = item.class?.instructor?.fullName || ''
     const hourDiffWithCreationOfInvoice = dayjs(actualStartTime).diff(currentTime, 'hours')
 
@@ -136,23 +136,7 @@ export class SetupReminderWorker {
     let contactName = enrollCourse.preferredName
     let contactPhone = enrollCourse.preferredPhone
 
-    const userAlias = await this.userAliasesRepository.findFirstByUserIdAndInstitution(
-      institution.id,
-      enrollCourse.userId,
-      { user: true }
-    )
-
-    if (userAlias) {
-      contactEmail = userAlias.email ?? userAlias.user?.email ?? contactEmail
-      contactName = userAlias.name ?? contactName
-      contactPhone = userAlias.user?.phone ?? contactPhone
-    }
-    const studentNotificationSetting = await this.studentNotifSettingService.getByStudentAndType(
-      userAlias?.userId ?? enrollCourse.userId,
-      institution.id,
-      SupportedType.STUDENT_LESSON_REMINDER
-    )
-    const actualEndTime = item.changeEndTime ?? item.endTime
+    const actualEndTime = item.endTime
     const localStartTime = utcToZonedTime(actualStartTime, userTimeZone)
     const localEndTime = utcToZonedTime(actualEndTime, userTimeZone)
 

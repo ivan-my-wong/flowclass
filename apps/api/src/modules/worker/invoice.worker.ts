@@ -613,7 +613,7 @@ class InvoiceWorker {
       .where('studentSchedule.classId IN (:...classIds)', { classIds: dto.classIds })
       .andWhere('studentLesson.startTime BETWEEN :start AND :end', { start, end })
       .orderBy('studentLesson.endTime', 'DESC')
-      .addOrderBy('studentLesson.changeEndTime', 'DESC')
+      .addOrderBy('studentLesson.endTime', 'DESC')
       .getMany()
   }
 

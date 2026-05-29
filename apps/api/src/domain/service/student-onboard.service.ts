@@ -1247,11 +1247,22 @@ export class StudentOnbService {
     })
     const grouped = _.groupBy(lessonsByEnroll, 'enrollCourseId')
 
+    // Batch-load all classes referenced by the current lesson classId fields so
+    // we can resolve class names even when EnrollClassMapping drifted after a
+    // lesson change.
+    const allLessonClassIds = [...new Set(lessonsByEnroll.map((l) => l.classId).filter((id): id is number => !!id))]
+    const classesById = new Map<number, { id: number; name: string; type: string }>()
+    if (allLessonClassIds.length > 0) {
+      const classes = await this.classRepository.find({
+        where: { id: In(allLessonClassIds) },
+        select: ['id', 'name', 'type'],
+      })
+      classes.forEach((c) => classesById.set(c.id, c))
+    }
+
     const processedSubscriptionClasses = []
     getAllClasses.forEach((item) => {
       item.enrollCourses.forEach((enrollCourse) => {
-        if (!enrollCourse.multipleClassMapping?.length) return
-
         // Collect all lessons for this enrollCourse. Prefer the directly-queried
         // student_lesson rows (which carry classId). Fall back to the schedule
         // relation but scope it to this enrollCourse so lessons don't bleed
@@ -1262,21 +1273,27 @@ export class StudentOnbService {
               .filter((s) => s.enrollCourseId === enrollCourse.id)
               .flatMap((s) => s.studentLessons)
 
-        // Emit one entry per class mapping so each class appears as its own
-        // row (previously only .at(0) was used, hiding additional classes).
-        enrollCourse.multipleClassMapping.forEach((mapping) => {
-          const mappedClass = mapping.class
-          if (!mappedClass) return
+        if (!enrollCourseItems.length) return
 
-          const classLessons = enrollCourseItems.filter(
-            (l) => l.classId === mappedClass.id
-          )
+        // Group by the lesson's CURRENT classId so stale EnrollClassMapping
+        // entries never produce empty rows, and lessons moved to a new class
+        // are always visible under the correct class name.
+        const rawClassIds: number[] = enrollCourseItems.map((l) => l.classId).filter((id): id is number => !!id)
+        const usedClassIds: number[] = [...new Set(rawClassIds)]
+
+        usedClassIds.forEach((classId: number) => {
+          const classInfo = classesById.get(classId)
+          if (!classInfo) return
+
+          const classLessons = enrollCourseItems.filter((l) => l.classId === classId)
+          if (!classLessons.length) return
+
           processedSubscriptionClasses.push({
             courseId: item.courseId,
             courseName: item.course.name,
             courseImg: item.course.previewImageUrl,
-            classId: mappedClass.id,
-            className: mappedClass.name,
+            classId: classInfo.id,
+            className: classInfo.name,
             enrollCourseId: enrollCourse.id,
             paymentState: item.paymentState,
             billingStartDate: enrollCourse.billingStartDate,
@@ -1287,7 +1304,7 @@ export class StudentOnbService {
             confirmState: enrollCourse.confirmState,
             registrationForm: enrollCourse.registrationForm,
             lessons: classLessons,
-            classType: mappedClass.type,
+            classType: classInfo.type as ClassTypeEnum,
           })
         })
       })
@@ -2132,9 +2149,15 @@ export class StudentOnbService {
 
     return await this.studentLessonRepository.save({
       ...studentLesson,
-      changeClassLessonId: classLesson.id,
-      changeStartTime: classLesson.startTime,
-      changeEndTime: classLesson.endTime,
+      // Preserve original reference on first change only
+      ...(studentLesson.changeClassLessonId ? {} : {
+        changeClassLessonId: studentLesson.classLessonId,
+        changeStartTime: studentLesson.startTime,
+        changeEndTime: studentLesson.endTime,
+      }),
+      classLessonId: classLesson.id,
+      startTime: classLesson.startTime,
+      endTime: classLesson.endTime,
     })
   }
 
@@ -2739,41 +2762,18 @@ export class StudentOnbService {
         throw new ApiError(ErrorCode.INSTITUTION_NOT_FOUND)
       }
 
-      // Check if course or class has changed
-      const isCourseChanged = studentLesson.courseId !== courseId
-      const isClassChanged = studentLesson.classId !== classId
-
-      let resultStudentLesson: StudentLesson
-
-      if (isCourseChanged || isClassChanged) {
-        // Handle course/class change - create new enroll_course and potentially new studentLesson
-        resultStudentLesson = await this.handleCourseOrClassChangeWithTransaction({
-          studentLesson,
-          courseId,
-          classId,
-          siteId,
-          institutionId,
-          lessonDateTime,
-          isSendEmail,
-          institution,
-          user,
-          transactionalEntityManager,
-        })
-      } else {
-        // Handle same course/class - use original logic
-        resultStudentLesson = await this.handleSameCourseClassChangeWithTransaction({
-          studentLesson,
-          courseId,
-          classId,
-          siteId,
-          institutionId,
-          lessonDateTime,
-          isSendEmail,
-          institution,
-          user,
-          transactionalEntityManager,
-        })
-      }
+      const resultStudentLesson = await this.handleSameCourseClassChangeWithTransaction({
+        studentLesson,
+        courseId,
+        classId,
+        siteId,
+        institutionId,
+        lessonDateTime,
+        isSendEmail,
+        institution,
+        user,
+        transactionalEntityManager,
+      })
 
       return resultStudentLesson
     })
@@ -2936,18 +2936,14 @@ export class StudentOnbService {
     const startTime = classLesson.changeStartTime ?? classLesson.startTime
     const endTime = classLesson.changeEndTime ?? classLesson.endTime
 
-    // Original logic for same course/class
-    const oldClassLesson = await transactionalEntityManager.findOne(ClassLesson, {
+    // Check if the current slot (classLessonId) will be vacated — soft-delete if no other students
+    const currentClassLesson = await transactionalEntityManager.findOne(ClassLesson, {
       where: { id: studentLesson.classLessonId },
     })
 
-    const changeClassLesson = await transactionalEntityManager.findOne(ClassLesson, {
-      where: { id: studentLesson.changeClassLessonId },
-    })
-
-    if (oldClassLesson) {
+    if (currentClassLesson) {
       const studentLessons = await this.studentLessonRepository.findByEffectiveClassLessonId(
-        [oldClassLesson.id],
+        [currentClassLesson.id],
         {
           where: {
             id: Not(studentLesson.id),
@@ -2957,35 +2953,52 @@ export class StudentOnbService {
 
       // check if there is any other student in this class lesson
       if (!studentLessons?.length) {
-        oldClassLesson.deletedAt = getCurrentTimeStamp() as unknown as Date
-        await transactionalEntityManager.save(ClassLesson, oldClassLesson)
+        currentClassLesson.deletedAt = getCurrentTimeStamp() as unknown as Date
+        await transactionalEntityManager.save(ClassLesson, currentClassLesson)
       }
     }
+    // changeClassLessonId is the original reference — never clean it up
 
-    if (changeClassLesson) {
-      const studentLessons = await this.studentLessonRepository.findByEffectiveClassLessonId(
-        [changeClassLesson.id],
-        {
-          where: {
-            id: Not(studentLesson.id),
-          },
-        }
-      )
+    const originalClassId = studentLesson.classId
 
-      // check if there is any other student in this class lesson
-      if (!studentLessons?.length) {
-        changeClassLesson.deletedAt = getCurrentTimeStamp() as unknown as Date
-        await transactionalEntityManager.save(ClassLesson, changeClassLesson)
-      }
+    // Preserve original reference on first change only
+    if (!studentLesson.changeClassLessonId) {
+      studentLesson.changeClassLessonId = studentLesson.classLessonId
+      studentLesson.changeStartTime = studentLesson.startTime
+      studentLesson.changeEndTime = studentLesson.endTime
     }
-
-    studentLesson.changeClassLessonId = classLesson.id
-    studentLesson.changeStartTime = startTime
-    studentLesson.changeEndTime = endTime
+    // Update primary fields to the new/current lesson
+    studentLesson.classLessonId = classLesson.id
+    studentLesson.startTime = startTime
+    studentLesson.endTime = endTime
     studentLesson.classId = classLesson.classId
     studentLesson.courseId = classLesson.courseId
 
     const res = await transactionalEntityManager.save(StudentLesson, studentLesson)
+
+    // When the class changes, update the EnrollClassMapping so TeachingService
+    // always reflects the correct current class. Try to match by the old classId
+    // first; fall back to any existing mapping for this enrollment (handles cases
+    // where prior changes left the mapping out of sync).
+    if (originalClassId !== classLesson.classId) {
+      let enrollClassMapping = await transactionalEntityManager.findOne(EnrollClassMapping, {
+        where: {
+          enrollCourseId: studentLesson.enrollCourseId,
+          classId: originalClassId,
+        },
+      })
+      if (!enrollClassMapping) {
+        // Fallback: find any mapping for this enrollment
+        enrollClassMapping = await transactionalEntityManager.findOne(EnrollClassMapping, {
+          where: { enrollCourseId: studentLesson.enrollCourseId },
+          order: { id: 'DESC' },
+        })
+      }
+      if (enrollClassMapping) {
+        enrollClassMapping.classId = classLesson.classId
+        await transactionalEntityManager.save(EnrollClassMapping, enrollClassMapping)
+      }
+    }
 
     // Send email/WhatsApp notification if requested (outside transaction to avoid blocking)
     if (isSendEmail) {
@@ -3207,16 +3220,16 @@ export class StudentOnbService {
     const instructor = classItem.instructor?.firstName || ''
     const timeZoneId = classItem.site?.timeZone?.id || 'UTC'
 
-    const oldClassLessonStartDate = dayjs(studentLesson.startTime)
+    const oldClassLessonStartDate = dayjs(studentLesson.changeStartTime)
       .tz(timeZoneId)
       .format('DD/MM/YYYY HH:mm')
-    const oldClassLessonEndTime = dayjs(studentLesson.endTime)
+    const oldClassLessonEndTime = dayjs(studentLesson.changeEndTime)
       .tz(timeZoneId)
       .format('DD/MM/YYYY HH:mm')
-    const newClassLessonStartDate = dayjs(studentLesson.changeStartTime)
+    const newClassLessonStartDate = dayjs(studentLesson.startTime)
       .tz(timeZoneId)
       .format('DD/MM/YYYY HH:mm')
-    const newClassLessonEndDate = dayjs(studentLesson.changeEndTime)
+    const newClassLessonEndDate = dayjs(studentLesson.endTime)
       .tz(timeZoneId)
       .format('DD/MM/YYYY HH:mm')
 
@@ -3467,12 +3480,12 @@ export class StudentOnbService {
   }): Promise<RecordLog> {
     const dataLog = await this.studentLessonRepository
       .createQueryBuilder('stu')
-      .leftJoin('class_lessons', 'cll_old', 'cll_old.id = stu.class_lesson_id')
-      .leftJoin('classes', 'cl_old', 'cl_old.id = cll_old.class_id')
-      .leftJoin('courses', 'co_old', 'co_old.id = cll_old.course_id')
-      .leftJoin('class_lessons', 'cll_new', 'cll_new.id = stu.change_class_lesson_id')
+      .leftJoin('class_lessons', 'cll_new', 'cll_new.id = stu.class_lesson_id')
       .leftJoin('classes', 'cl_new', 'cl_new.id = cll_new.class_id')
       .leftJoin('courses', 'co_new', 'co_new.id = cll_new.course_id')
+      .leftJoin('class_lessons', 'cll_old', 'cll_old.id = stu.change_class_lesson_id')
+      .leftJoin('classes', 'cl_old', 'cl_old.id = cll_old.class_id')
+      .leftJoin('courses', 'co_old', 'co_old.id = cll_old.course_id')
       .leftJoin('users', 'u', 'u.id = stu.user_id')
       .where({
         id: studentLesson.id,
@@ -3501,15 +3514,11 @@ export class StudentOnbService {
           educatorId: user.id,
           studentFirstName: dataLog.studentFirstName,
           studentLastName: dataLog.studentLastName,
-          oldStartTime: studentLesson.changeStartTime
-            ? studentLesson.changeStartTime
-            : studentLesson.startTime,
-          oldEndTime: studentLesson.changeEndTime
-            ? studentLesson.changeEndTime
-            : studentLesson.endTime,
+          oldStartTime: studentLesson.changeStartTime,
+          oldEndTime: studentLesson.changeEndTime,
           classLessonId,
-          classLessonStartTime: studentLesson.changeStartTime,
-          classLessonEndTime: studentLesson.changeEndTime,
+          classLessonStartTime: studentLesson.startTime,
+          classLessonEndTime: studentLesson.endTime,
           modifiedDate: dayjs().toDate(),
         },
         userId: studentLesson.userId,
@@ -3532,12 +3541,12 @@ export class StudentOnbService {
   }): Promise<RecordLog> {
     const dataLog = await this.studentLessonRepository
       .createQueryBuilder('stu')
-      .leftJoin('class_lessons', 'cll_old', 'cll_old.id = stu.class_lesson_id')
-      .leftJoin('classes', 'cl_old', 'cl_old.id = cll_old.class_id')
-      .leftJoin('courses', 'co_old', 'co_old.id = cll_old.course_id')
-      .leftJoin('class_lessons', 'cll_new', 'cll_new.id = stu.change_class_lesson_id')
+      .leftJoin('class_lessons', 'cll_new', 'cll_new.id = stu.class_lesson_id')
       .leftJoin('classes', 'cl_new', 'cl_new.id = cll_new.class_id')
       .leftJoin('courses', 'co_new', 'co_new.id = cll_new.course_id')
+      .leftJoin('class_lessons', 'cll_old', 'cll_old.id = stu.change_class_lesson_id')
+      .leftJoin('classes', 'cl_old', 'cl_old.id = cll_old.class_id')
+      .leftJoin('courses', 'co_old', 'co_old.id = cll_old.course_id')
       .leftJoin('users', 'u', 'u.id = stu.user_id')
       .where({
         id: studentLesson.id,
@@ -3567,15 +3576,11 @@ export class StudentOnbService {
           educatorId: user.id,
           studentFirstName: dataLog?.studentFirstName,
           studentLastName: dataLog?.studentLastName,
-          oldStartTime: studentLesson.changeStartTime
-            ? studentLesson.changeStartTime
-            : studentLesson.startTime,
-          oldEndTime: studentLesson.changeEndTime
-            ? studentLesson.changeEndTime
-            : studentLesson.endTime,
+          oldStartTime: studentLesson.changeStartTime,
+          oldEndTime: studentLesson.changeEndTime,
           classLessonId,
-          classLessonStartTime: studentLesson.changeStartTime,
-          classLessonEndTime: studentLesson.changeEndTime,
+          classLessonStartTime: studentLesson.startTime,
+          classLessonEndTime: studentLesson.endTime,
           modifiedDate: dayjs().toDate(),
         },
         userId: studentLesson.userId,

@@ -413,14 +413,9 @@ export class RecurringSchedulesService extends BaseService<RecurringSchedules> {
 
     if (lessons && lessons.length > 0) {
       const classLessonIds = lessons.map((lesson) => lesson?.id)
-      const foundLessons = await this.studentLessonRepository.findBy([
-        {
-          classLessonId: In(classLessonIds),
-        },
-        {
-          changeClassLessonId: In(classLessonIds),
-        },
-      ])
+      const foundLessons = await this.studentLessonRepository.findBy({
+        classLessonId: In(classLessonIds),
+      })
 
       if (foundLessons.length === recurringSchedules.length) {
         return foundLessons

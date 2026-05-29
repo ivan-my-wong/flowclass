@@ -244,18 +244,34 @@ export class RescheduleApprovalService {
         const startDate = requestTimeChange.requestStartTime.toISOString().split('T')[0]
         const startTime = classLesson.startTime.toISOString().split('T')[1]
         classLesson.changeStartTime = new Date(`${startDate}T${startTime}`)
-        requestTimeChange.studentLesson.changeStartTime = classLesson.changeStartTime
 
         const endDate = requestTimeChange.requestEndTime.toISOString().split('T')[0]
         const endTime = classLesson.endTime.toISOString().split('T')[1]
         classLesson.changeEndTime = new Date(`${endDate}T${endTime}`)
-        requestTimeChange.studentLesson.changeEndTime = classLesson.changeEndTime
+
+        // StudentLesson: preserve original reference on first approval, then update current times
+        const sl = requestTimeChange.studentLesson
+        if (!sl.changeStartTime) {
+          sl.changeClassLessonId = sl.classLessonId
+          sl.changeStartTime = sl.startTime
+          sl.changeEndTime = sl.endTime
+        }
+        sl.startTime = classLesson.changeStartTime
+        sl.endTime = classLesson.changeEndTime
       } else if (status === RequestTimeChangeStatus.PENDING) {
         classLesson.changeStartTime = null
-        requestTimeChange.studentLesson.changeStartTime = null
-
         classLesson.changeEndTime = null
-        requestTimeChange.studentLesson.changeEndTime = null
+
+        // Revert student lesson to its original times
+        const sl = requestTimeChange.studentLesson
+        if (sl.changeStartTime) {
+          sl.startTime = sl.changeStartTime
+          sl.endTime = sl.changeEndTime
+          sl.classLessonId = sl.changeClassLessonId
+          sl.changeClassLessonId = null
+          sl.changeStartTime = null
+          sl.changeEndTime = null
+        }
       }
 
       await this.classLessonRepository.save(classLesson)

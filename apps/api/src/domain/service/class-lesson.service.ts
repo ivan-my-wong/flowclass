@@ -141,8 +141,14 @@ export class ClassLessonService {
 
     // Update student lesson
     for (const studentLesson of studentLessons) {
-      studentLesson.changeStartTime = data.changeStartTime
-      studentLesson.changeEndTime = data.changeEndTime
+      // Preserve original reference on first reschedule
+      if (!studentLesson.changeStartTime) {
+        studentLesson.changeClassLessonId = studentLesson.classLessonId
+        studentLesson.changeStartTime = studentLesson.startTime
+        studentLesson.changeEndTime = studentLesson.endTime
+      }
+      studentLesson.startTime = data.changeStartTime
+      studentLesson.endTime = data.changeEndTime
       await this.studentLessonRepository.save(studentLesson)
     }
     // Update class lesson
@@ -649,6 +655,7 @@ export class ClassLessonService {
           aliases,
           id: student.id,
           classLessonId: student.classLessonId,
+          changeClassLessonId: student.changeClassLessonId,
           changeStartTime: student.changeStartTime,
           changeEndTime: student.changeEndTime,
           attendance: student.attendance,

@@ -69,6 +69,7 @@ import {
 import { SendPaymentActions } from '@/application/admin/payment-evidence/dto/confirm-state-payment-evidence.dto'
 import { InstitutionsRepository } from '@/models/institutions.repository'
 import { StudentLesson } from '@/models/student-lesson.entity'
+import { StudentLessonRepository } from '@/models/student-lesson.repository'
 import { UserAliasesRepository } from '@/models/user-aliases.repository'
 import { User } from '@/models/user.entity'
 import { SSEService } from '@/modules/sse/sse.service'
@@ -212,7 +213,8 @@ export class InvoiceCampaignService {
     private readonly whatsappWebService: WhatsappWebService,
     private readonly creditManagementService: CreditManagementService,
     private readonly sitesRepository: SitesRepository,
-    private readonly invoicePromotionUsedRepository: InvoicePromotionUsedRepository
+    private readonly invoicePromotionUsedRepository: InvoicePromotionUsedRepository,
+    private readonly studentLessonRepository: StudentLessonRepository
   ) {
     this.emailTransport = new NodemailerEmailTransport()
     this.jwtOption = {
@@ -2216,14 +2218,22 @@ export class InvoiceCampaignService {
           }
 
           const enrollCourseSchedules = enrollCourse.studentSchedule || []
+          const classMappings = enrollCourse.multipleClassMapping ?? []
           let scheduleIndex = 0
           for (const enrollInto of enrollCourse.enrollInto) {
             const { courseName, secondLevelName, ...rest } = enrollInto
             const studentSchedule = enrollCourseSchedules[scheduleIndex]
 
+            // Exclude lessons that were moved to a different class.
+            // Those lessons appear in the destination class's own row, so including them here
+            // would double-count them in both the bullet list and the lesson count.
+            const activeLessons = this.studentLessonRepository.filterActiveLessons(
+              studentSchedule?.studentLessons ?? []
+            )
+
             let desc = `${courseName} - ${secondLevelName}`
-            if (studentSchedule?.studentLessons?.length) {
-              const lessonsText = studentSchedule.studentLessons
+            if (activeLessons.length) {
+              const lessonsText = activeLessons
                 .map((o) => {
                   if (!o.startTime) return ''
                   const startDate = dayjs(o.startTime).tz(timeZoneId).format('YYYY/MM/DD')
@@ -2235,11 +2245,17 @@ export class InvoiceCampaignService {
               if (lessonsText) desc += `\n${lessonsText}`
             }
 
-            const lessonCount = Math.max(1, Number(rest?.lessonCount) || 1)
-            const amount = (rest.price || 0) * lessonCount
-            const unitPrice = amount / lessonCount
+            // Use the active (non-changed) lesson count. Fall back to enrollInto.lessonCount
+            // for legacy invoices where studentLessons are not attached.
+            const lessonCount = activeLessons.length || Math.max(1, Number(rest?.lessonCount) || 1)
+            // Use the gross per-lesson price from the class mapping (pre-discount).
+            // Fall back to enrollInto.price for enrollments without a mapping.
+            const grossUnitPrice = Number(
+              classMappings[scheduleIndex]?.lessonPrice ?? rest.price ?? 0
+            )
+            const amount = grossUnitPrice * lessonCount
 
-            bucket.rows.push({ desc, lessonCount, unitPrice, amount })
+            bucket.rows.push({ desc, lessonCount, unitPrice: grossUnitPrice, amount })
             bucket.subtotal += amount
             scheduleIndex++
           }
