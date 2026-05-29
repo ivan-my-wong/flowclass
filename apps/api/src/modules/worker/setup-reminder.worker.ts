@@ -147,6 +147,11 @@ export class SetupReminderWorker {
       enrolId: enrollCourse.id.toString(),
       token: invoice.proofToken,
     })
+    const studentNotificationSetting = await this.studentNotifSettingService.getByStudentAndType(
+      enrollCourse.userId,
+      institution.id,
+      SupportedType.STUDENT_LESSON_REMINDER
+    )
     const applicants: User[] = await this.userRepository.find({
       where: { id: In(invoice.applicants) },
     })
