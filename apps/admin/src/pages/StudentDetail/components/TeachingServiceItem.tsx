@@ -610,8 +610,8 @@ const TeachingServiceItem = ({
                                     {isChangeDate &&
                                       changeStartTime &&
                                       changeEndTime && (
-                                        <div className="text-xs">
-                                          {t('student:changedTo')}{' '}
+                                        <div className="text-xs text-gray-400 line-through">
+                                          {t('student:changedFrom')}{' '}
                                           {getLessonDateTime(
                                             changeStartTime.toString(),
                                             changeEndTime?.toString(),

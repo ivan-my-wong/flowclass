@@ -207,12 +207,8 @@ const TeachingService = ({
 
             // Check if any lesson overlaps with the filter date range
             return enrollCourse.lessons.some(lesson => {
-              const lessonStart = lesson.changeStartTime
-                ? new Date(lesson.changeStartTime).getTime()
-                : new Date(lesson.startTime).getTime()
-              const lessonEnd = lesson.changeEndTime
-                ? new Date(lesson.changeEndTime).getTime()
-                : new Date(lesson.endTime).getTime()
+              const lessonStart = new Date(lesson.startTime).getTime()
+              const lessonEnd = new Date(lesson.endTime).getTime()
 
               // Check if lesson overlaps with filter range
               return lessonStart <= filterEnd && lessonEnd >= filterStart

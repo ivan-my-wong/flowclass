@@ -200,11 +200,11 @@ const RightHeaderStudentDetail = ({
         courseName: row.courseName,
         className: row.className,
         lessonTimeStart: getFormatDate(
-          changeStartTime || startTime,
+          startTime,
           DATE_TIME_AM_FORMAT
         ),
         lessonTimeEnd: getFormatDate(
-          changeEndTime || endTime,
+          endTime,
           DATE_TIME_AM_FORMAT
         ),
         attendanceStatus: getAttendanceStatus(lesson.attendance),

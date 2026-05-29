@@ -41,9 +41,12 @@ const CourseContainer = (): JSX.Element => {
     })
   )
   const assignedClassIdsSet = useMemo(() => {
-    return currentActiveStudent
-      ? new Set(activeClasses.map(item => item.classId) ?? [])
-      : new Set<number>()
+    if (!currentActiveStudent) return new Set<number>()
+    return new Set(
+      activeClasses
+        .filter(item => item.studentItem.id === currentActiveStudent.id)
+        .map(item => item.classId)
+    )
   }, [currentActiveStudent, activeClasses])
 
   // Filter classes based on search query (name, course name, or ID)

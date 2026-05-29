@@ -256,7 +256,7 @@ const SendingProgressPage = (): JSX.Element => {
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-2xl bg-white">
-          <div className="p-2">
+          <div className="p-6">
             {/* Header */}
             <div className="mb-6">
               <h1 className="text-2xl font-bold text-gray-900">{title}</h1>

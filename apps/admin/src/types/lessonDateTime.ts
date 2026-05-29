@@ -34,6 +34,7 @@ export type StudentType = {
   lessons?: number
   completedLessons?: number
   classLessonId?: number
+  changeClassLessonId?: number
   enrollCourse?: EnrollCourseInstance
 
   aliases?: UserAlias

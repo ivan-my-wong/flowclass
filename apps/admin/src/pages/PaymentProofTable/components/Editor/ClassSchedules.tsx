@@ -232,16 +232,12 @@ const LessonRow: FC<{
 
     return {
       original:
-        startTime && endTime
-          ? getLessonDateTime(startTime.toString(), endTime.toString(), t)
+        changeDate && changeStartTime && changeEndTime
+          ? getLessonDateTime(changeStartTime.toString(), changeEndTime.toString(), t)
           : '',
       changed:
-        changeDate && changeStartTime && changeEndTime
-          ? getLessonDateTime(
-              changeStartTime.toString(),
-              changeEndTime.toString(),
-              t
-            )
+        startTime && endTime
+          ? getLessonDateTime(startTime.toString(), endTime.toString(), t)
           : '',
     }
   }, [lesson, getCurrentSiteTimeZoneDate, changeDate, t])

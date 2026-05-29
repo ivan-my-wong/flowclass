@@ -538,7 +538,9 @@ const InvoiceEditor = (): JSX.Element => {
     classes,
     invoiceCampaign,
     setInvoiceCampaign,
-    studentIdsToAssign,
+    // studentIdsToAssign intentionally omitted: URL params change when navigating
+    // to nested routes (e.g. SelectLessons), which would re-trigger this effect
+    // and wipe unsaved students that were added via the studentIds URL param.
     // studentList intentionally omitted: read as a snapshot inside the effect
     // so changes to the full student list don't re-trigger a campaign reset.
     // initializeCampaignData,

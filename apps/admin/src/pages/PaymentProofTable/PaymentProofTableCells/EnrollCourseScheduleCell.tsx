@@ -38,7 +38,7 @@ const EnrollCourseScheduleCell = ({
         const earliest = (s: PaymentProofStudentSchedule) =>
           Math.min(
             ...(s.studentLessons ?? []).map(l =>
-              new Date(l.changeStartTime || l.startTime).getTime()
+              new Date(l.startTime).getTime()
             ),
             Infinity
           )

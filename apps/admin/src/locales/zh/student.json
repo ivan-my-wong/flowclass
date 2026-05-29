@@ -80,6 +80,7 @@
     "title": "更改班別詳情"
   },
   "changedTo": "已更改為",
+  "changedFrom": "原本為",
   "changePassword": {
     "button": "更改密碼",
     "confirmPassword": "確認密碼",

@@ -80,6 +80,7 @@
     "title": "Detail Change Class"
   },
   "changedTo": "Changed to",
+  "changedFrom": "Changed from",
   "changePassword": {
     "button": "Change Password",
     "confirmPassword": "Confirm Password",

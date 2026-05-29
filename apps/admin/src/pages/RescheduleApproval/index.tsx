@@ -374,8 +374,7 @@ const RescheduleApprovalPage = () => {
       filter: false,
       width: 200,
       cellRenderer: ({ data }: ICellRendererParams<RequestTimeChange>) => {
-        const startTime =
-          data?.studentLesson?.changeStartTime || data?.studentLesson?.startTime
+        const startTime = data?.studentLesson?.startTime
         if (!startTime) return 0
 
         const diffHours = dayjs(startTime).diff(dayjs(), 'minutes')

@@ -45,7 +45,6 @@ import {
   calculateTotalDiscount,
   composeClassesAndSessions,
   formatTotalPriceInvoice,
-  getUniqueCourseIds,
 } from '@/utils/invoice-campaign.utils'
 
 export const generateDefaultInvoiceInstallment = (): InvoiceSplit => {

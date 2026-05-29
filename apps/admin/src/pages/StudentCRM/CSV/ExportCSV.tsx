@@ -122,7 +122,7 @@ const ExportCsvButton = ({
           const lastAttendanceDateObject = [
             ...(firstSortedStudentSchedule?.studentLessons ?? []),
           ].sort((a, b) => {
-            const dateA = new Date(a.changeEndTime || a.endTime)
+            const dateA = new Date(a.endTime)
             const dateB = new Date(b.changeEndTime || b.endTime)
 
             if (
@@ -138,9 +138,7 @@ const ExportCsvButton = ({
           let lastAttendanceDate = ''
 
           if (lastAttendanceDateObject) {
-            lastAttendanceDate =
-              lastAttendanceDateObject.changeEndTime ||
-              lastAttendanceDateObject.endTime
+            lastAttendanceDate = lastAttendanceDateObject.endTime
           }
 
           return {

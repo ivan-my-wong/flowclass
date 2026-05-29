@@ -364,7 +364,7 @@
       "coursesNeededToReachBundle": "Courses Needed to Reach Bundle:",
       "coursesNeeded_one": "{{count}} more course needed to qualify",
       "coursesNeeded_other": "{{count}} more courses needed to qualify",
-      "bundleDiscountEligible": "✓ Bundle discount eligible",
+      "bundleDiscountEligible": "Bundle discount eligible",
       "coursesUsed": "Courses Used:",
       "discountBreakdown": "Discount Breakdown:",
       "currentInvoiceDiscount": "Current Invoice Discount:",

@@ -47,8 +47,8 @@ const ClassDropDownCell = ({
                   <TableRow key={`${schedule.id}-${lesson.id || index}`}>
                     <TableCell>
                       {getLessonDateTime(
-                        lesson.changeStartTime || lesson.startTime,
-                        lesson.changeEndTime || lesson.endTime,
+                        lesson.startTime,
+                        lesson.endTime,
                         t
                       )}
                     </TableCell>

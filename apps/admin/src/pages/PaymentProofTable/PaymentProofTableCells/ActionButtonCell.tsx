@@ -91,7 +91,7 @@ const ActionButtonCell = ({
 
     const allLessonDates = studentInfo.studentSchedules
       .flatMap(s => s.studentLessons)
-      .map(l => dayjs(l.changeStartTime || l.startTime))
+      .map(l => dayjs(l.startTime))
       .sort((a, b) => a.valueOf() - b.valueOf())
 
     const period =
@@ -131,7 +131,7 @@ const ActionButtonCell = ({
           s => s.enrollCourseId === ec.id
         )
         const lessons = (schedule?.studentLessons ?? [])
-          .map(l => dayjs(l.changeStartTime || l.startTime))
+          .map(l => dayjs(l.startTime))
           .sort((a, b) => a.valueOf() - b.valueOf())
 
         const lessonCount = lessons.length || ei.lessonCount
