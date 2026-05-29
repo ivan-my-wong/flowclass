@@ -1547,8 +1547,16 @@ export class ClassLessonService {
 
   async bulkUpdateSharedVideo(
     classLessonIds: number[],
-    hasSharedVideo: SharedVideoStatus
+    hasSharedVideo: SharedVideoStatus,
+    studentLessonIds?: number[]
   ): Promise<void> {
+    if (studentLessonIds?.length) {
+      await this.studentLessonRepository.update(
+        { id: In(studentLessonIds) },
+        { hasSharedVideo }
+      )
+      return
+    }
     if (!classLessonIds.length) return
     await this.studentLessonRepository.update(
       { classLessonId: In(classLessonIds) },

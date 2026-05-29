@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
 import {
   IsArray,
@@ -158,6 +158,12 @@ export class BulkUpdateSharedVideoDto {
   @IsArray()
   @IsNumber({}, { each: true })
   classLessonIds: number[]
+
+  @ApiPropertyOptional({ isArray: true, items: { type: 'number' }, type: Number })
+  @IsOptional()
+  @IsArray()
+  @IsNumber({}, { each: true })
+  studentLessonIds?: number[]
 
   @ApiProperty({ enum: SharedVideoStatus })
   @IsEnum(SharedVideoStatus)

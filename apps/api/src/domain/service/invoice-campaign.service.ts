@@ -73,8 +73,7 @@ import { StudentLessonRepository } from '@/models/student-lesson.repository'
 import { UserAliasesRepository } from '@/models/user-aliases.repository'
 import { User } from '@/models/user.entity'
 import { SSEService } from '@/modules/sse/sse.service'
-import { calculateClassPrice } from '@/utils/courses.utils'
-import { buildUploadReceiptLink } from '@/utils/payment-link.utils'
+import { buildCmsUploadReceiptLink, buildUploadReceiptLink } from '@/utils/payment-link.utils'
 import { shallow } from '@/utils/shallow.utils'
 import { studentScheduleToString } from '@/utils/string.utils'
 import { calculateBillingEndDate, calculateBillingNextDate } from '@/utils/time.utils'
@@ -2032,14 +2031,10 @@ export class InvoiceCampaignService {
           (d) => d.invoiceId === invoice.id
         )
 
-        const paymentReceiptUploadLink =
-          buildUploadReceiptLink({
-            institution: invoice.institution,
-            invoice,
-            customDomain: site?.customDomain ?? '',
-            siteUrl: site?.url ?? '',
-            coursePath: invoice.course?.path,
-          }) ?? ''
+        const paymentReceiptUploadLink = buildCmsUploadReceiptLink({
+          proofToken: invoice.proofToken ?? '',
+          institutionId: invoice.institutionId,
+        })
 
         const doc = new PDFDocument({ margin: 50 })
         const buffers: Uint8Array[] = []

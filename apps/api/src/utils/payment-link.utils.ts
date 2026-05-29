@@ -95,4 +95,22 @@ const buildSuccessPaymentLink = ({
   return successPaymentLink
 }
 
-export { buildApplicationLink, buildSuccessPaymentLink, buildUploadReceiptLink }
+/**
+ * Upload-receipt link pointing to the CMS app (LINK_FLOWCLASS_CMS).
+ * Matches the copy-link button in PaymentProofTable — the page only reads
+ * `token` and `institutionId`.
+ */
+const buildCmsUploadReceiptLink = ({
+  proofToken,
+  institutionId,
+}: {
+  proofToken: string
+  institutionId: number
+}): string => {
+  const cmsHost = process.env.LINK_FLOWCLASS_CMS ?? ''
+  const base = process.env.APP_ENV === 'local' ? 'http://localhost:5173' : `https://${cmsHost}`
+  const params = new URLSearchParams({ token: proofToken, institutionId: String(institutionId) })
+  return `${base}/pay/upload-receipt?${params.toString()}`
+}
+
+export { buildApplicationLink, buildCmsUploadReceiptLink, buildSuccessPaymentLink, buildUploadReceiptLink }

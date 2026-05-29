@@ -103,7 +103,6 @@ import { User } from '@/models/user.entity'
 import { UsersRepository } from '@/models/users.repository'
 import {
   getNumberIdFromFieldId,
-  lessonDateToString,
   lessonObjectToString,
   parseStringToArray,
   transformEmail,
@@ -156,9 +155,7 @@ import {
   DataSource,
   FindOptionsWhere,
   In,
-  LessThanOrEqual,
   Like,
-  MoreThanOrEqual,
   Not,
   Repository,
 } from 'typeorm'
@@ -3322,149 +3319,14 @@ export class StudentOnbService {
 
   async updateLessonAttendance(
     updateLessonAttendanceDto: UpdateLessonAttendanceDto
-  ): Promise<StudentLesson> {
-    const studentLesson = await this.studentLessonRepository.findOne({
-      where: {
-        id: updateLessonAttendanceDto.studentLessonId,
-      },
-      relations: {
-        studentSchedule: {
-          studentLessons: true,
-        },
-        class: {
-          recurringFormat: true,
-          site: true,
-          institution: true,
-        },
-        course: true,
-        user: true,
-      },
-    })
-    if (!studentLesson) throw new ApiError(ErrorCode.CLASS_LESSON_NOT_FOUND)
-
-    if (studentLesson.attendance === AttendanceStatus.POSTPONE) {
-      throw new ApiError(ErrorCode.LESSON_UPDATE_NOT_AVAILABLE)
-    }
-
-    let userAlias = await this.userAliasesRepository.findFirstByUserIdAndInstitution(
-      studentLesson.institutionId,
-      studentLesson.userId
+  ): Promise<{ id: number; attendance: AttendanceStatus }> {
+    const { studentLessonId, attendance } = updateLessonAttendanceDto
+    const { affected } = await this.studentLessonRepository.update(
+      { id: studentLessonId },
+      { attendance }
     )
-    if (
-      studentLesson.attendance !== AttendanceStatus.NOT_ATTENDED &&
-      updateLessonAttendanceDto.attendance === AttendanceStatus.NOT_ATTENDED
-    ) {
-      if (userAlias) {
-        userAlias.assignableLessonCount = (userAlias.assignableLessonCount ?? 0) + 1
-        await this.userAliasesRepository.save(userAlias)
-      } else {
-        const user = await this.userRepository.findOneBy({ id: studentLesson.userId })
-        userAlias = await this.userAliasesRepository.findOrCreateByUserIdAndInstitution(
-          studentLesson.institutionId,
-          studentLesson.userId,
-          user?.firstName || 'Student'
-        )
-        userAlias.assignableLessonCount = 1
-        await this.userAliasesRepository.save(userAlias)
-      }
-    } else if (
-      studentLesson.attendance === AttendanceStatus.NOT_ATTENDED &&
-      updateLessonAttendanceDto.attendance !== AttendanceStatus.NOT_ATTENDED
-    ) {
-      if (userAlias) {
-        userAlias.assignableLessonCount = Math.max(0, (userAlias.assignableLessonCount ?? 0) - 1)
-        await this.userAliasesRepository.save(userAlias)
-      }
-    } else if (updateLessonAttendanceDto.attendance === AttendanceStatus.POSTPONE) {
-      const { class: classEntity, course, user } = studentLesson
-      const { recurringFormat, site, institution: school } = classEntity
-
-      const originalDateTime = `${studentLesson.startTime.toISOString()} ${studentLesson.endTime.toISOString()}`
-
-      // Get the last lesson in the current studentScheule first
-      const lastLesson = await this.studentLessonRepository.find({
-        where: {
-          studentScheduleId: studentLesson.studentScheduleId,
-        },
-        order: {
-          startTime: 'DESC',
-        },
-      })
-
-      let lessonStartTime = studentLesson.startTime
-      let lessonEndTime = studentLesson.endTime
-
-      if (lastLesson.length > 0) {
-        lessonStartTime = lastLesson[0].startTime
-        lessonEndTime = lastLesson[0].endTime
-      }
-
-      const { startDate, endDate } = await this.recurringSchedulesService.generateNextPostponeDate(
-        school.id,
-        recurringFormat,
-        lessonStartTime,
-        lessonEndTime
-      )
-
-      let classLesson = await this.classLessonRepository.findOne({
-        where: {
-          classId: studentLesson.classId,
-          courseId: studentLesson.courseId,
-          institutionId: studentLesson.institutionId,
-          startTime: MoreThanOrEqual(startDate),
-          endTime: LessThanOrEqual(endDate),
-        },
-      })
-
-      if (!classLesson) {
-        const classLessonDto = this.classLessonRepository.create({
-          classId: studentLesson.classId,
-          courseId: studentLesson.courseId,
-          institutionId: studentLesson.institutionId,
-          startTime: startDate,
-          endTime: endDate,
-          recurringScheduleId: studentLesson.classLesson?.recurringScheduleId,
-          lessonId: studentLesson.classLesson?.lessonId,
-        })
-        classLesson = await this.classLessonRepository.save(classLessonDto)
-      }
-
-      const newStudentLesson = await this.studentLessonRepository.create({
-        institutionId: studentLesson.institutionId,
-        classLessonId: classLesson.id,
-        courseId: studentLesson.courseId,
-        enrollCourseId: studentLesson.enrollCourseId,
-        studentScheduleId: studentLesson.studentScheduleId,
-        classId: studentLesson.classId,
-        userId: studentLesson.userId,
-        startTime: startDate,
-        endTime: endDate,
-        attendance: AttendanceStatus.PENDING,
-      })
-
-      await this.studentLessonRepository.save(newStudentLesson)
-      const newDateTime = `${startDate.toISOString()} ${endDate.toISOString()}`
-      await this.emailService.sendStudentPostponeEmail({
-        recipientUserId: user.id,
-        institutionId: school.id,
-        siteId: site.id,
-        schoolEmail: school.email,
-        schoolPhone: school.phone,
-        studentName: user.firstName,
-        studentEmail: user.email,
-        courseName: course.name,
-        originalDateTime: lessonDateToString(originalDateTime, site.timeZone.id),
-        newDateTime: lessonDateToString(newDateTime, site.timeZone.id),
-      })
-    }
-    await this.studentLessonRepository.update(
-      { id: updateLessonAttendanceDto.studentLessonId },
-      { attendance: updateLessonAttendanceDto.attendance }
-    )
-    const res = await this.studentLessonRepository.findOneBy({
-      id: updateLessonAttendanceDto.studentLessonId,
-    })
-    return res
+    if (!affected) throw new ApiError(ErrorCode.CLASS_LESSON_NOT_FOUND)
+    return { id: studentLessonId, attendance }
   }
 
   async recordLogRescheduleLesson({

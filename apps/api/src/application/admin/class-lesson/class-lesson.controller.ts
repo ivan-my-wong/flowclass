@@ -105,7 +105,7 @@ export class ClassLessonController {
   @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER, Role.INSTRUCTOR)
   @UseGuards(RolesGuard)
   async bulkUpdateSharedVideo(@Body() body: BulkUpdateSharedVideoDto) {
-    await this.classLessonService.bulkUpdateSharedVideo(body.classLessonIds, body.hasSharedVideo)
+    await this.classLessonService.bulkUpdateSharedVideo(body.classLessonIds, body.hasSharedVideo, body.studentLessonIds)
     return new ApiResult().success(null)
   }
 
