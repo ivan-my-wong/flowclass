@@ -4,10 +4,10 @@ import { RequireParam } from '@/models/enums/'
 
 export const getParamId = (req: Request, paramName): number => {
   const paramId =
-    req.body[paramName] ||
-    req.query[paramName] ||
-    req.headers[HEADER_PARAM[paramName]] ||
-    req.params[paramName]
+    req.body?.[paramName] ||
+    req.query?.[paramName] ||
+    req.headers?.[HEADER_PARAM[paramName]] ||
+    req.params?.[paramName]
 
   const result = parseInt(paramId)
 
