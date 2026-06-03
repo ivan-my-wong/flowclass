@@ -10,6 +10,7 @@ import { OpenAiConfig, OpenAiConfigSchema } from './openAi.config'
 import { SmtpConfig, smtpConfigSchema } from './smtp.config'
 import { StripeConfig, stripeConfigSchema } from './stripe.config'
 import { SwaggerConfig, swaggerConfigSchema } from './swagger.config'
+import { DivitConfig, divitConfigSchema } from './divit.config'
 
 export type TAppConfig = BaseConfig &
   DatabaseConfig &
@@ -18,6 +19,7 @@ export type TAppConfig = BaseConfig &
   MailConfig &
   SmtpConfig &
   StripeConfig &
+  DivitConfig &
   AwsConfig &
   OpenAiConfig &
   SwaggerConfig
@@ -30,6 +32,7 @@ export const configValidationSchema = Joi.object()
   .concat(mailConfigSchema)
   .concat(smtpConfigSchema)
   .concat(stripeConfigSchema)
+  .concat(divitConfigSchema)
   .concat(awsConfigSchema)
   .concat(OpenAiConfigSchema)
   .concat(swaggerConfigSchema)

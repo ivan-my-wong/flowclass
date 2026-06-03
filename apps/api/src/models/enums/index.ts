@@ -147,6 +147,7 @@ export enum STRIPE_CURRENCY {
 export enum PaymentMethod {
   PAY_LATER = 'PAY_LATER',
   PAY_NOW = 'PAY_NOW',
+  PAY_NOW_DIVIT = 'PAY_NOW_DIVIT',
   NOT_REQUIRED = 'NOT_REQUIRED',
 }
 

@@ -271,6 +271,11 @@ export type PaymentProofTableItem = {
   payLaterMethod?: {
     methodName: string
   }
+  divitOrder?: {
+    id: number
+    divitOrderId: string
+    environment: 'sandbox' | 'production'
+  } | null
   paymentEvidenceId: number | null
   paymentEvidence: PaymentEvidence
   paymentLink: string

@@ -38,12 +38,14 @@ import { ObjectStorageProvider } from '@/config/storage/object-storage.provider'
 import { SitesService } from '@/domain/service/sites.service'
 
 import { StripeClientModule } from './stripe-client/stripe-client.module'
+import { DivitStudentModule } from './divit/divit-student.module'
 import { AzureOpenaiModule } from './azure-openai.module'
 import { DatabaseModule } from './database.module'
 
 @Module({
   imports: [
     StripeClientModule,
+    DivitStudentModule,
     ScheduleModule.forRoot(),
     PassportModule.register({
       defaultStrategy: 'jwt',
@@ -65,7 +67,7 @@ import { DatabaseModule } from './database.module'
       {
         path: 'student',
         module: StudentModule,
-        children: [],
+        children: [DivitStudentModule],
       },
     ]),
     HttpModule,

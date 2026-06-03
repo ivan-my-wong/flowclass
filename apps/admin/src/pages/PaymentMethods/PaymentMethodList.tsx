@@ -12,6 +12,7 @@ import ContentLayout from '@/layouts/ContentLayout'
 
 import PaymentMethodItem from './PaymentMethodItem'
 import StripePaymentSection from './StripePaymentSection'
+import DivitSettingsSection from '../Divit/DivitSettingsSection'
 
 const PaymentSettingsPage = (): React.ReactElement => {
   const { t } = useTranslation()
@@ -41,6 +42,7 @@ const PaymentSettingsPage = (): React.ReactElement => {
     >
       <div className="p-4 box-col-full">
         <StripePaymentSection />
+        <DivitSettingsSection />
         {data?.meta && !(isLoading || isRefetching) && (
           <PaginatedItems
             meta={data?.meta}

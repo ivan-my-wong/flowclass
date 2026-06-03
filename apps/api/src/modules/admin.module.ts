@@ -86,11 +86,13 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { join } from 'path'
 import { AzureOpenaiModule } from './azure-openai.module'
 import { StripeClientModule } from './stripe-client/stripe-client.module'
+import { DivitModule } from './divit/divit.module'
 import { StatisticsController } from '@/application/admin/statistics/statistics.controller'
 
 @Module({
   imports: [
     StripeClientModule,
+    DivitModule,
     ScheduleModule.forRoot(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '@/..', 'exports'),
@@ -106,6 +108,7 @@ import { StatisticsController } from '@/application/admin/statistics/statistics.
       {
         path: 'admin',
         module: AdminModule,
+        children: [DivitModule],
       },
     ]),
     JwtModule.registerAsync({
@@ -235,14 +238,24 @@ export class AdminModule implements NestModule {
       {
         path: '/stream/(.*)',
         method: RequestMethod.GET,
+      },
+      {
+        path: '/admin/divit/webhook',
+        method: RequestMethod.POST,
       }
     )
     consumer
       .apply(RawBodyMiddleware)
-      .forRoutes({
-        path: '/admin/stripe-connects/webhook',
-        method: RequestMethod.POST,
-      })
+      .forRoutes(
+        {
+          path: '/admin/stripe-connects/webhook',
+          method: RequestMethod.POST,
+        },
+        {
+          path: '/admin/divit/webhook',
+          method: RequestMethod.POST,
+        }
+      )
       .apply(JsonBodyMiddleware)
       .forRoutes('*')
 

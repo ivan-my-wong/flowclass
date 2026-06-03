@@ -1,9 +1,11 @@
 import { useState } from 'react'
 
+import { useQuery } from 'react-query'
 import { useTranslation } from 'react-i18next'
 import { LuPencil } from 'react-icons/lu'
 import { MdSave } from 'react-icons/md'
 
+import { getDivitConfig } from '@/api/divit'
 import { Button } from '@/components/ui/Button'
 import ModalDialog from '@/components/ui/ModalDialog'
 import {
@@ -17,6 +19,7 @@ import { PaymentMethodsEnum } from '@/constants/payment'
 import useConfirm from '@/hooks/useGlobalConfirm'
 import usePaymentEvidenceData from '@/hooks/usePaymentEvidenceData'
 import usePayoutData from '@/hooks/usePayoutData'
+import useSchoolData from '@/hooks/useSchoolData'
 import { AlertTypes } from '@/reducers/confirm.reducers'
 import { Invoice, PayLaterMethod } from '@/types/enrollCourse'
 import { StripeConnectStatus } from '@/types/stripe-connect'
@@ -42,6 +45,15 @@ const UpdatePayLeterMethod = (props: PaymentAmountCellProps): JSX.Element => {
     stripeDetail?.status === StripeConnectStatus.COMPLETE &&
     stripeDetail.enabled
 
+  const { schoolData } = useSchoolData()
+  const currentInstitutionId = schoolData.currentSchool?.id || 0
+  const { data: divitConfig } = useQuery(
+    ['divitConfig', currentInstitutionId],
+    () => getDivitConfig(currentInstitutionId),
+    { enabled: !!currentInstitutionId }
+  )
+  const showDivit = !!divitConfig?.enabled
+
   const [isOpen, setIsOpen] = useState(false)
   const [payMethod, setPayMethod] = useState<string>()
 
@@ -54,6 +66,9 @@ const UpdatePayLeterMethod = (props: PaymentAmountCellProps): JSX.Element => {
   if (data?.paymentMethod === PaymentMethodsEnum.PAY_NOW) {
     methodId = 'stripe'
     methodName = 'Stripe'
+  } else if (data?.paymentMethod === PaymentMethodsEnum.PAY_NOW_DIVIT) {
+    methodId = 'divit'
+    methodName = 'Divit'
   }
 
   return (
@@ -91,6 +106,7 @@ const UpdatePayLeterMethod = (props: PaymentAmountCellProps): JSX.Element => {
                   {t('student:paymentProof.stripe')}
                 </SelectItem>
               )}
+              {showDivit && <SelectItem value="divit">Divit</SelectItem>}
               {payoutMethods?.content
                 ?.filter(o => o.enabled)
                 ?.map(option => (
@@ -130,6 +146,16 @@ const UpdatePayLeterMethod = (props: PaymentAmountCellProps): JSX.Element => {
                       description: 'Pay Now with Stripe',
                       siteId: stripeDetail?.siteId ?? 0,
                       methodType: PaymentMethodsEnum.PAY_NOW,
+                    } as PayLaterMethod
+                  } else if (payMethod === 'divit') {
+                    method = {
+                      id: divitConfig?.id ?? 0,
+                      enabled: true,
+                      methodName: 'Divit',
+                      institutionId: divitConfig?.institutionId ?? 0,
+                      description: 'Pay Now with Divit',
+                      siteId: divitConfig?.siteId ?? 0,
+                      methodType: PaymentMethodsEnum.PAY_NOW_DIVIT,
                     } as PayLaterMethod
                   } else {
                     method = payoutMethods?.content?.find(

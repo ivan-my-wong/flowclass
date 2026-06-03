@@ -581,6 +581,7 @@ const UploadReceiptContent = ({
                 invoices={invoices}
                 uploadReceiptSuccess={uploadReceiptSuccess}
                 setUploadReceiptSuccess={setUploadReceiptSuccess}
+                invoiceToken={token}
               />
             </div>
           )}

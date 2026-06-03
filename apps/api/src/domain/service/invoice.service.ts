@@ -44,6 +44,7 @@ import { TransactionRepository } from '@/models/transaction.repository'
 import { UserAlias } from '@/models/user-aliases.entity'
 import { User } from '@/models/user.entity'
 import { UsersRepository } from '@/models/users.repository'
+import { DivitOrder } from '@/modules/divit/entities/divit-order.entity'
 
 import {
   DashboardParams,
@@ -824,7 +825,7 @@ export class InvoiceService {
       })
     }
 
-    return this.invoiceRepository.paginationWithTransform(
+    const pageDto = await this.invoiceRepository.paginationWithTransform(
       rest,
       Invoice,
       whereCondition,
@@ -834,6 +835,24 @@ export class InvoiceService {
       true,
       additionalFilterFn
     )
+
+    const divitInvoiceIds = pageDto.content
+      .filter((invoice) => invoice.paymentMethod === 'PAY_NOW_DIVIT')
+      .map((invoice) => invoice.id)
+
+    if (divitInvoiceIds.length > 0) {
+      const divitOrders = await this.invoiceRepository.manager.find(DivitOrder, {
+        where: { invoiceId: In(divitInvoiceIds) },
+      })
+      const divitOrdersMap = _.keyBy(divitOrders, 'invoiceId')
+      pageDto.content.forEach((invoice) => {
+        if (invoice.paymentMethod === 'PAY_NOW_DIVIT') {
+          invoice.divitOrder = divitOrdersMap[invoice.id] || null
+        }
+      })
+    }
+
+    return pageDto
   }
 
   async findSingleInvoiceByInvoiceId(invoiceId: number): Promise<Invoice> {
@@ -867,6 +886,12 @@ export class InvoiceService {
 
     if (!invoice) {
       throw new NotFoundException('CANNOT_FIND_INVOICE')
+    }
+
+    if (invoice.paymentMethod === 'PAY_NOW_DIVIT') {
+      invoice.divitOrder = await this.invoiceRepository.manager.findOne(DivitOrder, {
+        where: { invoiceId: invoice.id },
+      })
     }
 
     return invoice
