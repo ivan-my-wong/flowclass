@@ -45,6 +45,7 @@ const PaymentSubmission = ({
   invoices,
   uploadReceiptSuccess,
   setUploadReceiptSuccess,
+  invoiceToken,
 }: {
   school: School
   course: Course
@@ -52,6 +53,7 @@ const PaymentSubmission = ({
   invoices: InvoiceResponse[]
   uploadReceiptSuccess: boolean
   setUploadReceiptSuccess: (val: boolean) => void
+  invoiceToken?: string
 }): JSX.Element => {
   // enrollmentDetail is the information returned from the API
 
@@ -278,6 +280,7 @@ const PaymentSubmission = ({
           onChange={setPaymentMethod}
           enrollmentDetail={enrollmentDetail}
           setPayLaterMethod={setPaymentDetail}
+          invoiceToken={invoiceToken}
         />
       )}
       {!uploadReceiptSuccess &&

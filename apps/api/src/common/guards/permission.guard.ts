@@ -111,7 +111,9 @@ export class PermissionGuard implements CanActivate {
     const resourceSiteId = this.getResourceSiteId(resourceType, request)
 
     // Check if user belongs to this site
-    const userSiteIds = user.permissions.filter((p) => p.siteId).map((p) => p.siteId)
+    const userSiteIds = (user.permissions || [])
+      .filter((p) => p?.siteId)
+      .map((p) => p.siteId)
 
     return userSiteIds.includes(resourceSiteId)
   }
@@ -121,8 +123,8 @@ export class PermissionGuard implements CanActivate {
     const resourceInstitutionId = this.getResourceInstitutionId(resourceType, request)
 
     // Check if user belongs to this institution
-    const userInstitutionIds = user.permissions
-      .filter((p) => p.institutionId)
+    const userInstitutionIds = (user.permissions || [])
+      .filter((p) => p?.institutionId)
       .map((p) => p.institutionId)
 
     return userInstitutionIds.includes(resourceInstitutionId)

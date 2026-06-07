@@ -71,6 +71,11 @@ services:
       JWT_SECRET_STUDENT: local-jwt-student-secret
       STRIPE_SECRET_KEY: local-stripe-secret
       STRIPE_ENDPOINT_SECRET: local-stripe-webhook-secret
+      # Required for Divit payment encryption. Generate with: openssl rand -hex 32
+      DIVIT_ENCRYPTION_KEY: ""
+      # Required for testing Divit webhook callbacks. Must be a publicly reachable URL (e.g. an ngrok tunnel).
+      # Leave empty if not using Divit payments or it will use the default API_BASE_URL.
+      DIVIT_WEBHOOK_BASE_URL: ""
       SWAGGER_ENABLED: "true"
     ports:
       - "3100:3100"

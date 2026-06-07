@@ -3,6 +3,7 @@ import { StatusPaymentProof } from '@/types/paymentProof'
 export enum PaymentMethodsEnum {
   PAY_LATER = 'PAY_LATER',
   PAY_NOW = 'PAY_NOW',
+  PAY_NOW_DIVIT = 'PAY_NOW_DIVIT',
 }
 
 export enum PaymentEvidenceState {

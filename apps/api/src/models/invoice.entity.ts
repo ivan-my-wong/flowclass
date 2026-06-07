@@ -53,6 +53,8 @@ export type InvoiceSplit = {
 
 @Entity('invoices')
 export class Invoice extends BaseEntity {
+  divitOrder?: any
+
   @Index('IX_invoices_site_id')
   @Column({ name: 'site_id' })
   siteId: number

@@ -51,6 +51,31 @@ const PaymentMethodCell = ({ data }: PropTypes): JSX.Element => {
                   {t('student:paymentMethod.creditCard')}
                 </>
               )
+            case PaymentMethodsEnum.PAY_NOW_DIVIT: {
+              const divitOrderId = data.divitOrder?.divitOrderId
+              const environment = data.divitOrder?.environment || 'sandbox'
+              if (divitOrderId) {
+                const host = environment === 'production'
+                  ? 'https://admin.divit.com.hk'
+                  : 'https://sandbox-admin.divit.dev'
+                const linkUrl = `${host}/en/orders/pay-now/order-information/${divitOrderId}`
+                return (
+                  <a
+                    href={linkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:text-blue-600 hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <BsCreditCard2BackFill /> Divit
+                  </a>
+                )
+              }
+              return (
+                <>
+                  <BsCreditCard2BackFill /> Divit
+                </>
+              )
+            }
             default:
               return null
           }

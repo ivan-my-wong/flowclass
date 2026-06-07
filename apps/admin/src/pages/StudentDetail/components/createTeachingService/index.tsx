@@ -776,7 +776,7 @@ const CreateTeachingService = ({
   const defaultProps = {
     headerBackButton,
     handleCloseAndClearData,
-    onLessonChanged,
+    // onLessonChanged,
     currentDetail,
     form,
     isFreeLesson,

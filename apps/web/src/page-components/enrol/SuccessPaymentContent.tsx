@@ -308,8 +308,10 @@ const SuccessPaymentContent = ({
                       {' '}
                       {invoice.paymentMethod === 'PAY_NOW'
                         ? t('enrol:paymentSuccessSummary.onlinePayment')
-                        : invoice.payLaterMethod?.methodName ||
-                          t('enrol:paymentSuccessSummary.payLater')}
+                        : invoice.paymentMethod === 'PAY_NOW_DIVIT'
+                          ? 'Divit'
+                          : invoice.payLaterMethod?.methodName ||
+                            t('enrol:paymentSuccessSummary.payLater')}
                     </div>
                   </div>
                 </>

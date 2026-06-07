@@ -69,8 +69,8 @@ export class User extends BaseEntity {
   @Column({ name: 'status', enum: UserStatus, default: UserStatus.ACTIVE })
   status: UserStatus
 
-  @OneToMany(() => UserRole, (userRole) => userRole.user, { cascade: true, lazy: true })
-  userRoles: Promise<UserRole[]>
+  @OneToMany(() => UserRole, (userRole) => userRole.user, { cascade: true, eager: true })
+  userRoles: UserRole[]
 
   @OneToMany(() => EnrollCourse, (enrollCourse) => enrollCourse.student)
   enrollCourses: EnrollCourse[]
@@ -82,9 +82,10 @@ export class User extends BaseEntity {
   notificationRecord: NotificationRecord[]
 
   @AfterLoad()
-  async getPermissions(): Promise<void> {
-    const userRoles = await this.userRoles
-    this.permissions = permissionsOfUser(userRoles)
+  getPermissions(): void {
+    if (this.userRoles) {
+      this.permissions = permissionsOfUser(this.userRoles)
+    }
   }
   permissions: Permission[]
 

@@ -5,6 +5,7 @@ import useTranslation from 'next-translate/useTranslation'
 import { useQuery } from 'react-query'
 
 import { getPaymentDetail, getSchoolStripeConnection } from '@/api/enrolApi'
+import { getDivitConnection } from '@/api/divitApi'
 import { QUERY_KEY } from '@/constants/queryKey'
 import { useEnrollPaymentLogic } from '@/hooks/useEnrollPaymentLogic'
 import { Course, School } from '@/types'
@@ -20,6 +21,7 @@ import { InvoiceResponse } from '@/types/receipt'
 import CustomPaymentDetail from './CustomPaymentDetail'
 import PaymentMethodItem from './PaymentMethodItem'
 import StripeEmbeddedForm from './StripeEmbeddedForm'
+import DivitPaymentOption from '../DivitPayment/DivitPaymentOption'
 
 type PropsType = {
   school: School
@@ -29,6 +31,7 @@ type PropsType = {
   onChange: (value: PaymentMethods) => void
   enrollData: UpdateInvoicePaymentData
   setPayLaterMethod: React.Dispatch<SetStateAction<PaymentDetailType | undefined>>
+  invoiceToken?: string
 }
 const PaymentMethodsSelector = ({
   invoice,
@@ -38,13 +41,14 @@ const PaymentMethodsSelector = ({
   onChange,
   enrollData,
   setPayLaterMethod,
+  invoiceToken,
 }: PropsType): JSX.Element => {
   const { t } = useTranslation()
   const [selectedPayment, setSelectedPayment] = useState<string | undefined>(undefined)
 
   const [hasNoPayLaterMethod, setHasNoPayLaterMethod] = useState(false)
 
-  const { data: stripeConnectionData } = useQuery(
+  const { data: stripeConnectionData, isFetched: isStripeFetched } = useQuery(
     [QUERY_KEY.getSchoolStripeConnectionKey, school.id],
     () => getSchoolStripeConnection(school.id.toString()),
     {
@@ -52,18 +56,18 @@ const PaymentMethodsSelector = ({
     }
   )
 
-  const { data } = useQuery({
+  const { data: divitConnectionData, isFetched: isDivitFetched } = useQuery(
+    ['divitConnection', school.id],
+    () => getDivitConnection(school.id),
+    { enabled: !!school.id }
+  )
+
+  const isDivitEnabled = !!divitConnectionData?.enabled
+  const isDivitSelected = selectedPayment === 'DIVIT'
+
+  const { data, isFetched: isPaymentDetailFetched } = useQuery({
     queryKey: [QUERY_KEY.currentPaymentDetailSchoolKey, school.id],
     queryFn: () => getPaymentDetail(school.id),
-    onSuccess: (data: PaymentDetailType[]) => {
-      if (data.length > 0 && !isStripeValid) {
-        setSelectedPayment(data[0].id?.toString() as string)
-        setPayLaterMethod(data[0])
-        onChange(PaymentMethods.PAY_LATER)
-      } else {
-        setHasNoPayLaterMethod(true)
-      }
-    },
     enabled: !!school.id,
   })
 
@@ -101,13 +105,40 @@ const PaymentMethodsSelector = ({
   }, [selectedPayment, data])
 
   useEffect(() => {
-    // If stripe is valid, then set the default payment method to stripe
-    // If stripe is not valid, then set the default payment method to custom with the first payment method
-    if (isStripeValid && stripeConnectionData?.stripeAccountId) {
+    // Only set default selection once when selectedPayment is not yet initialized (undefined)
+    if (selectedPayment !== undefined) return
+
+    // Wait until all queries are fetched
+    if (!isDivitFetched || !isStripeFetched || !isPaymentDetailFetched) {
+      return
+    }
+
+    if (isDivitEnabled) {
+      setSelectedPayment('DIVIT')
+      setPayLaterMethod(undefined)
+      onChange(PaymentMethods.PAY_NOW)
+    } else if (isStripeValid && stripeConnectionData?.stripeAccountId) {
       setSelectedPayment(stripeConnectionData.stripeAccountId)
       onChange(PaymentMethods.PAY_NOW)
+    } else if (data && data.length > 0) {
+      setSelectedPayment(data[0].id?.toString() as string)
+      setPayLaterMethod(data[0])
+      onChange(PaymentMethods.PAY_LATER)
+    } else {
+      setHasNoPayLaterMethod(true)
     }
-  }, [stripeConnectionData, onChange, isStripeValid])
+  }, [
+    selectedPayment,
+    isDivitFetched,
+    isStripeFetched,
+    isPaymentDetailFetched,
+    isDivitEnabled,
+    stripeConnectionData,
+    isStripeValid,
+    data,
+    onChange,
+    setPayLaterMethod,
+  ])
 
   return (
     <div className="flex w-full flex-col items-start justify-start gap-y-4">
@@ -139,6 +170,22 @@ const PaymentMethodsSelector = ({
                 /> */}
               </PaymentMethodItem>
             )}
+            {isDivitEnabled && (
+              <PaymentMethodItem
+                title="FPS by divit"
+                selected={isDivitSelected}
+                onClick={() => {
+                  setSelectedPayment('DIVIT')
+                  setPayLaterMethod(undefined)
+                  onChange(PaymentMethods.PAY_NOW)
+                }}
+              >
+                <p className="w-full flex flex-row items-center justify-between h-6">
+                  fast and secure payment by divit
+                  <img src="http://static.divit.com.hk/fps/fps-by-divit.svg" alt="" />
+                </p>
+              </PaymentMethodItem>
+            )}
             {data?.map(item => (
               <PaymentMethodItem
                 title={item.methodName as string}
@@ -151,15 +198,26 @@ const PaymentMethodsSelector = ({
             ))}
           </ul>
           <div className="flex w-full lg:w-1/2">
-            {enrollData.paymentMethod === PaymentMethods.PAY_NOW && isStripeValid && (
-              <StripeEmbeddedForm
-                clientSecret={clientSecret}
-                stripeAccount={stripeConnectionData?.stripeAccountId}
-                fetchClientSecret={fetchClientSecret}
+            {isDivitSelected ? (
+              <DivitPaymentOption
+                invoiceId={invoice.id}
+                invoiceToken={invoiceToken ?? ''}
+                selected={isDivitSelected}
+                onClick={() => {}}
               />
-            )}
-            {enrollData.paymentMethod === PaymentMethods.PAY_LATER && customPaymentMethod && (
-              <CustomPaymentDetail data={customPaymentMethod} />
+            ) : (
+              <>
+                {enrollData.paymentMethod === PaymentMethods.PAY_NOW && isStripeValid && (
+                  <StripeEmbeddedForm
+                    clientSecret={clientSecret}
+                    stripeAccount={stripeConnectionData?.stripeAccountId}
+                    fetchClientSecret={fetchClientSecret}
+                  />
+                )}
+                {enrollData.paymentMethod === PaymentMethods.PAY_LATER && customPaymentMethod && (
+                  <CustomPaymentDetail data={customPaymentMethod} />
+                )}
+              </>
             )}
           </div>
         </div>
