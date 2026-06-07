@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { IRowNode } from 'ag-grid-community'
 import { AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { FaCheckCircle } from 'react-icons/fa'
@@ -16,7 +15,6 @@ import ApiError, { handleApiError } from '@/api/errors/apiError'
 import { deleteStudent } from '@/api/student'
 import LoadingButton from '@/components/Buttons/LoadingButton'
 import SelectedActions from '@/components/Cards/SelectedActions'
-import { FEATURE_FLAG } from '@/constants/featureFlags'
 import { QUERY_KEY } from '@/constants/queryKey'
 import useGlobalConfirm from '@/hooks/useGlobalConfirm'
 import { AlertTypes } from '@/reducers/confirm.reducers'
@@ -31,8 +29,12 @@ import { BulkAssignCourseType } from '@/types/studentAddTeachingService'
 
 import AddToInvoiceCampaignModal from './AddToInvoiceCampaignModal'
 
+export type SelectedStudentRow = {
+  data?: StudentEnrolmentRecord
+}
+
 type IProps = {
-  selectedRows: IRowNode<StudentEnrolmentRecord>[]
+  selectedRows: SelectedStudentRow[]
   studentData: StudentState
   setStudentData: (prev: StudentState) => void
   handleClearSelection: () => void
@@ -74,13 +76,6 @@ const SelectionActionBulk = (params: IProps): JSX.Element => {
     },
   })
 
-  const isBulkAssignCourseDisabled = useMemo(() => {
-    const MAX_BULK_ASSIGN_LIMIT = 50
-    if (selectedRows.length <= MAX_BULK_ASSIGN_LIMIT) return false
-    if (FEATURE_FLAG.CAN_ASSIGN_MORE_THAN_FIVE_COURSES) return false
-    return true
-  }, [selectedRows])
-
   const { confirmState, openConfirm, closeConfirm, setLoading } =
     useGlobalConfirm(isLoading)
 
@@ -98,7 +93,7 @@ const SelectionActionBulk = (params: IProps): JSX.Element => {
   return (
     <AnimatePresence>
       {selectedRows.length > 0 && (
-        <div className="box-row-full gap-2 px-4 mt-4">
+        <div key="selection-bar" className="box-row-full gap-2 px-4 mt-4">
           <SelectedActions
             countText={t('student:paymentProof.selectedRecords')}
             onClearSelection={handleClearSelection}
@@ -167,7 +162,6 @@ const SelectionActionBulk = (params: IProps): JSX.Element => {
                       },
                     })
                   }}
-                  disabled={isBulkAssignCourseDisabled}
                   isLoading={false}
                 >
                   {t('student:button.assignCourse')}
@@ -203,12 +197,6 @@ const SelectionActionBulk = (params: IProps): JSX.Element => {
                 >
                   {t('student:button.addToExistingInvoiceCampaign')}
                 </LoadingButton>
-
-                {isBulkAssignCourseDisabled && (
-                  <p className="text-sm max-w-64">
-                    {t('student:button.cannotAssignMoreThanFiveCourses')}
-                  </p>
-                )}
               </div>
             }
           />
@@ -216,6 +204,7 @@ const SelectionActionBulk = (params: IProps): JSX.Element => {
       )}
 
       <AddToInvoiceCampaignModal
+        key="campaign-modal"
         open={isAddToCampaignOpen}
         onClose={() => setIsAddToCampaignOpen(false)}
         studentIds={selectedStudentIds}

@@ -52,7 +52,6 @@ import {
   PaymentProofTableItem,
 } from '@/types/enrollCourse'
 import { School } from '@/types/school'
-import { getInitialChartDateRange } from '@/utils/chartjsSetup'
 import { generatePaymentLink } from '@/utils/generate-link.utils'
 import { getRowId } from '@/utils/misc'
 import {

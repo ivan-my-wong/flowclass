@@ -415,3 +415,28 @@ export const parseDateOverride = (override: DateOverride) => {
 export const generateNextHour = (): string => {
   return dayjs().add(1, 'hour').startOf('hour').toISOString()
 }
+
+/**
+ * Default lesson repeat format used to seed an empty `regularScheduleV2.periodsV2`
+ * entry. Shared by `RegularClassSchedulePeriods` (which auto-seeds on mount when
+ * the array is empty) and `Class/index.tsx`'s `setFormData` (which pre-seeds the
+ * same value so the form's `defaultValues` matches the post-seed values — this
+ * stops react-hook-form's `isDirty` from being `true` on mount, which would
+ * otherwise show the "*Unsaved changes" banner without any user input).
+ */
+export const buildDefaultRegularV2LessonRepeatFormat = () => ({
+  repeat: false,
+  every: 1,
+  times: 1,
+  unit: RepeatUnit.weeks,
+  monthDay: 1,
+})
+
+export const buildDefaultRegularV2Period = () => {
+  const startIso = generateNextHour()
+  return {
+    startTime: new Date(startIso),
+    endTime: new Date(dayjs(startIso).add(1, 'hour').toISOString()),
+    lessonRepeatFormat: buildDefaultRegularV2LessonRepeatFormat(),
+  }
+}

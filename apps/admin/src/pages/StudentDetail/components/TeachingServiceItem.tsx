@@ -111,17 +111,6 @@ const TeachingServiceItem = ({
 
   const wasDrawerOpen = useRef(false)
 
-  useEffect(() => {
-    const isOpen = !!studentData.tableDrawers?.isOpenAssignCourse
-    if (wasDrawerOpen.current && !isOpen) {
-      queryClient.invalidateQueries(QUERY_KEY.student.getStudentDetailKey)
-      queryClient.invalidateQueries(
-        QUERY_KEY.teachingService.getTeachingServiceKey
-      )
-    }
-    wasDrawerOpen.current = isOpen
-  }, [studentData.tableDrawers?.isOpenAssignCourse, queryClient])
-
   // const [open, setOpen] = useState(false)
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [serviceToBeDeleted, setServiceToBeDeleted] =
@@ -136,6 +125,17 @@ const TeachingServiceItem = ({
   >(new Map())
 
   const [studentData, setStudentData] = useRecoilState(studentState)
+
+  useEffect(() => {
+    const isOpen = !!studentData.tableDrawers?.isOpenAssignCourse
+    if (wasDrawerOpen.current && !isOpen) {
+      queryClient.invalidateQueries(QUERY_KEY.student.getStudentDetailKey)
+      queryClient.invalidateQueries(
+        QUERY_KEY.teachingService.getTeachingServiceKey
+      )
+    }
+    wasDrawerOpen.current = isOpen
+  }, [studentData.tableDrawers?.isOpenAssignCourse, queryClient])
 
   const { timeZone, getCurrentSiteTimeZoneDate, siteData } = useSiteData()
   const { schoolData } = useSchoolData()
@@ -672,7 +672,7 @@ const TeachingServiceItem = ({
                                         },
                                         currentStudent: student,
                                         tableDrawers: {
-                                          ...studentData.tableDrawers,
+                                          ...prev.tableDrawers,
                                           isOpenAssignCourse: true,
                                           assignCourseMode:
                                             AddTeachingServiceMode.changeLesson,
@@ -729,7 +729,7 @@ const TeachingServiceItem = ({
                         },
                         currentStudentLesson: sortedServiceLessons?.[0],
                         tableDrawers: {
-                          ...studentData.tableDrawers,
+                          ...prev.tableDrawers,
                           assignCourseMode: AddTeachingServiceMode.addLesson,
                           isOpenAssignCourse: true,
                         },

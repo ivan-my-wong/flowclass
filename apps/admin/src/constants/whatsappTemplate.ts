@@ -1,17 +1,31 @@
 import { CustomMessage, SupportedType } from '@/types/customMessage'
 import {
   CustomMessageType,
+  WhatsappTemplate,
   WhatsappTemplateCategory,
   WhatsappTemplateStatus,
 } from '@/types/whatsappTemplate'
 
 import { CustomMessageVariable } from './common'
 
-export const defaultWhatsappTemplate: CustomMessage = {
+// Default values for both the WhatsApp template form (`useForm<WhatsappTemplate>`)
+// and the custom-message form (`useForm<CustomMessage>`). Every field a form
+// `watch()`-es or `register()`-s must have an explicit non-`undefined` default
+// here — otherwise the inputs flip from uncontrolled → controlled on the first
+// `formData.reset(detail)`, and react-hook-form silently strips the missing
+// keys from the submit payload (causing 422s when the backend requires them).
+export const defaultWhatsappTemplate: CustomMessage & WhatsappTemplate = {
   name: '',
   content: '',
   repeaterFormat: '',
   type: SupportedType.CREATE_INVOICE,
+  isDefault: false,
+  language: '',
+  category: WhatsappTemplateCategory.UTILITY,
+  assignedTo: {},
+  variables: {},
+  emailNotification: false,
+  whatsappNotification: false,
 }
 
 export const customMessageOptions: CustomMessageType[] = [

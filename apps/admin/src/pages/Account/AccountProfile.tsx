@@ -32,12 +32,12 @@ const ProfilePage = (): JSX.Element => {
   const loadProfile = async (): Promise<void> => {
     const res = await getUserProfile()
     setProfile(res)
-    setEmail(res.email)
-    setFirstName(res.firstName)
-    setLastName(res.lastName)
-    setCompany(res.company != null ? res.company : '')
-    setPhone(res.phone != null ? res.phone : '')
-    setPosition(res.position != null ? res.position : '')
+    setEmail(res.email ?? '')
+    setFirstName(res.firstName ?? '')
+    setLastName(res.lastName ?? '')
+    setCompany(res.company ?? '')
+    setPhone(res.phone ?? '')
+    setPosition(res.position ?? '')
   }
 
   const updateProfile = async (): Promise<void> => {

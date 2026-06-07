@@ -261,7 +261,7 @@ const TeachingService = ({
                 currentStudent: student,
                 currentEnrolId: null,
                 tableDrawers: {
-                  ...studentData.tableDrawers,
+                  ...prev.tableDrawers,
                   isOpenAssignCourse: true,
                   assignCourseMode: AddTeachingServiceMode.addCourseDirectly,
                 },
@@ -303,7 +303,7 @@ const TeachingService = ({
           setStudentData(prev => ({
             ...prev,
             tableDrawers: {
-              ...studentData.tableDrawers,
+              ...prev.tableDrawers,
               isOpenAssignCourse: false,
             },
           }))

@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { BundleDiscount } from '@/types/bundleDiscounts'
 import { Classes, PeriodLessons } from '@/types/classes'
-import { ClassTypeEnum } from '@/types/course'
+import { ClassTypeEnum, PriceType } from '@/types/course'
 import { Invoice } from '@/types/enrollCourse'
 import { FormInvoiceSubscriptionClass } from '@/types/invoice-campaign'
 import { StudentEnrolmentRecord } from '@/types/student'
@@ -52,6 +52,21 @@ export const buildRecurringLessons = (
     classId: session.classItem?.classId,
     id: session.id,
   }))
+}
+
+/**
+ * Pro-rate a multi-lesson price option down to a per-lesson amount based on
+ * how many lessons the student actually picked. Used when a PriceOption is
+ * priced for a fixed pack (e.g. "10 lessons for $1000") but the invoice should
+ * charge per-lesson against the selection count.
+ */
+const calculateLessonPrice = (
+  lessonPrice: number,
+  numOfSelectedLessons: number,
+  numberOfLessons: number
+): number => {
+  if (!numberOfLessons) return lessonPrice
+  return (lessonPrice * numOfSelectedLessons) / numberOfLessons
 }
 
 export const composeClassesAndSessions = (

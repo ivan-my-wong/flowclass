@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
 import { FiUser } from 'react-icons/fi'
-import { LuTrash, LuUsers } from 'react-icons/lu'
+import { LuExternalLink } from 'react-icons/lu'
 import { RiCloseLargeFill } from 'react-icons/ri'
 import {
   useRecoilState,
@@ -26,14 +27,9 @@ import { InvoiceStudent } from '@/types/studentInvoice.type'
 import { cn } from '@/utils/cn'
 import { formatPhoneNumber } from '@/utils/misc'
 
-import RemoveStudentsConfirmation from './RemoveStudentsConfirmation'
-import StudentSelectionDialog from './StudentSelectionDialog'
-
 const StudentCardontainer = (): JSX.Element => {
   const { t } = useTranslation(['invoiceCampaign'])
-  const [isOpenDialogStudent, setOpenDialogStudent] = useState<boolean>(false)
-  const [isOpenConfirmRemoveStudents, setOpenConfirmRemoveStudents] =
-    useState(false)
+  const navigate = useNavigate()
   const { useGetAllStudents } = useStudentInvoice()
   const { data: studentList } = useGetAllStudents()
   const setStudentList = useSetRecoilState(studentListState)
@@ -45,14 +41,6 @@ const StudentCardontainer = (): JSX.Element => {
     currentActiveStudentState
   )
   const resetActiveStudent = useResetRecoilState(currentActiveStudentState)
-
-  const handleBulkStudentSelection = (selectedStudents: InvoiceStudent[]) => {
-    const filteredStudents = selectedStudents.filter(
-      item => !allStudents.some(s => s.id === item.id)
-    )
-    setAllStudents(prev => [...prev, ...filteredStudents])
-    setOpenDialogStudent(false)
-  }
 
   const setActiveInvoice = (student: InvoiceStudent) => {
     setCurrentActiveStudent(student)
@@ -85,24 +73,15 @@ const StudentCardontainer = (): JSX.Element => {
             {t('studentCard.selectStudent')}
           </div>
           {!isInvoiceExist && (
-            <div className="space-y-3 mt-3">
+            <div className="mt-3">
               <Button
                 className="w-full"
-                iconBefore={<LuUsers />}
-                onClick={() => setOpenDialogStudent(true)}
+                variant="primary-outline"
+                iconBefore={<LuExternalLink />}
+                onClick={() => navigate('/student-record')}
               >
-                {t('studentCard.studentSelection')}
+                {t('studentCard.goToStudentCrm') || 'Manage students in CRM'}
               </Button>
-              {allStudents.length > 0 && (
-                <Button
-                  className="w-full border-red-600 text-red-600"
-                  variant="outline"
-                  iconBefore={<LuTrash />}
-                  onClick={() => setOpenConfirmRemoveStudents(true)}
-                >
-                  {t('studentCard.removeAllStudents')}
-                </Button>
-              )}
             </div>
           )}
         </div>
@@ -156,17 +135,6 @@ const StudentCardontainer = (): JSX.Element => {
           )}
         </div>
       </div>
-      <StudentSelectionDialog
-        open={isOpenDialogStudent}
-        studentList={studentList || []}
-        onSelect={handleBulkStudentSelection}
-        onClose={() => setOpenDialogStudent(false)}
-      />
-      <RemoveStudentsConfirmation
-        open={isOpenConfirmRemoveStudents}
-        onClose={setOpenConfirmRemoveStudents}
-        onCancel={() => setOpenConfirmRemoveStudents(false)}
-      />
     </>
   )
 }

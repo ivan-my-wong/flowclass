@@ -59,11 +59,14 @@ const StudentSelector: React.FC<StudentSelectorProps> = ({
       placeholder="Select Student"
       options={options}
       isMulti
-      formatOptionLabel={(data: any) => (
-        <div className="flex items-center justify-between w-full h-full text-text country-option">
-          <span className="p-4">{data.label}</span>
-        </div>
-      )}
+      formatOptionLabel={(data: any, formatMeta) => {
+        if (formatMeta?.context === 'value') return String(data.label ?? '')
+        return (
+          <div className="flex items-center justify-between w-full h-full text-text country-option">
+            <span className="p-4">{data.label}</span>
+          </div>
+        )
+      }}
       styles={selectCustomStyles(width)}
       onChange={onChange}
       onInputChange={onInputChange}

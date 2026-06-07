@@ -175,16 +175,19 @@ const BoxWithToggleGroup = ({
           className="border-b border-b-border"
         >
           <h2>{title}</h2>
-          {actionButton && (
-            <IconButton
-              size="large"
-              color="primary"
-              plain
-              icon={actionButton}
-              onClick={handleActionButtonClick}
-              data-testid="toggle-group-add-btn"
-            />
-          )}
+          {actionButton &&
+            (handleActionButtonClick ? (
+              <IconButton
+                size="large"
+                color="primary"
+                plain
+                icon={actionButton}
+                onClick={handleActionButtonClick}
+                data-testid="toggle-group-add-btn"
+              />
+            ) : (
+              actionButton
+            ))}
         </Box>
 
         {/* Active Classes Section */}

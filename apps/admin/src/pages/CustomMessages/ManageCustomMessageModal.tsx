@@ -281,30 +281,30 @@ const ManageCustomMessage = (): React.ReactElement => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('customMessage:form.type')}</FormLabel>
-                  <FormControl>
-                    <Select
-                      {...field}
-                      onValueChange={field.onChange}
-                      defaultValue="all"
-                      disabled
-                    >
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    defaultValue="all"
+                    disabled
+                  >
+                    <FormControl>
                       <SelectTrigger
                         className="w-full"
-                        dataTestId="custom-message-type"
+                        data-testid="custom-message-type"
                       >
                         <SelectValue
                           placeholder={t('customMessage:form.typePlaceholder')}
                         />
                       </SelectTrigger>
-                      <SelectContent>
-                        {types?.map(d => (
-                          <SelectItem key={d} value={d}>
-                            {t(`customMessage:form.typeOptions.${d}`)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
+                    </FormControl>
+                    <SelectContent>
+                      {types?.map(d => (
+                        <SelectItem key={d} value={d}>
+                          {t(`customMessage:form.typeOptions.${d}`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FormItem>
               )}
             />

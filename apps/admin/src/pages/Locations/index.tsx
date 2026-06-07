@@ -121,6 +121,10 @@ const LocationsPage = () => {
         headerName: t('location:locations.address').toString(),
         field: 'address',
         cellClass: 'justify-start',
+        // address is an object (Coordinate/Address shape); cellRenderer handles
+        // display, so silence AG Grid's "object cell data type needs a value
+        // formatter" warning with a no-op valueFormatter.
+        valueFormatter: () => '',
         cellRenderer: ({ data }: ICellRendererParams<LocationRoom>) => {
           if (!data) return null
           return (

@@ -391,8 +391,7 @@ const menuItems: MenuItem[] = [
   {
     label: 'whatsappTemplate',
     icon: RiWhatsappLine,
-    path: '/custom-messages',
-    // availableSites: [318],
+    path: '/whatsapp-templates',
     permissions: [
       UserRole.MasterAdmin,
       UserRole.SiteAdmin,

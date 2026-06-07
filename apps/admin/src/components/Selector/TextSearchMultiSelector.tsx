@@ -71,18 +71,21 @@ const TextSearchMultiSelector: React.FC<SelectorProps> = ({
       placeholder={t('promotion:select')}
       isMulti
       options={options}
-      formatOptionLabel={data => (
-        <div className="flex items-center justify-between w-full h-full text-text">
-          <img
-            src={data.image}
-            alt="country"
-            style={{ width: '60px', height: '60px' }}
-          />
-          <span style={{ padding: '0px 50px' }}>{data.label}</span>
+      formatOptionLabel={(data, formatMeta) => {
+        if (formatMeta?.context === 'value') return String(data.label ?? '')
+        return (
+          <div className="flex items-center justify-between w-full h-full text-text">
+            <img
+              src={data.image}
+              alt="country"
+              style={{ width: '60px', height: '60px' }}
+            />
+            <span style={{ padding: '0px 50px' }}>{data.label}</span>
 
-          <span style={{ paddingRight: '10px' }}>{data.icon}</span>
-        </div>
-      )}
+            <span style={{ paddingRight: '10px' }}>{data.icon}</span>
+          </div>
+        )
+      }}
       styles={selectCustomStyles(width)}
       onChange={onChange}
     />

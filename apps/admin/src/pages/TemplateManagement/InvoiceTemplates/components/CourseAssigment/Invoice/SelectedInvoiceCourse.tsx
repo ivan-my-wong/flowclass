@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/Popover'
 import useSiteData from '@/hooks/useSiteData'
 import { invoiceSessionState } from '@/stores/studentInvoice.store'
-import { ClassTypeEnum } from '@/types/course'
+import { ClassTypeEnum, PriceType } from '@/types/course'
 import { InvoiceClassType } from '@/types/studentInvoice.type'
 import { formatCurrency } from '@/utils/currency'
 import dayjs from '@/utils/dayjs'

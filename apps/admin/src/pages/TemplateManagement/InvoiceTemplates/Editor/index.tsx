@@ -73,6 +73,7 @@ import CourseAssignment from './CourseAssignment'
 import { InvoiceEditorProvider } from './InvoiceEditorContext'
 import LessonDataLoader from './LessonDataLoader'
 import PackageDiscountAutoApplyAll from './PackageDiscountAutoApplyAll'
+import { generatePaymentLink } from '@/utils/generate-link.utils'
 
 const InvoiceEditor = (): JSX.Element => {
   const { t } = useTranslation()
@@ -605,7 +606,7 @@ const InvoiceEditor = (): JSX.Element => {
   const isCompleted =
     invoiceCampaign?.status === BulkSendDocumentStatus.COMPLETED
 
-  const [isWhatsappModalOpen, setIsWhatsappModalOpen] = useState(false)
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false)
 
   const whatsappRows = useMemo<PaymentProofTableItem[]>(() => {
     if (!isCompleted || !invoiceCampaign?.invoices) return []
@@ -845,7 +846,7 @@ const InvoiceEditor = (): JSX.Element => {
                 variant="outline"
                 iconBefore={<LuSend />}
                 disabled={whatsappRows.length === 0}
-                onClick={() => setIsWhatsappModalOpen(true)}
+                onClick={() => setIsWhatsAppModalOpen(true)}
               >
                 {t('editor.send.sendViaWhatsApp', { ns: 'invoiceCampaign' })}
               </Button>

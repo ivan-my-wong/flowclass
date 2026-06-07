@@ -237,20 +237,25 @@ const LabelSelector = React.forwardRef<LabelSelectorRef, ClassSelectorProps>(
         placeholder={placeHolder}
         isMulti={isMulti || undefined}
         options={options}
-        formatOptionLabel={(data: SelectItemValuesProps) => (
-          <div className="flex items-center justify-between w-full h-full text-text">
-            {data.image && (
-              <ImageAspect
-                s3="public"
-                ratio={1}
-                width="20%"
-                src={data.image}
-                alt="Logo image"
-              />
-            )}
-            <span className="p-4">{data.label}</span>
-          </div>
-        )}
+        formatOptionLabel={(data: SelectItemValuesProps, formatMeta) => {
+          // For chip Remove aria-label and screenreader announcement, return a
+          // plain string. JSX would be stringified to "[object Object]".
+          if (formatMeta?.context === 'value') return String(data.label ?? '')
+          return (
+            <div className="flex items-center justify-between w-full h-full text-text">
+              {data.image && (
+                <ImageAspect
+                  s3="public"
+                  ratio={1}
+                  width="20%"
+                  src={data.image}
+                  alt="Logo image"
+                />
+              )}
+              <span className="p-4">{data.label}</span>
+            </div>
+          )
+        }}
         styles={customStyles}
         onChange={onChange}
         isDisabled={isDisabled ?? false}

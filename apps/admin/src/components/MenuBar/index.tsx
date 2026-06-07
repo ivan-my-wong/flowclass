@@ -79,7 +79,7 @@ const MenuBar: React.FC = () => {
 
   if (isLoading)
     return (
-      <nav className="w-[15.5rem] bg-background-layer-2 border-r-2 border-background-layer-3 h-full overflow-y-auto pl-2 pr-2 pb-4 flex flex-col items-center justify-start sm:w-full sm:h-screen sm:pb-16">
+      <nav className="w-[15.5rem] bg-background-layer-2 border-r-2 border-background-layer-3 h-full overflow-y-auto pl-2 pr-2 pb-4 flex flex-col items-center justify-start sm:w-full sm:pb-16">
         {menuItems.map(item => (
           <SkeletonLoader
             key={item.label}
@@ -95,7 +95,7 @@ const MenuBar: React.FC = () => {
     )
 
   return (
-    <nav className="w-[15.5rem] bg-background-layer-2 border-r-2 border-background-layer-3 h-full overflow-y-auto pl-2 pr-2 pb-4 flex flex-col items-center justify-start sm:w-full sm:h-screen sm:pb-16">
+    <nav className="w-[15.5rem] bg-background-layer-2 border-r-2 border-background-layer-3 h-full overflow-y-auto pl-2 pr-2 pb-4 flex flex-col items-center justify-start sm:w-full sm:pb-16">
       {isMobile && (
         <div
           role="group"

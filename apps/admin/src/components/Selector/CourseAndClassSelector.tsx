@@ -142,18 +142,26 @@ const CourseAndClassSelector: React.FC<CourseSelectorItemProps> = ({
       isMulti={isMulti !== undefined ? (isMulti as any) : true}
       closeMenuOnSelect={false}
       formatGroupLabel={formatGroupLabel}
-      formatOptionLabel={(data: OptionProps) => (
-        <div className="flex items-center justify-between w-full h-full text-text">
-          <div className="flex items-center gap-2">
-            {data.type && (
-              <div className="flex items-center">
-                {getCourseIcon(data.type)}
-              </div>
-            )}
-            <span className="p-1">{data.label}</span>
+      getOptionLabel={(data: OptionProps) => data.label}
+      getOptionValue={(data: OptionProps) => String(data.value)}
+      formatOptionLabel={(data: OptionProps, { context }) => {
+        // In 'value' context (selected multi-value chip) return a plain string
+        // so react-select's MultiValueRemove aria-label resolves to
+        // "Remove <label>" instead of "Remove [object Object]".
+        if (context === 'value') return data.label
+        return (
+          <div className="flex items-center justify-between w-full h-full text-text">
+            <div className="flex items-center gap-2">
+              {data.type && (
+                <div className="flex items-center">
+                  {getCourseIcon(data.type)}
+                </div>
+              )}
+              <span className="p-1">{data.label}</span>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }}
       styles={selectCustomStyles(width)}
       onChange={(newValue: any) => onChange(newValue)}
       {...props}

@@ -195,6 +195,15 @@ const CouponCard: React.FC<CouponCardProps> = ({
     <Box
       data-testid="coupon-card"
       direction="column"
+      role="button"
+      tabIndex={0}
+      onClick={handleEditCoupon}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          handleEditCoupon()
+        }
+      }}
       className={cn(
         'relative rounded-lg p-4 overflow-hidden cursor-pointer',
         !isActive

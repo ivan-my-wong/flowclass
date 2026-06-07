@@ -36,7 +36,7 @@ const EditPaymentProof = (): JSX.Element => {
   const { currentSite } = useRecoilValue(siteState)
   const { schoolData } = useSchoolData()
   const [studentData, setStudentData] = useRecoilState(studentState)
-  const isOpenAssignCourse = studentData.tableDrawers.isOpenAssignCourse
+  const { isOpenAssignCourse } = studentData.tableDrawers
 
   const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false)
 

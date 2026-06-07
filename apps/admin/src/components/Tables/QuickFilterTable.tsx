@@ -155,6 +155,7 @@ const QuickFilterTable: React.FC<TableProps> = ({
       resizable: true,
       filter: true,
       minWidth: columnMinWidth,
+      cellClass: '!flex !items-center',
     }
   }, [columnMinWidth])
 
@@ -263,7 +264,7 @@ const QuickFilterTable: React.FC<TableProps> = ({
               value={quickFilterText}
               variants="border"
               ref={inputRef}
-              containerCSSProps={{ width: '100%' }}
+              containerClassName="w-full"
             />
           </div>
           {hasFilterSelection && filterSelector && handleReset && (

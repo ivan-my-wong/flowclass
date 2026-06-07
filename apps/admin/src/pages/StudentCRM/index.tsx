@@ -74,6 +74,8 @@ import {
   SingleStudentCrmRecordEnrolledClassesStudentSchedule,
   StudentEnrolmentRecord,
 } from '@/types/student'
+import { getInitialChartDateRange } from '@/utils/chartjsSetup'
+import { convertCustomFieldToValue } from '@/utils/convert'
 import { generateDataTestId } from '@/utils/data-testid.utils'
 import dayjs from '@/utils/dayjs'
 import { formatPhoneNumber, getRowId } from '@/utils/misc'
@@ -169,6 +171,8 @@ const StudentDatabase = (): JSX.Element => {
   const [filteredStudentList, setFilteredStudentList] = useState<
     StudentEnrolmentRecord[]
   >([])
+  const studentPage = 0
+  const studentPageSize = 50
 
   const importCSVModalHandle = useRef<ImportCSVModalHandle>(null)
   const handlePrev = () => {
@@ -285,9 +289,6 @@ const StudentDatabase = (): JSX.Element => {
   useEffect(() => {
     restoreCustomFieldColumnsAndOrder(fieldsCustom || [], setCustomFieldColumns)
   }, [fieldsCustom])
-
-  // Read column order from cookie
-  const columnOrderCookie = Cookies.get(COLUMN_ORDER_COOKIE_KEY)
 
   const getCustomFieldFilterStudentData = useFetchCustomFieldFilterStudentData(
     async (data: any) => {
@@ -500,8 +501,8 @@ const StudentDatabase = (): JSX.Element => {
   const selectedRows = useMemo(() => {
     const studentMap = new Map<number, { data: StudentEnrolmentRecord }>()
     selectedRowNodes.forEach(node => {
-      const row = node.data as TableRowType
-      if (row?.student) studentMap.set(row.student.id, { data: row.student })
+      const row = node.data as StudentEnrolmentRecord | undefined
+      if (row?.id != null) studentMap.set(row.id, { data: row })
     })
     return Array.from(studentMap.values())
   }, [selectedRowNodes])
@@ -515,8 +516,8 @@ const StudentDatabase = (): JSX.Element => {
     setSelectedRowNodes([])
   }, [])
 
-  const gridColumnDefs = useMemo((): ColDef[] => {
-    return [
+  const tableColumns = useMemo((): ColDef[] => {
+    const baseColumns: ColDef[] = [
       {
         colId: '_clusterKey',
         headerName: '_clusterKey',
@@ -546,7 +547,6 @@ const StudentDatabase = (): JSX.Element => {
         sortable: false,
         lockPosition: true,
         width: 80,
-
         cellRenderer: (data: ICellRendererParams) => {
           const studentData: StudentEnrolmentRecord = data?.data
 
@@ -631,10 +631,13 @@ const StudentDatabase = (): JSX.Element => {
             </div>
           )
         },
-        cellClass: '!flex !items-center',
       },
       {
-        colId: 'phone',
+        // NOTE: previously this column used colId: 'phone' which collided
+        // with the `field: 'phone'` column above, producing AG Grid duplicate-id
+        // warnings (`phone_1`, `phone_2`). Renamed to 'phoneFormatted' to
+        // resolve the collision while preserving both phone variants.
+        colId: 'phoneFormatted',
         headerName: (t('student:column.phone') as string) || '',
         width: 130,
         minWidth: 120,
@@ -651,7 +654,6 @@ const StudentDatabase = (): JSX.Element => {
           const row = params.data as StudentEnrolmentRecord
           return formatPhoneNumber(row.phone || row.user?.phone || '')
         },
-        cellClass: '!flex !items-center',
       },
       {
         colId: 'email',
@@ -679,7 +681,6 @@ const StudentDatabase = (): JSX.Element => {
             </div>
           )
         },
-        cellClass: '!flex !items-center',
       },
       {
         colId: 'createdByEmail',
@@ -701,7 +702,6 @@ const StudentDatabase = (): JSX.Element => {
           const label = emails.size > 0 ? [...emails].join(', ') : '—'
           return <span className="text-sm">{label}</span>
         },
-        cellClass: '!flex !items-center',
       },
       {
         colId: 'numClasses',
@@ -713,7 +713,6 @@ const StudentDatabase = (): JSX.Element => {
         valueGetter: (params: ValueGetterParams) =>
           (params.data as StudentEnrolmentRecord).id,
         spanRows: true,
-        cellClass: '!flex !items-center',
         cellRenderer: (params: ICellRendererParams) => {
           const row = params.data as StudentEnrolmentRecord
           const currentMonth = dayjs().format('YYYY-MM')
@@ -753,77 +752,88 @@ const StudentDatabase = (): JSX.Element => {
       },
     ]
 
-    const customFieldColumnsWithValue = customFieldColumns.map(col => {
-      // Extract fieldId from col.field (e.g., 'custom_123')
-      let fieldId: number | null = null
-      if (typeof col.field === 'string' && col.field.startsWith('custom_')) {
-        const maybeId = Number(col.field.replace('custom_', ''))
-        fieldId = Number.isNaN(maybeId) ? null : maybeId
+    /**
+     * One column per month in the selected payment-view range.
+     * For each student, find the invoice associated with an enrollCourse
+     * whose lessons end in that month (mirrors the `numClasses` column's
+     * convention). Renders payment status via StudentCRMInvoiceCell.
+     */
+    const monthColumnDefs: ColDef[] = monthColumns.map(month => ({
+      colId: `month-${month.key}`,
+      headerName: month.label,
+      width: 180,
+      minWidth: 160,
+      filter: false,
+      sortable: false,
+      cellRenderer: (params: ICellRendererParams) => {
+        const row = params.data as StudentEnrolmentRecord
+        const matchingEnrollCourse = (row.enrollCourses ?? []).find(
+          ec =>
+            ec.course &&
+            ec.studentSchedule?.some(schedule =>
+              schedule.studentLessons?.some(
+                lesson =>
+                  lesson.endTime &&
+                  dayjs(lesson.endTime).format('YYYY-MM') === month.key
+              )
+            )
+        )
+        const invoice =
+          matchingEnrollCourse?.invoice ??
+          matchingEnrollCourse?.invoices?.[0] ??
+          null
+        return <StudentCRMInvoiceCell invoice={invoice} />
+      },
+    }))
+
+    const customFieldColumnsWithValue: ColDef[] = customFieldColumns.map(
+      col => {
+        let fieldId: number | null = null
+        if (typeof col.field === 'string' && col.field.startsWith('custom_')) {
+          const maybeId = Number(col.field.replace('custom_', ''))
+          fieldId = Number.isNaN(maybeId) ? null : maybeId
+        }
+        return {
+          ...col,
+            cellRenderer: (data: ICellRendererParams) => {
+            const studentData: StudentEnrolmentRecord = data?.data
+            const form = studentData.studentForms?.find(
+              (f: { formFieldId: string }) =>
+                extractFieldId(f.formFieldId) === fieldId?.toString()
+            )
+            const value = form
+              ? convertCustomFieldToValue({
+                  fieldValue: form.formFieldValue,
+                  fieldType: form.formFieldType,
+                  t,
+                })
+              : '-'
+            return (
+              <div className="text-sm flex items-center px-2 py-4">{value}</div>
+            )
+          },
+          getQuickFilterText: (params: GetQuickFilterTextParams) => {
+            const data = params.data as StudentEnrolmentRecord
+            const form = data.studentForms?.find(
+              (f: { formFieldId: string; formFieldValue?: unknown }) =>
+                extractFieldId(f.formFieldId) === fieldId?.toString()
+            )
+            return form?.formFieldValue?.toString() ?? ''
+          },
+        }
       }
-      return {
-        ...col,
-        value: col.field,
-        cellRenderer: (data: ICellRendererParams) => {
-          const studentData: StudentEnrolmentRecord = data?.data
+    )
 
-          // Find the registrationForm for this fieldId
-          const allStudentForms = studentData.studentForms
-
-          const form = allStudentForms?.find(
-            (f: any) => extractFieldId(f.formFieldId) === fieldId?.toString()
-          )
-
-          const value = form
-            ? convertCustomFieldToValue({
-                fieldValue: form.formFieldValue,
-                fieldType: form.formFieldType,
-                t,
-              })
-            : '-'
-
-          return (
-            <div className="text-sm flex items-center px-2 py-4">{value}</div>
-          )
-        },
-        getQuickFilterText: (params: GetQuickFilterTextParams) => {
-          const data = params.data as StudentEnrolmentRecord
-          const { isMerged } = data as any
-          const { mergedStudents } = data as any
-
-          if (isMerged && mergedStudents) {
-            // For merged rows, get all custom field values
-            return mergedStudents
-              .map((student: StudentEnrolmentRecord) => {
-                const form = student.studentForms?.find(
-                  (f: any) =>
-                    extractFieldId(f.formFieldId) === fieldId?.toString()
-                )
-                return form?.formFieldValue?.toString() ?? ''
-              })
-              .join(' ')
-          }
-
-          const form = data.studentForms?.find(
-            (f: any) => extractFieldId(f.formFieldId) === fieldId?.toString()
-          )
-          return form?.formFieldValue?.toString() ?? ''
-        },
-      }
-    })
-
-    const allColumns = [...baseColumns, ...customFieldColumnsWithValue]
-
-    if (columnOrderCookie) {
-      try {
-        const order: string[] = JSON.parse(columnOrderCookie)
-
-        return rearrangeColumnsByOrder(allColumns, order)
-      } catch {
-        return allColumns
-      }
-    }
-    return allColumns
-  }, [t, filteredStudentList, customFieldColumns, columnOrderCookie])
+    return [...baseColumns, ...monthColumnDefs, ...customFieldColumnsWithValue]
+  }, [
+    t,
+    studentList,
+    monthColumns,
+    customFieldColumns,
+    navigate,
+    refetchAllStudents,
+    selectedTab,
+  ])
 
   // Handler for column moved event
   const onColumnMoved = useCallback(

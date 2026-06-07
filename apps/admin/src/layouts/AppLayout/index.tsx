@@ -10,11 +10,11 @@ const AppLayout = ({ children }: { children?: React.ReactNode }) => {
       <div className="bg-background border-b-2 border-background-layer-3 h-12 z-default sm:block sm:sticky sm:top-0">
         <AppHeader />
       </div>
-      <div className="flex max-h-[calc(100vh-3rem)] flex-1 sm:max-h-none">
-        <aside className="hidden sm:block shrink-0">
+      <div className="flex flex-1 min-h-0">
+        <aside className="hidden sm:block shrink-0 h-full">
           <MenuBar />
         </aside>
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto min-h-0">
           <Outlet />
           {children}
         </main>

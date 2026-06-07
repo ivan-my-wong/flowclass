@@ -33,9 +33,12 @@ const LessonMatrixPage = () => {
   dayjs.tz.setDefault(timeZone)
 
   const [classSelected, setClassSelected] = useState<string | undefined>()
+  // Default window: 1 month back through 1 month forward. Wider than just
+  // "this month" so users land on a non-empty view when their lessons
+  // straddle month boundaries (the most common case).
   const [chartDate, setChartDate] = useState<ChartDate>(() => ({
-    startDate: dayjs().startOf('month').toISOString(),
-    endDate: dayjs().endOf('month').toISOString(),
+    startDate: dayjs().subtract(1, 'month').startOf('month').toISOString(),
+    endDate: dayjs().add(1, 'month').endOf('month').toISOString(),
   }))
 
   const [students, setStudents] = useState<Student[]>([])

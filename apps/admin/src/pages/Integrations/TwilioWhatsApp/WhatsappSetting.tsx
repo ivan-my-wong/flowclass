@@ -271,8 +271,11 @@ const WhatsappSetting = (): JSX.Element => {
                     <FormLabel className="w-full font-bold">
                       {t(`setting:whatsappSetting.selectWhatsappTemplate`)}
                     </FormLabel>
-                    <FormControl>
-                      <Select {...field} onValueChange={field.onChange}>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <FormControl>
                         <SelectTrigger className="w-full">
                           <SelectValue
                             placeholder={t(
@@ -280,30 +283,29 @@ const WhatsappSetting = (): JSX.Element => {
                             )}
                           />
                         </SelectTrigger>
-                        <SelectContent>
-                          {whatsappTemplates?.content?.map(item => (
-                            <SelectItem
-                              key={item.id}
-                              value={item.id?.toString() || ''}
-                              className="flex items-center gap-2 justify-between"
+                      </FormControl>
+                      <SelectContent>
+                        {whatsappTemplates?.content?.map(item => (
+                          <SelectItem
+                            key={item.id}
+                            value={item.id?.toString() || ''}
+                            className="flex items-center gap-2 justify-between"
+                          >
+                            <Badge
+                              variant={
+                                item.status === WhatsappTemplateStatus.APPROVED
+                                  ? 'success'
+                                  : 'warning'
+                              }
+                              className="mr-2"
                             >
-                              <Badge
-                                variant={
-                                  item.status ===
-                                  WhatsappTemplateStatus.APPROVED
-                                    ? 'success'
-                                    : 'warning'
-                                }
-                                className="mr-2"
-                              >
-                                {item.status}
-                              </Badge>
-                              {t(item.name)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
+                              {item.status}
+                            </Badge>
+                            {t(item.name)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormItem>
                 )}
               />

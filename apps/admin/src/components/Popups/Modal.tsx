@@ -22,11 +22,12 @@ type DialogProps = {
   children?: React.ReactNode
 }
 
-export const StyledContent = ({
-  className,
-  ...props
-}: React.ComponentProps<typeof Content>) => (
+export const StyledContent = forwardRef<
+  React.ElementRef<typeof Content>,
+  React.ComponentPropsWithoutRef<typeof Content>
+>(({ className, ...props }, ref) => (
   <Content
+    ref={ref}
     className={cn(
       'flex flex-col fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
       'max-w-[90%] min-w-[50%] md:min-h-[60vh] md:min-w-[70%] max-h-[90vh] overflow-y-auto',
@@ -37,14 +38,20 @@ export const StyledContent = ({
     )}
     {...props}
   />
-)
+))
+StyledContent.displayName = 'StyledContent'
 
-export const StyledOverlay = (props: React.ComponentProps<typeof Overlay>) => (
+export const StyledOverlay = forwardRef<
+  React.ElementRef<typeof Overlay>,
+  React.ComponentPropsWithoutRef<typeof Overlay>
+>((props, ref) => (
   <Overlay
+    ref={ref}
     className="fixed inset-0 bg-overlay z-[1050] data-[state=open]:animate-dialog-overlay data-[state=closed]:animate-none"
     {...props}
   />
-)
+))
+StyledOverlay.displayName = 'StyledOverlay'
 
 const ModalTitle = ({
   className,

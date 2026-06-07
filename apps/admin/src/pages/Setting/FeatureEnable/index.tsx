@@ -8,7 +8,7 @@ import { MdOutlineMailOutline } from 'react-icons/md'
 import FullScreenLoading from '@/components/FullScreen/FullScreenLoading'
 import BoxWithToggleGroup from '@/components/ToggleGroup/BoxWithToggleGroup'
 import useCheckPermissionAndQuota from '@/hooks/useCheckPermissionAndQuota'
-import { FeatureEnableEnum } from '@/types/schoolSubscriptionPlan'
+import { FeatureEnableEnum } from '@/types/feature-enable'
 
 import CreditSystem from './CreditSystem'
 import EmailSetting from './EmailSetting'
@@ -27,6 +27,20 @@ const FeatureEnable = (): JSX.Element => {
   const { t } = useTranslation()
   const [currentSection, setCurrentSection] = useState(
     FeatureSections.EMAIL_NOTIFICATION
+  )
+  const { isLoadingPermissionAndQuota, checkPermission } =
+    useCheckPermissionAndQuota()
+  const isStudentPortalAllowed = checkPermission(
+    FeatureEnableEnum.STUDENT_PORTAL,
+    ''
+  )
+  const isTextVersionAllowed = checkPermission(
+    FeatureEnableEnum.TEXT_VERSION,
+    ''
+  )
+  const isCreditSystemAllowed = checkPermission(
+    FeatureEnableEnum.CREDIT_SYSTEM,
+    ''
   )
 
   return (

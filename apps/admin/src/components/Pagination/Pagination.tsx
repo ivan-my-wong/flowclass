@@ -40,6 +40,11 @@ const PaginatedItems = ({
 }: PaginatedItemsProps &
   React.ComponentPropsWithoutRef<'div'>): JSX.Element => {
   const pageCount = Math.ceil(meta.itemCount / (meta.num || 1))
+  // Clamp the active page into a valid range so we never feed react-paginate
+  // a `forcePage` greater than `pageCount - 1` (which logs an out-of-range
+  // warning) or a negative value (when there are 0 items).
+  const safeForcePage =
+    pageCount > 0 ? Math.min(Math.max(meta.page - 1, 0), pageCount - 1) : 0
 
   return (
     <Box direction="col" {...props}>
@@ -70,9 +75,8 @@ const PaginatedItems = ({
             }
             pageClassName="h-8 w-8 rounded-md flex justify-center items-center"
             activeClassName="bg-primary text-primary-foreground"
-            initialPage={meta.page - 1}
             pageRangeDisplayed={2}
-            forcePage={meta.page - 1}
+            forcePage={safeForcePage}
             pageCount={pageCount}
             previousLabel={
               <PaginationButton

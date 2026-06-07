@@ -1,12 +1,12 @@
 import { useCallback, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import { AnimatePresence, motion } from 'framer-motion'
 import JSZip from 'jszip'
 import { useTranslation } from 'react-i18next'
 import {
-  LuCheckCircle,
   LuDownload,
-  LuFileSignature,
+  LuPencil,
   LuSend,
   LuTrash2,
   LuX,
@@ -15,18 +15,10 @@ import {
 import { fetchInvoicePdf } from '@/api/invoiceCampaign'
 import Box from '@/components/ui/Box'
 import { Button } from '@/components/ui/Button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/DropdownMenu'
 import Text from '@/components/ui/Text'
-import { PaymentEvidenceState } from '@/constants/payment'
 import useGlobalConfirm from '@/hooks/useGlobalConfirm'
 import usePaymentEvidenceData from '@/hooks/usePaymentEvidenceData'
 import useSchoolData from '@/hooks/useSchoolData'
-import { theme } from '@/styles'
 import { PaymentEvidence, PaymentProofTableItem } from '@/types/enrollCourse'
 import { DeletePaymentPayload, SendPaymentActions } from '@/types/paymentProof'
 
@@ -37,24 +29,17 @@ type BulkActionComponentProps = {
   selectedCount: number
   selectedRows: PaymentProofTableItem[]
   onClearSelection: () => void
-  handleReject: () => void
-  handleApprove: () => void
   paymentEvidenceList: PaymentEvidence[]
-  isLoadingApprove: boolean
-  isLoadingReject: boolean
 }
 const BulkActionComponent = ({
   selectedCount,
   selectedRows,
   countText,
   onClearSelection,
-  handleApprove,
-  handleReject,
   paymentEvidenceList,
-  isLoadingReject,
-  isLoadingApprove,
 }: BulkActionComponentProps): JSX.Element => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { currentSchool } = useSchoolData()
   const { useDeletePaymentProof } = usePaymentEvidenceData()
   const { isLoading, mutateAsync: deletePaymentProof } = useDeletePaymentProof()
@@ -103,15 +88,6 @@ const BulkActionComponent = ({
     } as DeletePaymentPayload
   }, [selectedRows, paymentEvidenceList])
   const { setConfirm, closeConfirm } = useGlobalConfirm(isLoading)
-
-  const isActionDisabled = useMemo(() => {
-    return !selectedRows.some(node => {
-      const paymentEvidence = paymentEvidenceList.find(
-        payment => payment.invoiceId === node.id
-      )
-      return paymentEvidence?.status === PaymentEvidenceState.PROCESSING
-    })
-  }, [selectedRows, paymentEvidenceList])
 
   const onClickDelete = () => {
     setConfirm({
@@ -173,33 +149,20 @@ const BulkActionComponent = ({
     }
   }, [currentSchool?.id, selectedRows])
 
-  const updateStatusMenus = useMemo(() => {
-    return [
-      {
-        key: 'approve-payment-proof',
-        icon: (
-          <LuCheckCircle size={24} className="fill-green-500 stroke-white" />
-        ),
-        text: t('student:button.approve'),
-        onClick: () => handleApprove(),
-        disabled: isLoadingApprove || isActionDisabled,
-      },
-      {
-        key: 'reject-payment-proof',
-        icon: <LuX size={24} className="stroke-red-500" />,
-        text: t('student:button.reject'),
-        onClick: () => handleReject(),
-        disabled: isLoadingReject || isActionDisabled,
-      },
-    ]
-  }, [
-    isActionDisabled,
-    isLoadingApprove,
-    isLoadingReject,
-    t,
-    handleApprove,
-    handleReject,
-  ])
+  const editTarget = selectedRows.length === 1 ? selectedRows[0] : null
+  const editHref = useMemo(() => {
+    if (!editTarget) return ''
+    const params = new URLSearchParams({
+      id: String(editTarget.id),
+    })
+    if (editTarget.institutionId != null) {
+      params.set('institutionId', String(editTarget.institutionId))
+    }
+    if (editTarget.userAlias?.id != null) {
+      params.set('userAlias', String(editTarget.userAlias.id))
+    }
+    return `/application/edit?${params.toString()}`
+  }, [editTarget])
 
   return (
     <>
@@ -255,31 +218,23 @@ const BulkActionComponent = ({
                 >
                   {t('student:paymentProof.sendInvoice')}
                 </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      disabled={isActionDisabled}
-                      iconBefore={<LuFileSignature />}
-                      size="sm"
-                      variant="outline"
-                    >
-                      {t('student:paymentProof.updateReceiptStatus')}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56">
-                    {updateStatusMenus.map(menu => (
-                      <DropdownMenuItem
-                        key={menu.key}
-                        disabled={menu.disabled}
-                        className="flex gap-x-2 items-center cursor-pointer"
-                        onClick={menu.onClick}
-                      >
-                        {menu.icon}
-                        {menu.text}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Button
+                  iconBefore={<LuPencil />}
+                  variant="outline"
+                  size="sm"
+                  disabled={!editTarget}
+                  onClick={() => {
+                    if (editHref) navigate(editHref)
+                  }}
+                  title={
+                    editTarget
+                      ? undefined
+                      : t('student:paymentProof.editSelectOneRow') ||
+                        'Select one row to edit'
+                  }
+                >
+                  {t('common:action.edit')}
+                </Button>
 
                 <Button
                   variant="destructive"

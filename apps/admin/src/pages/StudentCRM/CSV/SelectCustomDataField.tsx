@@ -322,7 +322,7 @@ const SelectStudentInformationField = ({
                       >
                         <SelectTrigger
                           className="w-full"
-                          dataTestId="select-field-trigger"
+                          data-testid="select-field-trigger"
                         >
                           <SelectValue data-testid="select-field-value" />
                         </SelectTrigger>

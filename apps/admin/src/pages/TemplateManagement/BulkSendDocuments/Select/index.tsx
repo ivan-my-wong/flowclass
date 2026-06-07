@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
@@ -87,7 +87,7 @@ const CampaignDocumentDetails = () => {
       <div className="mb-4 w-full pl-4 pt-4">
         <div className="flex gap-2 text-sm font-medium items-center">
           {steps.map((step, index) => (
-            <>
+            <React.Fragment key={step.label}>
               {index > 0 && <FaAngleRight className="text-gray-400" />}
               <div
                 className={[
@@ -107,7 +107,7 @@ const CampaignDocumentDetails = () => {
                 </div>
                 {step.label}
               </div>
-            </>
+            </React.Fragment>
           ))}
         </div>
       </div>

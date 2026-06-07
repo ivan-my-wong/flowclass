@@ -37,8 +37,12 @@ export class RequestPayoutService {
 
     // Validate the details of payout method
     await this.validatePayoutMethodDetails(receivePayoutPreferenceDto)
+    const isUpdate = receivePayoutPreferenceDto.id != null
     const setPayoutPreference = await this.requestPayoutRepository.save(receivePayoutPreferenceDto)
-    const httpStatus = setPayoutPreference.createdAt ? HttpStatus.CREATED : HttpStatus.OK
+    // 201 only on insert; 200 on update. The previous check used `createdAt`,
+    // which TypeORM sets on both insert and update — so it always returned 201
+    // and the frontend toast/UX treated edits as new records.
+    const httpStatus = isUpdate ? HttpStatus.OK : HttpStatus.CREATED
     return {
       item: plainToInstance(PayoutPreferenceDto, setPayoutPreference),
       status: httpStatus,

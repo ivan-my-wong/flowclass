@@ -19,6 +19,7 @@ import { EnrolledClassProvider } from '../Enrolled/EnrolledClassContext'
 import EnrolledDialog from '../Enrolled/EnrolledDialog'
 
 import CourseItem from './CourseItem'
+import { FEATURE_FLAG } from '@/constants/featureFlags'
 
 const MAX_VISIBLE_COURSES = 5
 

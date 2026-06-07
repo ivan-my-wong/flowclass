@@ -44,6 +44,7 @@ import { convertToClassFormData } from '@/utils/convert-class.utils'
 import dayjs from '@/utils/dayjs'
 import { getCourseIcon } from '@/utils/options'
 import { generateDefaultPriceOptionName } from '@/utils/price-option-name-generator'
+import { buildDefaultRegularV2Period } from '@/utils/regular-class-schedule.utils'
 
 import TransitioningRegularClassPopup from './Dialogs/TransitioningRegularClassPopup'
 import BasicSetting from './BasicSetting'
@@ -239,6 +240,22 @@ const Class = (props: {
             formData.priceOptions = [...formData.priceOptions].sort(
               (a, b) => (a.numberOfLessons || 0) - (b.numberOfLessons || 0)
             )
+          }
+
+          // For regularV2 classes, pre-seed an initial period when the API
+          // returned none. The child `RegularClassSchedulePeriods` would
+          // otherwise auto-seed via `useFieldArray.replace` on mount, which
+          // marks the form dirty before any user input — causing the
+          // "*Unsaved changes" banner to appear immediately on page load.
+          if (
+            formData.type === ClassTypeEnum.regularV2 &&
+            (!formData.regularScheduleV2?.periodsV2 ||
+              formData.regularScheduleV2.periodsV2.length === 0)
+          ) {
+            formData.regularScheduleV2 = {
+              ...(formData.regularScheduleV2 ?? {}),
+              periodsV2: [buildDefaultRegularV2Period()],
+            } as typeof formData.regularScheduleV2
           }
           const firstPriceOption = formData.priceOptions?.[0]
           if (firstPriceOption) {

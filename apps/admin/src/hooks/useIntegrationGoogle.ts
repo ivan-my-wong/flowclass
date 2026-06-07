@@ -1031,7 +1031,10 @@ export const useIntegrationGoogle = (): UseGoogleIntegrationReturn => {
       [...QUERY_KEY.googleIntegration.driveQuotaKey, institutionId],
       () => driveQuota(institutionId),
       {
-        enabled: !!institutionId,
+        // Only fetch the quota when Drive integration is actually connected —
+        // otherwise the API returns 400 and we churn the network log.
+        enabled:
+          !!institutionId && !!driveIntegrationStatus.data?.isConnected,
         onError: error => handleApiError({ error, t }),
       }
     )

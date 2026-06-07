@@ -100,6 +100,7 @@ const ManageWhatsappTemplate = (): React.ReactElement => {
       variables,
       assignedTo: data.assignedTo ?? {},
       category: data.category ?? categoriesSupported[0].value,
+      isDefault: data.isDefault ?? false,
     }
 
     if (detail) {
@@ -308,24 +309,24 @@ const ManageWhatsappTemplate = (): React.ReactElement => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t('whatsappTemplate:form.language')}</FormLabel>
-                <FormControl>
-                  <Select {...field} onValueChange={field.onChange}>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
                     <SelectTrigger className="w-full">
                       <SelectValue
                         placeholder={t('whatsappTemplate:language.all')}
                       />
                     </SelectTrigger>
-                    <SelectContent>
-                      {supportedLanguages
-                        .sort((a, b) => a.country.localeCompare(b.country))
-                        .map(item => (
-                          <SelectItem key={item.code} value={item.code}>
-                            {item.country}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
+                  </FormControl>
+                  <SelectContent>
+                    {supportedLanguages
+                      .sort((a, b) => a.country.localeCompare(b.country))
+                      .map(item => (
+                        <SelectItem key={item.code} value={item.code}>
+                          {item.country}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
               </FormItem>
             )}
           />
@@ -335,22 +336,22 @@ const ManageWhatsappTemplate = (): React.ReactElement => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t('whatsappTemplate:form.category')}</FormLabel>
-                <FormControl>
-                  <Select {...field} onValueChange={field.onChange}>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
                     <SelectTrigger className="w-full">
                       <SelectValue
                         placeholder={t('whatsappTemplate:category.utility')}
                       />
                     </SelectTrigger>
-                    <SelectContent>
-                      {categoriesSupported.map(item => (
-                        <SelectItem key={item.name} value={item.value}>
-                          {t(item.name)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
+                  </FormControl>
+                  <SelectContent>
+                    {categoriesSupported.map(item => (
+                      <SelectItem key={item.name} value={item.value}>
+                        {t(item.name)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormItem>
             )}
           />

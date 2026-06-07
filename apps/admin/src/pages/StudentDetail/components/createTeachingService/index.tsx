@@ -809,14 +809,18 @@ const CreateTeachingService = ({
     isLoadingCourseOptions,
   }
 
+  const getDrawerMaxWidth = () => {
+    if (mode === AddTeachingServiceMode.addCourseDirectly) return '40%'
+    if (mode === AddTeachingServiceMode.changeLesson) return '500px'
+    return undefined
+  }
+
   if (open) {
     return (
       <Drawer
         open={open}
         onClose={handleCloseAndClearData}
-        maxWidth={
-          mode === AddTeachingServiceMode.addCourseDirectly ? '40%' : undefined
-        }
+        maxWidth={getDrawerMaxWidth()}
       >
         <div className="pb-4">
           {mode === AddTeachingServiceMode.addCourseDirectly && (

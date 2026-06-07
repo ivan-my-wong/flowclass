@@ -278,7 +278,6 @@ const DialogSendInvoice = (): JSX.Element => {
   const parent = useRecoilValue(currentActiveParentState)
   const { t } = useTranslation(['invoiceCampaign', 'common'])
   const [isOpen, setIsOpen] = useState(true)
-  const [currentStep, setCurrentStep] = useState(1)
 
   const isCombined = invoiceCampaign?.isCombined ?? false
   const isCompleted =
@@ -486,9 +485,9 @@ const DialogSendInvoice = (): JSX.Element => {
     useUpdateInvoiceCampaign(invoiceCampaign?.id, sendInvoiceAfterAction)
 
   const handleSubmit: SubmitHandler<InvoiceCampaignDto> = async data => {
-    // Guard: only allow submission from step 2 to prevent accidental triggers
-    // (e.g. Enter key in DatePicker firing the form's onSubmit)
-    if (currentStep !== 2) return
+    // Guard: don't submit unless both edit/preview and delivery are valid.
+    // This also blocks accidental Enter-key triggers from the DatePicker.
+    if (!isStep1Valid || !isStep2Valid) return
     const invoices = buildInvoicesPayload()
     if (invoices.length === 0) return
 
@@ -595,10 +594,6 @@ const DialogSendInvoice = (): JSX.Element => {
     form.handleSubmit(handleSubmit)()
   }
 
-  const step1Label = isCombined
-    ? t('invoiceCampaign:editor.send.steps.step1Title')
-    : t('invoiceCampaign:editor.send.steps.step1Preview')
-
   return (
     <ModalDialog
       title={t('invoiceCampaign:editor.send.title') as string}
@@ -619,8 +614,8 @@ const DialogSendInvoice = (): JSX.Element => {
           </Button>
           <Button
             type="button"
-            onClick={handleNext}
-            disabled={currentStep === 1 ? !isStep1Valid : !isStep2Valid}
+            onClick={handleSendClick}
+            disabled={!isStep1Valid || !isStep2Valid}
             loading={isCreating || isSending || isUpdating || isEditResending}
           >
             {getSendButtonLabel(
@@ -643,38 +638,16 @@ const DialogSendInvoice = (): JSX.Element => {
       isFixedHeader
       footerClassName="px-8"
     >
-      {/* Step indicator */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <div
-            className={`h-1 flex-1 rounded ${
-              currentStep >= 1 ? 'bg-blue-600' : 'bg-gray-200'
-            }`}
-          />
-          <div
-            className={`h-1 flex-1 rounded ${
-              currentStep >= 2 ? 'bg-blue-600' : 'bg-gray-200'
-            }`}
-          />
-        </div>
-        <p className="text-sm text-gray-600 text-center">
-          {currentStep === 1
-            ? step1Label
-            : t('invoiceCampaign:editor.send.steps.step2SendNotification')}
-        </p>
-      </div>
+      <div className="space-y-8">
+        {/* Edit (combined) or Preview (individual) */}
+        {isCombined ? <CombinedEditStep /> : <IndividualPreviewStep />}
 
-      {/* Step 1: Edit (combined) or Preview (individual) */}
-      {currentStep === 1 &&
-        (isCombined ? <CombinedEditStep /> : <IndividualPreviewStep />)}
-
-      {/* Step 2: Delivery + recipients — always identical */}
-      {currentStep === 2 && (
-        <div className="space-y-6">
+        {/* Delivery + recipients */}
+        <div className="space-y-6 pt-6 border-t border-gray-200">
           <InvoiceDeliveryMethods />
           <InvoiceRecipients />
         </div>
-      )}
+      </div>
     </ModalDialog>
   )
 }

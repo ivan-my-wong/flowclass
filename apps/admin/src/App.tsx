@@ -7,6 +7,7 @@ import { useQuery } from 'react-query'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { v4 as uuidv4 } from 'uuid'
 
+import defaultLogo from '@/assets/logos/flowclass_icon.png'
 import FullScreenLoading from '@/components/FullScreen/FullScreenLoading'
 import { LocalStorageKeys } from '@/constants/localStorageKeys'
 import useCourseData from '@/hooks/useCourseData'
@@ -265,7 +266,6 @@ const CampaignDocumentDetails = lazy(
   () => import('@/pages/TemplateManagement/BulkSendDocuments/Select')
 )
 
-const defaultLogo = '@/assets/logos/flowclass_icon.png'
 const themeRoot = document.body
 
 /**

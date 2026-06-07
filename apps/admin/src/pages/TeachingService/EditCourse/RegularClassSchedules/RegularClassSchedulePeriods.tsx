@@ -31,7 +31,10 @@ import {
   RepeatFormats,
 } from '@/types/classes'
 import dayjs from '@/utils/dayjs'
-import { generateNextHour } from '@/utils/regular-class-schedule.utils'
+import {
+  buildDefaultRegularV2LessonRepeatFormat,
+  buildDefaultRegularV2Period,
+} from '@/utils/regular-class-schedule.utils'
 
 export const RegularClassSchedulePeriods = (): JSX.Element => {
   const { t } = useTranslation(['teachingService'])
@@ -54,19 +57,11 @@ export const RegularClassSchedulePeriods = (): JSX.Element => {
     name: 'regularScheduleV2.periodsV2',
   })
 
-  const defaultLessonRepeatFormat = {
-    repeat: false,
-    every: 1,
-    times: 1,
-    unit: RepeatUnit.weeks,
-    monthDay: 1,
-  } as RepeatFormats
+  const defaultLessonRepeatFormat =
+    buildDefaultRegularV2LessonRepeatFormat() as RepeatFormats
 
-  const defaultPeriod: Partial<ClassRegularPeriodsV2Form> = {
-    startTime: new Date(generateNextHour()),
-    endTime: new Date(dayjs(generateNextHour()).add(1, 'hour').toISOString()),
-    lessonRepeatFormat: defaultLessonRepeatFormat,
-  }
+  const defaultPeriod: Partial<ClassRegularPeriodsV2Form> =
+    buildDefaultRegularV2Period()
 
   useEffect(() => {
     if (fields.length === 0) {

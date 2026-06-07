@@ -54,6 +54,28 @@ const EditorAction = (): JSX.Element => {
     availableLessonsByClassState
   )
 
+  /**
+   * Shared price-option fields injected into every new InvoiceClassType.
+   * `price` is normalised to a per-lesson value so downstream consumers can
+   * multiply by sessionLength uniformly, regardless of priceType.
+   */
+  const extractPriceOptionData = useMemo(() => {
+    let calculatedPrice = 0
+    if (selectedPrice) {
+      const { priceType: optionPriceType, amount, numberOfLessons } = selectedPrice
+      if (optionPriceType === PriceType.PER_LESSON) {
+        calculatedPrice = Number(amount)
+      } else {
+        calculatedPrice = Number(amount) / (numberOfLessons || 1)
+      }
+    }
+    return {
+      priceType: selectedPrice?.priceType ?? PriceType.PER_LESSON,
+      price: calculatedPrice,
+      priceOption: selectedPrice ?? undefined,
+    }
+  }, [selectedPrice])
+
   // Populate available lessons for package discount auto-apply
   const populateAvailableLessons = (classId: number) => {
     if (!regularV2Lessons?.length) return

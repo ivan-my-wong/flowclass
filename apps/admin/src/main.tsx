@@ -48,7 +48,12 @@ root.render(
     <RecoilRoot>
       <QueryClientProvider client={queryClient}>
         <DndProvider backend={HTML5Backend}>
-          <BrowserRouter>
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true,
+            }}
+          >
             <TourProvider {...tourProviderConfig}>
               <App />
             </TourProvider>
