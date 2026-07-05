@@ -695,15 +695,7 @@ export class InstitutionsService extends BaseService<Institution> {
         deletedAt: null,
       },
       relations: {
-        classes: {
-          recurringFormat: true,
-          studentSchedules: true,
-          classLessons: true,
-          recurringSchedules: true,
-          regularPeriods: {
-            lessons: true,
-          },
-        },
+        classes: true,
       },
       select: ['id', 'name', 'previewImageUrl', 'previewVideoUrl'],
     })

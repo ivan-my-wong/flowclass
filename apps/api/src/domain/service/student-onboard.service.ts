@@ -147,7 +147,9 @@ import {
   isTimeslotWithinPeriod,
   toISOStringFromExcelOrString,
 } from '@/utils/time.utils'
+import * as chardet from 'chardet'
 import * as fs from 'fs'
+import * as iconv from 'iconv-lite'
 import * as _ from 'lodash'
 import * as path from 'path'
 import {
@@ -3641,7 +3643,17 @@ export class StudentOnbService {
   }
 
   async getColumnCSV(file: Express.Multer.File): Promise<{ clientColHeaders: string[] }> {
-    const workbook = XLSX.read(file.buffer, { type: 'buffer' })
+    const fileBuffer = Buffer.isBuffer(file.buffer) ? file.buffer : Buffer.from(file.buffer)
+    const ext = path.extname(file.originalname || '').toLowerCase()
+    let workbook: XLSX.WorkBook
+    if (ext === '.csv') {
+      const encoding = (chardet.detect(fileBuffer) as string) || 'utf-8'
+      let csvString = iconv.decode(fileBuffer, encoding)
+      if (csvString.charCodeAt(0) === 0xfeff) csvString = csvString.slice(1)
+      workbook = XLSX.read(csvString, { type: 'string' })
+    } else {
+      workbook = XLSX.read(fileBuffer, { type: 'buffer' })
+    }
     const worksheet = workbook.Sheets[workbook.SheetNames[0]]
     const range = XLSX.utils.decode_range(worksheet['!ref'])
     const clientColHeaders = []
@@ -3700,7 +3712,16 @@ export class StudentOnbService {
     if (fileExtension !== '.csv' && fileExtension !== '.xlsx' && fileExtension !== '.xls') {
       throw new ApiError(ImportCSVError.INVALID_FILE_CSV)
     }
-    const workbook = XLSX.readFile(file.path)
+    const fileBuffer = fs.readFileSync(file.path)
+    let workbook: XLSX.WorkBook
+    if (fileExtension === '.csv') {
+      const encoding = (chardet.detect(fileBuffer) as string) || 'utf-8'
+      let csvString = iconv.decode(fileBuffer, encoding)
+      if (csvString.charCodeAt(0) === 0xfeff) csvString = csvString.slice(1)
+      workbook = XLSX.read(csvString, { type: 'string' })
+    } else {
+      workbook = XLSX.read(fileBuffer, { type: 'buffer' })
+    }
 
     if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
       throw new ApiError(ErrorCode.WORKSHEET_NOT_EXIST)
