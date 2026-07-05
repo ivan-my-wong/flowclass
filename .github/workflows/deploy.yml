@@ -57,6 +57,7 @@ jobs:
             
             # Write system configurations
             echo "PORT=5000" >> .env
+            echo "APP_PORT=5000" >> .env
             echo "NODE_ENV=production" >> .env
             echo "NEXT_PUBLIC_API_BASE_URL=https://v2.apiv3.flowclass.io" >> .env
             echo "NEXT_WEB_BASE_DOMAIN=v2.flowclass.io" >> .env
@@ -92,17 +93,17 @@ jobs:
             printf "FIREBASE_CLIENT_EMAIL=%s\n" "$FIREBASE_CLIENT_EMAIL" >> .env
             printf "FIREBASE_CLIENT_ID=%s\n" "$FIREBASE_CLIENT_ID" >> .env
             
-            echo "==> Installing dependencies..."
-            pnpm install
+            echo "==> Building production Docker images..."
+            docker compose -f docker-compose.prod.yml build
             
             echo "==> Running database migrations on Supabase..."
-            pnpm run migration:up:prod
+            docker compose -f docker-compose.prod.yml run --rm api pnpm migration:up:prod
             
-            echo "==> Building all projects recursively with old-space-size memory limit..."
-            export NODE_OPTIONS=--max-old-space-size=4096
-            pnpm build
+            echo "==> Starting production Docker containers..."
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
             
-            echo "==> Reloading PM2 services with updated environment variables..."
-            pm2 reload ecosystem.config.js --update-env
+            echo "==> Cleaning up unused Docker images..."
+            docker image prune -f
             
-            echo "==> Clean build and deployment completed successfully!"
+            echo "==> Clean Docker-based deployment completed successfully!"
+
