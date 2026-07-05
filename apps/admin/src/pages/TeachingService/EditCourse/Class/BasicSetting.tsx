@@ -27,6 +27,7 @@ import Form, {
 import { Input } from '@/components/ui/Inputs/Input'
 import { Separator } from '@/components/ui/Separator'
 import Text from '@/components/ui/Text'
+import { TextArea } from '@/components/ui/TextArea'
 import { INCOMPLETE_FEATURE_FLAG } from '@/constants/featureFlags'
 import useClassData from '@/hooks/useClassData'
 import useCourseData from '@/hooks/useCourseData'

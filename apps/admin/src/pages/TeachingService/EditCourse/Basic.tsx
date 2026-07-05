@@ -95,6 +95,8 @@ const Basic = ({
       courseRecoilState.currentCourse?.name !== currentCourse?.name ||
       courseRecoilState.currentCourse?.path !== currentCourse?.path ||
       originalCourseCode !== currentCourseCode ||
+      courseRecoilState.currentCourse?.shortDescription !==
+        currentCourse?.shortDescription ||
       isQrAttendanceChanged ||
       courseRecoilState.currentCourse?.previewImageUrl !==
         currentCourse?.previewImageUrl ||
@@ -132,6 +134,15 @@ const Basic = ({
     setCurrentCourse({
       ...(currentCourse as Course),
       courseCode: newCodeValue === '' ? undefined : newCodeValue,
+    })
+  }
+
+  const handleShortDescriptionChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.value
+    setValue('shortDescription', newValue as any)
+    setCurrentCourse({
+      ...(currentCourse as Course),
+      shortDescription: newValue || null,
     })
   }
 
@@ -278,6 +289,19 @@ const Basic = ({
                 required: t('login:errors.required') as string,
                 onChange: e => {
                   handleNameChange(e)
+                  setIsUnSavedChanges(true)
+                },
+              })}
+            />
+          </div>
+          <div className="box-col-full" id="course-short-description-container">
+            <TextInput
+              value={currentCourse?.shortDescription || ''}
+              id="shortDescription"
+              label={`${t('teachingService:basic.shortDescription')} (${t('teachingService:enrollment.enrollmentModal.optional')})`}
+              {...register('shortDescription' as any, {
+                onChange: e => {
+                  handleShortDescriptionChange(e)
                   setIsUnSavedChanges(true)
                 },
               })}

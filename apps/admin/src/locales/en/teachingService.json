@@ -420,6 +420,7 @@
     "duration": "Duration",
     "durationPerLesson": "Duration per lesson",
     "name": "Class name",
+    "description": "Class description",
     "id": "Class ID (optional)",
     "tuition": "Price per lesson",
     "quota": "Quota",

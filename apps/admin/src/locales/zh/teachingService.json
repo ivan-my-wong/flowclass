@@ -428,6 +428,7 @@
     "duration": "課堂時長",
     "durationPerLesson": "每堂課時長",
     "name": "課程名稱",
+    "description": "班級描述",
     "id": "課程 ID (可選)",
     "tuition": "每堂費用",
     "quota": "名額",

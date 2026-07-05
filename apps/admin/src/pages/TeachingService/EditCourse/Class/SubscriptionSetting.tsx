@@ -19,6 +19,7 @@ import Form, {
 } from '@/components/ui/Form'
 import { Input } from '@/components/ui/Inputs/Input'
 import Text from '@/components/ui/Text'
+import { TextArea } from '@/components/ui/TextArea'
 import { INCOMPLETE_FEATURE_FLAG } from '@/constants/featureFlags'
 import useCourseData from '@/hooks/useCourseData'
 import useSiteData from '@/hooks/useSiteData'
@@ -117,6 +118,24 @@ const SubscriptionSetting = ({
               </FormLabel>
               <FormControl>
                 <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          name="classDescription"
+          control={localForm.control}
+          render={({ field }) => (
+            <FormItem
+              id="classDescription"
+              className="flex gap-x-4 w-full items-start leading-5"
+            >
+              <FormLabel className="w-[45%] font-bold mt-2">
+                {t('teachingService:class.description')}
+              </FormLabel>
+              <FormControl>
+                <TextArea rows={4} {...field} value={field.value ?? ''} />
               </FormControl>
               <FormMessage />
             </FormItem>
