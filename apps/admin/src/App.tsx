@@ -159,16 +159,16 @@ const EditBundleDiscount = lazy(
   () => import('@/pages/Promotion/BundleDiscounts/EditBundleDiscount')
 )
 const PackageDiscountsPage = lazy(
-  () => import('@/pages/Promotion/PackageDiscounts/PackageDiscounts')
+  () => import('@/pages/Promotion/PackageDiscounts')
 )
 const PackageDiscountDetail = lazy(
-  () => import('@/pages/Promotion/PackageDiscounts/PackageDiscountDetail')
+  () => import('@/pages/Promotion/PackageDiscountDetail')
 )
 const CreatePackageDiscount = lazy(
-  () => import('@/pages/Promotion/PackageDiscounts/CreatePackageDiscount')
+  () => import('@/pages/Promotion/CreatePackageDiscount')
 )
 const EditPackageDiscount = lazy(
-  () => import('@/pages/Promotion/PackageDiscounts/EditPackageDiscount')
+  () => import('@/pages/Promotion/EditPackageDiscount')
 )
 const AdminPage = lazy(() => import('@/pages/Admin'))
 

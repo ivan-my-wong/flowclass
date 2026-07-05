@@ -15,7 +15,7 @@ import ContentLayout from '@/layouts/ContentLayout'
 import { AlertTypes } from '@/reducers/confirm.reducers'
 import { PackageDiscount } from '@/types/packageDiscounts'
 
-import PackageDiscountCard from '../components/PackageDiscountCard'
+import PackageDiscountCard from './components/PackageDiscountCard'
 
 const PackageDiscountRow = ({
   packageDiscount,

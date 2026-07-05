@@ -61,14 +61,11 @@ services:
       SMTP_SECURE: "false"
       SMTP_USER: ""
       SMTP_PASS: ""
-      MAIL_ENCRYPTION: tls
       MAIL_FROM_ADDRESS: no-reply@localhost
       MAIL_FROM_NAME: Flowclass OSS
       JWT_SECRET: local-jwt-secret
       JWT_EXPIRES_IN: 7d
-      JWT_REFRESH_SECRET: local-jwt-refresh-secret
       JWT_REFRESH_EXPIRES_IN: 30d
-      JWT_SECRET_STUDENT: local-jwt-student-secret
       STRIPE_SECRET_KEY: local-stripe-secret
       STRIPE_ENDPOINT_SECRET: local-stripe-webhook-secret
       # Required for Divit payment encryption. Generate with: openssl rand -hex 32

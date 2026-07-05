@@ -191,7 +191,7 @@ export class AuthService {
 
     try {
       payload = this.jwtService.verify(refreshToken, {
-        secret: process.env.JWT_REFRESH_SECRET,
+        secret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET || 'local-dev-jwt-secret',
       })
     } catch (e) {
       if ((e.message as string).includes('expired')) {
@@ -423,8 +423,8 @@ export class AuthService {
     }
 
     return this.jwtService.signAsync(jwtPayload, {
-      secret: process.env.JWT_REFRESH_SECRET, // unique refresh secret from environment vars
-      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN, // unique refresh expiration from environment vars
+      secret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET || 'local-dev-jwt-secret', // unique refresh secret from environment vars
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d', // unique refresh expiration from environment vars
     })
   }
 
