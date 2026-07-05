@@ -388,4 +388,7 @@ export class Course extends BaseEntity {
 
   @Column({ name: 'course_code', nullable: true })
   courseCode: string
+
+  @Column({ name: 'short_description', nullable: true })
+  shortDescription?: string
 }

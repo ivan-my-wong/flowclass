@@ -322,6 +322,9 @@ export class PaymentEvidenceService {
     await this.invoiceRepository.save({
       ...invoice,
       paymentState: PaymentStatus.SUBMITTED,
+      ...(createPaymentEvidenceDto.paymentDate
+        ? { paymentDate: new Date(createPaymentEvidenceDto.paymentDate) }
+        : {}),
     })
 
     const imageBuffer = fileKey ? await this.objectStorageProvider.getObjectBuffer(fileKey) : null

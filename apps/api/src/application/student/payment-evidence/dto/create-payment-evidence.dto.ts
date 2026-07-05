@@ -29,4 +29,11 @@ export class StudentCreatePaymentEvidenceDto {
   })
   @IsOptional()
   payLaterMethod: string
+
+  @ApiProperty({
+    example: '2024-01-15T00:00:00.000Z',
+  })
+  @IsOptional()
+  @IsString()
+  paymentDate?: string
 }

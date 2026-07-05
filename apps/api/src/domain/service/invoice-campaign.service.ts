@@ -90,7 +90,12 @@ import { PaymentEvidenceService } from './payment-evidence.service'
 import { UsersService } from './users.service'
 import { WhatsappWebService } from './whatsapp-web.service'
 import { SitesRepository } from '@/models/sites.repository'
-import parsePhoneNumberFromString from 'libphonenumber-js'
+import { parsePhoneNumber } from 'libphonenumber-js'
+import {
+  IBankTransferDetails,
+  IOtherPayoutMethodDetails,
+} from '@/application/admin/request-payout/dto/receive-Payout-Preference.dto'
+import { PayoutMethodRepository } from '@/models/payout-method.entity'
 
 export type InvoiceCampaign = DocumentCampaign & { invoices: Invoice[] }
 export const SupportedVariables = [
@@ -213,8 +218,7 @@ export class InvoiceCampaignService {
     private readonly whatsappWebService: WhatsappWebService,
     private readonly creditManagementService: CreditManagementService,
     private readonly sitesRepository: SitesRepository,
-    private readonly invoicePromotionUsedRepository: InvoicePromotionUsedRepository,
-    private readonly studentLessonRepository: StudentLessonRepository
+    private readonly payoutMethodRepository: PayoutMethodRepository
   ) {
     this.emailTransport = new NodemailerEmailTransport()
     this.jwtOption = {
@@ -2023,6 +2027,9 @@ export class InvoiceCampaignService {
     const site =
       invoice.site ??
       (invoice.siteId ? await this.sitesRepository.findOneById(invoice.siteId) : null)
+    const payoutMethods = await this.payoutMethodRepository.findAll({
+      where: { institutionId: invoice.institutionId, enabled: true },
+    })
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       try {
@@ -2140,14 +2147,53 @@ export class InvoiceCampaignService {
           .font('NotoSansTC')
           .text(invoice.payBy, 270, 215)
 
+        // Payment methods
+        if (payoutMethods.length > 0) {
+          let pmY = 240
+          doc.fontSize(9).fillColor('#888').font('NotoSansTC').text('Payment Methods', 270, pmY)
+          pmY += 14
+          for (const method of payoutMethods) {
+            const details = method.payoutMethodDetails as IBankTransferDetails &
+              IOtherPayoutMethodDetails
+            doc
+              .fontSize(9)
+              .fillColor('black')
+              .font('NotoSansTC')
+              .text(method.methodName, 270, pmY, { width: 280, continued: false })
+            pmY += 12
+            if (details?.bankName) {
+              doc.text(`Bank: ${details.bankName}`, 270, pmY, { width: 280 })
+              pmY += 12
+            }
+            if (details?.accountName) {
+              doc.text(`Name: ${details.accountName}`, 270, pmY, { width: 280 })
+              pmY += 12
+            }
+            if (details?.accountId) {
+              doc.text(`Account: ${details.accountId}`, 270, pmY, { width: 280 })
+              pmY += 12
+            }
+            if (details?.payoutUrl) {
+              doc.fillColor(blue).text(details.payoutUrl, 270, pmY, {
+                width: 280,
+                link: details.payoutUrl,
+                underline: true,
+              })
+              doc.fillColor('black')
+              pmY += 12
+            }
+            pmY += 4
+          }
+        }
+
         // Pay online link
         doc
           .fontSize(12)
           .fillColor(blue)
-          .text('Pay online', 40, 340, { link: paymentReceiptUploadLink, underline: true })
+          .text('Pay online', 40, 315, { link: paymentReceiptUploadLink, underline: true })
 
         // Table header
-        const tableHeaderTop = 420
+        const tableHeaderTop = 375
         const tableHeaderBottom = tableHeaderTop + 35
         doc
           .moveDown()

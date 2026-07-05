@@ -158,6 +158,11 @@ class CreateCourseBasicDTO extends CourseWithTypeDTO {
   courseCode: string
 
   @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  shortDescription?: string
+
+  @ApiPropertyOptional()
   @IsOptional()
   seoContent: SeoContent
 
