@@ -256,6 +256,7 @@
     "instructor": "導師",
     "location": "地點",
     "discountIncluded": "已包含折扣",
+    "paymentDateLabel": "付款日期 (選填)",
     "receiptStatus": {
       "waiting": "您的報名已經提交給教育者。請完成付款和上傳收據以確認報名。",
       "disapproved": "很抱歉，您之前上傳的收據未被課程提供者批准。請重新支付費用。",

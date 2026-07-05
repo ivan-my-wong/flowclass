@@ -185,6 +185,7 @@
     "total": "合計",
     "selectedPayLaterMethod": "選択した決済方法",
     "discountIncluded": "割引が含まれています",
+    "paymentDateLabel": "支払日 (任意)",
     "receiptStatus": {
       "waiting": "申し込みを受け付けました。お支払いを完了し、ご証明をアップロードして、席を確保されられます。",
       "disapproved": "前回アップロードした支払い証明は、講師に承認されませんでした。再度支払いをしてください。",

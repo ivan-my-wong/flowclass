@@ -119,12 +119,14 @@ export const uploadPaymentProof = async ({
   invoiceId,
   file,
   payLaterMethod,
+  paymentDate,
 }: uploadReceiptData): Promise<uploadReceiptResponse> => {
   const formData = new FormData()
   formData.append('enrollId', enrollId)
   formData.append('invoiceId', invoiceId.toString())
   formData.append('payLaterMethod', JSON.stringify(payLaterMethod))
   formData.append('file', file)
+  if (paymentDate) formData.append('paymentDate', paymentDate)
 
   const { data: result } = await customFetch<uploadReceiptResponse>(
     '/student/payment-evidence/token',

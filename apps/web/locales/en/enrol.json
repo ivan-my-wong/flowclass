@@ -256,6 +256,7 @@
     "discountIncluded": "Discount Included",
     "instructor": "Instructor",
     "location": "Location",
+    "paymentDateLabel": "Payment Date (Optional)",
     "receiptStatus": {
       "waiting": "Please select whether to pay by online payment or offline payment to complete the registration.",
       "disapproved": "The receipt you uploaded earlier is disapproved by the educator. Please pay again.",

@@ -124,6 +124,7 @@ export type uploadReceiptData = {
   invoiceId: number
   file: File
   payLaterMethod: PaymentDetailType
+  paymentDate?: string
 }
 
 export type uploadReceiptResponse = {

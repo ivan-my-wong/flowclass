@@ -7,6 +7,7 @@ import { useRecoilState, useRecoilValue } from 'recoil'
 
 import { clsx } from 'clsx'
 import useTranslation from 'next-translate/useTranslation'
+import DatePicker from 'react-datepicker'
 import { FaChevronRight } from 'react-icons/fa'
 import { useMutation } from 'react-query'
 import { toast } from 'sonner'
@@ -33,6 +34,8 @@ import { templateSectionBgColor } from '@/types/websiteTemplate'
 import { exportDomain } from '@/utils/domain'
 import { getStudentScheduleSingleMeta } from '@/utils/enroll-course.utils'
 import { validatePhone } from '@/utils/validate'
+
+import 'react-datepicker/dist/react-datepicker.css'
 
 const PaymentMethodsSelector = dynamic(() => import('./PaymentMethodsSelector'), { ssr: false })
 
@@ -82,6 +85,7 @@ const PaymentSubmission = ({
   // const initialPrice = invoiceData.originalFee
 
   const [proofImage, setProofImage] = useState<File>()
+  const [paymentDate, setPaymentDate] = useState<Date | null>(null)
   const currentTheme = useRecoilValue(currentWebsiteTheme)
 
   const multipleClassMetaData = useMemo<EnrolCourseMetaData[] | undefined>(() => {
@@ -205,6 +209,7 @@ const PaymentSubmission = ({
       invoiceId: invoice.id,
       file: proofImage,
       payLaterMethod: paymentDetail ?? {},
+      paymentDate: paymentDate ? paymentDate.toISOString() : undefined,
     }
 
     return mutateAsync(payload)
@@ -301,10 +306,25 @@ const PaymentSubmission = ({
                         onProcessingChange={setIsUploadProcessing}
                       />
                     </div>
+                    <div className="mt-2 w-48">
+                      <p className="mb-1 text-sm font-medium">
+                        {t('enrol:uploadReceipt.paymentDateLabel')}
+                      </p>
+                      <DatePicker
+                        selected={paymentDate}
+                        onChange={date => setPaymentDate(date)}
+                        dateFormat="yyyy/MM/dd"
+                        maxDate={new Date()}
+                        placeholderText="yyyy/mm/dd"
+                        className="w-48 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        wrapperClassName="w-48"
+                        isClearable
+                      />
+                    </div>
                   </div>
                 </div>
               )}
-              <div>
+              <div className="mt-8">
                 <Button
                   className={`w-full min-w-[6rem] ${
                     !!proofImage && 'transition hover:translate-x-1'

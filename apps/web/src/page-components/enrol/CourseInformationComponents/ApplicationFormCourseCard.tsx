@@ -207,14 +207,17 @@ const ApplicationFormCourseCard = ({
       <Heading className="text-xl" id="select-course">
         {_course.name}
       </Heading>
+      {_course.shortDescription && (
+        <Text className="whitespace-pre-line">{_course.shortDescription}</Text>
+      )}
 
       {_enrolForm?.selectedClassData.length !== 0 && (
         <>
           <Text className="font-bold">{t('enrol:stepTitles.pickedClass')}:</Text>
           {_enrolForm.selectedClassData.map((item, index) => (
-            <Text key={`selected-class-${item?.selectedClass?.id}`} id={`selectedClass-${index}`}>
-              {item?.selectedClass?.name}
-            </Text>
+            <div key={`selected-class-${item?.selectedClass?.id}`}>
+              <Text id={`selectedClass-${index}`}>{item?.selectedClass?.name}</Text>
+            </div>
           ))}
         </>
       )}
