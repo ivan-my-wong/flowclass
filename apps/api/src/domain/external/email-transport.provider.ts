@@ -150,10 +150,60 @@ export class NodemailerEmailTransport {
       return { statusCode: 400, body: { message: 'Invalid email params' } }
     }
 
-    const transporter = await this.resolveTransporter()
     const firstRecipient = params.to[0]
     const context = this.resolveTemplateContext(firstRecipient.email, params)
     const html = params.html || this.renderTemplate(params.templateId, context)
+
+    // Optional MailerSend Integration with fallback to Nodemailer/SMTP
+    if (process.env.MAILERSEND_API_KEY) {
+      try {
+        console.log('[Email] Sending email via MailerSend REST API...')
+        const axios = require('axios')
+        const payload = {
+          from: {
+            email: params.from.email || process.env.MAIL_FROM_ADDRESS || 'no-reply@flowclass.io',
+            name: params.from.name || process.env.MAIL_FROM_NAME || 'Flowclass Team',
+          },
+          to: params.to.map((r) => ({
+            email: r.email,
+            name: r.name || undefined,
+          })),
+          reply_to: params.replyTo ? {
+            email: params.replyTo.email,
+            name: params.replyTo.name || undefined,
+          } : undefined,
+          subject: params.subject,
+          html: html,
+          attachments: (params.attachments || []).map((attachment) => ({
+            content: attachment.content, // base64 encoded content
+            filename: attachment.filename,
+            disposition: attachment.disposition || 'attachment',
+            id: attachment.disposition === 'inline' ? attachment.filename : undefined,
+          })),
+        }
+
+        const response = await axios.post('https://api.mailersend.com/v1/email', payload, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.MAILERSEND_API_KEY}`,
+          },
+          timeout: 10000,
+        })
+
+        console.log('[Email] MailerSend API send successful. Msg ID:', response.headers['x-message-id'])
+        return {
+          statusCode: 202,
+          headers: {
+            'x-message-id': (response.headers['x-message-id'] as string) || '',
+          },
+          body: response.data,
+        }
+      } catch (err: any) {
+        console.error('[Email] MailerSend API failed, falling back to SMTP/Nodemailer:', err.response?.data || err.message)
+      }
+    }
+
+    const transporter = await this.resolveTransporter()
 
     const result: any = await transporter.sendMail({
       from: this.formatSender(params.from),

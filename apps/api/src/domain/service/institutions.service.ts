@@ -265,9 +265,35 @@ export class InstitutionsService extends BaseService<Institution> {
   }
 
   async findOneByUrl(domain: string, url?: string) {
-    const site =
-      (await this.sitesRepository.findOneBy({ url: domain })) ??
-      (await this.sitesRepository.findOne({ where: {}, order: { id: 'ASC' } }))
+    let site = await this.sitesRepository.findOneBy({ url: domain })
+
+    if (!site && domain.endsWith('.v2.flowclass.io')) {
+      const legacyDomain = domain.replace('.v2.flowclass.io', '.flowclass.io')
+      site = await this.sitesRepository.findOneBy({ url: legacyDomain })
+    }
+
+    if (!site && domain.endsWith('.flowclass.io')) {
+      const v2Domain = domain.replace('.flowclass.io', '.v2.flowclass.io')
+      site = await this.sitesRepository.findOneBy({ url: v2Domain })
+    }
+
+    if (!site) {
+      site = await this.sitesRepository.findOneBy({ customDomain: domain })
+    }
+
+    if (!site && domain.endsWith('.v2.flowclass.io')) {
+      const legacyDomain = domain.replace('.v2.flowclass.io', '.flowclass.io')
+      site = await this.sitesRepository.findOneBy({ customDomain: legacyDomain })
+    }
+
+    if (!site && domain.endsWith('.flowclass.io')) {
+      const v2Domain = domain.replace('.flowclass.io', '.v2.flowclass.io')
+      site = await this.sitesRepository.findOneBy({ customDomain: v2Domain })
+    }
+
+    if (!site) {
+      site = await this.sitesRepository.findOne({ where: {}, order: { id: 'ASC' } })
+    }
 
     if (!site) {
       throw new BadRequestException(SiteErrorMessage.SITE_NOT_FOUND)

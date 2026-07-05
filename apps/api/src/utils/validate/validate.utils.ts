@@ -1,8 +1,8 @@
 export const validateDomain = (s?: string): boolean => {
   if (s) {
-    const validDomain = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+$/
+    const validDomain = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9-]{2,})+$/
     const validSubdomain =
-      /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.staging)?(\.flowclass\.io|\.course\.site|\.flowclass\.site|\.educator\.site)$/
+      /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.staging)?(\.v2)?(\.flowclass\.io|\.course\.site|\.flowclass\.site|\.educator\.site)$/
 
     const healthCheckDomain = /^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
 
@@ -15,7 +15,7 @@ export const validateDomain = (s?: string): boolean => {
 export const isFlowclassDomain = (s?: string): boolean => {
   if (s) {
     const validSubdomain =
-      /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.staging)?(\.flowclass\.io|\.course\.site|\.flowclass\.site|\.educator\.site)$/
+      /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.staging)?(\.v2)?(\.flowclass\.io|\.course\.site|\.flowclass\.site|\.educator\.site)$/
 
     return validSubdomain.test(s)
   } else {

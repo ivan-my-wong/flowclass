@@ -18,12 +18,16 @@ import { LoggerMiddleware } from '@/common/middlewares/logger.middleware'
   imports: [
     ConfigModule.forRoot({
       // Pick the env file sequence (later files override earlier ones).
-      // Load from monorepo root. When running via pnpm dev from root, cwd is root.
+      // Load from monorepo root. Support both when run from monorepo root and from within workspace packages.
       envFilePath: [
         resolve(process.cwd(), `.env.${process.env.NODE_ENV || 'development'}.local`),
         resolve(process.cwd(), `.env.${process.env.NODE_ENV || 'development'}`),
         resolve(process.cwd(), '.env'),
         resolve(process.cwd(), '.env.local'),
+        resolve(process.cwd(), '..', '..', `.env.${process.env.NODE_ENV || 'development'}.local`),
+        resolve(process.cwd(), '..', '..', `.env.${process.env.NODE_ENV || 'development'}`),
+        resolve(process.cwd(), '..', '..', '.env'),
+        resolve(process.cwd(), '..', '..', '.env.local'),
       ],
       validationSchema: configValidationSchema,
       isGlobal: true,

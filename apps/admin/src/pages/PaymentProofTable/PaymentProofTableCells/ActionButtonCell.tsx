@@ -10,7 +10,7 @@ import {
   LuMessageCircle,
   LuPencil,
 } from 'react-icons/lu'
-import { useNavigate } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
 import { fetchInvoicePdf } from '@/api/invoiceCampaign'

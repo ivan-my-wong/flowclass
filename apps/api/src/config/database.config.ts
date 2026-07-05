@@ -7,6 +7,7 @@ export type DatabaseConfig = {
   DATABASE_NAME: string
   DATABASE_PORT: string
   DATABASE_SSL: boolean
+  DATABASE_URL?: string
 }
 
 export const databaseConfigSchema = Joi.object<DatabaseConfig>({
@@ -16,4 +17,5 @@ export const databaseConfigSchema = Joi.object<DatabaseConfig>({
   DATABASE_NAME: Joi.string().default('flowclass'),
   DATABASE_PORT: Joi.number().default(5432),
   DATABASE_SSL: Joi.boolean().default(false),
+  DATABASE_URL: Joi.string().optional(),
 }).required()

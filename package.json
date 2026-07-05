@@ -22,6 +22,9 @@
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "start": "bash scripts/start.sh",
+    "start:api": "pnpm --filter @flowclass/api start:prod",
+    "start:web": "pnpm --filter @flowclass/web start -- -p 3001",
+    "migration:up:prod": "pnpm --filter @flowclass/api migration:up:prod",
     "dev:web": "pnpm --filter @flowclass/web dev",
     "dev:api": "pnpm --filter @flowclass/api dev",
     "dev:admin": "pnpm --filter @flowclass/admin dev",

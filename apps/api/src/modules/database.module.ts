@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
 import * as fs from 'fs'
+import * as path from 'path'
 import { Connection, createConnection, DataSource } from 'typeorm'
 import { addTransactionalDataSource } from 'typeorm-transactional'
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions'
@@ -42,21 +43,32 @@ const getEnvironmentSpecificPoolConfig = (environment: string) => {
         const poolConfig = getEnvironmentSpecificPoolConfig(environment)
 
         const ssl = configService.get<boolean>('DATABASE_SSL')
+        const rawDatabaseUrl = configService.get<string>('DATABASE_URL')
+        const databaseUrl = rawDatabaseUrl ? rawDatabaseUrl.replace(/[?&]sslmode=[^&]+/g, '') : undefined
         const databaseHost = configService.get<string>('DATABASE_HOST')
         const databasePort = configService.get<number>('DATABASE_PORT')
         const databaseName = configService.get<string>('DATABASE_NAME')
         const databaseUser = configService.get<string>('DATABASE_USER')
         const databasePassword = configService.get<string>('DATABASE_PASSWORD')
-        console.log('Connected to database', databaseHost, databasePort, databaseName)
+
+        if (databaseUrl) {
+          console.log('Connected to database via DATABASE_URL')
+        } else {
+          console.log('Connected to database', databaseHost, databasePort, databaseName)
+        }
         console.log('Environment', environment)
 
         const options: TypeOrmModuleOptions & { cli: Record<string, string> } = {
           type: 'postgres',
-          host: databaseHost,
-          port: databasePort,
-          username: databaseUser,
-          password: databasePassword,
-          database: databaseName,
+          ...(databaseUrl
+            ? { url: databaseUrl }
+            : {
+                host: databaseHost,
+                port: databasePort,
+                username: databaseUser,
+                password: databasePassword,
+                database: databaseName,
+              }),
           synchronize: environment === 'development',
           useUTC: true,
           migrationsRun: false,
@@ -80,7 +92,6 @@ const getEnvironmentSpecificPoolConfig = (environment: string) => {
           },
           ssl: ssl
             ? {
-                ca: fs.readFileSync('src/config/certs/ap-east-1-bundle.pem').toString(),
                 rejectUnauthorized: false,
               }
             : false,
@@ -148,13 +159,19 @@ const getEnvironmentSpecificPoolConfig = (environment: string) => {
 })
 export class DatabaseModule {
   public async runMigrations(configService: ConfigService<TAppConfig>) {
+    const rawDatabaseUrl = configService.get<string>('DATABASE_URL')
+    const databaseUrl = rawDatabaseUrl ? rawDatabaseUrl.replace(/[?&]sslmode=[^&]+/g, '') : undefined
     const connection: Connection = await createConnection({
       type: 'postgres',
-      host: configService.get<string>('DATABASE_HOST'),
-      port: configService.get<number>('DATABASE_PORT'),
-      username: configService.get<string>('DATABASE_USER'),
-      password: configService.get<string>('DATABASE_PASSWORD'),
-      database: configService.get<string>('DATABASE_NAME'),
+      ...(databaseUrl
+        ? { url: databaseUrl }
+        : {
+            host: configService.get<string>('DATABASE_HOST'),
+            port: configService.get<number>('DATABASE_PORT'),
+            username: configService.get<string>('DATABASE_USER'),
+            password: configService.get<string>('DATABASE_PASSWORD'),
+            database: configService.get<string>('DATABASE_NAME'),
+          }),
     })
 
     console.log('Run migration', connection.migrations)

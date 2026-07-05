@@ -90,7 +90,7 @@ import { PaymentEvidenceService } from './payment-evidence.service'
 import { UsersService } from './users.service'
 import { WhatsappWebService } from './whatsapp-web.service'
 import { SitesRepository } from '@/models/sites.repository'
-import { parsePhoneNumber } from 'libphonenumber-js'
+import { parsePhoneNumber, parsePhoneNumberFromString } from 'libphonenumber-js'
 import {
   IBankTransferDetails,
   IOtherPayoutMethodDetails,
@@ -218,7 +218,9 @@ export class InvoiceCampaignService {
     private readonly whatsappWebService: WhatsappWebService,
     private readonly creditManagementService: CreditManagementService,
     private readonly sitesRepository: SitesRepository,
-    private readonly payoutMethodRepository: PayoutMethodRepository
+    private readonly payoutMethodRepository: PayoutMethodRepository,
+    private readonly invoicePromotionUsedRepository: InvoicePromotionUsedRepository,
+    private readonly studentLessonRepository: StudentLessonRepository
   ) {
     this.emailTransport = new NodemailerEmailTransport()
     this.jwtOption = {

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { IoMdAdd } from 'react-icons/io'
-import { useNavigate } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/Button'
 import ContentLayout from '@/layouts/ContentLayout'

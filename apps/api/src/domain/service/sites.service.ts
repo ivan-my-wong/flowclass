@@ -151,10 +151,16 @@ export class SitesService extends BaseService<Site> {
     let sitemapDomain = domain
     if (isFlowclassDomain(domain)) {
       // write a function to get the domain name from a domain with subdomain BUT you don't know how many . the domain has
+      const searchDomains = [domain]
+      if (domain.endsWith('.v2.flowclass.io')) {
+        searchDomains.push(domain.replace('.v2.flowclass.io', '.flowclass.io'))
+      } else if (domain.endsWith('.flowclass.io')) {
+        searchDomains.push(domain.replace('.flowclass.io', '.v2.flowclass.io'))
+      }
 
       sitesAndInstitutionsAndCourses = await this.sitesRepository
         .createQueryBuilder('sites')
-        .where('sites.url = :url', { url: domain })
+        .where('sites.url IN (:...urls)', { urls: searchDomains })
         .leftJoinAndSelect('sites.institutions', 'institutions')
         .leftJoinAndSelect('institutions.courses', 'courses')
         .getMany()
@@ -226,9 +232,22 @@ export class SitesService extends BaseService<Site> {
   }
 
   async findOneByDomain(domain: string): Promise<SiteDetailDto> {
-    const site =
-      (await this.sitesRepository.findOneBy({ url: domain })) ??
-      (await this.sitesRepository.findOne({ where: {}, order: { id: 'ASC' } }))
+    let site = await this.sitesRepository.findOneBy({ url: domain })
+
+    if (!site && domain.endsWith('.v2.flowclass.io')) {
+      const legacyDomain = domain.replace('.v2.flowclass.io', '.flowclass.io')
+      site = await this.sitesRepository.findOneBy({ url: legacyDomain })
+    }
+
+    if (!site && domain.endsWith('.flowclass.io')) {
+      const v2Domain = domain.replace('.flowclass.io', '.v2.flowclass.io')
+      site = await this.sitesRepository.findOneBy({ url: v2Domain })
+    }
+
+    if (!site) {
+      site = await this.sitesRepository.findOne({ where: {}, order: { id: 'ASC' } })
+    }
+
     if (!site) {
       throw new BadRequestException(SiteErrorMessage.SITE_NOT_FOUND)
     }
@@ -236,7 +255,18 @@ export class SitesService extends BaseService<Site> {
   }
 
   async findOneByCustomDomain(domain: string): Promise<SiteDetailDto> {
-    const site = await this.sitesRepository.findOneBy({ customDomain: domain })
+    let site = await this.sitesRepository.findOneBy({ customDomain: domain })
+
+    if (!site && domain.endsWith('.v2.flowclass.io')) {
+      const legacyDomain = domain.replace('.v2.flowclass.io', '.flowclass.io')
+      site = await this.sitesRepository.findOneBy({ customDomain: legacyDomain })
+    }
+
+    if (!site && domain.endsWith('.flowclass.io')) {
+      const v2Domain = domain.replace('.flowclass.io', '.v2.flowclass.io')
+      site = await this.sitesRepository.findOneBy({ customDomain: v2Domain })
+    }
+
     if (!site) {
       throw new BadRequestException(SiteErrorMessage.SITE_NOT_FOUND)
     }

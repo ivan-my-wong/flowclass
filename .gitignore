@@ -33,3 +33,6 @@ libs/*/node_modules/
 # Uploaded media (local dev and Docker bind mount)
 uploads/
 .playwright-mcp
+
+# SSH Automation
+*_run.exp
