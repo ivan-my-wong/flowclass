@@ -86,7 +86,7 @@ export class ObjectStorageProvider {
         const params = {
           Bucket: bucket,
           Key: s3Key,
-          Expires: parseInt(process.env.AWS_PRESIGNED_URL_EXPIRES || '3600', 10),
+          Expires: 3600,
         }
         return this.s3.getSignedUrl('getObject', params)
       }

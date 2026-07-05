@@ -12,13 +12,15 @@ jobs:
     steps:
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          ENV_FILE: ${{ secrets.ENV_FILE }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
-          password: ${{ secrets.SSH_PASSWORD }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
           script_stop: true
+          envs: ENV_FILE
           script: |
             echo "==> Accessing application directory..."
             cd /var/www/flowclass-open-source
@@ -28,6 +30,9 @@ jobs:
             
             echo "==> Resetting local branch to match origin/main exactly..."
             git reset --hard origin/main
+            
+            echo "==> Injecting live .env secrets from GitHub..."
+            printf "%s\n" "$ENV_FILE" > .env
             
             echo "==> Installing dependencies..."
             pnpm install
@@ -39,7 +44,7 @@ jobs:
             export NODE_OPTIONS=--max-old-space-size=4096
             pnpm build
             
-            echo "==> Reloading PM2 services..."
-            pm2 reload ecosystem.config.js
+            echo "==> Reloading PM2 services with updated environment variables..."
+            pm2 reload ecosystem.config.js --update-env
             
             echo "==> Clean build and deployment completed successfully!"
