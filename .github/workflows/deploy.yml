@@ -14,14 +14,33 @@ jobs:
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@v1.0.3
         env:
-          ENV_FILE: ${{ secrets.ENV_FILE }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
+          AWS_PRIVATE_BUCKET_NAME: ${{ secrets.AWS_PRIVATE_BUCKET_NAME }}
+          MAILERSEND_API_KEY: ${{ secrets.MAILERSEND_API_KEY }}
+          MAIL_FROM_ADDRESS: ${{ secrets.MAIL_FROM_ADDRESS }}
+          MAIL_FROM_NAME: ${{ secrets.MAIL_FROM_NAME }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_ENDPOINT_SECRET: ${{ secrets.STRIPE_ENDPOINT_SECRET }}
+          STRIPE_CONNECT_ENDPOINT_SECRET: ${{ secrets.STRIPE_CONNECT_ENDPOINT_SECRET }}
+          STRIPE_SUBSCRIPTION_SUCCESS_URL: ${{ secrets.STRIPE_SUBSCRIPTION_SUCCESS_URL }}
+          STRIPE_SUBSCRIPTION_CANCEL_URL: ${{ secrets.STRIPE_SUBSCRIPTION_CANCEL_URL }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
+          FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
+          FIREBASE_CLIENT_ID: ${{ secrets.FIREBASE_CLIENT_ID }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
           script_stop: true
-          envs: ENV_FILE
+          envs: DATABASE_URL,JWT_SECRET,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_REGION,AWS_BUCKET_NAME,AWS_PRIVATE_BUCKET_NAME,MAILERSEND_API_KEY,MAIL_FROM_ADDRESS,MAIL_FROM_NAME,STRIPE_SECRET_KEY,STRIPE_ENDPOINT_SECRET,STRIPE_CONNECT_ENDPOINT_SECRET,STRIPE_SUBSCRIPTION_SUCCESS_URL,STRIPE_SUBSCRIPTION_CANCEL_URL,NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,FIREBASE_PROJECT_ID,FIREBASE_PRIVATE_KEY,FIREBASE_CLIENT_EMAIL,FIREBASE_CLIENT_ID
           script: |
             echo "==> Accessing application directory..."
             cd /var/www/flowclass-open-source
@@ -33,7 +52,45 @@ jobs:
             git reset --hard origin/main
             
             echo "==> Injecting live .env secrets from GitHub..."
-            printf "%s\n" "$ENV_FILE" > .env
+            # Reset/truncate .env file first
+            > .env
+            
+            # Write system configurations
+            echo "PORT=5000" >> .env
+            echo "NODE_ENV=production" >> .env
+            echo "NEXT_PUBLIC_API_BASE_URL=https://v2.apiv3.flowclass.io" >> .env
+            echo "NEXT_WEB_BASE_DOMAIN=v2.flowclass.io" >> .env
+            
+            # Safely write each secret to .env using printf to preserve formats (especially multi-line values like private keys)
+            printf "DATABASE_URL=%s\n" "$DATABASE_URL" >> .env
+            printf "JWT_SECRET=%s\n" "$JWT_SECRET" >> .env
+            
+            printf "AWS_ACCESS_KEY_ID=%s\n" "$AWS_ACCESS_KEY_ID" >> .env
+            printf "AWS_SECRET_ACCESS_KEY=%s\n" "$AWS_SECRET_ACCESS_KEY" >> .env
+            printf "AWS_REGION=%s\n" "$AWS_REGION" >> .env
+            printf "AWS_BUCKET_NAME=%s\n" "$AWS_BUCKET_NAME" >> .env
+            printf "AWS_PRIVATE_BUCKET_NAME=%s\n" "$AWS_PRIVATE_BUCKET_NAME" >> .env
+            
+            printf "NEXT_PUBLIC_AWS_REGION=%s\n" "$AWS_REGION" >> .env
+            printf "NEXT_PUBLIC_AWS_BUCKET_NAME=%s\n" "$AWS_BUCKET_NAME" >> .env
+            printf "VITE_AWS_REGION=%s\n" "$AWS_REGION" >> .env
+            printf "VITE_AWS_BUCKET_NAME=%s\n" "$AWS_BUCKET_NAME" >> .env
+            
+            printf "MAILERSEND_API_KEY=%s\n" "$MAILERSEND_API_KEY" >> .env
+            printf "MAIL_FROM_ADDRESS=%s\n" "$MAIL_FROM_ADDRESS" >> .env
+            printf "MAIL_FROM_NAME=%s\n" "$MAIL_FROM_NAME" >> .env
+            
+            printf "STRIPE_SECRET_KEY=%s\n" "$STRIPE_SECRET_KEY" >> .env
+            printf "STRIPE_ENDPOINT_SECRET=%s\n" "$STRIPE_ENDPOINT_SECRET" >> .env
+            printf "STRIPE_CONNECT_ENDPOINT_SECRET=%s\n" "$STRIPE_CONNECT_ENDPOINT_SECRET" >> .env
+            printf "STRIPE_SUBSCRIPTION_SUCCESS_URL=%s\n" "$STRIPE_SUBSCRIPTION_SUCCESS_URL" >> .env
+            printf "STRIPE_SUBSCRIPTION_CANCEL_URL=%s\n" "$STRIPE_SUBSCRIPTION_CANCEL_URL" >> .env
+            printf "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=%s\n" "$NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY" >> .env
+            
+            printf "FIREBASE_PROJECT_ID=%s\n" "$FIREBASE_PROJECT_ID" >> .env
+            printf "FIREBASE_PRIVATE_KEY=%s\n" "$FIREBASE_PRIVATE_KEY" >> .env
+            printf "FIREBASE_CLIENT_EMAIL=%s\n" "$FIREBASE_CLIENT_EMAIL" >> .env
+            printf "FIREBASE_CLIENT_ID=%s\n" "$FIREBASE_CLIENT_ID" >> .env
             
             echo "==> Installing dependencies..."
             pnpm install
