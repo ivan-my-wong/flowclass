@@ -64,6 +64,7 @@ services:
       MAIL_FROM_ADDRESS: no-reply@localhost
       MAIL_FROM_NAME: Flowclass OSS
       JWT_SECRET: local-jwt-secret
+      JWT_SECRET_STUDENT: local-jwt-secret-student
       JWT_EXPIRES_IN: 7d
       JWT_REFRESH_EXPIRES_IN: 30d
       STRIPE_SECRET_KEY: local-stripe-secret

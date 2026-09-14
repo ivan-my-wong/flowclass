@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { IsEmail, IsNotEmpty, MaxLength, Validate } from 'class-validator'
 
 import { IsModeratelyStrongPassword } from '@/common/validators/moderately-strong-password'
+import { PhoneNumberRule } from '@/common/validators/phone-number.validator'
 
 export class StudentRegisterAccountDto {
   @ApiProperty({
@@ -19,6 +20,8 @@ export class StudentRegisterAccountDto {
   @ApiProperty({
     example: '85239428934',
   })
+  @IsNotEmpty()
+  @Validate(PhoneNumberRule)
   phone: string
 
   @ApiProperty({

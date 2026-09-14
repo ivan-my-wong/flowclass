@@ -592,6 +592,13 @@ export class StudentSubmissionService {
     const removedMaterial = await this.classMediaMaterialsRepository.findOne({
       where: {
         id: materialId,
+        studentSubmission: {
+          studentId,
+          institutionId,
+        },
+      },
+      relations: {
+        studentSubmission: true,
       },
     })
     if (!removedMaterial) {
@@ -608,6 +615,7 @@ export class StudentSubmissionService {
       where: {
         id: studentSubmissionId,
         studentId,
+        institutionId,
       },
       relations: {
         mediaMaterials: true,

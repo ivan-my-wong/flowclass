@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   ParseIntPipe,
@@ -23,7 +24,6 @@ import {
 } from '@nestjs/swagger'
 
 import { CurrentUser } from '@/common/decorators/current-user.decorator'
-import { Public } from '@/common/decorators/public.decorator'
 import { RequireParams } from '@/common/decorators/require-param.decorator'
 import { StudentAuthGuard } from '@/common/guards/student-auth.guard'
 import { ClassMaterialsService } from '@/domain/service/class-materials.service'
@@ -43,7 +43,6 @@ import { StudentMaterialsDto } from './dto/student-submission.dto'
   description: "This is because the token is expired or user haven't login yet",
 })
 @ApiTags('Student Submission')
-@Public()
 @Controller('submission')
 export class StudentSubmissionController {
   constructor(
@@ -63,7 +62,6 @@ export class StudentSubmissionController {
   async uploadStudentMaterials(
     @CurrentUser() user: User,
     @Query('institutionId', ParseIntPipe) institutionId: number,
-    @Body('studentId') studentId: string,
     @Body('studentLessonId') studentLessonId: string,
     @UploadedFile('files')
     files: {
@@ -71,18 +69,24 @@ export class StudentSubmissionController {
     }
   ) {
     const dto = {
-      studentId,
+      studentId: user.id.toString(),
       studentLessonId,
     } as StudentMaterialsDto
     return this.studentSubmissionService.uploadStudentMaterialsSync(institutionId, dto, files.files)
   }
 
+  @UseGuards(StudentAuthGuard)
+  @ApiBearerAuth('access-token')
   @Get(':jobId/status')
   @ApiOperation({
     summary: 'This api for student use to get student submission status',
   })
-  async getMaterialsStatus(@Param('jobId') jobId: string) {
-    return this.classMaterialsService.getMaterialsStatus(jobId)
+  async getMaterialsStatus(@CurrentUser() user: User, @Param('jobId') jobId: string) {
+    const progress = await this.classMaterialsService.getMaterialsStatus(jobId)
+    if (progress && progress.userId !== user.id) {
+      throw new ForbiddenException('Access denied')
+    }
+    return progress
   }
 
   @RequireParams(RequireParam.INSTITUTION_ID)
@@ -100,3 +104,4 @@ export class StudentSubmissionController {
     return this.studentSubmissionService.removeStudentMaterial(institutionId, materialId, user.id)
   }
 }
+
