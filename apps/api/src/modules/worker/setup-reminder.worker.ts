@@ -5,13 +5,16 @@ import { In } from 'typeorm'
 
 import { SupportedType } from '@/application/admin/custom-messages/dto/custom-message.dto'
 import { StudentData } from '@/application/student/enroll-courses/dto/create-enroll-course.dto'
+import { EmailService } from '@/domain/external/email.service'
 import { SettingSiteService } from '@/domain/service/setting-site.service'
 import { StudentNotifSettingService } from '@/domain/service/student-notif-setting.service'
+import { AutomationSettingsType } from '@/models/automation-settings.entity'
+import { AutomationSettingsRepository } from '@/models/automation-settings.repository'
 import { CoursesRepository } from '@/models/courses.repository'
 import { Invoice } from '@/models/invoice.entity'
 import { StudentLesson } from '@/models/student-lesson.entity'
+import { StudentMemoRepository } from '@/models/student-memo.repository'
 import { User } from '@/models/user.entity'
-import { UserAliasesRepository } from '@/models/user-aliases.repository'
 import { UsersRepository } from '@/models/users.repository'
 import { buildUploadReceiptLink } from '@/utils/payment-link.utils'
 import { shallow } from '@/utils/shallow.utils'
@@ -24,9 +27,11 @@ export class SetupReminderWorker {
   constructor(
     private readonly settingSiteService: SettingSiteService,
     private readonly courseRepository: CoursesRepository,
-    private readonly userAliasesRepository: UserAliasesRepository,
+    private readonly studentMemoRepository: StudentMemoRepository,
+    private readonly emailService: EmailService,
     private readonly userRepository: UsersRepository,
-    private readonly studentNotifSettingService: StudentNotifSettingService
+    private readonly studentNotifSettingService: StudentNotifSettingService,
+    private readonly automationSettingsRepository: AutomationSettingsRepository
   ) {}
   async buildPayloadSendingInvoiceMassage(invoice: Invoice) {
     const enrollCourse = invoice.enrollCourses.at(0)
@@ -42,6 +47,15 @@ export class SetupReminderWorker {
       siteUrl: institution.site?.url,
       coursePath: invoice.course?.path,
     })
+
+    const automationSetting = await this.automationSettingsRepository.findByType(
+      institution.id,
+      AutomationSettingsType.INVOICE_REMINDER
+    )
+
+    if (automationSetting?.settings.sendWhatsappAfterGenerateInvoice) {
+      return null
+    }
 
     const studentNotificationSetting = await this.studentNotifSettingService.getByStudentAndType(
       enrollCourse.userId,
@@ -122,8 +136,8 @@ export class SetupReminderWorker {
     // const location = addressObjectToString(institution.address)
     const userTimeZone = site.timeZone?.id || 'Asia/Hong_Kong'
 
-    const actualStartTime = item.startTime
-    const location = item.class?.locationRoom?.name || ''
+    const actualStartTime = item.changeStartTime ?? item.startTime
+    const location = item.class?.locationRoom?.address || ''
     const instructor = item.class?.instructor?.fullName || ''
     const hourDiffWithCreationOfInvoice = dayjs(actualStartTime).diff(currentTime, 'hours')
 
@@ -136,7 +150,22 @@ export class SetupReminderWorker {
     let contactName = enrollCourse.preferredName
     let contactPhone = enrollCourse.preferredPhone
 
-    const actualEndTime = item.endTime
+    const studentMemo = await this.studentMemoRepository.findOneBy({
+      userId: enrollCourse.userId,
+      institutionId: institution.id,
+    })
+
+    if (studentMemo) {
+      contactEmail = studentMemo.preferredEmail || contactEmail
+      contactName = studentMemo.preferredName || contactName
+      contactPhone = studentMemo.preferredPhone || contactPhone
+    }
+    const studentNotificationSetting = await this.studentNotifSettingService.getByStudentAndType(
+      studentMemo?.userId ?? enrollCourse.userId,
+      institution.id,
+      SupportedType.STUDENT_LESSON_REMINDER
+    )
+    const actualEndTime = item.changeEndTime ?? item.endTime
     const localStartTime = utcToZonedTime(actualStartTime, userTimeZone)
     const localEndTime = utcToZonedTime(actualEndTime, userTimeZone)
 
@@ -147,11 +176,6 @@ export class SetupReminderWorker {
       enrolId: enrollCourse.id.toString(),
       token: invoice.proofToken,
     })
-    const studentNotificationSetting = await this.studentNotifSettingService.getByStudentAndType(
-      enrollCourse.userId,
-      institution.id,
-      SupportedType.STUDENT_LESSON_REMINDER
-    )
     const applicants: User[] = await this.userRepository.find({
       where: { id: In(invoice.applicants) },
     })

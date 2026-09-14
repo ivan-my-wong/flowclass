@@ -20,15 +20,15 @@ import { ErrorCode } from '@/exceptions/error-message/errors'
 import { PromotionErrorMessage } from '@/exceptions/error-message/promotion'
 import { Coupon } from '@/models/coupons.entity'
 import { CouponsRepository } from '@/models/coupons.repository'
+import { CoursePromotionUsedRepository } from '@/models/course-promotion-used.repository'
 import { Course } from '@/models/courses.entity'
 import { CoursesRepository } from '@/models/courses.repository'
-import { DiscountType, PromotionType as PromotionTypeEnum, RecordLogType } from '@/models/enums/'
-import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
+import { DiscountType, RecordLogType } from '@/models/enums/'
 import { CouponStatus, PromotionUsedStatus } from '@/models/enums/status'
 import { InstitutionsRepository } from '@/models/institutions.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
 import { SitesRepository } from '@/models/sites.repository'
-import { UserAliasesRepository } from '@/models/user-aliases.repository'
+import { StudentMemoRepository } from '@/models/student-memo.repository'
 import { User } from '@/models/user.entity'
 import { UsersRepository } from '@/models/users.repository'
 import { BaseService } from '@/modules/base/base.service'
@@ -36,6 +36,7 @@ import { BaseService } from '@/modules/base/base.service'
 import { RecordLogService } from './record-log.service'
 
 import { ClassRepository } from '@/models/classes.repository'
+import { UserAliasesRepository } from '@/models/user-aliases.repository'
 import {
   EnrollClassMappingRepository,
   EnrollCourseRepository,
@@ -44,7 +45,14 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { plainToInstance } from 'class-transformer'
 import * as dayjs from 'dayjs'
 import * as _ from 'lodash'
-import { ArrayContains, FindOptionsOrder, FindOptionsWhere, In, MoreThanOrEqual } from 'typeorm'
+import {
+  ArrayContains,
+  FindOptionsOrder,
+  FindOptionsRelations,
+  FindOptionsWhere,
+  In,
+  MoreThanOrEqual,
+} from 'typeorm'
 
 // import { StudentOnbService } from '@/domain/service/student-onboard.service';
 const UN_LIMITED_COUPON = -1
@@ -64,11 +72,12 @@ export class CouponsService extends BaseService<Coupon> {
     private recordLogService: RecordLogService,
 
     // private studentOnbService: StudentOnbService
-    private readonly invoicePromotionUsedRepository: InvoicePromotionUsedRepository,
+    private studentMemoRepository: StudentMemoRepository,
+    private coursePromotionUsedRepository: CoursePromotionUsedRepository,
     private emailService: EmailService,
     private enrollCourseRepository: EnrollCourseRepository,
     private enrollClassRepository: EnrollClassMappingRepository,
-    private readonly userAliasesRepository: UserAliasesRepository
+    private userAliasesRepository: UserAliasesRepository
   ) {
     super(couponsRepository)
   }
@@ -90,22 +99,15 @@ export class CouponsService extends BaseService<Coupon> {
 
     whereCondition.expireDate = MoreThanOrEqual(new Date())
 
+    const relations: FindOptionsRelations<Coupon> = {
+      couponUsed: true,
+    }
+
     const listOfCoupons = await this.couponsRepository.pagination(
       pageOptionsDto,
       whereCondition,
-      orderOption
-    )
-
-    await Promise.all(
-      listOfCoupons.content.map(async (coupon) => {
-        coupon.usedCount = await this.invoicePromotionUsedRepository.count({
-          where: {
-            promotionId: coupon.id,
-            promotionType: PromotionTypeEnum.COUPON_DISCOUNT,
-            usedStatus: PromotionUsedStatus.CONFIRMED,
-          },
-        })
-      })
+      orderOption,
+      relations
     )
 
     return listOfCoupons
@@ -117,33 +119,71 @@ export class CouponsService extends BaseService<Coupon> {
       throw new BadRequestException(PromotionErrorMessage.COUPON_NOT_FOUND)
     }
 
-    const usedCount = await this.invoicePromotionUsedRepository.count({
+    const coursePromotionUsed = await this.coursePromotionUsedRepository.find({
       where: {
-        promotionId: coupon.id,
-        promotionType: PromotionTypeEnum.COUPON_DISCOUNT,
+        couponId: coupon.id,
         usedStatus: PromotionUsedStatus.CONFIRMED,
+      },
+      relations: {
+        coupon: true,
       },
     })
 
+    const enrolIds = coursePromotionUsed.map((o) => o.enrollId)
+
+    // const [enrollCourses, enrollClasses] = await Promise.all([
+    //   this.enrollCourseRepository.find({
+    //     where: { id: In(enrolIds) },
+    //   }),
+    //   this.enrollClassRepository.find({
+    //     where: { enrollCourseId: In(enrolIds) },
+    //   }),
+    // ])
+
+    // const userIds = [...new Set(enrollCourses.map((o) => o.userId))]
+    // const classIds = [...new Set(enrollClasses.map((o) => o.classId))]
+
     const [studentAssigned, courseAssigned] = await Promise.all([
-      this.getStudentAssigned(coupon.userIds),
+      this.getStudentAssigned(coupon.userAliasIds || []),
       this.getCourseClassAssigned(coupon.classIds),
     ])
     return plainToInstance(CouponDetailDtoV2, {
       ...coupon,
-      usage: usedCount,
+      usage: enrolIds.length,
       studentsAssigned: studentAssigned,
       courseAssigned,
     })
   }
 
-  async getStudentAssigned(userIds: number[]) {
-    const studentAssigned = await this.userRepository.find({
+  async getStudentAssigned(userAliasIds: number[]) {
+    if (!userAliasIds || userAliasIds.length === 0) {
+      return []
+    }
+    const userAliases = await this.userAliasesRepository.find({
       where: {
-        id: In(userIds),
+        id: In(userAliasIds),
         deletedAt: null,
       },
-      select: ['email', 'lastName', 'firstName', 'id', 'phone'],
+      relations: {
+        user: true,
+      },
+    })
+
+    const studentAssigned = userAliases.map((ua) => {
+      const names = (ua.name || '').trim().split(' ')
+      const firstName = names[0] || ua.user?.firstName || ''
+      const lastName = names.slice(1).join(' ') || ua.user?.lastName || ''
+      return {
+        id: ua.id,
+        userAliasId: ua.id,
+        userId: ua.userId,
+        email: ua.email || ua.user?.email || '',
+        firstName,
+        lastName,
+        name: ua.name || ua.user?.fullName || `${firstName} ${lastName}`.trim(),
+        phone: ua.user?.phone || '',
+        avatarUrl: ua.user?.avatarUrl || '',
+      }
     })
 
     return studentAssigned
@@ -246,21 +286,23 @@ export class CouponsService extends BaseService<Coupon> {
   }
 
   async create(createCouponDto: CreateCouponDTO, user): Promise<CouponDetailDto> {
-    const courses = await this.courseRepository.find({
-      select: {
-        id: true,
-        institutionId: true,
-      },
-      where: {
-        id: In(createCouponDto.courseIds),
-      },
-    })
-    if (courses.length != createCouponDto.courseIds?.length) {
-      throw new BadRequestException(PromotionErrorMessage.COURSE_NOT_FOUND)
-    }
+    if (createCouponDto.courseIds?.length) {
+      const courses = await this.courseRepository.find({
+        select: {
+          id: true,
+          institutionId: true,
+        },
+        where: {
+          id: In(createCouponDto.courseIds),
+        },
+      })
+      if (courses.length != createCouponDto.courseIds?.length) {
+        throw new BadRequestException(PromotionErrorMessage.COURSE_NOT_FOUND)
+      }
 
-    if (courses.some((cid) => cid.institutionId != createCouponDto.institutionId)) {
-      throw new BadRequestException(PromotionErrorMessage.COURSE_NOT_BELONG_INSTITUTION)
+      if (courses.some((cid) => cid.institutionId != createCouponDto.institutionId)) {
+        throw new BadRequestException(PromotionErrorMessage.COURSE_NOT_BELONG_INSTITUTION)
+      }
     }
 
     if (new Date(createCouponDto.expireDate) <= new Date())
@@ -272,8 +314,14 @@ export class CouponsService extends BaseService<Coupon> {
     })
     if (existCoupon) throw new BadRequestException(PromotionErrorMessage.COUPON_ALREADY_EXIST)
 
+    const userAliasIds = createCouponDto.userAliasIds || createCouponDto.userIds || []
     createCouponDto.quota = createCouponDto.quota >= 0 ? createCouponDto.quota : UN_LIMITED_COUPON
-    const coupon = await this.couponsRepository.save(this.couponsRepository.create(createCouponDto))
+    const coupon = await this.couponsRepository.save(
+      this.couponsRepository.create({
+        ...createCouponDto,
+        userAliasIds,
+      })
+    )
 
     // record log create coupon
     await this.recordLogService.create([
@@ -296,9 +344,10 @@ export class CouponsService extends BaseService<Coupon> {
      * record history assign coupon
      *
      */
-    if (!_.isEmpty(createCouponDto.userIds)) {
+    if (!_.isEmpty(userAliasIds)) {
       const dataAssignUser: AssignCouponDto = {
-        userIds: createCouponDto.userIds,
+        userAliasIds,
+        userIds: userAliasIds,
         institutionId: createCouponDto.institutionId,
         coupon,
         educatorName: user.firstName,
@@ -338,37 +387,27 @@ export class CouponsService extends BaseService<Coupon> {
       }
     }
 
-    // Validate users if userIds provided
-    if (updateCouponDto.userIds?.length) {
-      const users = await this.userRepository.find({
-        select: {
-          id: true,
-        },
-        where: {
-          id: In(updateCouponDto.userIds),
-        },
-        relations: {
-          userRoles: {
-            institution: true,
+    // Validate users if userAliasIds or userIds provided
+    const userAliasIds =
+      updateCouponDto.userAliasIds !== undefined
+        ? updateCouponDto.userAliasIds
+        : updateCouponDto.userIds
+
+    if (userAliasIds !== undefined) {
+      if (userAliasIds.length > 0) {
+        const userAliases = await this.userAliasesRepository.find({
+          where: {
+            id: In(userAliasIds),
+            institutionId: coupon.institutionId,
+            deletedAt: null,
           },
-        },
-      })
+        })
 
-      if (!users?.length || users.length !== updateCouponDto.userIds.length) {
-        throw new BadRequestException(PromotionErrorMessage.USER_NOT_FOUND)
-      }
-
-      // Check if all users belong to the same institution as the coupon
-      for (const user of users) {
-        const userRoles = (await user.userRoles) || []
-        const hasValidInstitution = userRoles.some(
-          (role) => role.institutionId === coupon.institutionId
-        )
-        if (userRoles.length > 0 && !hasValidInstitution) {
-          updateCouponDto.userIds = updateCouponDto.userIds.filter((id) => id !== user.id)
-          console.log('updateCouponDto.userIds', user.id)
+        if (!userAliases?.length || userAliases.length !== userAliasIds.length) {
+          throw new BadRequestException(PromotionErrorMessage.USER_NOT_FOUND)
         }
       }
+      updateCouponDto.userAliasIds = userAliasIds
     }
 
     // Only update quota if provided
@@ -396,7 +435,7 @@ export class CouponsService extends BaseService<Coupon> {
     }
     const couponRemoved = await this.couponsRepository.softRemove(coupon)
 
-    const uids = [...coupon.userIds, user.id]
+    const uids = [...(coupon.userAliasIds || []), user.id]
 
     const logs = _.map(uids, (id) => {
       return {
@@ -504,11 +543,10 @@ export class CouponsService extends BaseService<Coupon> {
       }
     }
 
-    // NEED CHECK THE INVOICE PROMOTION USED TO SEE IF THE COUPON IS USED
-    const couponUsed = await this.invoicePromotionUsedRepository.count({
+    // NEED CHECK THE COURSE PROMOTION USED TO SEE IF THE COUPON IS USED
+    const couponUsed = await this.coursePromotionUsedRepository.count({
       where: {
-        promotionId: coupon.id,
-        promotionType: PromotionTypeEnum.COUPON_DISCOUNT,
+        couponId: coupon.id,
         usedStatus: PromotionUsedStatus.CONFIRMED,
       },
     })
@@ -534,10 +572,12 @@ export class CouponsService extends BaseService<Coupon> {
           relations: { studentSchedules: true },
         })
         const classIds = invoiceOfEnrollment.studentSchedules?.map((s) => s.classId)
+        const targetUserAliasId = enrolment.userAliasId
+
         if (
-          coupon.userIds &&
-          coupon.userIds.length > 0 &&
-          !coupon.userIds.includes(enrolment.userId)
+          coupon.userAliasIds &&
+          coupon.userAliasIds.length > 0 &&
+          (!targetUserAliasId || !coupon.userAliasIds.includes(targetUserAliasId))
         ) {
           return {
             valid: false,
@@ -545,9 +585,6 @@ export class CouponsService extends BaseService<Coupon> {
             message: PromotionErrorMessage.COUPON_NOT_APPLY_FOR_USER,
           }
         }
-
-        console.log('coupon.classIds', coupon.classIds)
-        console.log('classIds', classIds)
 
         if (
           coupon.classIds &&
@@ -574,14 +611,16 @@ export class CouponsService extends BaseService<Coupon> {
       deletedAt: null,
       expireDate: MoreThanOrEqual(new Date()),
     }
-    if (params.userId) {
-      where.userIds = ArrayContains([params.userId])
+
+    if (params.userAliasId) {
+      where.userAliasIds = ArrayContains([params.userAliasId])
     }
     return await this.couponsRepository.findAll({
       where,
       order: {
         createdAt: 'DESC',
       },
+      relations: { couponUsed: true },
     })
   }
 
@@ -590,9 +629,9 @@ export class CouponsService extends BaseService<Coupon> {
       proofToken: enrolToken,
     })
 
-    if (!!couponCourse && couponCourse.userId && couponCourse.institutionId) {
+    if (couponCourse?.userAliasId && couponCourse.institutionId) {
       const coupon = await this.getCoupons({
-        userId: couponCourse.userId,
+        userAliasId: couponCourse.userAliasId,
         institutionId: couponCourse.institutionId,
         siteId: couponCourse.siteId,
       })
@@ -601,93 +640,84 @@ export class CouponsService extends BaseService<Coupon> {
         return []
       }
 
-      // Compute usedCount for each coupon via invoice_promotion_used
-      const couponIds = coupon.map((c) => c.id)
-      if (couponIds.length > 0) {
-        const usedRecords = await this.invoicePromotionUsedRepository.find({
-          where: {
-            promotionId: In(couponIds),
-            promotionType: PromotionTypeEnum.COUPON_DISCOUNT,
-            usedStatus: PromotionUsedStatus.CONFIRMED,
-          },
-          select: ['promotionId'],
-        })
-        const usedCountMap: Record<number, number> = {}
-        usedRecords.forEach((u) => {
-          usedCountMap[u.promotionId] = (usedCountMap[u.promotionId] || 0) + 1
-        })
-        coupon.forEach((c) => {
-          c.usedCount = usedCountMap[c.id] || 0
-        })
-      }
-
       // The above function get ALL coupon that belongs to a student. We need to filter out the expired coupons
       const filteredCoupon = coupon.filter((c) => {
-        return (
-          c.expireDate >= new Date() && (c.quota === UN_LIMITED_COUPON || c.usedCount < c.quota)
-        )
+        if (!c.couponUsed || c.couponUsed.length === 0) {
+          return c.expireDate >= new Date()
+        }
+
+        return c.expireDate >= new Date() && c.usedCount < c.quota
       })
 
       return filteredCoupon
     } else {
-      throw new ApiError(ErrorCode.USERID_NOT_FOUND)
+      return []
     }
   }
 
   async assignCouponForUsers(data: AssignCouponDto): Promise<void> {
-    const { userIds, institutionId, coupon, educatorName, educatorId, emailNotifyOn } = data
-    const users = await this.userRepository.find({
-      where: {
-        id: In(userIds),
-        deletedAt: null,
-        userRoles: {
-          isStudent: true,
-          institutionId,
-        },
-      },
-      relations: {
-        userRoles: true,
-      },
-      select: ['id', 'email', 'firstName', 'lastName'],
-    })
-
+    const {
+      userAliasIds,
+      userIds,
+      institutionId,
+      coupon,
+      educatorName,
+      educatorId,
+      emailNotifyOn,
+    } = data
+    const targetAliasIds = userAliasIds || userIds || []
     const userAliases = await this.userAliasesRepository.find({
       where: {
-        userId: In(userIds),
+        id: In(targetAliasIds),
         institutionId,
+        deletedAt: null,
       },
       relations: {
         user: true,
       },
     })
 
+    const studentMemos = await this.studentMemoRepository.find({
+      where: {
+        userAliasId: In(targetAliasIds),
+        institutionId,
+      },
+    })
+
     const school = await this.institutionsRepository.findOneById(institutionId)
     const site = await this.siteRepository.findOneById(school.siteId)
 
-    if (users.length != userIds.length) {
+    if (userAliases.length !== targetAliasIds.length) {
       throw new BadRequestException(PromotionErrorMessage.USER_NOT_FOUND)
     }
 
     const createCouponLog: CreateRecordLogDto[] = []
-    for (const user of users) {
-      let contactEmail = user.email
-      let contactName = user.fullName
+    for (const userAlias of userAliases) {
+      const names = (userAlias.name || '').trim().split(' ')
+      const firstName = names[0] || userAlias.user?.firstName || ''
+      const lastName = names.slice(1).join(' ') || userAlias.user?.lastName || ''
 
-      const userAlias = userAliases.find((ua) => ua.userId === user.id)
+      let contactEmail = userAlias.email || userAlias.user?.email || ''
+      let contactName =
+        userAlias.name || userAlias.user?.fullName || `${firstName} ${lastName}`.trim()
 
-      if (userAlias) {
-        contactEmail = userAlias.email ?? userAlias.user?.email ?? contactEmail
-        contactName = userAlias.name ?? contactName
+      const studentMemo = studentMemos.find((sm) => sm.userAliasId === userAlias.id)
+
+      if (studentMemo) {
+        contactEmail = studentMemo.preferredEmail || contactEmail
+        contactName = studentMemo.preferredName || contactName
       }
 
       const params = {
         type: RecordLogType.CREATE_COUPON,
         institutionId,
-        userId: user.id,
+        userAliasId: userAlias.id,
+        userId: userAlias.userId,
         detail: {
-          studentId: user.id,
-          studentFirstName: user.firstName,
-          studentLastName: user.lastName,
+          studentId: userAlias.userId,
+          userAliasId: userAlias.id,
+          studentFirstName: firstName,
+          studentLastName: lastName,
           couponCode: coupon.code,
           educatorName,
           educatorId,
@@ -701,15 +731,16 @@ export class CouponsService extends BaseService<Coupon> {
           ? `${site.currency} ${coupon.amount}`
           : `${coupon.amount} %`
 
-      if (emailNotifyOn) {
+      if (emailNotifyOn && contactEmail) {
         await this.emailService.sendAssignCouponEmail({
-          userId: user.id,
+          userId: userAlias.userId,
           studentName: contactName,
           studentEmail: contactEmail,
           institutionName: school.name,
           couponCode: coupon.code,
           discountAmountUnit,
           expiredDate: coupon.expireDate,
+          institutionId,
         })
       }
     }
@@ -732,29 +763,22 @@ export class CouponsService extends BaseService<Coupon> {
     student: User
     status: PromotionUsedStatus
   }): Promise<void> {
-    const existingPromoUsed = await this.invoicePromotionUsedRepository.findOneBy({
+    const coursePromotionUsed = await this.coursePromotionUsedRepository.findOneBy({
       invoiceId,
-      promotionType: PromotionTypeEnum.COUPON_DISCOUNT,
     })
 
-    if (!existingPromoUsed) {
-      const invoice = await this.invoiceRepository.findOneBy({ id: invoiceId })
-      const amount =
-        coupon.discountType === DiscountType.FIXED_AMOUNT
-          ? coupon.amount
-          : invoice
-          ? (coupon.amount / 100) * invoice.payAmount
-          : 0
-      await this.invoicePromotionUsedRepository.save({
-        invoiceId,
-        siteId: course.siteId,
-        institutionId: course.institutionId,
-        promotionType: PromotionTypeEnum.COUPON_DISCOUNT,
-        promotionId: coupon.id,
-        name: coupon.code,
-        amount,
-        usedStatus: status,
-      })
+    // To prevent double-saving two course promotion used records
+    if (!coursePromotionUsed) {
+      const newRecord = this.coursePromotionUsedRepository.create()
+      newRecord.couponId = coupon.id
+      newRecord.courseId = course.id
+      newRecord.siteId = course.siteId
+      newRecord.institutionId = course.institutionId
+      newRecord.enrollId = enrollId
+      newRecord.invoiceId = invoiceId
+      newRecord.studentId = student.id
+      newRecord.usedStatus = status
+      await this.coursePromotionUsedRepository.save(newRecord)
 
       await this.recordLogService.create([
         {
@@ -770,8 +794,12 @@ export class CouponsService extends BaseService<Coupon> {
         },
       ])
     } else {
-      if (existingPromoUsed.usedStatus !== PromotionUsedStatus.CONFIRMED) {
-        await this.invoicePromotionUsedRepository.save({ ...existingPromoUsed, usedStatus: status })
+      if (coursePromotionUsed.usedStatus !== PromotionUsedStatus.CONFIRMED) {
+        await this.coursePromotionUsedRepository.save({
+          ...coursePromotionUsed,
+          couponId: coupon.id,
+          usedStatus: status,
+        })
       }
 
       await this.recordLogService.create([
@@ -800,7 +828,7 @@ export class CouponsService extends BaseService<Coupon> {
     await this.couponsRepository.save(couponExist)
 
     if (status === CouponStatus.INACTIVE) {
-      const logs = _.map(couponExist.userIds, (id) => {
+      const logs = _.map(couponExist.userAliasIds || couponExist.userIds, (id) => {
         return {
           type: RecordLogType.INACTIVE_COUPON,
           institutionId: couponExist.institutionId,

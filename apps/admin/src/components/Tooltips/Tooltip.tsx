@@ -6,12 +6,28 @@ import {
   Trigger,
 } from '@radix-ui/react-tooltip'
 
-import { cn } from '@/utils/cn'
+import { styled } from '../../styles'
 
 type TooltipProps = {
   trigger: JSX.Element
   children: JSX.Element
 }
+
+const StyledArrow = styled(Arrow, {})
+
+const StyledContent = styled(Content, {
+  borderRadius: '$medium',
+  padding: '$small $small',
+  fontSize: '$medium',
+  boxShadow: '$1',
+  color: '$text',
+  maxWidth: '300px',
+  backgroundColor: '$backgroundLayer2',
+  [`& ${StyledArrow}`]: {
+    fill: '$backgroundLayer2',
+  },
+  zIndex: '$tooltip',
+})
 
 const Tooltip: React.FC<TooltipProps> = ({ trigger, children }) => {
   return (
@@ -19,15 +35,10 @@ const Tooltip: React.FC<TooltipProps> = ({ trigger, children }) => {
       <Root delayDuration={0}>
         <Trigger asChild>{trigger}</Trigger>
 
-        <Content
-          className={cn(
-            'rounded-md px-2 py-2 text-base shadow-md text-text max-w-[300px] bg-background-layer-2 z-tooltip',
-            '[&[data-radix-popper-content-wrapper]>svg]:fill-background-layer-2'
-          )}
-        >
+        <StyledContent>
           {children}
-          <Arrow className="fill-background-layer-2" />
-        </Content>
+          <StyledArrow />
+        </StyledContent>
       </Root>
     </Provider>
   )

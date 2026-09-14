@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useRecoilValue } from 'recoil'
 
 // import { useRecoilValue } from 'recoil'
+import { DialogDescription } from '@/components/ui/Dialog'
 import ModalDialog from '@/components/ui/ModalDialog'
 import usePayoutData from '@/hooks/usePayoutData'
 import { schoolState } from '@/stores/schoolData'
@@ -224,7 +225,9 @@ const ManagePaymentModal = ({
       open={open}
       onOpenChange={handleOpenChange}
     >
-      <p>{t('payout:confirmManage.description')}</p>
+      <DialogDescription>
+        {t('payout:confirmManage.description')}
+      </DialogDescription>
     </ModalDialog>
   )
 }

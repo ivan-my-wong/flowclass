@@ -1,14 +1,22 @@
 import { Content, List, Root, Trigger } from '@radix-ui/react-tabs'
 
-import { cn } from '@/utils/cn'
-
+import { styled } from '../../styles'
 import Button from '../Buttons/Button'
 
-type TabsContentProps = React.ComponentProps<typeof Content>
+const StyledTabs = styled(Root, {})
 
-const TabsContent = ({ className, ...props }: TabsContentProps) => (
-  <Content className={cn('p-4', className)} {...props} />
-)
+const StyledTabList = styled(List, {})
+
+const StyledTabButton = styled(Button, {
+  padding: '$small $small',
+  '&[data-state="active"]': {
+    outline: '2px solid $borderColor',
+  },
+})
+
+const TabsContent = styled(Content, {
+  padding: '$medium',
+})
 
 type TabsProps = {
   labels: string[]
@@ -22,21 +30,18 @@ const Tabs: React.FC<TabsProps> & { Content: typeof TabsContent } = ({
   children,
 }) => {
   return (
-    <Root defaultValue={defaultValue}>
-      <List>
-        {labels.map(label => (
-          <Trigger key={label} value={label} asChild>
-            <Button
-              variants="text"
-              className="px-2 py-2 data-[state=active]:outline data-[state=active]:outline-2 data-[state=active]:outline-border"
-            >
-              {label}
-            </Button>
-          </Trigger>
-        ))}
-      </List>
+    <StyledTabs defaultValue={defaultValue}>
+      <StyledTabList>
+        {labels.map(label => {
+          return (
+            <Trigger key={label} value={label} asChild>
+              <StyledTabButton variants="text">{label}</StyledTabButton>
+            </Trigger>
+          )
+        })}
+      </StyledTabList>
       {children}
-    </Root>
+    </StyledTabs>
   )
 }
 

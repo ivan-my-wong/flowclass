@@ -32,10 +32,9 @@ import { RequireParams } from '@/common/decorators/require-param.decorator'
 import { RequireParamsGuard } from '@/common/guards/require-params.guard'
 import { StudentAuthGuard } from '@/common/guards/student-auth.guard'
 import {
-  StorageImageUploadInterceptor,
-  StorageTargetDirectory,
-  UploadedStorageFile,
-} from '@/config/storage/storage-image-upload-interceptor'
+  S3ImageUploadInterceptor,
+  S3TargetDirectory,
+} from '@/config/s3/s3-image-upload-interceptor'
 import { PaymentEvidenceService } from '@/domain/service/payment-evidence.service'
 import { RequireParam } from '@/models/enums/'
 import { Institution } from '@/models/institutions.entity'
@@ -141,10 +140,10 @@ export class PaymentEvidenceController {
   @ApiOkResponse({
     schema: paymentEvidenceSchema,
   })
-  @UseInterceptors(StorageImageUploadInterceptor(StorageTargetDirectory.PAYMENT_EVIDENCE))
+  @UseInterceptors(S3ImageUploadInterceptor(S3TargetDirectory.PAYMENT_EVIDENCE))
   createByToken(
     @Body() createPaymentEvidenceDto: StudentCreatePaymentEvidenceDto,
-    @UploadedFile() file: UploadedStorageFile,
+    @UploadedFile() file: Express.MulterS3.File,
     @Query('token') token: string,
     @Query('siteId') siteId: number,
     @Query('institutionId') institutionId: number

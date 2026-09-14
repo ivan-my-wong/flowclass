@@ -17,7 +17,6 @@ export type RadioGroupProps = {
   itemValues: RadioItemProps[]
   onValueChange: (value: string) => any
   className?: string
-  disabled?: boolean
 }
 
 const RadioButtonGroup = ({

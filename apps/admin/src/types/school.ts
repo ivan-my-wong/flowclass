@@ -1,5 +1,6 @@
 import { InstitutionMediaUploadResponse } from './apiResponse'
 import { SectionDescription } from './course'
+import { SubscriptionPlanRecord } from './schoolSubscriptionPlan'
 
 export type AdminSchool = {
   id: number | null
@@ -15,7 +16,7 @@ export type School = {
     | AddressDetail
     | InstitutionMediaUploadResponse[]
     | SectionDescription[]
-    | unknown[]
+    | SubscriptionPlanRecord[]
     | SiteSetting
     | AdminSchool[]
   id: number

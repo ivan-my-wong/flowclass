@@ -11,14 +11,16 @@ import {
   Title,
   Trigger,
 } from '@radix-ui/react-dialog'
+import { keyframes } from '@stitches/react'
 import { useTranslation } from 'react-i18next'
 import { IoMdAdd, IoMdClose } from 'react-icons/io'
 
-import { cn } from '@/utils/cn'
-
+import { styled } from '../../styles'
 import Button from '../Buttons/Button'
 import IconButton from '../Buttons/IconButton'
 import { TextInput } from '../Inputs/TextInput'
+
+// import { useTranslation } from 'react-i18next' // TODO: Add translations
 
 type DialogArgs = {
   /** Main Display Text */
@@ -30,7 +32,6 @@ type DialogArgs = {
   /** Method: Require a key value for creating new section */
   onCreate: (value: string) => void
 }
-
 const PromptDialog = ({ title, desc, defaultValue, onCreate }: DialogArgs) => {
   const { t } = useTranslation()
 
@@ -45,50 +46,34 @@ const PromptDialog = ({ title, desc, defaultValue, onCreate }: DialogArgs) => {
     <Root open={open}>
       <Trigger asChild>
         <IconButton
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            setOpen(true)
+          }}
           plain
           icon={<IoMdAdd />}
           color="primary"
         />
       </Trigger>
       <Portal>
-        <Overlay
-          className="fixed inset-0 animate-dialog-overlay"
-          style={{ backgroundColor: blackA.blackA9 }}
-        />
-        <Content
-          className={cn(
-            'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-            'w-[90vw] max-w-[450px] max-h-[85vh] p-6 rounded-md bg-white',
-            'shadow-[hsl(206_22%_7%/35%)_0px_10px_38px_-10px,hsl(206_22%_7%/20%)_0px_10px_20px_-15px]',
-            'animate-dialog-content',
-            'focus:outline-none'
-          )}
-        >
-          <Title
-            className="m-0 font-medium text-[17px]"
-            style={{ color: mauve.mauve12 }}
-          >
-            {title ?? 'Prompt Title'}
-          </Title>
-          <Description
-            className="my-2.5 mb-5 text-[15px] leading-[1.5]"
-            style={{ color: mauve.mauve11 }}
-          >
-            {desc ?? 'Prompt Desc'}
-          </Description>
+        <DialogOverlay />
+        <DialogContent>
+          <DialogTitle>{title ?? 'Prompt Title'}</DialogTitle>
+          <DialogDescription>{desc ?? 'Prompt Desc'}</DialogDescription>
           <TextInput
             id="name"
             defaultValue={defaultValue}
             value={value}
             onChange={e => setValue(e.target.value)}
           />
-          <div className="flex justify-end mt-6">
-            <Button className="m-1.5 bg-[#BBBBBB]" onClick={closeModal}>
+          <Flex css={{ marginTop: 25, justifyContent: 'flex-end' }}>
+            <Button
+              css={{ margin: 5, backgroundColor: '#BBBBBB' }}
+              onClick={closeModal}
+            >
               {t('common:action.cancel')}
             </Button>
             <Button
-              className="m-1.5"
+              css={{ margin: 5 }}
               onClick={() => {
                 onCreate(value)
                 closeModal()
@@ -96,20 +81,70 @@ const PromptDialog = ({ title, desc, defaultValue, onCreate }: DialogArgs) => {
             >
               {t('common:action.saveChanges')}
             </Button>
-          </div>
+          </Flex>
           <Close asChild>
             <IconButton
               aria-label="Close"
               onClick={closeModal}
               icon={<IoMdClose />}
-              className="absolute top-2.5 right-2.5"
+              css={{ position: 'absolute', top: 10, right: 10 }}
               plain
             />
           </Close>
-        </Content>
+        </DialogContent>
       </Portal>
     </Root>
   )
 }
+
+const overlayShow = keyframes({
+  '0%': { opacity: 0 },
+  '100%': { opacity: 1 },
+})
+
+const contentShow = keyframes({
+  '0%': { opacity: 0, transform: 'translate(-50%, -48%) scale(.96)' },
+  '100%': { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
+})
+
+const DialogOverlay = styled(Overlay, {
+  backgroundColor: blackA.blackA9,
+  position: 'fixed',
+  inset: 0,
+  animation: `${overlayShow} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
+})
+
+const DialogContent = styled(Content, {
+  backgroundColor: 'white',
+  borderRadius: 6,
+  boxShadow:
+    'hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px',
+  position: 'fixed',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '90vw',
+  maxWidth: '450px',
+  maxHeight: '85vh',
+  padding: 25,
+  animation: `${contentShow} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
+  '&:focus': { outline: 'none' },
+})
+
+const DialogTitle = styled(Title, {
+  margin: 0,
+  fontWeight: 500,
+  color: mauve.mauve12,
+  fontSize: 17,
+})
+
+const DialogDescription = styled(Description, {
+  margin: '10px 0 20px',
+  color: mauve.mauve11,
+  fontSize: 15,
+  lineHeight: 1.5,
+})
+
+const Flex = styled('div', { display: 'flex' })
 
 export default PromptDialog

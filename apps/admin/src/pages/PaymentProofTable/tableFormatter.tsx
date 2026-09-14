@@ -10,6 +10,7 @@ import {
   PaymentMethodsEnum,
   PaymentState,
 } from '@/constants/payment'
+import { theme } from '@/styles'
 import {
   EnrollCourseInstance,
   Invoice,
@@ -27,6 +28,7 @@ export type EnrollCourseItemForExport = {
   paymentAmount: number
   paymentState: PaymentState
   lastAttendanceDate: string
+  paymentDate?: string | null
 }
 
 export const paymentMethodFormatter = (paymentMethod: string) => {
@@ -69,13 +71,9 @@ export const periodFormatter = (
 
 export const booleanFieldValue = (value: boolean) => {
   return value ? (
-    <span className="text-success">
-      <TiTick color="currentColor" />
-    </span>
+    <TiTick color={theme.colors.success.toString()} />
   ) : (
-    <span className="text-warn">
-      <RxCross2 color="currentColor" />
-    </span>
+    <RxCross2 color={theme.colors.warn.toString()} />
   )
 }
 
@@ -173,7 +171,23 @@ export const formatCsvData = (
     const updatedAt = utcToZonedTime(obj?.updatedAt ?? '', timeZoneId ?? '')
 
     csvData.lastUpdated = formatChartDateInWords(updatedAt)
-    csvData.paymentState = t(`student:paymentStatus.${obj.paymentState}`)
+    csvData.paymentState = obj.paymentState
+      ? t(`student:paymentStatus.${obj.paymentState}`)
+      : ''
+
+    let formattedPaymentDate = ''
+    if (obj.paymentDate) {
+      try {
+        const paymentDateZoned = utcToZonedTime(
+          obj.paymentDate,
+          timeZoneId ?? ''
+        )
+        formattedPaymentDate = format(paymentDateZoned, 'dd MMM yyyy')
+      } catch (e) {
+        console.error('Error formatting paymentDate:', e)
+      }
+    }
+    csvData.paymentDate = formattedPaymentDate
     const firstEnrollCourse = obj.enrollCourses?.at(0)
     if (firstEnrollCourse) {
       csvData.name = firstEnrollCourse.name
@@ -211,14 +225,11 @@ export const formatCsvData = (
         : obj.statistics.totalPaidRevenueNum
     }
 
-    const couponPromotion = obj.invoicePromotionsUsed?.find(
-      p => p.promotionType === 'COUPON_DISCOUNT'
-    )
-    if (couponPromotion) {
+    if (obj.promotionUsed && obj.promotionUsed.coupon) {
       csvData.promotionUsed = `${t('promotion:titles.couponCode')}: ${
-        couponPromotion.name ?? ''
+        obj.promotionUsed.coupon.code
       }, -${formatCurrency(
-        Number(couponPromotion.amount),
+        Number(obj.promotionUsed.coupon.amount),
         obj.currency ?? firstEnrollCourse?.currency ?? ''
       )}`
     }
@@ -258,7 +269,23 @@ export const formatCsvData = (
       csvData.currency = obj.enrollCourseMetadata?.currency
       csvData.paymentAmount = obj.enrollCourseMetadata?.paymentAmount
       csvData.paymentState = obj.enrollCourseMetadata?.paymentState
+        ? t(`student:paymentStatus.${obj.enrollCourseMetadata.paymentState}`)
+        : ''
       csvData.lastAttendanceDate = obj.enrollCourseMetadata?.lastAttendanceDate
+
+      if (obj.enrollCourseMetadata.paymentDate) {
+        let metadataFormattedPaymentDate = ''
+        try {
+          const paymentDateZoned = utcToZonedTime(
+            obj.enrollCourseMetadata.paymentDate,
+            timeZoneId ?? ''
+          )
+          metadataFormattedPaymentDate = format(paymentDateZoned, 'dd MMM yyyy')
+        } catch (e) {
+          console.error('Error formatting metadata paymentDate:', e)
+        }
+        csvData.paymentDate = metadataFormattedPaymentDate
+      }
     }
 
     customFieldsHeader.forEach((header: any) => {
@@ -318,8 +345,28 @@ export const formatCsvData = (
           extraRow.currency = enrollCourse.currency || obj.currency || ''
           extraRow.paymentAmount = enrollCourse.paymentAmount
           extraRow.paymentState = enrollCourse.paymentState
+            ? t(`student:paymentStatus.${enrollCourse.paymentState}`)
+            : ''
           extraRow.createdAt = enrollCourse.createdAt
           extraRow.lastAttendanceDate = enrollCourse.lastAttendanceDate
+
+          let extraFormattedPaymentDate = ''
+          if (enrollCourse.paymentDate) {
+            try {
+              const paymentDateZoned = utcToZonedTime(
+                enrollCourse.paymentDate,
+                timeZoneId ?? ''
+              )
+              extraFormattedPaymentDate = format(
+                paymentDateZoned,
+                'dd MMM yyyy'
+              )
+            } catch (e) {
+              console.error('Error formatting extraRow paymentDate:', e)
+            }
+          }
+          extraRow.paymentDate = extraFormattedPaymentDate
+
           // All other columns empty
           csvDataList.push(extraRow)
         }

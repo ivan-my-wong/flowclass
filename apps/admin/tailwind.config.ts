@@ -224,35 +224,6 @@ const config: Config = {
           '33%': { backgroundColor: 'rgb(147 51 234 / 0.9)' }, /* Purple */
           '66%': { backgroundColor: 'rgb(236 72 153 / 0.9)' }, /* Pink */
         },
-        'slide-up-fade': {
-          '0%': { opacity: '0', transform: 'translateY(2px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        'slide-down-fade': {
-          '0%': { opacity: '0', transform: 'translateY(-2px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        'slide-left-fade': {
-          '0%': { opacity: '0', transform: 'translateX(2px)' },
-          '100%': { opacity: '1', transform: 'translateX(0)' },
-        },
-        'slide-right-fade': {
-          '0%': { opacity: '0', transform: 'translateX(-2px)' },
-          '100%': { opacity: '1', transform: 'translateX(0)' },
-        },
-        'dialog-overlay': {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        'dialog-content': {
-          '0%': { opacity: '0', transform: 'translate(-50%, -48%) scale(0.96)' },
-          '100%': { opacity: '1', transform: 'translate(-50%, -50%) scale(1)' },
-        },
-        dash: {
-          '0%': { strokeDasharray: '1, 150', strokeDashoffset: '0' },
-          '50%': { strokeDasharray: '90, 150', strokeDashoffset: '-35' },
-          '100%': { strokeDasharray: '90, 150', strokeDashoffset: '-124' },
-        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -261,13 +232,6 @@ const config: Config = {
         'slide-right': 'slide-right 0.3s ease-out',
         'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite',
         'color-cycle': 'color-cycle 6s ease-in-out infinite',
-        'slide-up-fade': 'slide-up-fade 400ms cubic-bezier(0.16, 1, 0.3, 1)',
-        'slide-down-fade': 'slide-down-fade 400ms cubic-bezier(0.16, 1, 0.3, 1)',
-        'slide-left-fade': 'slide-left-fade 400ms cubic-bezier(0.16, 1, 0.3, 1)',
-        'slide-right-fade': 'slide-right-fade 400ms cubic-bezier(0.16, 1, 0.3, 1)',
-        'dialog-overlay': 'dialog-overlay 150ms cubic-bezier(0.16, 1, 0.3, 1)',
-        'dialog-content': 'dialog-content 150ms cubic-bezier(0.16, 1, 0.3, 1)',
-        dash: 'dash 1.5s ease-in-out infinite',
       },
     },
   },

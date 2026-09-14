@@ -12,13 +12,14 @@ import Select, {
 } from 'react-select'
 import { atom } from 'recoil'
 
-import { DataTestId } from '@/types/common'
-
+import { styled, theme } from '../../styles'
 import Button from '../Buttons/Button'
 import ImageAspect from '../Images/ImageAspect'
 import Text from '../Texts/Text'
 
 import { SelectItemValuesProps } from './Select'
+import value = atom.value
+import { DataTestId } from '@/types/common'
 
 export type ClassSelectorProps = {
   options: SelectItemValuesProps[]
@@ -42,26 +43,26 @@ export type LabelSelectorRef = SelectInstance<SelectItemValuesProps, true>
 export const selectCustomStyles = (width: string): CustomStylesConfig => ({
   option: styles => ({
     ...styles,
-    backgroundColor: 'var(--color-background)',
-    color: 'var(--color-text)',
+    backgroundColor: theme.colors.background.toString(),
+    color: theme.colors.text.toString(),
     ':hover': {
-      backgroundColor: 'var(--color-primary-highlight-subtle)',
+      backgroundColor: theme.colors.primaryHighlightSubtle.toString(),
     },
   }),
   control: styles => ({
     ...styles,
-    backgroundColor: 'var(--color-background)',
-    color: 'var(--color-text)',
-    borderColor: 'var(--color-border)',
+    backgroundColor: theme.colors.background.toString(),
+    color: theme.colors.text.toString(),
+    borderColor: theme.colors.borderColor.toString(),
   }),
   singleValue: styles => ({
     ...styles,
     padding: '0.25rem',
-    color: 'var(--color-text)',
+    color: theme.colors.text.toString(),
   }),
   input: styles => ({
     ...styles,
-    color: 'var(--color-text)',
+    color: theme.colors.text.toString(),
   }),
   container: styles => ({
     ...styles,
@@ -70,14 +71,14 @@ export const selectCustomStyles = (width: string): CustomStylesConfig => ({
   menuList: styles => ({
     ...styles,
     padding: 0,
-    backgroundColor: 'var(--color-background-layer-2)',
+    backgroundColor: theme.colors.backgroundLayer2.toString(),
   }),
   multiValue: styles => ({
     ...styles,
     width: 'fit-content',
-    backgroundColor: 'var(--color-background-layer-3)',
-    color: 'var(--color-text)',
-    borderRadius: '0.5rem',
+    backgroundColor: theme.colors.backgroundLayer3.toString(),
+    color: theme.colors.text.toString(),
+    borderRadius: theme.sizes[2].toString(),
   }),
   multiValueLabel: styles => ({
     ...styles,
@@ -86,7 +87,7 @@ export const selectCustomStyles = (width: string): CustomStylesConfig => ({
   multiValueRemove: styles => ({
     ...styles,
     ':hover': {
-      backgroundColor: 'var(--color-primary-highlight)',
+      backgroundColor: theme.colors.primaryHighlight.toString(),
     },
   }),
   valueContainer: styles => ({
@@ -100,35 +101,41 @@ export const selectCustomStyles = (width: string): CustomStylesConfig => ({
   }),
 })
 
-const ExtraOptionsLabel = ({
-  children,
-  ...props
-}: React.ComponentProps<'div'>) => (
-  <div
-    className="bg-background-layer-3 text-text py-0.5 px-2 rounded-xl my-0.5 text-[0.8em]"
-    {...props}
-  >
-    {children}
-  </div>
-)
+const Wrapper = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: '100%',
+  height: '100%',
+  color: '$text',
+})
 
-const SelectedItemsContainer = ({
-  children,
-  ...props
-}: React.ComponentProps<'div'>) => (
-  <div className="flex flex-wrap p-2 border-b border-border gap-2" {...props}>
-    {children}
-  </div>
-)
+const ExtraOptionsLabel = styled('div', {
+  backgroundColor: '$backgroundLayer3',
+  color: '$text',
+  padding: '3px 0.5rem',
+  borderRadius: '$2',
+  margin: '2px',
+  fontSize: '0.8em',
+})
 
-const SelectedItem = ({ children, ...props }: React.ComponentProps<'div'>) => (
-  <div
-    className="flex items-center py-0.5 px-1.5 bg-background-layer-3 text-text rounded-xl gap-1"
-    {...props}
-  >
-    {children}
-  </div>
-)
+const SelectedItemsContainer = styled('div', {
+  display: 'flex',
+  flexWrap: 'wrap',
+  padding: '$2',
+  borderBottom: '1px solid $border',
+  gap: '$2',
+})
+
+const SelectedItem = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  padding: '0.5px 5px',
+  backgroundColor: '$backgroundLayer3',
+  color: '$text',
+  borderRadius: '$2',
+  gap: '$1',
+})
 
 const ValueContainer = ({
   children,
@@ -178,7 +185,7 @@ const MenuList = ({ children, ...props }: MenuListProps<any, true>) => {
             <SelectedItem key={value.value}>
               <Text size="small">{value.label}</Text>
               <Button
-                className="ml-auto p-0"
+                css={{ marginLeft: 'auto', padding: 'unset' }}
                 variants="cancel"
                 onClick={() => handleRemove(value)}
                 iconBefore={<IoMdClose />}
@@ -237,25 +244,20 @@ const LabelSelector = React.forwardRef<LabelSelectorRef, ClassSelectorProps>(
         placeholder={placeHolder}
         isMulti={isMulti || undefined}
         options={options}
-        formatOptionLabel={(data: SelectItemValuesProps, formatMeta) => {
-          // For chip Remove aria-label and screenreader announcement, return a
-          // plain string. JSX would be stringified to "[object Object]".
-          if (formatMeta?.context === 'value') return String(data.label ?? '')
-          return (
-            <div className="flex items-center justify-between w-full h-full text-text">
-              {data.image && (
-                <ImageAspect
-                  s3="public"
-                  ratio={1}
-                  width="20%"
-                  src={data.image}
-                  alt="Logo image"
-                />
-              )}
-              <span className="p-4">{data.label}</span>
-            </div>
-          )
-        }}
+        formatOptionLabel={(data: SelectItemValuesProps) => (
+          <Wrapper className="country-option">
+            {data.image && (
+              <ImageAspect
+                s3="public"
+                ratio={1}
+                width="20%"
+                src={data.image}
+                alt="Logo image"
+              />
+            )}
+            <span style={{ padding: '$4' }}>{data.label}</span>
+          </Wrapper>
+        )}
         styles={customStyles}
         onChange={onChange}
         isDisabled={isDisabled ?? false}

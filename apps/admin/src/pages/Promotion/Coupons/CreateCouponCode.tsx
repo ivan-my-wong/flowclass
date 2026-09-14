@@ -25,6 +25,7 @@ import usePromotionData from '@/hooks/usePromotionData'
 import useSchoolData from '@/hooks/useSchoolData'
 import useSiteData from '@/hooks/useSiteData'
 import ContentLayout from '@/layouts/ContentLayout'
+import { css } from '@/styles'
 import { DiscountType } from '@/types/coupon'
 import {
   CourseAndClassOptionProps,
@@ -65,7 +66,10 @@ const CreateCouponCode = ({ open, handleClose }: Props): JSX.Element => {
 
   const [searchParams] = useSearchParams()
 
-  const idStudent = searchParams.get('userId') || searchParams.get('student')
+  const idStudent =
+    searchParams.get('userAliasId') ||
+    searchParams.get('userId') ||
+    searchParams.get('student')
   const name = searchParams.get('name') || ''
   const back = searchParams.get('back') || '/promotion/coupon-code'
 
@@ -181,6 +185,8 @@ const CreateCouponCode = ({ open, handleClose }: Props): JSX.Element => {
   const createCouponCode = async () => {
     createCoupon
       .mutateAsync({
+        userAliasIds:
+          selectedOptionStudent.map(student => +student.value) || [],
         userIds: selectedOptionStudent.map(student => +student.value) || [],
         courseIds: selectedOptionCourse?.map(course => +course.courseId) || [],
         classIds: selectedOptionClass?.map(course => +course.value) || [],
@@ -237,11 +243,14 @@ const CreateCouponCode = ({ open, handleClose }: Props): JSX.Element => {
       </Button>
     </Box>
   )
+  const leftHeaderCSS = css({
+    maxHeight: '100%',
+  })
   if (open) {
     return (
       <Drawer open={open} onClose={handleClose}>
         <ContentLayout
-          leftHeaderCSS="max-h-full"
+          leftHeaderCSS={leftHeaderCSS}
           headerBackButton={headerBackButton}
           leftHeader={leftHeaderContent}
           rightHeader={rightHeaderContent}

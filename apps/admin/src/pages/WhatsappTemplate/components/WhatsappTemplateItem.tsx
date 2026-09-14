@@ -14,6 +14,7 @@ import {
 
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
+import { AutomationFunction } from '@/types/automationFlow'
 import {
   WhatsappTemplate,
   WhatsappTemplateStatus,
@@ -27,7 +28,9 @@ const WhatsappTemplateItem = ({ item, onDelete }: PropType): JSX.Element => {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const goToEdit = () => {
-    navigate(`/whatsapp-templates/edit?id=${item.id}`)
+    navigate(
+      `/custom-messages/whatsapp-templates/edit?id=${item.id}&tab=whatsapp-templates`
+    )
   }
   const variantBadge = useMemo(() => {
     switch (item.status) {
@@ -97,10 +100,7 @@ const WhatsappTemplateItem = ({ item, onDelete }: PropType): JSX.Element => {
         </div>
         <div className="text-right">
           Assigned to:{' '}
-          {(item.assignedTo as Record<string, any> | undefined)?.name ??
-            (item.assignedTo as Record<string, any> | undefined)
-              ?.functionName ??
-            '-'}
+          {(item.assignedTo as AutomationFunction | undefined)?.name}
         </div>
       </div>
     </div>

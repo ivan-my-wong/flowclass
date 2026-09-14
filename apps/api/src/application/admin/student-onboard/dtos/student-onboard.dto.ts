@@ -27,6 +27,7 @@ import { ChargeFrequency, FilterMatchMode, Operator } from '@/models/enums/'
 import { AttendanceStatus, EnrollConfirmStatus, PaymentStatus } from '@/models/enums/status'
 import { StudentFormMetadata } from '@/models/student-form.entity'
 import { StudentLesson } from '@/models/student-lesson.entity'
+import { StudentMemo } from '@/models/student-memo.entity'
 import { UserAlias } from '@/models/user-aliases.entity'
 import { User, UserStatus } from '@/models/user.entity'
 
@@ -141,18 +142,14 @@ export class GetStudentDetailResponseDto extends PartialType(User) {
   id: number
 
   @ApiPropertyOptional({
-    description: 'The student info (user alias with memo fields)',
-    type: UserAlias,
+    description: 'The memo associated with the student',
+    type: StudentMemo,
   })
   @Expose()
-  studentInfo?: {
-    userAlias?: Pick<
-      UserAlias,
-      'id' | 'name' | 'email' | 'userId' | 'secondaryEmail' | 'childOfUserAliasId'
-    >
-    userAliasId?: number
-    [key: string]: unknown
-  } | null
+  studentInfo?: StudentMemo & {
+    userAlias: UserAlias
+    userAliasId: number
+  }
 
   @ApiPropertyOptional({
     description: 'See if the user has user aliases in other institutions',
@@ -244,22 +241,6 @@ export class StudentOnbDetailtByAliasIdDto extends StudentOnbDetailtDto {
   invoiceId?: number
 }
 
-// Used by the invoice-scoped teaching-service endpoint where the invoice itself
-// constrains the result set. Either invoiceId or userAliasId must be supplied;
-// when invoiceId is provided, every enrollCourse on the invoice is returned
-// regardless of which alias it belongs to (combined invoices ↔ many students).
-export class GetTeachingServiceByInvoiceDto extends StudentOnbDetailtDto {
-  @ApiProperty({ example: 1, required: false })
-  @IsOptional()
-  @IsNumber()
-  userAliasId?: number
-
-  @ApiProperty({ example: 1, required: false })
-  @IsOptional()
-  @IsNumber()
-  invoiceId?: number
-}
-
 export class UpdateStudentDto extends StudentOnbBaseDto {
   @ApiProperty({
     example: 'Student A',
@@ -340,13 +321,21 @@ export class TeachingServiceDto extends StudentOnbBaseDto {
 }
 
 export class StudentCouponDto extends StudentOnbBaseDto {
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 1,
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
-  @Transform(({ value }) => Number(value))
-  userId: number
+  @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
+  userAliasId?: number
+
+  @ApiPropertyOptional({
+    example: 1,
+  })
+  @IsOptional()
+  @IsNumber()
+  @Transform(({ value }) => (value !== undefined ? Number(value) : undefined))
+  userId?: number
 
   @ApiProperty({
     example: 1,
@@ -483,7 +472,7 @@ export class AddTeachingServiceDto extends CreateStudentDto {
   priceOptionId?: number
 
   @ApiPropertyOptional({
-    example: 'https://example.com',
+    example: 'https://flowclass.io',
   })
   @IsNotEmpty()
   @IsString()
@@ -946,8 +935,8 @@ export class ImportStuResponseDto {
   userAlias: UserAlias
 
   @Expose()
-  @Type(() => UserAlias)
-  studentMemo: UserAlias
+  @Type(() => StudentMemo)
+  studentMemo: StudentMemo
 
   @Expose()
   @Type(() => StudentFormMetadata)

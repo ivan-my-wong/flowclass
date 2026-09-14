@@ -4,8 +4,8 @@ import { AfterLoad, Column, Entity, Index, OneToMany } from 'typeorm'
 import { Permission } from '@/application/admin/users/dto/user-role.dto'
 import { Invoice } from '@/models/invoice.entity'
 import { NotificationRecord } from '@/models/notification-record.entity'
+import { StudentMemo } from '@/models/student-memo.entity'
 import { BaseEntity } from '@/modules/base/base.entity'
-import { permissionsOfUser } from '@/utils/user-roles.utils'
 
 import { ClassLesson } from './class-lessons.entity'
 import { ClassEntity } from './classes.entity'
@@ -44,6 +44,9 @@ export class User extends BaseEntity {
   @Column({ name: 'is_email_verified', default: false })
   isEmailVerified: boolean
 
+  @Column({ name: 'firebase_id', nullable: true })
+  firebaseId: string
+
   @Column({ name: 'last_active_time', type: 'timestamptz', default: null })
   lastActiveTime: Date
 
@@ -69,8 +72,8 @@ export class User extends BaseEntity {
   @Column({ name: 'status', enum: UserStatus, default: UserStatus.ACTIVE })
   status: UserStatus
 
-  @OneToMany(() => UserRole, (userRole) => userRole.user, { cascade: true, eager: true })
-  userRoles: UserRole[]
+  @OneToMany(() => UserRole, (userRole) => userRole.user, { cascade: true, lazy: true })
+  userRoles: Promise<UserRole[]>
 
   @OneToMany(() => EnrollCourse, (enrollCourse) => enrollCourse.student)
   enrollCourses: EnrollCourse[]
@@ -81,12 +84,11 @@ export class User extends BaseEntity {
   @OneToMany(() => NotificationRecord, (notificationRecord) => notificationRecord.user)
   notificationRecord: NotificationRecord[]
 
-  @AfterLoad()
-  getPermissions(): void {
-    if (this.userRoles) {
-      this.permissions = permissionsOfUser(this.userRoles)
-    }
-  }
+  @OneToMany(() => StudentMemo, (memo) => memo.user, {
+    createForeignKeyConstraints: false,
+  })
+  studentMemos: StudentMemo[]
+
   permissions: Permission[]
 
   @OneToMany(() => UserAlias, (userAlias) => userAlias.user)

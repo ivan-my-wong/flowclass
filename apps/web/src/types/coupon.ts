@@ -38,7 +38,8 @@ export type Coupon = {
 
   expireDate: Date
   status: CouponStatus
-  userIds: number[]
+  userAliasIds?: number[]
+  userIds?: number[]
 }
 
 export type CheckCouponResponse = {
@@ -55,6 +56,7 @@ export type ValidateCouponDto = {
   couponCode: string
   institutionId: number
   invoiceId?: number
+  userAliasId?: number
 }
 
 export type ValidateCouponResponse = {

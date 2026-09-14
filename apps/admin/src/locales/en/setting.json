@@ -2,25 +2,16 @@
   "pageTitle": "Settings",
   "freeAlert": "You are now using our free plan. To unlock more functions.",
   "upgrade": "Upgrade",
-
   "featureEnable": {
     "title": "Feature Enable"
   },
-
   "enrollmentForm": "Enrolment Presets",
   "headings": {
-    "websiteConfiguration": "Backend configuration",
-    "localizationUserPreferences": "Localization & User Preferences",
     "communicationEngagement": "Communication & Engagement",
-    "monetizationServices": "Monetization & Services",
-    "paymentNotifications": "Payment & Notifications",
     "firstTimeConfig": "First Time Configuration",
-    "branding": "Website Configuration",
-    "timeTable": "Timetable Settings",
-    "systemSetting": "System Setting"
+    "branding": "Website Configuration"
   },
   "menu": {
-    "payment": "Payment Settings",
     "webpage": "Site Styles & Templates",
     "languageTimezone": "Location, Language & Timezone",
     "domainSettings": "Site Domain",
@@ -28,21 +19,14 @@
     "engagementTool": "Student engagement tool",
     "socialMedia": "Social Media Links",
     "webPanel": "Flowclass Editor Setting",
-    "emailSettings": "Email Settings",
     "blockTime": "Block Time",
     "studentInformationField": "Custom Data Fields",
     "applicationForm": "Application Form",
-    "embedWebsite": "Embed in Website",
-    "whatsappSettings": "WhatsApp Settings",
     "T&C": "Terms & Conditions",
     "userPermission": "User permission",
-    "additionalFee": "Additional Fee",
-    "automationFlow": "Automation Flow"
+    "additionalFee": "Additional Fee"
   },
   "socialMedia": {
-    "shownContent": "See where social media content will be shown",
-    "tutorialVideo": "Watch our tutorial Video",
-    "contactUs": "Contact us for help",
     "updateSuccess": "You have updated social media link successfully",
     "updateError": "Something went wrong while trying to update social media link. Please try again later",
     "creatSocialMediaLink": "Create social media link",
@@ -50,20 +34,10 @@
     "linkIsRequired": "Link is required"
   },
   "termsConditions": {
-    "title": "Terms & Conditions",
-    "updateT&C": "Update Terms & Conditions",
-    "t&cDescription": "This will be shown to students before their final confirmation when applying for your course",
     "updateSuccess": "You have updated Terms & Conditions successfully",
     "updateError": "Something went wrong while trying to update Terms & Conditions. Please try again later"
   },
   "next": "Next",
-  "Instagram": "Instagram",
-  "Facebook": "Facebook",
-  "Twitter": "Twitter",
-  "Youtube": "Youtube",
-  "alert2": "To see how Facebook and Instagram users interacted with the content on your website, we have to connect to your Metal Pixel ID",
-  "alert3": "Setting up conversion tracking allows you to run Google Ads with precise knowledge of how many people contacted you through the ads",
-
   "userManagement": {
     "title": "Staff Management",
     "userProfile": "User Profile",
@@ -123,13 +97,10 @@
     "filterClassByDate": "Filter by date",
     "filterByLocation": "Filter by location",
     "search": "Search",
-
     "filterByClass": "Filter by class",
     "searchByClassName": "Search by class name",
     "searchByClass": "Search by class",
-
     "includeFuture": "Include future lessons",
-
     "hourlyRates": {
       "manageHourlyRates": "Manage Hourly Rates",
       "enableHourlyRates": "Enable Hourly Rates",
@@ -168,7 +139,6 @@
       "classSpecificStudentRatesHint": "Leave empty to use default settings",
       "overrideDefaultSettings": "Override Default Settings"
     },
-
     "lessonTable": {
       "date": "Date",
       "time": "Time",
@@ -186,7 +156,6 @@
       "upcoming": "Upcoming",
       "salary": "Salary"
     },
-
     "profilePage": {
       "status": "Status",
       "course": "Course",
@@ -204,11 +173,8 @@
     "currency": "Currency",
     "timezoneHint": "The timezone follows the default country. If you want to change it, please change your default country.",
     "currencyHint": "The currency follows the default country. If you want to change it, please change your default country.",
-    "styles": "Site Branding",
     "save": "Save",
     "themeColor": "Site Theme Color",
-    "secondaryColor": "Site Secondary Color",
-    "highlightColor": "Site Highlight Color",
     "templates": "Templates",
     "default": "Default",
     "updateSuccess": "You have updated the site settings successfully",
@@ -227,53 +193,20 @@
       "hero": "A template with a large hero image at the top of the page. Suitable for a standalone website.",
       "barebone": "The simplest layout with no navigation bar. Only with your logo on the top. Suitable to be embedded in other websites."
     },
-    "templatePreview": "Template Preview",
-    "websiteVersion": "Website version",
     "mobileVersion": "Mobile version"
   },
   "paymentSetting": {
-    "setup": "Set Up",
-    "stripePayNowTitle": "Online Payment Methods",
-    "stripePaymentMethod": "Connect to Stripe and start accepting online payments quickly and securely with our software. Stripe can provide multiple payment options for your students, including",
-    "stripe": "Stripe",
-    "creditCard": "Credit Card",
-    "googlePay": "Google Pay",
-    "applePay": "Apple Pay",
-    "alipay": "Alipay",
-    "wechatPay": "WeChat Pay",
     "connectStripe": "Create a Stripe Account",
-    "ifHavePreviousAccount": "If you have a Stripe account, please log in with the same email and password to skip the onboarding process.",
-    "manageAccount": "Manage your payments",
-    "whyManageAccount": "Simplify tuition payment management with our software integrated with Stripe. Easily manage payments, track tuition history, and streamline administrative tasks for teachers and educators.",
-    "pleaseLoginConnect": "Please log into your Stripe account with the same email and password you have used to create your Stripe account.",
-    "createLink": "Link your account",
-    "visitDashboard": "Visit your dashboard",
     "notCompleteOnboarding": "You have not linked your Stripe account. Please complete the onboarding process to visit your dashboard",
     "updateSuccess": "You will be redirected to Stripe to complete the onboarding process. See you soon!",
-    "dashboardSuccess": "You will be able to view all your transactions in the new tab!",
-    "completePayout": "Complete business details to enable payout",
-    "editAccount": "Edit your account details",
-    "completeOnboarding": "Please complete the onboarding process on Stripe to visit your dashboard, Once the process is completed, Stripe will be displayed as a payment option for students",
-    "noStripeAccount": "You have not created a Stripe account yet.",
-    "migratingStripe": "We are currently migrating your Stripe account to our new system. You will need to create a new Stripe account. If you still have funds in your previous Stripe account, please contact us using the chat box in the corner and we will pay them out.",
     "connectStripeTips": "Getting ready to create a Stripe account for collecting payments!",
-    "createStripeAccountReminder": "Please ensure that the country you select in the site settings matches the country you intend to register with on Stripe. Once registered, it will not be possible to modify your country on Stripe. If you need to change your country, you can do so by adjusting the settings on the site.",
-    "currentCountry": "Current Country or Region",
-    "updateCountry": "Update Country or Region",
-    "createStripeAccount": "Create Stripe Account",
-    "createStripeAccountDescription": "Current country: {{country}}.\nCurrent email: {{email}}.\nPlease make sure both your country and email address are correct before creating a Stripe account. Once the account is created by clicking “Confirm”, neither your country nor your email can be changed on Stripe.\n\nIf you wish to use a different email, please log in to the correct account and return to this page.",
-    "createStripeAccountProblem": "*If you run into any issues while creating a Stripe account, please don't hesitate to reach out to us via email (admin@flowclass.io) or the chat box in the corner.",
-    "availableInYourCountry": "Available in your country",
-    "unavailableInYourCountry": "Unavailable in your country",
-    "connectedWithStripe": "Connected with Stripe",
-    "missingInformation": "Missing information for enabling payouts",
-    "notconnectedStripeAccount": "Not connected with Stripe"
+    "createStripeAccountDescription": "Current country: {{country}}.\nCurrent email: {{email}}.\nPlease make sure both your country and email address are correct before creating a Stripe account. Once the account is created by clicking “Confirm”, neither your country nor your email can be changed on Stripe.\n\nIf you wish to use a different email, please log in to the correct account and return to this page."
   },
   "customizeSite": {
     "title": "Domain Settings",
     "inputReminder": "Please only use alphabets and numbers. No special characters allowed.",
     "description": "This will be the link your students will use to access your site. If you change it, the students will not be able to access using the old link.",
-    "description2": "Enter any domain for your site (e.g. example.com, localhost). You can also connect your own custom domain according to this guide.",
+    "description2": "Note that .flowclass.io domains come in a first-come-first-served basis. If you have your own domain, you can connect it according to this guide",
     "customSiteDomain": "Custom Site Domain",
     "setYourDomain": "Set your domain",
     "availableInStarter": "(Available In Starter Plan)",
@@ -282,9 +215,6 @@
     "customDomainGuide": "Once you have saved your own domain, please contact us to seek assistance in completing the setup process for your domain.",
     "contactUs": "Contact Us",
     "planRestriction": "This feature is only applicable to the growth tier or higher"
-  },
-  "studentManagement": {
-    "selectCourse": "Select Course"
   },
   "emailLogoSetting": {
     "emailNotification": "Email Notification",
@@ -296,38 +226,21 @@
   "emailSenderSetting": {
     "title": "Email Sender Settings",
     "sendByCustomEmail": "Send email notification by school name and email",
-    "tierRestriction": "This feature is only applicable to the starter tier or higher",
-    "updateSuccess": "You have successfully updated email settings。"
+    "tierRestriction": "This feature is only applicable to the starter tier or higher"
   },
   "notificationSettings": {
-    "title": "Payment Reminder Settings",
-    "description": "You can choose to send reminder notifications via email.",
-    "schedule": "An email will be sent to the student the first day after the application date, and every 4 days after that.",
-    "email": "Email",
     "tierRestriction": "This feature is only applicable to the growth tier or higher",
-    "updateSuccess": "You have successfully updated notification setting.",
-    "notificationUserEmail": "Notification User Email",
-    "notificationType": "Notification Type",
-    "notificationChannel": "Notification Channel"
+    "notificationType": "Notification Type"
   },
   "lessonReminderSettings": {
-    "title": "Lesson Reminder Settings",
-    "description": "You can choose to send reminder notifications via email.",
-    "schedule": "An email will be sent to the student before the lesson day",
-    "email": "Email",
-    "tierRestriction": "This feature is only applicable to the growth tier or higher",
-    "updateSuccess": "You have successfully updated notification setting."
+    "tierRestriction": "This feature is only applicable to the growth tier or higher"
   },
   "systemSettings": {
-    "blockTime": "Block time",
     "blockTimeSetting": "Closing Time",
     "addBlockTime": "Add Block Time",
-    "fulltime": "Full Day Block",
     "inBeta": "This feature is currently in beta so it only applies to recurring classes. All closed time will prevent students from booking classes.",
-    "notification": "If a lesson is on 'Blocked time', then that lesson and afterwards will be delayed by its recurring condition.",
     "start": "Start",
     "end": "End",
-    "descriptionDeleteBlockTime": "This action is irreversible.",
     "titleDeleteDialog": "Do you want to delete block time",
     "createBlockTimeSuccess": "You have created block time successfully",
     "deleteBlockTimeSuccess": "Delete block time successfully",
@@ -346,18 +259,12 @@
     "titleDeleteDialog": "Do you want to delete custom field:",
     "descriptionDelete": "This action is irreversible. Relevant student information stored under this field will ALL be removed from the student profile.",
     "notification": "Custom data fields are used to store information of a student (i.e. parent contact and academic level) into their profile. These fields can be used to create application forms for students to fill in when they are applying for a course.",
-    "descriptionCreate": "Only field name can be changed afterwards",
-    "descriptionEdit": "Only field name can be changed",
     "descriptionReorder": "Reordering the custom field will affect their order in student profiles.",
     "fieldType": "Field type",
     "placeHolderType": "Please choose a fields type",
     "nameField": "Question",
     "descriptionField": "Description",
     "answerField": "Answer",
-    "placeHolderName": "i.e. parent contact",
-    "option": "Options",
-    "addOption": "Add option",
-    "descriptionAddOption": "Please add options for users to choose",
     "createInformationField": "Create student custom field successfully",
     "updateInformationField": "Update student custom field successfully",
     "reOrderInformationField": "Reorder student custom field successfully",
@@ -378,17 +285,12 @@
     "nameOfForm": "Name of the form",
     "descriptionCreate": "For your recognition and will not be shown to students.",
     "placeholder": "i.e. general form",
-    "informationFields": "Custom fields",
     "applicantFields": "Personal Information Fields",
     "commonFields": "Application Fields",
     "commonInformation": "The fields here will be shown when you assign the form to a class option which accept multiple applicants",
-    "createField": "Create field",
     "description2Create": "Please select the fields to be included in the application form. Name, Email and Phone Number are compulsory for the system record. To further modify the custom field, please go to",
-    "dragAndDrop": "You can drag the fields to rearrange their orders",
-    "Field": "Fields to be filled in:",
     "titleDeleteDialog": "Do you want to delete application form:",
     "descriptionDelete": "This action is irreversible..",
-    "notification": "Student custom fields are used to store information of a student (i.e. parent contact and academic level) in their profile. These fields can be used to create application forms for students to fill in when they are applying for a course.",
     "createApplicationForm": "Create application form successfully",
     "updateApplicationForm": "Update application form successfully",
     "deleteApplicationForm": "Delete application form successfully",
@@ -403,45 +305,27 @@
     "descriptionCommonFields": "These fields relate to the entire application and include information such as purpose, relationship between applicants and desired outcomes. \nThey are filled out once at the conclusion of the application process. If you need to modify the fields, please visit"
   },
   "whatsappSetting": {
-    "settingHints": "We connect with Twilio to send WhatsApp messages. If you need help, we can help you with the setup.",
+    "settingHints": "We connect with Meta WhatsApp Cloud API to send official WhatsApp messages. If you need help, we can help you with the setup.",
     "contactUsOnWhatsapp": "Contact us on WhatsApp",
     "reminder": "You should set up WhatsApp API before sending messages to students.",
     "whatsAppApiSettings": "WhatsApp API Settings",
-    "customMessage": "Custom Message",
-    "wtsApiToken": "Twilio API Token",
-    "wtsApiSid": "Twilio API SID",
+    "wtsApiToken": "Meta API Token",
+    "wtsApiSid": "WhatsApp Business Account (WABA) ID",
     "phoneNumberSender": "Phone number for sending message",
     "phoneNumberReceiver": "Testing phone number for receiving message",
     "customMessageVariable": {
       "studentName": "Student Name",
       "schoolName": "School Name",
       "className": "Class Name",
-      "paymentLink": "Payment Link",
       "courseName": "Course Name",
       "adminPhone": "Admin Phone",
       "location": "Location",
       "classLessonDate": "Class Lesson Date",
       "newClassLessonDate": "New Class Lesson Date",
       "institutionName": "Institution Name",
-      "siteLink": "Site Link",
-      "period": "Period",
-      "payAmount": "Pay Amount",
-      "uploadPaymentUrl": "Payment Link",
-      "courseItems": "Course Items (repeater)",
-      "lessonItems": "Lesson Items (repeater)",
-      "courseIndex": "Course #",
-      "schedule": "Schedule",
-      "lessonCount": "Lesson Count",
-      "teacherName": "Teacher Name",
-      "lessonDatesLabel": "Dates Label",
-      "lessonDates": "Lesson Dates",
-      "coursePrice": "Course Price",
-      "lessonIndex": "Lesson #",
-      "lessonDate": "Lesson Date",
-      "lessonTime": "Lesson Time"
+      "siteLink": "Site Link"
     },
     "selectWhatsappTemplate": "Select WhatsApp template",
-    "customMessageExample": "Your customized message will be sent to students. Eg. Hello! We are {{schoolName}}. This is a friendly reminder.",
     "send": "Send to testing phone number",
     "sendTestMsgSuccess": "You have successfully sent the whatsapp message.",
     "sendMaterialPlaceholder": "Hi {{studentName}} New materials uploaded to {{courseName}},\n\nJust a quick note to let you know that a new material has been uploaded to the course.\n\nBest regards,\n{{institutionName}}",
@@ -450,11 +334,9 @@
   "additionalFee": {
     "title": "Additional Fee",
     "createFee": "Add fee",
-    "createAdditionalFee": "Add additional fee",
     "unassignSuccess": "Unassignment additional fee was successful.",
     "createSuccess": "Success create additional fee",
     "deleteSuccess": "Success delete additional fee",
-    "editAdditionalFee": "Edit additional fee",
     "name": "Name",
     "additionalFeeDisplay": "The name of the additional fee will be displayed to students",
     "fee": "Fee",
@@ -470,7 +352,6 @@
     "heading": "Login Button",
     "label": "Show login button on your website",
     "updateSuccess": "You have updated student portal successfully",
-
     "primaryIdentifier": "Primary Identifier",
     "confirmChangeTitle": "Change Primary Identifier?",
     "choosePrimaryIdentifier": "Choose the primary identifier for students to be registered and logged in.",

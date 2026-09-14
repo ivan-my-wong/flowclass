@@ -6,6 +6,33 @@ import { MdLanguage } from 'react-icons/md'
 
 import ActionCard from '../../../components/Cards/ActionCard'
 import Heading from '../../../components/Texts/Heading'
+import { styled } from '../../../styles'
+
+const Wrapper = styled('div', {
+  padding: '$4',
+})
+
+const AlertBox = styled('div', {
+  padding: '$5',
+  border: `0.06rem solid $colors$borderColor`,
+  borderRadius: '0.25rem',
+  marginBottom: '$5',
+  marginTop: '$5',
+  display: 'flex',
+  flowDirection: 'row',
+})
+
+const UpgradeAction = styled('div', {
+  marginLeft: 'auto',
+  float: 'right',
+  color: '$primarySubtle',
+  cursor: 'pointer',
+})
+
+const AlertIcon = styled('div', {
+  marginRight: '$5',
+  color: '$warn',
+})
 
 const items = [
   {
@@ -15,32 +42,34 @@ const items = [
   },
 ]
 
+AlertBox.displayName = 'AlertBox'
+UpgradeAction.displayName = 'UpgradeAction'
+AlertIcon.displayName = 'AlertIcon'
+
 const SiteSetting = (): JSX.Element => {
   const { t } = useTranslation()
   const navigate = useNavigate()
 
   return (
-    <div className="p-4">
+    <Wrapper>
       <Heading size="medium">{t('setting:pageTitle')}</Heading>
-      <div className="p-5 border border-border rounded my-5 flex flex-row">
-        <div className="mr-5 text-warn">
+      <AlertBox>
+        <AlertIcon>
           <IoIosInformationCircle />
-        </div>
+        </AlertIcon>
 
         {t('setting:freeAlert')}
-        <button
-          type="button"
-          className="ml-auto float-right text-primary-subtle cursor-pointer bg-transparent border-0 p-0 font-inherit"
+        <UpgradeAction
           onClick={() => {
             navigate('/subscription')
           }}
         >
           {t('setting:upgrade')}
-        </button>
-      </div>
+        </UpgradeAction>
+      </AlertBox>
 
       <ActionCard items={items} />
-    </div>
+    </Wrapper>
   )
 }
 

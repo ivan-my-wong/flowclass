@@ -19,11 +19,12 @@ import { DateRange, DayPicker } from 'react-day-picker'
 
 import Popover from '@/components/Tooltips/Popover'
 import { Button } from '@/components/ui/Button'
-import { ChartDate } from '@/types/chartDate.type'
 import {
   chartDateOptionMapping,
   customDateRangeMapping,
-} from '@/utils/chartjsSetup'
+} from '@/pages/GoogleAnalytics/components/chartjsSetup'
+import { styled } from '@/styles'
+import { ChartDate } from '@/types/chartDate.type'
 import { cn } from '@/utils/cn'
 import {
   formatChartDate,
@@ -137,6 +138,10 @@ const ChartRangeDatePicker = ({
           to = lastYear.endOf('year').toDate()
           break
         }
+        case 'allTime':
+          from = new Date('2018-01-01')
+          to = today.toDate()
+          break
         default:
           from = today.toDate()
           to = today.toDate()
@@ -202,13 +207,13 @@ const ChartRangeDatePicker = ({
             className
           )}
         >
-          <div className="flex items-center justify-start gap-2 cursor-pointer w-full">
+          <TriggerContainer className="justify-start">
             <CiCalendarDate size="1.5rem" className="text-blue-600" />
             <span className="line-clamp-1 text-blue-700 font-medium">
               {formatChartDateInWords(displayedDate?.from)} -{' '}
               {formatChartDateInWords(displayedDate?.to)}
             </span>
-          </div>
+          </TriggerContainer>
           <TriangleDownIcon className="text-blue-600" />
         </div>
       }
@@ -261,16 +266,15 @@ const ChartRangeDatePicker = ({
               ))}
             </div>
           </div>
-          <DayPicker
+          <StyledDayPicker
             // initialFocus
             mode="range"
             selected={tempDateSelection}
             onSelect={handleDatePickerChange}
-            fromMonth={new Date(formatDateRelativeToToday(365))}
+            fromMonth={new Date('2018-01-01')}
             toMonth={includeFuture ? undefined : new Date()}
             disabled={includeFuture ? undefined : { after: new Date() }}
             showOutsideDays
-            className="[&_.rdp-nav]:z-[1050] [&_.rdp-day_selected]:bg-blue-100 [&_.rdp-day_selected]:text-blue-800 [&_.rdp-day_range_start]:bg-blue-600 [&_.rdp-day_range_start]:text-white [&_.rdp-day_range_end]:bg-blue-600 [&_.rdp-day_range_end]:text-white [&_.rdp-day_range_middle]:bg-blue-100 [&_.rdp-day_range_middle]:text-blue-800 [&_.rdp-day:hover:not(.rdp-day_disabled):not(.rdp-day_selected)]:bg-blue-50 [&_.rdp-day:hover:not(.rdp-day_disabled):not(.rdp-day_selected)]:text-blue-800"
           />
         </div>
         <div className="box-row-full justify-between items-center pt-4 pb-2 border-t border-text-disabled gap-4">
@@ -306,6 +310,42 @@ const ChartRangeDatePicker = ({
 }
 
 export default ChartDatePicker
+
+const TriggerContainer = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'right',
+  gap: '0.5rem',
+  cursor: 'pointer',
+  width: '100%',
+})
+
+const StyledDayPicker = styled(DayPicker, {
+  '.rdp-nav': {
+    zIndex: '$modalContent',
+  },
+  '.rdp-day_selected': {
+    backgroundColor: '#DBEAFE',
+    color: '#1E40AF',
+  },
+  '.rdp-day_range_start': {
+    backgroundColor: '#3B82F6',
+    color: '#FFFFFF',
+  },
+
+  '.rdp-day_range_end': {
+    backgroundColor: '#3B82F6',
+    color: '#FFFFFF',
+  },
+  '.rdp-day_range_middle': {
+    backgroundColor: '#DBEAFE',
+    color: '#1E40AF',
+  },
+  '.rdp-day:hover:not(.rdp-day_disabled):not(.rdp-day_selected)': {
+    backgroundColor: '#EFF6FF',
+    color: '#1E40AF',
+  },
+})
 
 const ChartMonthDatePicker = ({
   chartDate,
@@ -351,18 +391,18 @@ const ChartMonthDatePicker = ({
             className
           )}
         >
-          <div className="flex items-center justify-start gap-2 cursor-pointer w-full">
+          <TriggerContainer className="justify-start">
             <CiCalendarDate size="1.5rem" className="text-blue-600" />
             <span className="line-clamp-1 text-blue-700 font-medium">
               {monthLabel}
             </span>
-          </div>
+          </TriggerContainer>
           <TriangleDownIcon className="text-blue-600" />
         </div>
       }
     >
       <div className="box-col gap-4 items-start p-4 bg-white rounded-lg">
-        <DayPicker
+        <StyledMonthPicker
           mode="single"
           captionLayout="dropdown-buttons"
           month={tempMonth}
@@ -379,7 +419,6 @@ const ChartMonthDatePicker = ({
                   after: now.endOf('month').toDate(),
                 }
           }
-          className="[&_.rdp-table]:hidden [&_.rdp-weekdays]:hidden [&_.rdp-caption_label]:font-bold [&_.rdp-caption_dropdowns]:w-full [&_.rdp-caption_dropdowns]:gap-2"
         />
         <div className="box-row-full justify-between items-center border-t border-text-disabled pt-3">
           <Close
@@ -397,3 +436,19 @@ const ChartMonthDatePicker = ({
     </Popover>
   )
 }
+
+const StyledMonthPicker = styled(DayPicker, {
+  '.rdp-table': {
+    display: 'none',
+  },
+  '.rdp-weekdays': {
+    display: 'none',
+  },
+  '.rdp-caption_label': {
+    fontWeight: '$bold',
+  },
+  '.rdp-caption_dropdowns': {
+    width: '100%',
+    gap: '0.5rem',
+  },
+})

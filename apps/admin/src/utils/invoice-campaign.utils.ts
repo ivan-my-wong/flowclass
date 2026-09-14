@@ -1,14 +1,11 @@
 /* eslint-disable prettier/prettier */
-import { BundleDiscount } from '@/types/bundleDiscounts'
-import { Classes, PeriodLessons } from '@/types/classes'
+import { PeriodLessons } from '@/types/classes'
 import { ClassTypeEnum, PriceType } from '@/types/course'
-import { Invoice } from '@/types/enrollCourse'
 import { FormInvoiceSubscriptionClass } from '@/types/invoice-campaign'
 import { StudentEnrolmentRecord } from '@/types/student'
 import {
   AppliedPromotion,
   InvoiceCampaignDetailDto,
-  InvoiceCampaignDto,
   InvoiceClassType,
   InvoiceSessionType,
   InvoiceSplitType,
@@ -18,7 +15,6 @@ import {
   PromotionTypeItem,
   RegularScheduleLessonPreviewPeriodGroup,
 } from '@/types/studentInvoice.type'
-import { InvoiceCampaign } from '@/types/templateManagement'
 
 import { formatCurrency } from './currency'
 import dayjs from './dayjs'
@@ -52,21 +48,6 @@ export const buildRecurringLessons = (
     classId: session.classItem?.classId,
     id: session.id,
   }))
-}
-
-/**
- * Pro-rate a multi-lesson price option down to a per-lesson amount based on
- * how many lessons the student actually picked. Used when a PriceOption is
- * priced for a fixed pack (e.g. "10 lessons for $1000") but the invoice should
- * charge per-lesson against the selection count.
- */
-const calculateLessonPrice = (
-  lessonPrice: number,
-  numOfSelectedLessons: number,
-  numberOfLessons: number
-): number => {
-  if (!numberOfLessons) return lessonPrice
-  return (lessonPrice * numOfSelectedLessons) / numberOfLessons
 }
 
 export const composeClassesAndSessions = (
@@ -145,24 +126,13 @@ export const composeClassesAndSessions = (
   })
   return newInvoiceClasses
 }
-
-export const getEarliestSessionDate = (
-  studentId: number,
-  allSessions: InvoiceSessionType[]
-): Date | null => {
-  const studentSessions = allSessions.filter(
-    s => s.studentItem?.id === studentId
-  )
-  if (studentSessions.length === 0) return null
-
-  const timestamps = studentSessions
-    .map(s => dayjs(s.date || s.startTime).valueOf())
-    .filter(t => !Number.isNaN(t))
-
-  if (timestamps.length === 0) return null
-  return dayjs(Math.min(...timestamps)).toDate()
+const calculateLessonPrice = (
+  lessonPrice: number,
+  numOfSelectedLessons: number,
+  numberOfLessons: number
+) => {
+  return (lessonPrice * numOfSelectedLessons) / numberOfLessons
 }
-
 export const buildInvoiceCampaignData = (
   institutionId: number,
   siteId: number,
@@ -225,9 +195,6 @@ export const buildInvoiceCampaignData = (
       classes: generatedClassAndSessions,
       splitType: invoiceSplitType,
       total: invoiceSubtotal.totalPrice,
-      paymentDate: student.paymentDate
-        ? dayjs(student.paymentDate).format('YYYY-MM-DD')
-        : null,
     }
     if (invoiceSplitType === InvoiceSplitType.CUSTOM_SPLIT) {
       newInvoiceItem.splitItems = invoiceSplitItems
@@ -274,13 +241,17 @@ export const formatTotalPriceInvoice = (
 
 export const calculateTotalDiscount = (
   totalPrice: number,
-  appliedPromotions: AppliedPromotion[]
+  appliedPromotions: AppliedPromotion[],
+  currency: string
 ): {
   totalDiscount: number
+  totalDiscountLabel: string
   discountAmounts: number[]
   discountAmountsByPromoId: Record<string | number, number>
   priceAfterDiscount: number
+  priceAfterDiscountLabel: string
   additionalFee: number
+  additionalFeeLabel: string
 } => {
   let currentPrice = totalPrice ?? 0
   const discounts: number[] = []
@@ -311,15 +282,6 @@ export const calculateTotalDiscount = (
         (retroactiveDiscount !== undefined && retroactiveDiscount > 0
           ? retroactiveDiscount
           : 0)
-    } else if (type === PromotionTypeItem.PACKAGE) {
-      // Package discount: compute from per-lesson amount × qualified lesson count
-      const perLesson =
-        parseFloat(String(item.packageDiscountPerLesson)) || 0
-      const lessonCount = item.qualifiedLessonCount ?? 0
-      discountValue =
-        perLesson > 0 && lessonCount > 0
-          ? perLesson * lessonCount
-          : parseFloat(String(amount)) || 0
     } else {
       // For other discounts, calculate based on discount type
       discountValue =
@@ -345,13 +307,15 @@ export const calculateTotalDiscount = (
     totalPrice - totalDiscountTemp + additionalFees,
     0
   )
-  
   return {
     totalDiscount: totalDiscountTemp,
+    totalDiscountLabel: `-${formatCurrency(totalDiscountTemp, currency)}`,
     discountAmounts: discounts,
     discountAmountsByPromoId,
     additionalFee: additionalFees,
+    additionalFeeLabel: `+${formatCurrency(additionalFees, currency)}`,
     priceAfterDiscount,
+    priceAfterDiscountLabel: formatCurrency(priceAfterDiscount, currency),
   }
 }
 
@@ -468,282 +432,4 @@ export const getUniqueCourseIds = (classes: InvoiceClassType[]): number[] => {
     .filter((id): id is number => id !== null && id !== undefined)
 
   return [...new Set(courseIds)]
-}
-
-/**
- * Returns the unique student count for an invoice campaign.
- * Prefers metadata.invoices (by userAliasId); falls back to the invoices relation.
- */
-export function getUniqueStudentCount(item: InvoiceCampaign): number {
-  if (item.metadata?.invoices && item.metadata.invoices.length > 0) {
-    return new Set(item.metadata.invoices.map(i => i.userAliasId)).size
-  }
-  return new Set(
-    (item.invoices ?? []).map(i => i.userAlias?.id).filter(Boolean)
-  ).size
-}
-
-/**
- * Builds a "Name1, Name2 +N" label from an invoice campaign's student list.
- * Shows up to 3 names; appends "+N" for additional students.
- */
-export function buildStudentNamesLabel(
-  item: InvoiceCampaign,
-  fallback: string
-): string {
-  const names: string[] = []
-  if (item.metadata?.invoices && item.metadata.invoices.length > 0) {
-    const seen = new Set<number>()
-    item.metadata.invoices.some(inv => {
-      if (!seen.has(inv.userAliasId) && inv.name) {
-        seen.add(inv.userAliasId)
-        names.push(inv.name)
-      }
-      return names.length === 3
-    })
-  } else if (item.invoices && item.invoices.length > 0) {
-    const seen = new Set<number>()
-    item.invoices.some(inv => {
-      const id = inv.userAlias?.id
-      const name = inv.userAlias?.name
-      if (id !== undefined && !seen.has(id) && name) {
-        seen.add(id)
-        names.push(name)
-      }
-      return names.length === 3
-    })
-  }
-  if (names.length === 0) return fallback
-  const total = getUniqueStudentCount(item)
-  const extra = total - names.length
-  return extra > 0 ? `${names.join(', ')} +${extra}` : names.join(', ')
-}
-
-type PromotionLike = {
-  id: number | string
-  status?: string
-  expireDate?: string
-  isActive?: boolean
-  endDate?: string
-  name?: string
-  code?: string
-}
-
-/**
- * Initializes Recoil invoice editor state from a single fetched Invoice.
- * Mirrors initializeCampaignData() in Editor/index.tsx but works from a
- * single Invoice entity (not an InvoiceCampaign).
- *
- * Note: sessions are sourced from invoice.studentSchedules[].studentLessons[]
- * because the backend loads studentSchedules (with studentLessons) on the
- * detail endpoint, but does NOT load enrollCourses.studentSchedule.
- */
-export function initializeInvoiceData(
-  invoice: Invoice,
-  classes: Classes[],
-  allPromotions: PromotionLike[] | undefined,
-  setAllStudents: (s: InvoiceStudent[]) => void,
-  setAllClasses: (c: InvoiceClassType[]) => void,
-  setAllSessions: (s: InvoiceSessionType[]) => void,
-  setInvoiceCampaign: (c: InvoiceCampaignDto) => void
-): void {
-  // 1. Build single student from invoice.userAlias
-  const appliedPromotions: AppliedPromotion[] = (
-    invoice.adminDiscounts ?? []
-  ).map(appliedItem => {
-    const promotionData = allPromotions?.find(
-      x => Number(x.id) === Number(appliedItem.id)
-    )
-    const result = { ...appliedItem }
-    if (promotionData) {
-      const now = dayjs()
-      if ('code' in promotionData) {
-        result.isApplicable =
-          promotionData.status === 'ACTIVE' &&
-          !dayjs(promotionData.expireDate).endOf('day').isBefore(now)
-      } else if ('name' in promotionData) {
-        const bd = promotionData as BundleDiscount
-        result.isApplicable =
-          bd.isActive && !dayjs(bd.endDate).endOf('day').isBefore(now)
-      }
-    }
-    return result
-  })
-
-  const student: InvoiceStudent = {
-    id: invoice.userAlias.id,
-    userId: invoice.userId,
-    name: invoice.userAlias.name,
-    email: invoice.userAlias.email ?? '',
-    phone: invoice.userAlias.user?.phone ?? '',
-    total: 0,
-    appliedPromotions,
-    invoiceRemark: '',
-    invoiceSplitType: invoice.splitType ?? InvoiceSplitType.SINGLE,
-    invoiceSplitItems: invoice.splitItems ?? [],
-    isPayByCredit: (invoice.usedBalance ?? 0) > 0,
-    usedBalance: invoice.usedBalance ?? 0,
-    childOfUserAliasId: invoice.userAlias.childOfUserAliasId ?? null,
-    isStudentParent: invoice.userAlias.isStudentParent ?? false,
-    isSendToParent: !!(invoice.userAlias.childOfUserAliasId),
-    paymentDate: null,
-  }
-  setAllStudents([student])
-
-  // 2. Build classes — one per enrollCourse
-  const invoiceClasses: InvoiceClassType[] = (invoice.enrollCourses ?? [])
-    .filter(ec => ec.classId != null)
-    .map(enrollCourse => {
-      const classData = classes.find(c => c.id === enrollCourse.classId)
-      const enrollInto = Array.isArray(enrollCourse.enrollInto)
-        ? enrollCourse.enrollInto[0]
-        : enrollCourse.enrollInto
-      const type = (classData?.type ?? enrollInto?.type) as ClassTypeEnum
-      // Count lessons from top-level studentSchedules filtered by enrollCourseId
-      const sessionLength =
-        (invoice.studentSchedules ?? [])
-          .filter(s => s.enrollCourseId === enrollCourse.id)
-          .flatMap(s => s.studentLessons ?? []).length || 1
-      return {
-        classId: enrollCourse.classId as number,
-        courseId: enrollCourse.courseId,
-        type,
-        courseName: classData?.name ?? enrollCourse.course?.name ?? '',
-        price:
-          classData?.tuition != null ? Number(classData.tuition) : 0,
-        sessionLength,
-        remark: '',
-        studentItem: student,
-      } as InvoiceClassType
-    })
-  setAllClasses(invoiceClasses)
-
-  // 3. Build sessions — from invoice.studentSchedules[].studentLessons[]
-  const sessions: InvoiceSessionType[] = (invoice.studentSchedules ?? [])
-    .flatMap(schedule => {
-      const classItem =
-        invoiceClasses.find(c => c.classId === schedule.classId) ?? null
-      return (schedule.studentLessons ?? []).map(lesson => ({
-        id: Number(lesson.id),
-        startTime: lesson.startTime,
-        endTime: lesson.endTime,
-        date: dayjs(lesson.startTime).format('YYYY-MM-DD'),
-        lessonNumber: 1,
-        isBlocked: false,
-        isOverride: false,
-        studentItem: student,
-        classItem,
-      } as InvoiceSessionType))
-    })
-  setAllSessions(sessions)
-
-  // 4. Minimal campaign state — invoiceIds triggers UPDATE path on re-send
-  setInvoiceCampaign({
-    id: invoice.documentCampaignId,
-    isCombined: false,
-    title: '',
-    isDraft: false,
-    invoices: [],
-    sendViaEmail: false,
-    emailSubject: '',
-    emailBody: '',
-    sendViaWhatsapp: false,
-    whatsappContent: '',
-    invoiceIds: invoice.id ? [invoice.id] : [],
-    jobId: null,
-  })
-}
-
-/**
- * Check if all available lessons in a calendar month are selected for a given class.
- * Used for package discount auto-apply qualification.
- */
-export const isPackageDiscountQualified = (
-  selectedSessions: InvoiceSessionType[],
-  availableLessons: { id: number; date: string; period?: number }[],
-  classId: number
-): { qualified: boolean; qualifiedMonths: string[]; lessonCount: number } => {
-  // Filter selected sessions for this class
-  const classSelectedSessions = selectedSessions.filter(
-    s => s.classItem?.classId === classId
-  )
-
-  if (classSelectedSessions.length === 0 || availableLessons.length === 0) {
-    return { qualified: false, qualifiedMonths: [], lessonCount: 0 }
-  }
-
-  const hasPeriodInfo = availableLessons.some(l => l.period != null)
-
-  if (hasPeriodInfo) {
-    // Period-aware check: for each (period, month) group in selected sessions,
-    // verify all available lessons in that exact period+month are selected.
-    // This prevents cross-period false negatives in multi-period classes.
-    const selectedByPeriodMonth = new Map<string, Set<number>>()
-    classSelectedSessions.forEach(session => {
-      const period = session.period ?? 0
-      const month = session.date.substring(0, 7)
-      const key = `${period}:${month}`
-      if (!selectedByPeriodMonth.has(key)) selectedByPeriodMonth.set(key, new Set())
-      selectedByPeriodMonth.get(key)!.add(session.id)
-    })
-
-    const availableByPeriodMonth = new Map<string, Set<number>>()
-    availableLessons.forEach(lesson => {
-      if (lesson.period == null) return
-      const month = lesson.date.substring(0, 7)
-      const key = `${lesson.period}:${month}`
-      if (!availableByPeriodMonth.has(key)) availableByPeriodMonth.set(key, new Set())
-      availableByPeriodMonth.get(key)!.add(lesson.id)
-    })
-
-    const qualifiedMonths: string[] = []
-    let totalLessonCount = 0
-
-    selectedByPeriodMonth.forEach((selectedIds, key) => {
-      const availableIds = availableByPeriodMonth.get(key)
-      if (!availableIds || availableIds.size === 0) return
-      const allSelected = [...availableIds].every(id => selectedIds.has(id))
-      if (allSelected) {
-        const month = key.split(':')[1]
-        if (!qualifiedMonths.includes(month)) qualifiedMonths.push(month)
-        totalLessonCount += availableIds.size
-      }
-    })
-
-    return { qualified: qualifiedMonths.length > 0, qualifiedMonths, lessonCount: totalLessonCount }
-  }
-
-  // Fallback: period-unaware (original logic for backward compat)
-  const availableByMonth: Record<string, Set<number>> = {}
-  availableLessons.forEach(lesson => {
-    const month = lesson.date.substring(0, 7)
-    if (!availableByMonth[month]) availableByMonth[month] = new Set()
-    availableByMonth[month].add(lesson.id)
-  })
-
-  const selectedByMonth: Record<string, Set<number>> = {}
-  classSelectedSessions.forEach(session => {
-    const month = session.date.substring(0, 7)
-    if (!selectedByMonth[month]) selectedByMonth[month] = new Set()
-    selectedByMonth[month].add(session.id)
-  })
-
-  const qualifiedMonths: string[] = []
-  let totalLessonCount = 0
-
-  Object.entries(availableByMonth).forEach(([month, availableIds]) => {
-    const selectedIds = selectedByMonth[month]
-    if (!selectedIds) return
-    const allSelected = [...availableIds].every(id => selectedIds.has(id))
-    if (allSelected && availableIds.size > 0) {
-      qualifiedMonths.push(month)
-      totalLessonCount += availableIds.size
-    }
-  })
-
-  return {
-    qualified: qualifiedMonths.length > 0,
-    qualifiedMonths,
-    lessonCount: totalLessonCount,
-  }
 }

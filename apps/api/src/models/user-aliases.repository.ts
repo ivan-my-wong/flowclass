@@ -53,18 +53,6 @@ export class UserAliasesRepository extends BaseAbstractRepository<UserAlias> {
     })
   }
 
-  async findFirstByUserIdAndInstitution(
-    institutionId: number,
-    userId: number,
-    relations?: { user?: boolean }
-  ): Promise<UserAlias | null> {
-    return this._repository.findOne({
-      where: { institutionId, userId },
-      order: { id: 'ASC' },
-      relations,
-    })
-  }
-
   async findOrCreate(params: {
     institutionId: number
     userId: number
@@ -83,23 +71,6 @@ export class UserAliasesRepository extends BaseAbstractRepository<UserAlias> {
         name: params.alias,
       })
       await this.insert(userAlias)
-    }
-    return userAlias
-  }
-
-  async findOrCreateByUserIdAndInstitution(
-    institutionId: number,
-    userId: number,
-    defaultName: string
-  ): Promise<UserAlias> {
-    let userAlias = await this.findFirstByUserIdAndInstitution(institutionId, userId)
-    if (!userAlias) {
-      userAlias = this._repository.create({
-        institutionId,
-        userId,
-        name: defaultName,
-      })
-      userAlias = await this._repository.save(userAlias)
     }
     return userAlias
   }

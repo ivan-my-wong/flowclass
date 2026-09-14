@@ -7,13 +7,14 @@ import { TextInput } from '@/components/Inputs/TextInput'
 import Separator from '@/components/Separators/Separator'
 import Box from '@/components/ui/Box'
 import usePayoutData from '@/hooks/usePayoutData'
+import usePlanData from '@/hooks/useSubscriptionPlanData'
 
 const CreateStripeAccount = (): JSX.Element => {
   const [stripeAccountSchoolId, setStripeAccountSchoolId] = useState<number>()
   const [customerAccountSchoolId, setcustomerAccountSchoolId] =
     useState<number>()
-  const { useCreateCustomerAccount, useCreateExpressStripeAccount } =
-    usePayoutData()
+  const { useCreateCustomerAccount } = usePlanData()
+  const { useCreateExpressStripeAccount } = usePayoutData()
   const { mutateAsync: stripeAccountMutate, isLoading: creatingStripeAccount } =
     useCreateExpressStripeAccount()
   const {

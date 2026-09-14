@@ -11,7 +11,7 @@ export class CreateStripeConnectDto {
   institutionId: number
 
   @ApiPropertyOptional({
-    example: 'https://example.com/settings/payments',
+    example: 'https://app.flowclass.io/settings/payments',
   })
   @IsString()
   @IsOptional()
@@ -19,7 +19,7 @@ export class CreateStripeConnectDto {
   returnUrl: string
 
   @ApiPropertyOptional({
-    example: 'https://example.com/settings/payments',
+    example: 'https://app.flowclass.io/settings/payments',
   })
   @IsString()
   @IsOptional()

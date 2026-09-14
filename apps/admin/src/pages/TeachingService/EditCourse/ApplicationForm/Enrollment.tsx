@@ -34,6 +34,7 @@ import Box from '@/components/ui/Box'
 import { Button } from '@/components/ui/Button'
 import useCourseData from '@/hooks/useCourseData'
 import { courseState } from '@/stores/courseData'
+import { styled } from '@/styles'
 import { Course, QuestionData } from '@/types/course'
 
 import EnrollmentQuestionModal, {
@@ -241,7 +242,7 @@ const Enrollment = ({
           unSavedChanges={unSavedChanges}
         />
       </Box>
-      <div className="flex flex-col justify-center items-center w-full border border-background-layer-3 rounded-md gap-6 sm:w-full sm:p-4">
+      <FormBox padding="lg">
         {/* <SpecialStudyField /> */}
         <DraggableContainer
           items={currentCourse.customFields ?? []}
@@ -266,7 +267,7 @@ const Enrollment = ({
           questionData={defaultQuestionData()}
           handleQuestionDataSubmit={handleAddQuestionData}
         />
-      </div>
+      </FormBox>
     </Box>
   )
 }
@@ -285,18 +286,18 @@ const EnrollmentCard = ({
   handleEditQuestionData,
 }: EnrollmentCardProps): JSX.Element => {
   return (
-    <div className="flex flex-row flex-wrap content-center justify-between items-center w-full h-fit rounded-md">
-      <div className="flex justify-center w-10 mr-[3%]">
+    <EnrollmentCardBox>
+      <IconBox>
         <CustomFieldIcon field={field} />
-      </div>
-      <Text className="w-[65%] break-all flex items-center">
+      </IconBox>
+      <DragableBoxText>
         <span>
           {field.description}
           {field.validation === 'validation_required' && (
             <span style={{ color: '#cf3232' }}>*</span>
           )}
         </span>
-      </Text>
+      </DragableBoxText>
       <Box className="w-fit">
         <EnrollmentQuestionModal
           questionData={field}
@@ -312,7 +313,7 @@ const EnrollmentCard = ({
           <MdOutlineDeleteForever size="2rem" color="#cf3232" />
         </Box>
       </Box>
-    </div>
+    </EnrollmentCardBox>
   )
 }
 
@@ -353,14 +354,11 @@ const CreateNewFieldButton = ({
 }): JSX.Element => {
   const { t } = useTranslation(['teachingService'])
   return (
-    <div className="flex justify-center w-full rounded-md p-2">
-      <Text
-        className="text-primary cursor-pointer self-center hover:underline hover:text-primary-highlight"
-        onClick={openModal}
-      >
+    <CreateNewFieldButtonBox>
+      <CreateNewFieldButtonBoxText onClick={openModal}>
         {t('enrollment.enrollmentForm.addNewField')}
-      </Text>
-    </div>
+      </CreateNewFieldButtonBoxText>
+    </CreateNewFieldButtonBox>
   )
 }
 
@@ -390,5 +388,78 @@ const CustomFieldIcon = ({ field }: { field: QuestionData }): JSX.Element => {
       return <></>
   }
 }
+
+const FormBox = styled(Box, {
+  display: 'flex',
+  flexDirection: 'column !important',
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: '100% !important',
+  border: '1px solid $colors$backgroundLayer3',
+  borderRadius: '$medium',
+  gap: '$6',
+  '@sm': {
+    width: '100% !important',
+    padding: '$4 !important',
+  },
+})
+
+const DragableBoxText = styled(Text, {
+  width: '65%',
+  overflowWrap: 'anywhere',
+  display: 'flex',
+  alignItems: 'center',
+})
+
+const CreateNewFieldButtonBox = styled('div', {
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  borderRadius: '$medium',
+  padding: '$2',
+})
+
+const CreateNewFieldButtonBoxText = styled(Text, {
+  color: '$primary',
+  cursor: 'pointer',
+  alignSelf: 'center',
+  '&:hover': {
+    textDecoration: 'underline',
+    color: '$primaryHighlight',
+  },
+})
+
+// const SpecialStudyFieldBox = styled('div', {
+//   width: '100%',
+//   height: 'fit-content',
+//   display: 'flex',
+//   flexDirection: 'row',
+//   alignContent: 'center',
+//   justifyContent: 'space-between',
+//   alignItems: 'center',
+//   backgroundColor: '$backgroundLayer2',
+//   padding: '$4',
+//   borderRadius: '$medium',
+// })
+
+const IconBox = styled('div', {
+  marginRight: '3%',
+  display: 'flex',
+  justifyContent: 'center',
+  width: '2.5rem',
+})
+
+const EnrollmentCardBox = styled('div', {
+  width: '100%',
+  height: 'fit-content',
+  display: 'flex',
+  flexDirection: 'row',
+  alignContent: 'center',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  // backgroundColor: '$backgroundLayer2',
+  // padding: '$4',
+  borderRadius: '$medium',
+})
 
 export default Enrollment

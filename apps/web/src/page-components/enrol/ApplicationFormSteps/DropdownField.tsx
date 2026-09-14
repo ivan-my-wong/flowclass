@@ -62,7 +62,7 @@ const DropdownField = ({
                 defaultValue={defaultValue}
                 options={options || []}
                 placeholder={placeholder}
-                onChange={val => onChange(val?.value || null)}
+                onChange={(val: any) => onChange(val?.value || null)}
                 className="w-full"
                 required={required}
                 isClearable={isClearable}

@@ -1,7 +1,7 @@
 import Head from 'next/head'
 
 import { Course, School, Site } from '@/types'
-import { getMediaFileUrl } from '@/utils/convert'
+import { getS3FileUrl } from '@/utils/convert'
 
 const flowclassLogo = '/flowclass_icon.ico'
 const LayoutHead = ({
@@ -14,9 +14,9 @@ const LayoutHead = ({
 }): JSX.Element => {
   let logo = flowclassLogo
   if (school?.logo && school?.logo !== '') {
-    logo = getMediaFileUrl(school.logo)
+    logo = getS3FileUrl(school.logo)
   } else if (site?.logo && site?.logo !== '') {
-    logo = getMediaFileUrl(site.logo)
+    logo = getS3FileUrl(site.logo)
   }
 
   return (

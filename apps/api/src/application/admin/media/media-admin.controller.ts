@@ -27,13 +27,12 @@ import { Public } from '@/common/decorators/public.decorator'
 import { RequireParams } from '@/common/decorators/require-param.decorator'
 import { AdminAuthGuard } from '@/common/guards/admin-auth.guard'
 import { RequireParamsGuard } from '@/common/guards/require-params.guard'
-import { ObjectStorageProvider } from '@/config/storage/object-storage.provider'
+import { S3ClientFactory } from '@/config/s3/s3-factory.provider'
 import {
   MediaFileDirectory,
-  StorageImageUploadInterceptor,
-  StorageTargetDirectory,
-  UploadedStorageFile,
-} from '@/config/storage/storage-image-upload-interceptor'
+  S3ImageUploadInterceptor,
+  S3TargetDirectory,
+} from '@/config/s3/s3-image-upload-interceptor'
 import { RequireParam } from '@/models/enums/'
 
 import { CreateMediaDto } from '../../../modules/media/dto/media.dto'
@@ -51,7 +50,7 @@ import { MediaService } from '../../../modules/media/media.service'
 export class MediaAdminController {
   public constructor(
     private readonly mediaService: MediaService,
-    private readonly objectStorageProvider: ObjectStorageProvider
+    private readonly s3ClientFactory: S3ClientFactory
   ) {}
 
   @ApiBadRequestResponse({
@@ -92,9 +91,9 @@ export class MediaAdminController {
   @RequireParams(RequireParam.INSTITUTION_ID, RequireParam.SITE_ID)
   @UseGuards(RequireParamsGuard)
   @Post('upload')
-  @UseInterceptors(StorageImageUploadInterceptor(StorageTargetDirectory.MEDIA))
+  @UseInterceptors(S3ImageUploadInterceptor(S3TargetDirectory.MEDIA))
   public async uploadFile(
-    @UploadedFile() file: UploadedStorageFile,
+    @UploadedFile() file: Express.MulterS3.File,
     @Query('siteId') siteId: number,
     @Query('institutionId') institutionId: number
   ) {
@@ -112,15 +111,15 @@ export class MediaAdminController {
   }
 
   @ApiOperation({
-    summary: 'This api for get private object access url',
+    summary: 'This api for get s3 private object presigned url',
   })
   // @ApiOkResponse({
   //   schema: deleteClassSchema,
   // })
   @Public()
   @HttpCode(200)
-  @Get('object-access-url')
-  async getObjectAccessUrl(@Query('key') key: string) {
-    return this.objectStorageProvider.getObjectAccessUrl(key)
+  @Get('s3-presigned-url')
+  async getS3ObjectPresignedUrl(@Query('key') key: string) {
+    return this.s3ClientFactory.getS3ObjectPresignedUrl(key)
   }
 }

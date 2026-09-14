@@ -25,8 +25,10 @@ import { informationFieldState } from '@/stores/informationFieldData'
 import { schoolState } from '@/stores/schoolData'
 import { InformationFieldTypes } from '@/types/applicationForm'
 import { TypeStudentEnrollment } from '@/types/student'
+import { StudentInfoResponse } from '@/types/studentMemo'
 
 type Props = {
+  studentMemo: StudentInfoResponse
   disabled?: boolean
   enrollmentForm: UseFormReturn
   studentEnrollment: Record<string, TypeStudentEnrollment>
@@ -62,6 +64,7 @@ const EnrollmentFormDetail = ({
   disabled = false,
   enrollmentForm,
   studentEnrollment,
+  studentMemo,
 }: Props): React.ReactElement => {
   const { t } = useTranslation()
   const { setValue, getValues } = enrollmentForm
@@ -318,7 +321,7 @@ const EnrollmentFormDetail = ({
                   option: correctField?.option ?? [],
                 }
               }
-              if (!completeCustomField?.id) return null
+              if (!completeCustomField?.id) return <></>
               return (
                 <FormFields
                   key={customField.id}

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+import { getAuth, GoogleAuthProvider, signInWithPopup } from '@firebase/auth'
 import { useTranslation } from 'react-i18next'
 import {
   useMutation,
@@ -297,6 +298,7 @@ export interface UseGoogleIntegrationReturn {
 export const useIntegrationGoogle = (): UseGoogleIntegrationReturn => {
   const queryClient = useQueryClient()
   const { t } = useTranslation(['integrations', 'integration', 'availability'])
+  const firebaseAuth = getAuth()
   const { currentSchool } = useSchoolData()
   const institutionId = currentSchool?.id ?? 0
   const { isLogin } = useAuth()
@@ -554,7 +556,34 @@ export const useIntegrationGoogle = (): UseGoogleIntegrationReturn => {
     async () => {
       setIsAuthLoading(true)
       try {
-        throw new Error('Google popup authentication is disabled in OSS mode.')
+        const googleAuthProvider = new GoogleAuthProvider()
+        googleAuthProvider.addScope('https://www.googleapis.com/auth/calendar')
+        googleAuthProvider.addScope(
+          'https://www.googleapis.com/auth/calendar.events'
+        )
+        googleAuthProvider.setCustomParameters({
+          access_type: 'offline',
+          prompt: 'consent',
+        })
+        const { currentUser } = firebaseAuth
+        if (!currentUser)
+          throw new Error(t('auth.errors.notSignedIn') as string)
+        const idToken = await currentUser.getIdToken()
+        const authResult = await signInWithPopup(
+          firebaseAuth,
+          googleAuthProvider
+        )
+        const credential = GoogleAuthProvider.credentialFromResult(authResult)
+        if (!credential?.accessToken)
+          throw new Error(t('errors.googleCredential') as string)
+
+        const payload: CreateIntegrationCalendarDto = {
+          institutionId: institutionId ?? 0,
+          provider: CalendarProvider.GOOGLE,
+          idToken,
+          accessToken: credential.accessToken,
+        }
+        return await apiCreateCalendarIntegration(payload)
       } finally {
         setIsAuthLoading(false)
       }
@@ -577,7 +606,39 @@ export const useIntegrationGoogle = (): UseGoogleIntegrationReturn => {
     async () => {
       setIsAuthLoading(true)
       try {
-        throw new Error('Google popup authentication is disabled in OSS mode.')
+        const googleAuthProvider = new GoogleAuthProvider()
+        googleAuthProvider.addScope(
+          'https://www.googleapis.com/auth/meetings.space.created'
+        )
+        googleAuthProvider.addScope(
+          'https://www.googleapis.com/auth/meetings.space.readonly'
+        )
+        googleAuthProvider.addScope(
+          'https://www.googleapis.com/auth/calendar.events.readonly'
+        )
+        googleAuthProvider.setCustomParameters({
+          access_type: 'offline',
+          prompt: 'consent',
+        })
+        const { currentUser } = firebaseAuth
+        if (!currentUser)
+          throw new Error(t('auth.errors.notSignedIn') as string)
+        const idToken = await currentUser.getIdToken()
+        const authResult = await signInWithPopup(
+          firebaseAuth,
+          googleAuthProvider
+        )
+        const credential = GoogleAuthProvider.credentialFromResult(authResult)
+        if (!credential?.accessToken)
+          throw new Error(t('errors.googleCredential') as string)
+
+        const payload: CreateIntegrationOnlineMeetingDto = {
+          institutionId: institutionId ?? 0,
+          provider: OnlineMeetingProvider.GOOGLE_MEET,
+          idToken,
+          accessToken: credential.accessToken,
+        }
+        return await apiCreateMeetIntegration(payload)
       } finally {
         setIsAuthLoading(false)
       }
@@ -1031,10 +1092,7 @@ export const useIntegrationGoogle = (): UseGoogleIntegrationReturn => {
       [...QUERY_KEY.googleIntegration.driveQuotaKey, institutionId],
       () => driveQuota(institutionId),
       {
-        // Only fetch the quota when Drive integration is actually connected —
-        // otherwise the API returns 400 and we churn the network log.
-        enabled:
-          !!institutionId && !!driveIntegrationStatus.data?.isConnected,
+        enabled: !!institutionId,
         onError: error => handleApiError({ error, t }),
       }
     )

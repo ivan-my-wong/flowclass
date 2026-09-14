@@ -16,17 +16,11 @@ import {
 import { SettingSiteErrorMessage } from '@/exceptions/error-message/setting-site'
 import { SettingSite } from '@/models/setting-site.entity'
 import { SettingSiteRepository } from '@/models/setting-site.repository'
-import { SitesRepository } from '@/models/sites.repository'
-import { UserRolesRepository } from '@/models/user-roles.repository'
 import { BaseService } from '@/modules/base/base.service'
 
 @Injectable()
 export class SettingSiteService extends BaseService<SettingSite> {
-  constructor(
-    private readonly settingSiteRepository: SettingSiteRepository,
-    private readonly siteRepository: SitesRepository,
-    private readonly userRolesRepository: UserRolesRepository
-  ) {
+  constructor(private readonly settingSiteRepository: SettingSiteRepository) {
     super(settingSiteRepository)
   }
 
@@ -53,25 +47,11 @@ export class SettingSiteService extends BaseService<SettingSite> {
 
   async create(dto: CreateSettingSiteDto) {
     let setting = await this.findOneBySite(dto.siteId)
-    const site = await this.siteRepository.findOneBy({ id: dto.siteId })
-    const siteOwner = await this.userRolesRepository.findOne({
-      where: {
-        siteId: dto.siteId,
-        isSiteManager: true,
-      },
-      relations: {
-        user: true,
-      },
-    })
 
     if (setting) {
       setting = await this.settingSiteRepository.save({ ...setting, ...dto })
     } else {
       setting = await this.settingSiteRepository.save(this.settingSiteRepository.create(dto))
-
-      if (site) {
-        // Site created - analytics integration removed
-      }
     }
 
     return setting

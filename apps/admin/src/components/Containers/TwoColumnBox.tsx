@@ -1,6 +1,34 @@
-import { cn } from '@/utils/cn'
+import { styled } from '../../styles'
 
 import Box from './Box'
+
+const StyledLeftBox = styled('div', {
+  width: '30%',
+  maxWidth: '40%',
+  justifyContent: 'flex-start',
+  display: 'flex',
+
+  fontSize: '$medium',
+
+  '@sm': {
+    width: '50%',
+    maxWidth: 'unset',
+  },
+})
+
+const StyledRightBox = styled('div', {
+  width: '70%',
+  maxWidth: '60%',
+  justifyContent: 'flex-start',
+  display: 'flex',
+  fontSize: '$medium',
+
+  '@sm': {
+    width: '50%',
+    maxWidth: 'unset',
+    justifyContent: 'flex-end',
+  },
+})
 
 const TwoColumnBox = ({
   leftColumn,
@@ -10,23 +38,16 @@ const TwoColumnBox = ({
   rightColumn: JSX.Element
 }): JSX.Element => {
   return (
-    <Box justify="flex-start" className="md:justify-between">
-      <div
-        className={cn(
-          'w-[30%] max-w-[40%] flex justify-start text-base',
-          'sm:w-1/2 sm:max-w-none'
-        )}
-      >
-        {leftColumn}
-      </div>
-      <div
-        className={cn(
-          'w-[70%] max-w-[60%] flex justify-start text-base',
-          'sm:w-1/2 sm:max-w-none sm:justify-end'
-        )}
-      >
-        {rightColumn}
-      </div>
+    <Box
+      justify="flex-start"
+      css={{
+        '@sm': {
+          justifyContent: 'space-between',
+        },
+      }}
+    >
+      <StyledLeftBox>{leftColumn}</StyledLeftBox>
+      <StyledRightBox>{rightColumn}</StyledRightBox>
     </Box>
   )
 }

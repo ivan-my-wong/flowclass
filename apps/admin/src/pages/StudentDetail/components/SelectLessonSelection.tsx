@@ -11,6 +11,7 @@ import Calendar from '@/components/DatePickers/Calendar'
 import Drawer from '@/components/Drawer/Drawer'
 import Text from '@/components/Texts/Text'
 import EventContentMobile from '@/pages/FullCalendar/components/EventContentMobile'
+import { styled } from '@/styles'
 import { StudentLesson } from '@/types/student'
 
 type Props = {
@@ -106,22 +107,17 @@ const SelectLessonSelection = ({
   return (
     <Drawer open={open} onClose={() => {}}>
       <>
-        <div className="flex justify-between items-center">
-          <div className="flex gap-2.5 h-fit items-center justify-between w-full">
+        <Header>
+          <Title>
             <Text bold size="large">
               {t('student:teachingService.lessonSelection')}
             </Text>
-            <button
-              type="button"
-              className="cursor-pointer bg-transparent border-0 p-0"
-              onClick={handleCloseDrw}
-              aria-label="Close"
-            >
+            <Icon onClick={handleCloseDrw}>
               <CloseIcon />
-            </button>
-          </div>
-        </div>
-        <div className="w-full h-px bg-[#BFBFBF] my-[22px]" />
+            </Icon>
+          </Title>
+        </Header>
+        <Hr />
         {/* <CalendarHeader
           calendarRef={calendarRef}
           handleClassSelect={handleClassSelect}
@@ -165,5 +161,28 @@ const SelectLessonSelection = ({
     </Drawer>
   )
 }
+
+const Header = styled('div', {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+})
+const Title = styled('div', {
+  display: 'flex',
+  gap: 10,
+  height: 'fit-content',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: '100%',
+})
+const Hr = styled('div', {
+  width: '100%',
+  height: 1,
+  backgroundColor: '#BFBFBF',
+  margin: '22px 0',
+})
+const Icon = styled('div', {
+  cursor: 'pointer',
+})
 
 export default SelectLessonSelection

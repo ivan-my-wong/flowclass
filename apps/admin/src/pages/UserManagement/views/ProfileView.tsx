@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/Button'
 import useSchoolData from '@/hooks/useSchoolData'
 import useSiteData from '@/hooks/useSiteData'
 import { getSinglePermissionFromUserRole } from '@/utils/convert'
-import { getMediaFileUrl } from '@/utils/generate-link.utils'
+import { getS3FileUrl } from '@/utils/generate-link.utils'
 
 import PermissionBadges from '../components/PermissionBadges'
 import { useProfile } from '../ProfileContext'
@@ -70,7 +70,7 @@ const ProfileView = (): JSX.Element => {
           <ImageAspect
             src={
               userRoleData?.user?.avatarUrl
-                ? getMediaFileUrl(userRoleData?.user?.avatarUrl)
+                ? getS3FileUrl(userRoleData?.user?.avatarUrl)
                 : ''
             }
             alt={`${userRoleData?.user?.firstName} ${

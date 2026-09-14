@@ -15,7 +15,7 @@ import {
   TemplateBackgroundProps,
   TemplateFieldData,
 } from '@/types/templateManagement'
-import { getMediaFileUrl } from '@/utils/generate-link.utils'
+import { getS3FileUrl } from '@/utils/generate-link.utils'
 
 type LeftSidebarProps = {
   name: string
@@ -52,13 +52,13 @@ const LeftSidebar = (props: LeftSidebarProps) => {
 
   const handleUploadFile = (imageUrl: string) => {
     const image = new Image()
-    image.src = getMediaFileUrl(imageUrl)
+    image.src = getS3FileUrl(imageUrl)
     setImage(image)
 
     image.onload = () => {
       setBackground({
         ...background,
-        url: getMediaFileUrl(imageUrl),
+        url: getS3FileUrl(imageUrl),
         width: image.width,
         height: image.height,
       })

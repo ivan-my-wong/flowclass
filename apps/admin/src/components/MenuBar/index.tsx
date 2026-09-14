@@ -6,9 +6,11 @@ import { useRecoilValue } from 'recoil'
 
 import { useResponsive } from '@/hooks/useResponsive'
 import useSiteData from '@/hooks/useSiteData'
+import useSitesFeatureEnabled from '@/hooks/useSiteFeatureEnableData'
+import { schoolSubscriptionState } from '@/stores/schoolSubscriptionData'
 import { userState } from '@/stores/userData'
 import { userPermissionState, UserRole } from '@/stores/userPermissionData'
-import { cn } from '@/utils/cn'
+import { styled, theme } from '@/styles'
 
 import ViewSiteButton from '../Buttons/ViewSite'
 import SvgIcon from '../Images/SvgIcon'
@@ -16,23 +18,117 @@ import SkeletonLoader from '../Loaders/SkeletonLoader'
 import SchoolSelector from '../Selector/SchoolSelector'
 import Text from '../Texts/Text'
 
-import menuItems, { buildMenuItems } from './menuBarItems'
+import menuItems, {
+  buildMenuItems,
+  FeatureMenu,
+  FeatureSiteMap,
+} from './menuBarItems'
 import { siteMenuItems } from './menuBarSiteItems'
+
+const MenuBarContainer = styled('nav', {
+  width: '15.5rem',
+  backgroundColor: '$backgroundLayer2',
+  borderRight: `2px solid $colors$backgroundLayer3`,
+  height: '100%',
+  overflowY: 'auto',
+  paddingLeft: '$2',
+  paddingRight: '$2',
+  paddingBottom: '$4',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+
+  '@sm': {
+    width: '100%',
+    height: '100vh',
+    paddingBottom: '$16',
+  },
+})
+
+const MenuItem = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  marginTop: '$3',
+  width: '90%',
+
+  padding: '$2',
+  textDecoration: 'none',
+  transition: 'background-color 0.2s ease',
+
+  cursor: 'pointer',
+  textAlign: 'center',
+  whiteSpace: 'nowrap',
+  borderRadius: '0.5rem',
+
+  fontSize: '0.95rem',
+
+  '.menuItemText': {
+    fontSize: '0.95rem',
+    lineHeight: '$4',
+    marginLeft: '$4',
+  },
+
+  '&:hover': {
+    color: '$primary',
+    svg: {
+      stroke: '$primary',
+      color: '$primary',
+    },
+    '#whatsappTemplate svg': {
+      fill: '$primary',
+      stroke: 'none',
+    },
+  },
+
+  '@md': {
+    width: '95%',
+  },
+
+  variants: {
+    active: {
+      true: {
+        backgroundColor: 'white',
+        color: '$primary',
+      },
+    },
+    noHover: {
+      true: {
+        '&:hover': {
+          backgroundColor: 'unset',
+          color: 'unset',
+        },
+      },
+    },
+  },
+})
 
 const MenuBar: React.FC = () => {
   const { t } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
-  const { useFetchAllSiteData } = useSiteData()
+  const { siteData, useFetchAllSiteData } = useSiteData()
   const { isLoading } = useFetchAllSiteData()
   const { isMobile } = useResponsive()
+  const { useFetchSitesFeatureEnabled } = useSitesFeatureEnabled()
+  const { data: sitesFeatureEnabled } = useFetchSitesFeatureEnabled()
   const userPermission = useRecoilValue(userPermissionState)
   const currentUser = useRecoilValue(userState)
+  const { activePlan } = useRecoilValue(schoolSubscriptionState)
 
+  // This allows the switch from school to site
   const isSitePage = location.pathname.includes('/site')
 
   // const isSitePage = false
 
+  const featureSitesMap = useMemo<FeatureSiteMap>(() => {
+    if (!sitesFeatureEnabled) return new Map()
+    const newMap = new Map()
+    sitesFeatureEnabled.forEach(d => {
+      newMap.set(d.feature, d.siteIds)
+    })
+    return newMap
+  }, [sitesFeatureEnabled])
   const filteredMenuItems = useMemo(() => {
     if (isSitePage) {
       return siteMenuItems.filter(
@@ -42,70 +138,117 @@ const MenuBar: React.FC = () => {
       )
     }
 
-    return buildMenuItems(new Map()).filter(item => {
+    return buildMenuItems(featureSitesMap).filter(item => {
+      const limitedFeatures = Object.values(FeatureMenu)
       if (userPermission === UserRole.MasterAdmin) {
         return true
+      }
+      if (
+        limitedFeatures.includes(item.label as FeatureMenu) &&
+        item.availableSites
+      ) {
+        return item.availableSites.includes(siteData.currentSite?.id ?? 0)
       }
       if (item.path === '#' && item.permissions.length === 0) {
         return true
       }
+
+      // No need hide the path right now. Instead, I will show a screen to tell user to subscribe to whatsapp
+      // if (item.path === '/custom-messages') {
+      //   return isSubscribedwhatsAppOfficial || isSubscribedwhatsAppUnOfficial
+      // }
       return (
         item.permissions.length === 0 ||
         item.permissions.includes(userPermission)
       )
     })
-  }, [isSitePage, userPermission])
+    // return menuItems
+  }, [
+    activePlan,
+    isSitePage,
+    siteData.currentSite?.id,
+    userPermission,
+    featureSitesMap,
+  ])
 
   const checkIsActive = (path: string) => {
     const localPath = location.pathname
 
     if (!localPath.includes('/site')) {
+      // if (!localPath.includes('/site') && !localPath.includes('/student')) {
       if (localPath.endsWith(path)) {
         return localPath.includes(path)
       }
+
+      // Hard code bacuase lazy for /settings/payment
       if (localPath.includes('/settings/payment') && path === '/settings') {
         return false
       }
+
+      // Hard code for profile
       if (
         localPath.includes('/settings/users/profile') &&
         path.includes('/settings/users/profile')
       ) {
         return true
       }
+
       return localPath.includes(`${path}/`)
     }
+
     return localPath === path
   }
 
   if (isLoading)
     return (
-      <nav className="w-[15.5rem] bg-background-layer-2 border-r-2 border-background-layer-3 h-full overflow-y-auto pl-2 pr-2 pb-4 flex flex-col items-center justify-start sm:w-full sm:pb-16">
+      <MenuBarContainer>
         {menuItems.map(item => (
           <SkeletonLoader
             key={item.label}
-            boxClassName="self-center w-[70%]"
             boxCSS={{
+              alignSelf: 'center',
+              width: '70%',
               height: item.path === '#' ? '1rem' : '3rem',
-              marginTop: item.path === '#' ? '1rem' : '0.5rem',
+              marginTop: item.path === '#' ? '$4' : '$2',
             }}
             height="100%"
           />
         ))}
-      </nav>
+      </MenuBarContainer>
     )
-
   return (
-    <nav className="w-[15.5rem] bg-background-layer-2 border-r-2 border-background-layer-3 h-full overflow-y-auto pl-2 pr-2 pb-4 flex flex-col items-center justify-start sm:w-full sm:pb-16">
+    <MenuBarContainer>
+      {/* This element allows switching to the site sidebar. Disabled for now.
+      
+      <MenuItem
+        noHover
+        onClick={() => {
+          if (!isSitePage) {
+            navigate('/site')
+          } else {
+            navigate('/school')
+          }
+        }}
+      >
+        <FaChevronLeft />
+        <span className="menuItemText">
+          {isSitePage
+            ? t(`component:menubar.backToSchool`)
+            : t(`component:menubar.siteSettings`)}
+        </span>
+      </MenuItem> */}
       {isMobile && (
-        <div
-          role="group"
-          className="flex items-center mt-3 w-[90%] p-2 cursor-pointer text-center whitespace-nowrap rounded-lg text-sm md:w-[95%] flex-col gap-2"
+        <MenuItem
           onClick={e => e.stopPropagation()}
-          onKeyDown={e => e.stopPropagation()}
+          noHover
+          css={{
+            flexDirection: 'column',
+            gap: '$2',
+          }}
         >
-          <SchoolSelector />
+          <SchoolSelector triggerVariant="fullWidth" />
           <ViewSiteButton />
-        </div>
+        </MenuItem>
       )}
 
       {filteredMenuItems.map(item => {
@@ -129,62 +272,51 @@ const MenuBar: React.FC = () => {
               align="left"
               bold
               type="subtle"
-              className="w-[90%] mt-4"
+              css={{ width: '90%', marginTop: '$4' }}
               key={item.label}
             >
               {t(`component:menubar.${item.label}`)}
             </Text>
           )
         }
-
         return (
-          <div
+          <MenuItem
             id={item.label}
             key={item.label}
-            role="button"
-            tabIndex={0}
-            onClick={() => navigate(`${itemPath}`)}
-            onKeyDown={e => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                navigate(`${itemPath}`)
-              }
+            onClick={() => {
+              navigate(`${itemPath}`)
             }}
-            className={cn(
-              'flex items-center mt-3 w-[90%] p-2 no-underline transition-colors cursor-pointer text-center whitespace-nowrap rounded-lg text-sm md:w-[95%]',
-              'hover:text-primary [&:hover_svg]:stroke-primary [&:hover_svg]:text-primary [&:hover_#whatsappTemplate_svg]:fill-primary [&:hover_#whatsappTemplate_svg]:stroke-none',
-              checkIsActive(itemPath) && 'bg-white text-primary'
-            )}
+            active={checkIsActive(itemPath)}
           >
             <SvgIcon
               id={`icon-${item.label}`}
               active={checkIsActive(itemPath)}
-              style={{ width: '1rem' }}
+              style={{ width: '$4' }}
               baseColor={
                 item.label === 'whatsappTemplate'
-                  ? 'var(--color-text)'
+                  ? theme.colors.text.toString()
                   : 'transparent'
               }
               stroke={
                 checkIsActive(itemPath)
-                  ? 'var(--color-primary)'
-                  : 'var(--color-text)'
+                  ? theme.colors.primary.toString()
+                  : theme.colors.text.toString()
               }
               activeColor={
                 item.label === 'whatsappTemplate'
-                  ? 'var(--color-primary)'
+                  ? theme.colors.primary.toString()
                   : 'transparent'
               }
             >
               <item.icon />
             </SvgIcon>
-            <span className="text-sm leading-4 ml-4">
+            <span className="menuItemText">
               {t(`component:menubar.${item.label}`)}
             </span>
-          </div>
+          </MenuItem>
         )
       })}
-    </nav>
+    </MenuBarContainer>
   )
 }
 

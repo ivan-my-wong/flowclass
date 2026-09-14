@@ -1,6 +1,5 @@
-import DatePicker from 'react-datepicker'
 import { useTranslation } from 'react-i18next'
-import { LuCalendar, LuCheck, LuCopy } from 'react-icons/lu'
+import { LuCheck, LuCopy } from 'react-icons/lu'
 import { useRecoilState, useRecoilValue } from 'recoil'
 
 import { Button } from '@/components/ui/Button'
@@ -32,8 +31,6 @@ import { useContextInvoiceEditDialog } from './EditInvoiceContext'
 import InvoiceDiscount from './InvoiceDiscount'
 import InvoiceRemark from './InvoiceRemark'
 import SelectedCourseTable from './SelectedCourseTable'
-
-import 'react-datepicker/dist/react-datepicker.css'
 
 interface Props {
   open: boolean
@@ -136,36 +133,21 @@ const DialogEditInvoice: React.FC<Props> = ({
           </DialogDescription>
         </DialogHeader>
         <DialogBody>
-          <div className="flex items-center gap-2 mb-4">
-            <LuCalendar className="text-gray-500 shrink-0" size={16} />
-            <label
-              htmlFor="dialog-payment-date"
-              className="text-sm font-medium text-gray-700 whitespace-nowrap"
-            >
-              {t('editor.paymentDate')}
-            </label>
-            <DatePicker
-              id="dialog-payment-date"
-              selected={
-                currentActiveStudent?.paymentDate
-                  ? new Date(currentActiveStudent.paymentDate)
-                  : null
-              }
-              dateFormat="MMMM d, yyyy"
-              className="h-9 rounded-md border text-sm border-gray-300 px-3 w-full"
-              onChange={(date: Date | null) => {
-                if (!currentActiveStudent) return
-                setAllStudents(prev =>
-                  prev.map(s =>
-                    s.id === currentActiveStudent.id
-                      ? { ...s, paymentDate: date }
-                      : s
-                  )
-                )
-              }}
-              isClearable
-              placeholderText={t('editor.selectPaymentDate') as string}
-            />
+          <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+            <h3 className="font-semibold text-blue-900">
+              {t('editor.invoicePreview.invoiceFor', {
+                studentName: currentActiveStudent?.name,
+              })}
+            </h3>
+            {currentActiveStudent?.email ||
+              (currentActiveStudent?.phone && (
+                <p className="text-blue-700">
+                  {[
+                    currentActiveStudent?.email,
+                    currentActiveStudent?.phone,
+                  ].join(' • ')}
+                </p>
+              ))}
           </div>
           <Card className="p-4 shadow-none border-gray-300 mb-6">
             <SelectedCourseTable currentClasses={currentClasses} />

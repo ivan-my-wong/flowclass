@@ -28,7 +28,7 @@
           "background_color": "#ffffff",
           "border_style": "rounded",
           "button_color": "#0074d4",
-          "display_name": "Example Organization",
+          "display_name": "Hong Kong Association of Gerontology",
           "font_family": "default",
           "icon": null,
           "logo": null
@@ -65,14 +65,14 @@
             "state": null
           },
           "business_name": null,
-          "email": "customer@example.com",
+          "email": "chslee@skhwc.org.hk",
           "individual_name": null,
-          "name": "John Doe",
+          "name": "NG KAI HONG PATRICK",
           "phone": null,
           "tax_exempt": "none",
           "tax_ids": []
         },
-        "customer_email": "customer@example.com",
+        "customer_email": "chslee@skhwc.org.hk",
         "discounts": [],
         "expires_at": 1764057506,
         "invoice": null,
@@ -116,7 +116,7 @@
         },
         "recovered_from": null,
         "redirect_on_completion": "always",
-        "return_url": "https://example.com/enrol/success-payment?school=&course=2025AC_org_mem&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImN1c3RvbWVyQGV4YW1wbGUuY29tIiwiaWF0IjoxNjAwMDAwMDAwLCJleHAiOjE5MDAwMDAwMDB9.example-signature&session_id={CHECKOUT_SESSION_ID}",
+        "return_url": "https://hongkongag.flowclass.io/enrol/success-payment?school=&course=2025AC_org_mem&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNoc2xlZUBza2h3Yy5vcmcuaGsiLCJpYXQiOjE3NjM5NzExMDEsImV4cCI6MTc5NTUyODcwMX0.5HHazXQv6uOz6kZa2E0FUWNwu9pXyAog9EVkaaMN4-o&session_id={CHECKOUT_SESSION_ID}",
         "saved_payment_method_options": null,
         "setup_intent": null,
         "shipping_address_collection": null,
@@ -158,7 +158,7 @@
       "type": "ENROLL_COURSE"
     },
     "mode": "payment",
-    "return_url": "https://example.com/enrol/success-payment?school=&course=Repertory-Orchestra-Nov-2025&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImN1c3RvbWVyQGV4YW1wbGUuY29tIiwiaWF0IjoxNjAwMDAwMDAwLCJleHAiOjE5MDAwMDAwMDB9.example-signature&session_id={CHECKOUT_SESSION_ID}",
+    "return_url": "https://mosl.flowclass.io/enrol/success-payment?school=&course=Repertory-Orchestra-Nov-2025&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imp1ZGl0aEBnYXJ5Y2hlbmcuY29tIiwiaWF0IjoxNzYxMDEzMzIzLCJleHAiOjE3OTI1NzA5MjN9.XjIgUPcdvIWCuspAtZUu_fbPWmjECwL4jMuXNlcO7d8&session_id={CHECKOUT_SESSION_ID}",
     "ui_mode": "embedded"
   }
 ]

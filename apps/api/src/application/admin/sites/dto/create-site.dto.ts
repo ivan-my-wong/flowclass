@@ -111,6 +111,13 @@ export class CreateUserDto {
   @ApiProperty({
     example: '',
   })
+  @MaxLength(255)
+  @IsNotEmpty()
+  firebaseId: string
+
+  @ApiProperty({
+    example: '',
+  })
   @MaxLength(15)
   @IsOptional()
   phone: string
@@ -171,9 +178,11 @@ export class StoreSiteDto {
   @ApiProperty({
     example: {
       email: 'site-manager@gmail.com',
-      password: 'SecurePassword123!',
+      password: 'SiteManager@123',
       firstName: 'Site',
       lastName: 'Manager',
+
+      firebaseId: 1,
       phone: '0987654321',
       company: 'other',
       position: 'Site Manager',
@@ -277,6 +286,10 @@ export class UserResponse {
   @ApiPropertyOptional()
   @Expose()
   isEmailVerified: boolean
+
+  @ApiPropertyOptional()
+  @Expose()
+  firebaseId: string
 
   @ApiPropertyOptional()
   @Expose()

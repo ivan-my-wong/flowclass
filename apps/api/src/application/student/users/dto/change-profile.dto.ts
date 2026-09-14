@@ -25,6 +25,14 @@ export class StudentChangeProfileDto {
   @IsOptional()
   lastName: string
 
+  @ApiProperty({
+    example: '',
+  })
+  @MaxLength(255)
+  @IsNotEmpty()
+  @IsOptional()
+  firebaseId: string
+
   @ApiPropertyOptional({
     example: '',
   })

@@ -80,15 +80,6 @@ export class WhatsAppTemplateDto {
 }
 
 export class RecipientDto {
-  @ApiPropertyOptional({
-    example: 123,
-    description:
-      'UserAlias ID — when provided, used for direct lookup instead of name/email/phone search',
-  })
-  @IsOptional()
-  @IsNumber()
-  userAliasId?: number
-
   @ApiProperty({ example: 'John' })
   @IsString()
   name: string
@@ -116,7 +107,6 @@ export enum PromotionType {
   COUPON = 'coupon',
   MANUAL = 'manual',
   REFERRAL = 'referral',
-  PACKAGE = 'package',
 }
 export enum DiscountAmountType {
   FIXED = 'fixedAmount',
@@ -128,9 +118,7 @@ export class DiscountInvoices {
     example: 1,
     required: false,
   })
-  @ValidateIf(
-    (o) => ![PromotionType.REFERRAL, PromotionType.MANUAL, PromotionType.PACKAGE].includes(o.type)
-  )
+  @ValidateIf((o) => ![PromotionType.REFERRAL, PromotionType.MANUAL].includes(o.type))
   @IsNumber()
   id?: number
 
@@ -438,14 +426,6 @@ export class InvoiceItem {
   @ValidateNested({ each: true })
   @Type(() => ChildInvoiceItem)
   childs?: ChildInvoiceItem[]
-
-  @ApiPropertyOptional({
-    example: '2026-04-01',
-    description: 'Payment date for this invoice (YYYY-MM-DD)',
-  })
-  @IsOptional()
-  @IsString()
-  paymentDate?: string | null
 }
 
 export class IndividualLesson {
@@ -506,9 +486,9 @@ export class InvoiceCampaignDto {
     type: String,
     example: 'Dear [Name],\n\n this is your invoice for [Course Name]!',
   })
+  @IsOptional()
   @IsString()
   @ValidateIf((o) => o.sendViaWhatsapp)
-  @IsOptional()
   whatsappContent?: string
 }
 
@@ -612,11 +592,6 @@ export interface SendingInvoiceData {
   amount?: string
   status?: SendingCampaignStatus
   message?: string
-  invoiceId?: number
-  proofToken?: string
-  userAliasId?: number
-  userId?: number
-  institutionId?: number
 }
 
 export class ResendInvoiceDto {
@@ -671,33 +646,6 @@ export class SendInvoiceDirectlyDto extends SendInvoiceBaseDto {
   @ApiProperty()
   @IsInt()
   invoiceId: number
-}
-
-export class SyncEnrollCoursesDiffItemDto {
-  @ApiProperty({ example: 1 })
-  @IsInt()
-  invoiceId: number
-
-  @ApiPropertyOptional({ type: [MetaRef] })
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => MetaRef)
-  addedClasses?: MetaRef[]
-
-  @ApiPropertyOptional({ example: [1, 2] })
-  @IsOptional()
-  @IsArray()
-  @IsInt({ each: true })
-  removedClassIds?: number[]
-}
-
-export class SyncEnrollCoursesDto {
-  @ApiProperty({ type: [SyncEnrollCoursesDiffItemDto] })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => SyncEnrollCoursesDiffItemDto)
-  diffs: SyncEnrollCoursesDiffItemDto[]
 }
 
 export class PageParamsDto {

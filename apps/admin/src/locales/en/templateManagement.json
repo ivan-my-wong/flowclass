@@ -10,7 +10,6 @@
     "campaignsList": "Campaigns List",
     "createNew": "Create New Template"
   },
-  "usedInCampaigns": "Used in Campaigns",
   "certificateTemplatesEditor": "Certificate Templates Editor",
   "bulkDocumentSender": "Bulk Document Sender",
   "empty": {
@@ -21,8 +20,6 @@
     "updateTemplate": "Template updated successfully.",
     "deleteTemplate": "Template deleted successfully.",
     "createBulkSendDocument": "Documents sent successfully.",
-    "updateBulkSendDocument": "Documents updated successfully.",
-    "deleteBulkSendDocument": "Documents deleted successfully.",
     "resendDocumentCampaign": "Document resent successfully."
   },
   "errors": {
@@ -32,13 +29,10 @@
     "imageIsEmpty": "Please add an image template first!",
     "mandatoryFieldMissing": "Please fill in all mandatory fields!",
     "createBulkSendDocument": "Failed to send documents.",
-    "updateBulkSendDocument": "Failed to update documents.",
-    "deleteBulkSendDocument": "Failed to delete documents.",
     "resendDocumentCampaign": "Failed to resend document."
   },
   "dialog": {
     "titleDeleteDialog": "Delete Template",
-    "descriptionDeleteTemplate": "Are you sure you want to delete this template?",
     "selectedRecords": "Selected Records"
   },
   "recipientsList": {

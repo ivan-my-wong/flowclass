@@ -19,7 +19,6 @@
     "uploadResponseTo": "Upload Response to",
     "selectFilesUpload": "Select Files Upload",
     "supportForPDFDOCXJPGPNG": "Support for PDF, DOC, DOCX, JPG, PNG",
-    "selectFiles": "Select Files",
     "selectedFiles": "Selected Files ({{count}})"
   },
   "studentDocumentLength": "Student Document ({{count}})",

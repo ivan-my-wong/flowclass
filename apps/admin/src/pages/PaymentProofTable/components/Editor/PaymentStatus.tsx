@@ -5,11 +5,10 @@ import { useTranslation } from 'react-i18next'
 import usePaymentEvidenceData from '@/hooks/usePaymentEvidenceData'
 import { handleStatusPayment } from '@/pages/StudentCRM/components/TeachingServiceEnrolledRow'
 import { Invoice, PaymentProofTableItem } from '@/types/enrollCourse'
+import dayjs from '@/utils/dayjs'
 
 import PaymentReceiptStatusCell from '../../PaymentProofTableCells/PaymentReceiptStatusCell'
 
-import UpdateAmountPaid from './UpdateAmountPaid'
-import UpdateInvoiceDateField from './UpdateInvoiceDateField'
 import UpdatePayAmount from './UpdatePayAmount'
 import UpdatePayLeterMethod from './UpdatePayLeterMethod'
 import UpdatePaymentDate from './UpdatePaymentDate'
@@ -21,7 +20,7 @@ interface Props {
 }
 
 const PaymentStatus: FC<Props> = ({ invoiceData, refetch }): JSX.Element => {
-  const { t } = useTranslation()
+  const { t } = useTranslation(['student', 'common'])
 
   const { useFetchPaymentEvidence } = usePaymentEvidenceData()
   const { data: paymentEvidences, refetch: refetchPaymentEvidences } =
@@ -41,10 +40,6 @@ const PaymentStatus: FC<Props> = ({ invoiceData, refetch }): JSX.Element => {
           <UpdatePayAmount data={invoiceData} refetch={refetch} />
         </div>
         <div className="flex items-center justify-between font-medium">
-          <div className="text-sm">{t('student:paymentProof.amountPaid')}</div>
-          <UpdateAmountPaid data={invoiceData} refetch={refetch} />
-        </div>
-        <div className="flex items-center justify-between font-medium">
           <div className="text-sm">{t('student:paymentProof.status')}</div>
           <div className="flex items-center gap-2">
             <div className="mt-1 flex-shrink-0">
@@ -56,13 +51,6 @@ const PaymentStatus: FC<Props> = ({ invoiceData, refetch }): JSX.Element => {
               refetch={refetch}
             />
           </div>
-        </div>
-        <div className="flex items-center justify-between font-medium">
-          <div className="text-sm">{t('student:paymentProof.paymentDate')}</div>
-          <UpdatePaymentDate
-            data={invoiceData as unknown as PaymentProofTableItem}
-            refetch={refetch}
-          />
         </div>
         <div className="flex items-center justify-between font-medium">
           <div className="text-sm">{t('student:paymentProof.method')}</div>
@@ -82,23 +70,28 @@ const PaymentStatus: FC<Props> = ({ invoiceData, refetch }): JSX.Element => {
           />
         </div>
         <div className="flex items-center justify-between font-medium">
-          <div className="text-sm">{t('student:paymentProof.createdDate')}</div>
-          <UpdateInvoiceDateField
-            data={invoiceData}
-            field="createdAt"
+          <div className="text-sm">{t('student:paymentProof.paymentDate')}</div>
+          <UpdatePaymentDate
+            data={invoiceData as unknown as PaymentProofTableItem}
             refetch={refetch}
           />
         </div>
-        <div className="flex items-center justify-between font-medium">
-          <div className="text-sm">
-            {t('student:paymentProof.lastUpdatedDate')}
+        {invoiceData.createdAt != null && (
+          <div className="flex items-center justify-between font-medium">
+            <div className="text-sm">{t('student:column.createdDate')}</div>
+            <div className="text-sm text-muted-foreground">
+              {dayjs(invoiceData.createdAt).format('D MMM YYYY HH:mm')}
+            </div>
           </div>
-          <UpdateInvoiceDateField
-            data={invoiceData}
-            field="updatedAt"
-            refetch={refetch}
-          />
-        </div>
+        )}
+        {invoiceData.updatedAt != null && (
+          <div className="flex items-center justify-between font-medium">
+            <div className="text-sm">{t('student:column.lastUpdated')}</div>
+            <div className="text-sm text-muted-foreground">
+              {dayjs(invoiceData.updatedAt).format('D MMM YYYY HH:mm')}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

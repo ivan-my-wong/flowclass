@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
+import { styled } from '@stitches/react'
 import { useTranslation } from 'react-i18next'
 import { AiOutlineUserSwitch } from 'react-icons/ai'
 import { IoBookOutline } from 'react-icons/io5'
@@ -9,8 +10,6 @@ import {
   LuEye,
   LuLink,
   LuMerge,
-  LuMessageSquare,
-  LuPrinter,
   LuUserCheck,
   LuUserMinus,
   LuUserPlus,
@@ -22,7 +21,7 @@ import { toast } from 'sonner'
 import ApiError, { handleApiError } from '@/api/errors/apiError'
 import { deleteStudent, editStatusStudent } from '@/api/student'
 import DeleteIcon from '@/assets/svgs/student/DeleteIcon'
-import TeachingServiceIcon from '@/assets/svgs/student/TeachingServiceIcon'
+import RemarkIcon from '@/assets/svgs/student/RemarkIcon'
 import ViewIcon from '@/assets/svgs/student/ViewIcon'
 import DropdownMenu, {
   DropDownMenuItemType,
@@ -36,13 +35,18 @@ import {
   STUDENT_TABS,
   StudentStatus,
 } from '@/constants/common'
+import { INCOMPLETE_FEATURE_FLAG } from '@/constants/featureFlags'
 import { QUERY_KEY } from '@/constants/queryKey'
 import useCredit from '@/hooks/useCredit'
 import { PrintLabelModalHandle } from '@/pages/StudentCRM/Label/PrintLabelModal'
 import { AlertTypes } from '@/reducers/confirm.reducers'
 import { schoolState } from '@/stores/schoolData'
 import { siteState } from '@/stores/siteData'
-import { AddTeachingServiceMode, studentState } from '@/stores/studentData'
+import {
+  AddTeachingServiceMode,
+  remarksState,
+  studentState,
+} from '@/stores/studentData'
 import { userPermissionState, UserRole } from '@/stores/userPermissionData'
 import {
   StudentEnrolmentRecord,
@@ -61,7 +65,6 @@ import ChangeToNewFamilyGroupModal, {
 import CreditBalanceModal, {
   CreditBalanceModalHandle,
 } from './CreditBalanceModal'
-import EditRemarksModal, { EditRemarksModalHandle } from './EditRemarksModal'
 import MergeStudentModal, { MergeStudentModalHandle } from './MergeStudentModal'
 import RemoveFromCurrentGroupModal, {
   RemoveFromCurrentGroupModalHandle,
@@ -83,6 +86,7 @@ const ActionButton = ({
 }: ActionButtonProps): React.ReactElement => {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [schoolData] = useRecoilState(schoolState)
   const currentSchoolId = schoolData.currentSchool?.id || 0
   const [siteData] = useRecoilState(siteState)
@@ -111,11 +115,21 @@ const ActionButton = ({
   ].includes(userPermission)
 
   const [, setStudentData] = useRecoilState(studentState)
+  const [, setRemarks] = useRecoilState(remarksState)
   const registrationForm = useMemo(() => {
     return (studentInfo.enrollCourses || []).flatMap(
       enrollCourse => enrollCourse.registrationForm || []
     )
   }, [studentInfo?.enrollCourses])
+  const printData = useMemo(() => {
+    return {
+      studentId: userId,
+      name: studentInfo.name,
+      email,
+      phone: studentInfo.phone,
+      registrationForm,
+    }
+  }, [userId, studentInfo.name, studentInfo.phone, email, registrationForm])
 
   const { useCheckCreditSystemActive } = useCredit()
   const { isActive: showCreditSystem } = useCheckCreditSystemActive()
@@ -145,7 +159,6 @@ const ActionButton = ({
   }, [registrationForm])
 
   const printLabelModalHandle = useRef<PrintLabelModalHandle>(null)
-  const editRemarksModalHandle = useRef<EditRemarksModalHandle>(null)
   const creditBalanceModalHandle = useRef<CreditBalanceModalHandle>(null)
   const addToParentGroupModalHandle = useRef<AddToParentGroupModalHandle>(null)
   const setAsParentAccountModalHandle =
@@ -219,6 +232,15 @@ const ActionButton = ({
   const handleEditStudent = () => {
     navigate(`/student-record/${studentInfo.id}?userId=${studentInfo.userId}`)
   }
+  const handleAddRemarks = () => {
+    setRemarks(prevRemarks => ({
+      ...prevRemarks,
+      [studentInfo.id]: {
+        ...prevRemarks[studentInfo.id],
+        isShow: true,
+      },
+    }))
+  }
   const renderMenuItem = ({
     icon,
     title,
@@ -277,6 +299,9 @@ const ActionButton = ({
         }),
       },
       {
+        type: 'separator',
+      },
+      {
         ...renderMenuItem({
           icon: <LuMerge size={20} />,
           title: t('student:menu.merge'),
@@ -312,6 +337,32 @@ const ActionButton = ({
         }),
       },
 
+      // {
+      //   ...renderMenuItem({
+      //     icon: <LuArrowDownToDot size={20} />,
+      //     title: t('student:menu:addCourseDirectly'),
+      //     funcHandleEvent: async () => {
+      //       await navigate(
+      //         `/student-record/${studentInfo.id}?userId=${studentInfo.userId}&student=${userId}`
+      //       )
+      //       setStudentData(prev => ({
+      //         ...prev,
+      //         tableDrawers: {
+      //           ...prev.tableDrawers,
+      //           isOpenAssignCourse: true,
+      //           assignCourseMode: AddTeachingServiceMode.addCourseDirectly,
+      //         },
+      //         currentStudent: {
+      //           id: studentInfo.id,
+      //           fullName: studentInfo.name,
+      //           phone: studentInfo.phone,
+      //           email: studentInfo.user?.email || studentInfo.email,
+      //         } as StudentUser,
+      //       }))
+      //     },
+      //   }),
+      // },
+
       {
         ...renderMenuItem({
           icon: <IoBookOutline size={20} />,
@@ -324,19 +375,46 @@ const ActionButton = ({
         }),
       },
 
-      {
-        ...renderMenuItem({
-          icon: <LuMessageSquare size={20} />,
-          title: t('student:menu:addRemark'),
-          funcHandleEvent: () => {
-            editRemarksModalHandle.current?.open(
-              studentInfo.id,
-              studentInfo.remarks ?? null
-            )
+      INCOMPLETE_FEATURE_FLAG.STUDENT_CRM_MEMO_FEATURE
+        ? {
+            ...renderMenuItem(
+              {
+                icon: <RemarkIcon />,
+                title: `${t('student:menu:addRemark')}`,
+                funcHandleEvent: () => {
+                  handleAddRemarks()
+                },
+              }
+              // true
+            ),
+          }
+        : {
+            type: 'separator',
           },
-        }),
-      },
 
+      // {
+      //   ...renderMenuItem({
+      //     icon: <CouponIcon />,
+      //     title: t('student:menu:assignCoupon'),
+      //     funcHandleEvent: () => {
+      //       navigate(`?student=${userId}`)
+      //       setSearchParams(prev => ({
+      //         ...prev,
+      //         back: `/student-record`,
+      //       }))
+      //       setStudentData(prev => ({
+      //         ...prev,
+      //         tableDrawers: {
+      //           ...prev.tableDrawers,
+      //           isOpenCreateCoupon: true,
+      //         },
+      //       }))
+      //     },
+      //   }),
+      // },
+      // {
+      //   type: 'separator',
+      // },
       ...(!childOfUserAliasId && showCreditSystem
         ? [
             {
@@ -348,6 +426,27 @@ const ActionButton = ({
                 },
               }),
             },
+            // I think we just need to have the main credit balance button
+            // {
+            //   ...renderMenuItem({
+            //     icon: <TbCreditCardRefund className="text-xl" />,
+            //     title: t('student:menu.addCreditBalance'),
+            //     funcHandleEvent: () => {
+            //       addCreditModalHandle.current?.handleOpenChange?.()
+            //     },
+            //     disabled: !isStudentParent,
+            //   }),
+            // },
+            // {
+            //   ...renderMenuItem({
+            //     icon: <TbCreditCardPay className="text-xl" />,
+            //     title: t('student:menu.deductCreditBalance'),
+            //     funcHandleEvent: () => {
+            //       deductCreditModalHandle.current?.handleOpenChange?.()
+            //     },
+            //     disabled: !isStudentParent,
+            //   }),
+            // },
           ]
         : []),
       ...(!isStudentParent && !childOfUserAliasId
@@ -401,6 +500,21 @@ const ActionButton = ({
           ]
         : []),
 
+      {
+        type: 'separator',
+      },
+      // {
+      //   ...renderMenuItem({
+      //     icon: <LuPrinter size={20} />,
+      //     title: t('student:menu.printLabel'),
+      //     funcHandleEvent: () => {
+      //       printLabelModalHandle.current?.handleOpenChange?.()
+      //     },
+      //   }),
+      // },
+      // {
+      //   type: 'separator',
+      // },
       {
         ...renderMenuItem({
           icon: <DeleteIcon fill="#F87575" />,
@@ -476,7 +590,6 @@ const ActionButton = ({
         loading={mutationEditStatusStudent.isLoading}
       />
 
-      <EditRemarksModal ref={editRemarksModalHandle} />
       <CreditBalanceModal
         ref={creditBalanceModalHandle}
         userAliasId={userAliasId}
@@ -522,16 +635,14 @@ const ActionButton = ({
     </Box>
   )
 }
-const ComingSoonText = ({
-  children,
-  className,
-  ...props
-}: React.ComponentProps<typeof Text>) => (
-  <Text
-    className="absolute right-2 p-1 rounded-md text-text bg-tertiary z-[999] text-[8px]"
-    {...props}
-  >
-    {children}
-  </Text>
-)
+const ComingSoonText = styled(Text, {
+  position: 'absolute',
+  right: '$2',
+  padding: '$1 !important',
+  borderRadius: '$1',
+  color: '$text',
+  backgroundColor: '$tertiary',
+  zIndex: 999,
+  fontSize: '8px',
+})
 export default ActionButton

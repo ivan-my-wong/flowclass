@@ -14,4 +14,4 @@ import { CacheRepository } from './cacheClient.repository'
   providers: [CacheRepository],
   exports: [CacheRepository],
 })
-export class CacheClientModule {}
+export class RedisModule {}

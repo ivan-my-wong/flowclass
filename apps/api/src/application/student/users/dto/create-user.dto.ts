@@ -5,7 +5,7 @@ import { IsModeratelyStrongPassword } from '@/common/validators/moderately-stron
 
 export class StudentCreateUserDto {
   @ApiProperty({
-    example: 'user@example.com',
+    example: 'flowclass@gmail.com',
   })
   @IsNotEmpty()
   @MinLength(5)
@@ -36,6 +36,13 @@ export class StudentCreateUserDto {
   @MaxLength(255)
   @IsOptional()
   lastName: string
+
+  @ApiProperty({
+    example: '',
+  })
+  @MaxLength(255)
+  @IsNotEmpty()
+  firebaseId: string
 
   @ApiPropertyOptional({
     example: '',

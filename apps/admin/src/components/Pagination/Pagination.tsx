@@ -2,6 +2,7 @@ import React from 'react'
 
 import ReactPaginate from 'react-paginate'
 
+import { styled } from '@/styles'
 import { MetaType } from '@/types/pagination'
 import { cn } from '@/utils/cn'
 
@@ -28,23 +29,39 @@ type PaginatedItemsProps = {
   isBottomPagination?: boolean
 }
 
+const PaginationWrapper = styled('div', {
+  width: '100%',
+
+  display: 'flex',
+
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: '0.5rem 0',
+  ul: {
+    flexWrap: 'wrap',
+    listStyleType: 'none' /* Remove bullets */,
+    padding: 0 /* Remove padding */,
+    margin: 0 /* Remove margins */,
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '$4',
+    alignItems: 'center',
+    '.selected': {
+      fontWeight: 'bold',
+    },
+  },
+})
+
 const PaginatedItems = ({
   title,
   actionButton,
   meta,
   pageButtonProps,
   children,
-  itemWrapperClassName,
-  isBottomPagination,
   ...props
 }: PaginatedItemsProps &
   React.ComponentPropsWithoutRef<'div'>): JSX.Element => {
   const pageCount = Math.ceil(meta.itemCount / (meta.num || 1))
-  // Clamp the active page into a valid range so we never feed react-paginate
-  // a `forcePage` greater than `pageCount - 1` (which logs an out-of-range
-  // warning) or a negative value (when there are 0 items).
-  const safeForcePage =
-    pageCount > 0 ? Math.min(Math.max(meta.page - 1, 0), pageCount - 1) : 0
 
   return (
     <Box direction="col" {...props}>
@@ -56,10 +73,10 @@ const PaginatedItems = ({
       <div
         className={cn({
           'flex flex-col w-full': true,
-          'flex-col-reverse': isBottomPagination,
+          'flex-col-reverse': props.isBottomPagination,
         })}
       >
-        <div className="w-full flex justify-center items-center py-2 [&_ul]:flex-wrap [&_ul]:list-none [&_ul]:p-0 [&_ul]:m-0 [&_ul]:flex [&_ul]:justify-center [&_ul]:gap-4 [&_ul]:items-center [&_.selected]:font-bold">
+        <PaginationWrapper>
           <ReactPaginate
             breakLabel="..."
             nextLabel={
@@ -75,8 +92,9 @@ const PaginatedItems = ({
             }
             pageClassName="h-8 w-8 rounded-md flex justify-center items-center"
             activeClassName="bg-primary text-primary-foreground"
+            initialPage={meta.page - 1}
             pageRangeDisplayed={2}
-            forcePage={safeForcePage}
+            forcePage={meta.page - 1}
             pageCount={pageCount}
             previousLabel={
               <PaginationButton
@@ -88,8 +106,10 @@ const PaginatedItems = ({
             }
             renderOnZeroPageCount={null}
           />
+        </PaginationWrapper>
+        <div className={cn('w-full', props.itemWrapperClassName)}>
+          {children}
         </div>
-        <div className={cn('w-full', itemWrapperClassName)}>{children}</div>
       </div>
     </Box>
   )

@@ -1,11 +1,44 @@
 import { forwardRef } from 'react'
 
 import { Root, SwitchProps, Thumb } from '@radix-ui/react-switch'
+import { ComponentProps } from '@stitches/react'
 import { DefaultTFuncReturn } from 'i18next'
 
+import { styled } from '@/styles'
 import { cn } from '@/utils/cn'
 
 import Box from '../ui/Box'
+
+const SwitchRoot = styled(Root, {
+  all: 'unset',
+  width: 42,
+  height: 25,
+  backgroundColor: '$backgroundLayer3',
+  border: '2px solid $colors$background',
+  borderRadius: '9999px',
+  position: 'relative',
+  boxShadow: `$2`,
+  WebkitTapHighlightColor: 'rgba(0, 0, 0, 0)',
+  '&:focus': { boxShadow: `0 0 0 2px $colors$primary` },
+  '&[data-state="checked"]': { backgroundColor: '$primary' },
+  '&[data-disabled]': {
+    backgroundColor: '$backgroundLayer3',
+    borderColor: '$backgroundLayer2',
+  },
+})
+
+const SwitchThumb = styled(Thumb, {
+  display: 'block',
+  width: 21,
+  height: 21,
+  backgroundColor: 'white',
+  borderRadius: '9999px',
+  boxShadow: `0 2px 2px $colors$shadowColor`,
+  transition: 'transform 100ms',
+  transform: 'translateX(2px)',
+  willChange: 'transform',
+  '&[data-state="checked"]': { transform: 'translateX(19px)' },
+})
 
 type ThisSwitchProps = {
   checked: boolean
@@ -16,7 +49,7 @@ type ThisSwitchProps = {
   className?: string
   textClassName?: string
 } & SwitchProps &
-  Omit<React.ComponentProps<typeof Box>, 'children'>
+  Omit<ComponentProps<typeof Box>, 'children'>
 
 const Switch = forwardRef<HTMLDivElement, ThisSwitchProps>(
   (
@@ -34,8 +67,8 @@ const Switch = forwardRef<HTMLDivElement, ThisSwitchProps>(
   ) => {
     return (
       <div
-        ref={ref}
         {...props}
+        {...ref}
         className={cn(
           'flex flex-row items-center justify-center gap-2 p-0 w-full',
           className
@@ -51,34 +84,17 @@ const Switch = forwardRef<HTMLDivElement, ThisSwitchProps>(
             {label}
           </p>
         )}
-        <Root
+        <SwitchRoot
           checked={checked}
           disabled={disabled}
           data-testid={dataTestId}
           onCheckedChange={onCheckedChange}
-          className={cn(
-            'w-[42px] h-[25px] bg-background-layer-3',
-            'border-2 border-background rounded-full relative shadow-md',
-            '[-webkit-tap-highlight-color:rgba(0,0,0,0)]',
-            'focus:outline-none focus:ring-2 focus:ring-primary',
-            'data-[state=checked]:bg-primary',
-            'data-[disabled]:bg-background-layer-3 data-[disabled]:border-background-layer-2'
-          )}
         >
-          <Thumb
-            className={cn(
-              'block w-[21px] h-[21px] bg-white rounded-full',
-              'shadow-[0_2px_2px_hsl(var(--border))]',
-              'transition-transform duration-100 translate-x-0.5',
-              'data-[state=checked]:translate-x-[19px]'
-            )}
-          />
-        </Root>
+          <SwitchThumb />
+        </SwitchRoot>
       </div>
     )
   }
 )
-
-Switch.displayName = 'Switch'
 
 export default Switch

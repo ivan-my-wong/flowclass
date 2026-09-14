@@ -3,8 +3,10 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 
 import * as _ from 'lodash'
 import { useTranslation } from 'react-i18next'
-import { LuInfo } from 'react-icons/lu'
+import { LuFileWarning, LuInfo } from 'react-icons/lu'
 
+import { WhatsAppConnectionStatus } from '@/api/whatsappWeb'
+import AlertBox from '@/components/Boxes/AlertBox'
 import SkeletonLoader from '@/components/Loaders/SkeletonLoader'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert'
 import { Badge } from '@/components/ui/Badge'
@@ -15,6 +17,7 @@ import { MAX_LIMIT_REMIND_STUDENT } from '@/constants/payment'
 import usePaymentEvidenceData from '@/hooks/usePaymentEvidenceData'
 import useStudentInvoice from '@/hooks/useStudentInvoice'
 import usePlanData from '@/hooks/useSubscriptionPlanData'
+import { useWhatsappWeb } from '@/hooks/useWhatsappWeb'
 import { PaymentProofTableItem } from '@/types/enrollCourse'
 // import { Course } from '@/types/course'
 // import { EnrollCourseInstance } from '@/types/enrollCourse'
@@ -95,6 +98,9 @@ const ConfirmSendPaymentProof = ({
   const { schoolSubscription } = usePlanData()
   const { planQuotas } = schoolSubscription
 
+  const { useGetSessionStatus } = useWhatsappWeb()
+  const { data: whatsappStatus } = useGetSessionStatus()
+
   const isWhatsappReminder = useMemo(() => {
     return (
       action === SendPaymentActions.SEND_WA_REMINDER ||
@@ -173,7 +179,14 @@ const ConfirmSendPaymentProof = ({
     return recipientList.length > MAX_LIMIT_REMIND_STUDENT
   }, [recipientList])
 
-  const isReachNotifQuota = false
+  const isReachNotifQuota = useMemo(() => {
+    if (planQuotas?.reminder)
+      return (
+        recipientList.length + planQuotas?.reminder.used >
+        planQuotas?.reminder.quota
+      )
+    return false
+  }, [recipientList, planQuotas?.reminder])
 
   const isRecipientListLoading = useMemo(() => {
     const hasSelectedRows =
@@ -239,10 +252,10 @@ const ConfirmSendPaymentProof = ({
         item => {
           let parent: StudentEnrolmentRecord | null = null
           if (item.childOfUserAliasId) {
-            const found =
+            parent =
               studentList.find(p => p.id === item.childOfUserAliasId) ?? null
-            if (found) {
-              parent = { ...found, phone: found.user?.phone ?? found.phone }
+            if (parent) {
+              parent.phone = parent?.user.phone
             }
           }
           return {
@@ -270,6 +283,37 @@ const ConfirmSendPaymentProof = ({
       setIsOpen(propIsOpen)
     }
   }, [propIsOpen])
+
+  if (
+    isWhatsappReminder &&
+    whatsappStatus?.data.status !== WhatsAppConnectionStatus.READY
+  ) {
+    return (
+      <ModalDialog
+        open
+        onOpenChange={onBack}
+        title={
+          t('customMessage:whatsappWeb.notConnected') ||
+          'WhatsApp is not yet connected'
+        }
+        footer={<></>}
+      >
+        <AlertBox
+          content={t('customMessage:whatsappWeb.notYetConnected')}
+          icon={<LuFileWarning className="text-warn" />}
+          status="warning"
+          actionLink={
+            <Button
+              variant="outline"
+              onClick={() => navigate('/custom-messages')}
+            >
+              {t('customMessage:whatsappWeb.connectWhatsapp')}
+            </Button>
+          }
+        />
+      </ModalDialog>
+    )
+  }
 
   // const renderEmailSelector = (studentItem: {
   //   email: string
@@ -525,7 +569,7 @@ const ConfirmSendPaymentProof = ({
           <AlertDescription>
             {t(
               'student:paymentProof.confirmReminder.studentCountReachQuotaLimit'
-            ).replace('{limit}', '')}
+            ).replace('{limit}', String(planQuotas?.reminder?.quota))}
           </AlertDescription>
         </Alert>
       )}

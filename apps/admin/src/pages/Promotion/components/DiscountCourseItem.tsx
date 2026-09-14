@@ -31,7 +31,9 @@ const DiscountCourseItem: React.FC<DiscountCourseItemProps> = ({
       }}
       padding="small"
     >
-      <MdClose className="cursor-pointer text-text-subtle" />
+      <MdClose
+        style={{ cursor: 'pointer', color: theme.colors.textSubtle.toString() }}
+      />
       <img src={img} alt="" style={{ width: '60px', height: '60px' }} />
       <Text>{title}</Text>
       <div style={{ marginLeft: 'auto', marginRight: '10px' }}>{icon}</div>

@@ -21,6 +21,7 @@ import { AdminAuthGuard } from '@/common/guards/admin-auth.guard'
 import { RequireParamsGuard } from '@/common/guards/require-params.guard'
 import { RolesGuard } from '@/common/guards/roles.guard'
 import { StripeConnectService } from '@/domain/external/stripe-connect.service'
+import { StripeCheckoutSessionType } from '@/models/enums'
 import { RequireParam, Role } from '@/models/enums/'
 import { Institution } from '@/models/institutions.entity'
 import { StripeConnect } from '@/models/stripe-connect.entity'
@@ -33,6 +34,8 @@ import {
   CreateStripeConnectDto,
   CreateStripeConnectResponse,
   StripeExpressAccountResponse,
+  StripeSubscriptionResponse,
+  UpdateSubscriptionDto,
 } from './dto/create-stripe-connect.dto'
 import { EnableStripeDto } from './dto/enable-stripe.dto'
 import { StripeWebhookResponse } from './dto/stripe-connect.dto'
@@ -41,7 +44,9 @@ import {
   createLinkLoginExpressDashboardSchema,
   createStripeConnectSchema,
   getExpressAccountDetailSchema,
+  getSubscriptionDetailSchema,
   stripeConnectRepositorySchema,
+  updateSubscriptionSchema,
 } from './dto/stripe-connect.schema'
 import { StripeConnectDetailDto } from './dto/stripe-connect-detail.dto'
 
@@ -66,7 +71,14 @@ export class StripeConnectController {
   ) {}
   @ApiExtraModels(CreateStripeConnectResponse, CreateLoginLinkResponse)
   @Post()
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR,
+    Role.STUDENT
+  )
   @UseGuards(RolesGuard)
   @RequireParams(RequireParam.INSTITUTION_ID)
   @UseGuards(RequireParamsGuard)
@@ -83,7 +95,14 @@ export class StripeConnectController {
   }
 
   @Post('express-dashboard')
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR,
+    Role.STUDENT
+  )
   @UseGuards(RolesGuard)
   @RequireParams(RequireParam.INSTITUTION_ID)
   @UseGuards(RequireParamsGuard)
@@ -101,7 +120,14 @@ export class StripeConnectController {
   }
 
   @Get('billing-portal')
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR,
+    Role.STUDENT
+  )
   @UseGuards(RolesGuard)
   @RequireParams(RequireParam.INSTITUTION_ID)
   @UseGuards(RequireParamsGuard)
@@ -119,8 +145,130 @@ export class StripeConnectController {
     return this.stripeConnectService.createBillingPortalLink(institution)
   }
 
+  @Get('subscription-detail')
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR,
+    Role.STUDENT
+  )
+  @UseGuards(RolesGuard)
+  @RequireParams(RequireParam.INSTITUTION_ID)
+  @UseGuards(RequireParamsGuard)
+  @ApiExtraModels(StripeSubscriptionResponse)
+  @ApiQuery({ name: 'institutionId', type: Number })
+  @ApiOperation({
+    summary: 'This api for institution manager use to get subscrpition detail from stripe.',
+  })
+  @ApiOkResponse({
+    schema: getSubscriptionDetailSchema,
+  })
+  getSubscriptionDetail(
+    @CurrentInstitution() institution: Institution
+  ): Promise<Stripe.Subscription> {
+    return this.stripeConnectService.getSubscriptionDetail(institution)
+  }
+
+  @Post('create-subscription')
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR,
+    Role.STUDENT
+  )
+  @UseGuards(RolesGuard)
+  @RequireParams(RequireParam.INSTITUTION_ID)
+  @UseGuards(RequireParamsGuard)
+  @ApiQuery({ name: 'institutionId', type: Number })
+  @ApiOperation({
+    summary: 'This api for institution manager use to create subscrpition from stripe.',
+  })
+  @ApiOkResponse({
+    schema: createStripeConnectSchema,
+  })
+  createSubscription(
+    @Query('institutionId') institutionId: number,
+    @Body()
+    createSubscriptionDto: {
+      stripeProductPriceIds: number[]
+    }
+  ): Promise<Stripe.Checkout.Session> {
+    return this.stripeConnectService.createSubscription(
+      institutionId,
+      createSubscriptionDto.stripeProductPriceIds,
+      StripeCheckoutSessionType.CREATE_SUBSCRIPTION
+    )
+  }
+
+  @Post('update-subscription')
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR,
+    Role.STUDENT
+  )
+  @UseGuards(RolesGuard)
+  @RequireParams(RequireParam.INSTITUTION_ID)
+  @UseGuards(RequireParamsGuard)
+  @ApiQuery({ name: 'institutionId', type: Number })
+  @ApiOperation({
+    summary: 'This api for institution manager use to update subscrpition from stripe.',
+  })
+  @ApiOkResponse({
+    schema: updateSubscriptionSchema,
+  })
+  updateSubscription(
+    @CurrentInstitution() institution: Institution,
+    @Body() updateSubscriptionDto: UpdateSubscriptionDto
+  ): Promise<Stripe.Subscription> {
+    return this.stripeConnectService.updateSubscription(institution, updateSubscriptionDto)
+  }
+
+  @Post('update-subscription-portal-link')
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR,
+    Role.STUDENT
+  )
+  @UseGuards(RolesGuard)
+  @RequireParams(RequireParam.INSTITUTION_ID)
+  @UseGuards(RequireParamsGuard)
+  @ApiQuery({ name: 'institutionId', type: Number })
+  @ApiOperation({
+    summary:
+      'This api for institution manager use to get update subscrpition portal link from stripe.',
+  })
+  @ApiOkResponse({
+    schema: updateSubscriptionSchema,
+  })
+  getUpdateSubscriptionBillingPortalLink(
+    @CurrentInstitution() institution: Institution,
+    @Body() updateSubscriptionDto: UpdateSubscriptionDto
+  ): Promise<Stripe.BillingPortal.Session> {
+    return this.stripeConnectService.getUpdateSubscriptionBillingPortalLink(
+      institution,
+      updateSubscriptionDto
+    )
+  }
+
   @Get('account-detail')
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR,
+    Role.STUDENT
+  )
   @UseGuards(RolesGuard)
   @RequireParams(RequireParam.INSTITUTION_ID)
   @UseGuards(RequireParamsGuard)
@@ -138,7 +286,14 @@ export class StripeConnectController {
   }
 
   @Get('stripe-connect-detail')
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR,
+    Role.STUDENT
+  )
   @UseGuards(RolesGuard)
   @RequireParams(RequireParam.INSTITUTION_ID)
   @UseGuards(RequireParamsGuard)
@@ -158,7 +313,14 @@ export class StripeConnectController {
   }
 
   @Post('create-account')
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR,
+    Role.STUDENT
+  )
   @UseGuards(RolesGuard)
   @RequireParams(RequireParam.INSTITUTION_ID)
   @UseGuards(RequireParamsGuard)
@@ -174,7 +336,14 @@ export class StripeConnectController {
   }
 
   @Post('create-customer-account')
-  @Roles(Role.MASTER_ADMIN)
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR,
+    Role.STUDENT
+  )
   @UseGuards(RolesGuard)
   @RequireParams(RequireParam.INSTITUTION_ID)
   @UseGuards(RequireParamsGuard)
@@ -185,14 +354,19 @@ export class StripeConnectController {
   @ApiOkResponse({
     schema: stripeConnectRepositorySchema,
   })
-  createCustomerAccount(
-    @CurrentInstitution() institution: Institution
-  ): Promise<StripeConnect | null> {
+  createCustomerAccount(@CurrentInstitution() institution: Institution): Promise<StripeConnect> {
     return this.stripeConnectService.createCustomerAccount(institution)
   }
 
   @Post('enabled')
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR,
+    Role.STUDENT
+  )
   @UseGuards(RolesGuard)
   @RequireParams(RequireParam.INSTITUTION_ID)
   @UseGuards(RequireParamsGuard)

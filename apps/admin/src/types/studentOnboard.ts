@@ -56,6 +56,7 @@ type StudentFields = {
   studentMemos?: StudentMemos
   user?: User
   enrollCourses?: EnrollCourses
+  studentForms?: boolean
 }
 const USER_FIELDS = {
   email: true,
@@ -121,4 +122,6 @@ export const SELECT_STUDENT_FIELDS: StudentFields = {
   studentMemos: STUDENT_MEMOS_FIELDS,
   // Enrolled courses information
   enrollCourses: ENROLL_COURSES_FIELDS,
+  // Custom form fields for CSV export
+  studentForms: true,
 }

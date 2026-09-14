@@ -102,6 +102,16 @@ const SuccessPaymentContent = ({
 
   useEffect(() => {
     if (invoicesData.length === 0) {
+      let appliedCouponDiscount = 0
+      if (invoice.promotionUsed?.coupon) {
+        const coupon = invoice.promotionUsed.coupon
+        if (coupon.discountType === 'percentage') {
+          appliedCouponDiscount = (invoice.originalFee * coupon.amount) / 100
+        } else {
+          appliedCouponDiscount = coupon.amount * (invoice.numOfApplicant || 1)
+        }
+      }
+
       setInvoicesData([
         {
           ...invoice,
@@ -110,7 +120,8 @@ const SuccessPaymentContent = ({
           numberOfLesson: invoice.numOfLesson,
           paymentAmount: invoice.payAmount.toString(),
           discountInfo: [invoice.discounts],
-          couponDiscount: invoice.discountAmount,
+          couponDiscount: appliedCouponDiscount,
+          couponCode: invoice.promotionUsed?.coupon?.code || '',
           currency: invoice.currency ?? '',
           totalDiscount: invoice.discountAmount,
           numOfApplicant: invoice.numOfApplicant,
@@ -118,9 +129,20 @@ const SuccessPaymentContent = ({
           directDiscount: 0,
           bundleDiscount: 0,
           recurringDiscount: 0,
+          autoCouponApplied: !!invoice.promotionUsed?.coupon,
         },
       ])
     } else {
+      let appliedCouponDiscount = 0
+      if (invoice.promotionUsed?.coupon) {
+        const coupon = invoice.promotionUsed.coupon
+        if (coupon.discountType === 'percentage') {
+          appliedCouponDiscount = (invoice.originalFee * coupon.amount) / 100
+        } else {
+          appliedCouponDiscount = coupon.amount * (invoice.numOfApplicant || 1)
+        }
+      }
+
       setInvoicesData(prev =>
         prev.map(inv => ({
           ...inv,
@@ -129,9 +151,11 @@ const SuccessPaymentContent = ({
           numOfLesson: invoice.numOfLesson,
           paymentAmount: invoice.payAmount,
           discountInfo: [invoice.discounts],
-          couponDiscount: invoice.discountAmount,
+          couponDiscount: appliedCouponDiscount,
+          couponCode: invoice.promotionUsed?.coupon?.code || '',
           currency: invoice.currency ?? '',
           totalDiscount: invoice.discountAmount,
+          autoCouponApplied: !!invoice.promotionUsed?.coupon,
         }))
       )
     }
@@ -139,13 +163,10 @@ const SuccessPaymentContent = ({
 
   const classesAndPrice = useMemo(() => {
     if (invoice) {
-      const subtotalPrice = (invoice.enrollCourses ?? [])
-        .map(enrollCourse => {
-          return typeof enrollCourse.paymentAmount === 'string'
-            ? parseFloat(enrollCourse.paymentAmount)
-            : enrollCourse.paymentAmount
-        })
-        .reduce((sum, price) => sum + price, 0)
+      const subtotalPrice =
+        typeof invoice.originalFee === 'string'
+          ? parseFloat(invoice.originalFee)
+          : invoice.originalFee
 
       const additionalFeeAmount =
         typeof invoice.additionalFee === 'string'
@@ -308,10 +329,8 @@ const SuccessPaymentContent = ({
                       {' '}
                       {invoice.paymentMethod === 'PAY_NOW'
                         ? t('enrol:paymentSuccessSummary.onlinePayment')
-                        : invoice.paymentMethod === 'PAY_NOW_DIVIT'
-                          ? 'Divit'
-                          : invoice.payLaterMethod?.methodName ||
-                            t('enrol:paymentSuccessSummary.payLater')}
+                        : invoice.payLaterMethod?.methodName ||
+                          t('enrol:paymentSuccessSummary.payLater')}
                     </div>
                   </div>
                 </>

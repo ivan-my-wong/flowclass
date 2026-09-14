@@ -35,6 +35,7 @@ import {
   RecordLogListDto,
   StudentActivitiesDto,
 } from './dto/get-list-record-log.dto'
+import { ResendNotificationLogDto } from './dto/resend-notification-log.dto'
 
 @Controller('record-logs')
 @ApiTags('Record Logs')
@@ -124,6 +125,27 @@ export class RecordLogController {
   @RequireParams(RequireParam.INSTITUTION_ID)
   async getNotificationLogByContact(@Query() params: GetRecordLogByContactDto) {
     const result = await this.notificationRecordService.getNotificationLogByContact(params)
+    return new ApiResult().success(result)
+  }
+
+  @Post('notification-log/resend')
+  @ApiOperation({
+    summary: 'Resend failed notification logs',
+  })
+  @ApiOkResponse({
+    type: ApiResult,
+  })
+  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER, Role.INSTRUCTOR)
+  @UseGuards(RolesGuard)
+  @RequireParams(RequireParam.INSTITUTION_ID)
+  async resendNotificationLogs(
+    @Query() query: { siteId: number; institutionId?: number },
+    @Body() body: ResendNotificationLogDto
+  ) {
+    const result = await this.notificationRecordService.resendNotificationLogs(
+      body.recordIds,
+      query
+    )
     return new ApiResult().success(result)
   }
 }

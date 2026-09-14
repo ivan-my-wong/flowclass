@@ -1,5 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import * as Handlebars from 'handlebars'
 import parsePhoneNumber from 'libphonenumber-js'
+import { EmailParams, Recipient, Sender } from 'mailersend'
+import { Personalization, Variable } from 'mailersend/lib/modules/Email.module'
+import { APIResponse } from 'mailersend/lib/services/request.service'
+import * as nodemailer from 'nodemailer'
 import * as QRCode from 'qrcode'
 import { ILike, In } from 'typeorm'
 
@@ -12,21 +17,16 @@ import {
 } from '@/application/admin/setting-notifications/setting-notifications.dto'
 import { QRCodeAttendanceDto } from '@/application/admin/student-onboard/dtos/student-onboard.dto'
 import { ApiError } from '@/common/api-formats/api-error'
+import { emailTemplates } from '@/common/constants/email-templates.constants'
+import { baseEmailLayout } from '@/common/email-templates/base-layout.template'
+import { paymentRejectedTemplate } from '@/common/email-templates/payment-rejected.template'
 import { CloudWatchLoggerProvider } from '@/config/loggers/cloudwatch-nestjs.provider'
-import { ObjectStorageProvider } from '@/config/storage/object-storage.provider'
-import {
-  APIResponse,
-  EmailParams,
-  NodemailerEmailTransport,
-  Personalization,
-  Recipient,
-  Sender,
-  Variable,
-} from '@/domain/external/email-transport.provider'
+import { S3ClientFactory } from '@/config/s3/s3-factory.provider'
 import { SettingNotificationsService } from '@/domain/service/setting-notifications.service'
 import { StudentScheduleService } from '@/domain/service/student-schedule.service'
 import { ErrorCode } from '@/exceptions/error-message/errors'
 import { InstitutionErrorMessage } from '@/exceptions/error-message/institution'
+import { AutomationFlow } from '@/models/automation-flow.entity'
 import { ClassRepository } from '@/models/classes.repository'
 import { RegularPeriodsRepository } from '@/models/course-regular-periods.entity'
 import type { EmailSettings } from '@/models/courses.entity'
@@ -75,6 +75,7 @@ import { Invoice } from '@/models/invoice.entity'
 import { InvoiceRepository } from '@/models/invoice.repository'
 import {
   NotificationChannel,
+  NotificationRecord,
   NotificationStatus,
   NotificationType,
 } from '@/models/notification-record.entity'
@@ -83,6 +84,7 @@ import { SitesRepository } from '@/models/sites.repository'
 import { StudentLessonRepository } from '@/models/student-lesson.repository'
 import { StudentNotificationSettingRepository } from '@/models/student-notification-setting.entity'
 import { StudentSchedule, StudentScheduleWithUserAlias } from '@/models/student-schedule.entity'
+import { SubscriptionPlanRecordsRepository } from '@/models/subscription-plan-records.entity'
 import { UserAliasesRepository } from '@/models/user-aliases.repository'
 import { UsersRepository } from '@/models/users.repository'
 import { buildUploadReceiptLink } from '@/utils/payment-link.utils'
@@ -103,8 +105,8 @@ import { SettingSiteService } from '../service/setting-site.service'
 
 @Injectable()
 export class EmailService {
-  private readonly emailTransport: NodemailerEmailTransport
   private defaultSentFrom
+  private readonly nodemailerTransporter: nodemailer.Transporter
 
   constructor(
     private readonly logger: CloudWatchLoggerProvider,
@@ -113,7 +115,7 @@ export class EmailService {
     private readonly settingSiteService: SettingSiteService,
     private readonly studentScheduleService: StudentScheduleService,
     private readonly settingNotificationsService: SettingNotificationsService,
-    private readonly objectStorageProvider: ObjectStorageProvider,
+    private readonly s3ClientFactory: S3ClientFactory,
     private readonly coursesRepository: CoursesRepository,
     private readonly usersRepository: UsersRepository,
     private readonly classRepository: ClassRepository,
@@ -123,24 +125,51 @@ export class EmailService {
     private readonly notificationRecordRepository: NotificationRecordRepository,
     private readonly studentLessonRepository: StudentLessonRepository,
     private readonly studentNotifSettingRepository: StudentNotificationSettingRepository,
+    private readonly subscriptionPlanRecordsRepository: SubscriptionPlanRecordsRepository,
     private readonly userAliasesRepository: UserAliasesRepository
   ) {
-    this.emailTransport = new NodemailerEmailTransport()
-    this.defaultSentFrom = new Sender('info@flowclass.ai', 'Flowclass')
-  }
+    const fromAddress = 'info@flowclass.io'
+    const fromName = 'Flowclass'
+    this.defaultSentFrom = new Sender(fromAddress, fromName)
 
-  private async getSenderForInstitution(
-    institutionId: number | null,
-    fallbackName?: string
-  ): Promise<Sender> {
-    if (!institutionId) return this.defaultSentFrom
-    const institution = await this.institutionsRepository.findOneById(institutionId)
-    if (institution?.email) {
-      return new Sender(institution.email, institution.name ?? fallbackName ?? 'Institution')
+    const smtpHost = process.env.SMTP_HOST || process.env.MAIL_HOST || 'localhost'
+    const smtpPort = parseInt(process.env.SMTP_PORT || process.env.MAIL_PORT || '587', 10)
+    const smtpSecure =
+      process.env.SMTP_SECURE === 'true' || process.env.MAIL_SECURE === 'true' || smtpPort === 465
+
+    const smtpUser =
+      process.env.SMTP_USER ||
+      process.env.SMTP_USERNAME ||
+      process.env.MAIL_USER ||
+      process.env.MAIL_USERNAME
+    const smtpPass =
+      process.env.SMTP_PASS ||
+      process.env.SMTP_PASSWORD ||
+      process.env.MAIL_PASS ||
+      process.env.MAIL_PASSWORD
+
+    const transportConfig: any = {
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpSecure,
+      connectionTimeout: 10000, // 10 seconds
+      greetingTimeout: 10000, // 10 seconds
+      socketTimeout: 10000, // 10 seconds
     }
-    return fallbackName
-      ? new Sender(this.defaultSentFrom.email, fallbackName)
-      : this.defaultSentFrom
+
+    if (smtpUser && smtpPass) {
+      transportConfig.auth = {
+        user: smtpUser,
+        pass: smtpPass,
+      }
+    }
+
+    this.logger.log(
+      `[SMTP Init] Initializing SMTP Transport | Host: ${smtpHost} | Port: ${smtpPort} | Secure: ${smtpSecure} | Auth: ${
+        smtpUser ? 'Yes' : 'No'
+      }`
+    )
+    this.nodemailerTransporter = nodemailer.createTransport(transportConfig)
   }
 
   async buildSendClassStudentWaitingPayload(
@@ -211,6 +240,7 @@ export class EmailService {
     parentUserAlias,
     params,
     recipientUserId,
+    automationFlow,
   }: SendClassStudentWaitingParams): Promise<void | APIResponse> {
     const parentUser = {
       studentAccount: parentUserAlias.user,
@@ -330,7 +360,7 @@ export class EmailService {
       emailAddress: parentUser.email,
       recipientUserId,
       recipientName: parentUser.name,
-      templateId: 'remind-payment',
+      templateId: emailTemplates.CLASS_STUDENT_WAITING_PAYMENT,
       personalization,
       advancePersonalization,
       notificationType: NotificationType.WAITING_FOR_PAYMENT,
@@ -343,6 +373,7 @@ export class EmailService {
 
     return await this.sendEmail({
       emailPayload,
+      automationFlow,
       enrollCourse: params.enrollCourses.at(0),
     })
   }
@@ -393,7 +424,7 @@ export class EmailService {
       emailAddress: rest.emailAddress,
       recipientUserId: rest.userId,
       recipientName: studentName,
-      templateId: 'teacher-feedback-uploaded',
+      templateId: emailTemplates.UPLOADED_TEACHER_FEEDBACK,
       personalization,
       advancePersonalization,
       notificationType: NotificationType.TEACHER_FEEDBACK,
@@ -415,6 +446,7 @@ export class EmailService {
     institutionId,
     siteId,
     enrollCourse,
+    automationFlow,
     invoice,
     recipientUser,
   }: SendStudentConfirmCourseParams): Promise<void | APIResponse> {
@@ -461,105 +493,26 @@ export class EmailService {
         },
       })
     }
+
+    let course = enrollCourse.course
+    if (!course) {
+      course = await this.coursesRepository.findOneBy({
+        id: enrollCourse.courseId,
+        institutionId,
+      })
+    }
+
+    const courseEmailSettings = this.getEmailSettingsForCourse(course)
+    const emailSubject =
+      courseEmailSettings?.emailTitle?.trim?.() ||
+      `You are now enrolled in ${courseName} by ${institutionName}`
+
+    const hasCustom = this.hasCustomEmailTemplate(course)
     const hasQrCode = await this.isQRCodeModuleEnabled(enrollCourse.courseId)
     const effectiveEmail = userAlias?.email || recipientUser.email || payload.emailAddress
 
-    const personalization = [
-      {
-        email: effectiveEmail,
-        substitutions: this.convertValuesToString([
-          {
-            var: 'price',
-            value: price,
-          },
-          {
-            var: 'remark',
-            value: remark,
-          },
-          {
-            var: 'enrolId',
-            value: enrolId,
-          },
-          {
-            var: 'location',
-            value: location,
-          },
-          {
-            var: 'password',
-            value: password,
-          },
-          {
-            var: 'className',
-            value: className?.replace(/\n/g, '<br />'),
-          },
-          {
-            var: 'adminEmail',
-            value: adminEmail,
-          },
-          {
-            var: 'adminPhone',
-            value: parsePhoneNumber(`+${adminPhone}`)?.formatInternational() ?? '',
-          },
-          {
-            var: 'courseName',
-            value: courseName,
-          },
-          {
-            var: 'studentEmail',
-            value: effectiveEmail,
-          },
-          {
-            var: 'studentName',
-            value: studentName,
-          },
-          {
-            var: 'studentPhone',
-            value: recipientUser.phoneNumber || 'No phone number',
-          },
-          {
-            var: 'classDateTime',
-            value: classDateTime?.replace(/\n/g, '<br />'),
-          },
-          {
-            var: 'paymentMethod',
-            value: paymentMethod,
-          },
-          {
-            var: 'paymentStatus',
-            value: paymentStatus,
-          },
-          {
-            var: 'transactionId',
-            value: transactionId,
-          },
-          {
-            var: 'institutionName',
-            value: institutionName,
-          },
-          {
-            var: 'courseName',
-            value: courseName,
-          },
-          {
-            var: 'institutionName',
-            value: institutionName,
-          },
-          {
-            var: 'timeZone',
-            value: timeZone,
-          },
-          {
-            var: 'successPaymentLink',
-            value: successPaymentLink,
-          },
-        ]),
-      },
-    ]
-
-    const emailSubject = `You are now enrolled in ${courseName} by ${institutionName}`
-    const isFirstApplicant = invoice.applicants.at(0) === recipientUser.id
-
     // If isFirstApplicant, send all qrcode as attachment into applicants
+    const isFirstApplicant = invoice.applicants.at(0) === recipientUser.id
     const attachments = await this.generateQrCodeAttachments({
       invoice,
       enrollCourse,
@@ -567,32 +520,317 @@ export class EmailService {
       isForFirstApplicant: isFirstApplicant,
       participantId: enrollCourse.userId,
     })
-    const advancePersonalization: Personalization[] = [
-      {
-        email: effectiveEmail,
-        data: {
-          schoolLogo: await this.checkDisplayEmailLogo(institutionId),
-          hasQrCode,
-          attachments: attachments.map((d) => d.id),
+
+    let emailPayload: any
+
+    if (hasCustom) {
+      const personalization = [
+        {
+          email: effectiveEmail,
+          substitutions: this.convertValuesToString([
+            {
+              var: 'price',
+              value: price,
+            },
+            {
+              var: 'remark',
+              value: remark,
+            },
+            {
+              var: 'enrolId',
+              value: enrolId,
+            },
+            {
+              var: 'location',
+              value: location,
+            },
+            {
+              var: 'password',
+              value: password,
+            },
+            {
+              var: 'className',
+              value: className?.replace(/\n/g, '<br />'),
+            },
+            {
+              var: 'adminEmail',
+              value: adminEmail,
+            },
+            {
+              var: 'adminPhone',
+              value: parsePhoneNumber(`+${adminPhone}`)?.formatInternational() ?? '',
+            },
+            {
+              var: 'courseName',
+              value: courseName,
+            },
+            {
+              var: 'studentEmail',
+              value: effectiveEmail,
+            },
+            {
+              var: 'studentName',
+              value: studentName,
+            },
+            {
+              var: 'studentPhone',
+              value: recipientUser.phoneNumber || 'No phone number',
+            },
+            {
+              var: 'classDateTime',
+              value: classDateTime?.replace(/\n/g, '<br />'),
+            },
+            {
+              var: 'paymentMethod',
+              value: paymentMethod,
+            },
+            {
+              var: 'paymentStatus',
+              value: paymentStatus,
+            },
+            {
+              var: 'transactionId',
+              value: transactionId,
+            },
+            {
+              var: 'institutionName',
+              value: institutionName,
+            },
+            {
+              var: 'courseName',
+              value: courseName,
+            },
+            {
+              var: 'institutionName',
+              value: institutionName,
+            },
+            {
+              var: 'timeZone',
+              value: timeZone,
+            },
+            {
+              var: 'successPaymentLink',
+              value: successPaymentLink,
+            },
+          ]),
         },
-      },
-    ]
-    const emailPayload = {
-      emailSubject,
-      emailAddress: effectiveEmail,
-      recipientUserId: recipientUser.id,
-      recipientName: recipientUser.studentName,
-      templateId: 'student-confirmation',
-      personalization,
-      advancePersonalization,
-      notificationType: NotificationType.ENROLLED_IN_COURSE,
-      institutionId,
-      institutionName,
-      siteId,
-      attachments,
+      ]
+
+      const advancePersonalization: Personalization[] = [
+        {
+          email: effectiveEmail,
+          data: {
+            schoolLogo: await this.checkDisplayEmailLogo(institutionId),
+            hasQrCode,
+            attachments: attachments.map((d) => d.id),
+          },
+        },
+      ]
+
+      emailPayload = {
+        emailSubject,
+        emailAddress: effectiveEmail,
+        recipientUserId: recipientUser.id,
+        recipientName: recipientUser.studentName,
+        templateId: courseEmailSettings?.emailId || emailTemplates.CLASS_STUDENT_CONFIRMATION,
+        personalization,
+        advancePersonalization,
+        notificationType: NotificationType.ENROLLED_IN_COURSE,
+        institutionId,
+        institutionName,
+        siteId,
+        attachments,
+      }
+    } else {
+      const template = Handlebars.compile(baseEmailLayout)
+      const schoolLogo = await this.checkDisplayEmailLogo(institutionId)
+
+      const formattedClassName = className?.replace(/\n/g, '<br />')
+      const formattedClassDateTime = classDateTime?.replace(/\n/g, '<br />')
+      const formattedStudentPhone = recipientUser.phoneNumber
+        ? parsePhoneNumber(`+${recipientUser.phoneNumber}`)?.formatInternational() ??
+          recipientUser.phoneNumber
+        : 'No phone number'
+      const formattedAdminPhone = adminPhone
+        ? parsePhoneNumber(`+${adminPhone}`)?.formatInternational() ?? adminPhone
+        : ''
+
+      const body = `<p>Hello ${studentName},</p>
+<p>We’re from <strong>${institutionName}</strong>. This email is to confirm that we have confirmed your application and you are now enrolled into <strong>${courseName}</strong>.</p>`
+
+      let additionalContent = ''
+
+      if (hasQrCode) {
+        additionalContent += `
+<div class="info-card" style="border-left: 4px solid #10b981; background: #f0fdf4; margin-bottom: 20px; padding: 16px;">
+    <div style="font-weight: 600; color: #166534; font-size: 14px; margin-bottom: 4px;">Attendance QR Code Attached</div>
+    <div style="color: #1b4332; font-size: 13px; line-height: 1.5;">Please present the attached QR code for attendance when you arrive at the class.</div>
+</div>
+`
+      }
+
+      additionalContent += `
+<div class="section-title">Application Information</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">Application ID</div>
+        <div class="info-value" style="font-weight: 600;">${enrolId}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Course Name</div>
+        <div class="info-value">${courseName}</div>
+    </div>
+    ${
+      className
+        ? `
+    <div class="info-row">
+        <div class="info-label">Option Name</div>
+        <div class="info-value">${formattedClassName}</div>
+    </div>`
+        : ''
     }
+    <div class="info-row">
+        <div class="info-label">Date & Time</div>
+        <div class="info-value">${formattedClassDateTime}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Time Zone</div>
+        <div class="info-value">${timeZone}</div>
+    </div>
+    ${
+      payload.instructor
+        ? `
+    <div class="info-row">
+        <div class="info-label">Instructor</div>
+        <div class="info-value">${payload.instructor}</div>
+    </div>`
+        : ''
+    }
+    ${
+      location
+        ? `
+    <div class="info-row">
+        <div class="info-label">Location</div>
+        <div class="info-value">${location}</div>
+    </div>`
+        : ''
+    }
+</div>
+
+<div class="section-title">Your Contact Information</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">Name</div>
+        <div class="info-value" style="font-weight: 600;">${studentName}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Phone</div>
+        <div class="info-value">${formattedStudentPhone}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Email</div>
+        <div class="info-value"><a href="mailto:${effectiveEmail}" style="color: #4f46e5; text-decoration: none;">${effectiveEmail}</a></div>
+    </div>
+</div>
+
+<div class="section-title">Contact Information of ${institutionName}</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">Name</div>
+        <div class="info-value" style="font-weight: 600;">${institutionName}</div>
+    </div>
+    ${
+      adminPhone
+        ? `
+    <div class="info-row">
+        <div class="info-label">Phone</div>
+        <div class="info-value">${formattedAdminPhone}</div>
+    </div>`
+        : ''
+    }
+    ${
+      adminEmail
+        ? `
+    <div class="info-row">
+        <div class="info-label">Email</div>
+        <div class="info-value"><a href="mailto:${adminEmail}" style="color: #4f46e5; text-decoration: none;">${adminEmail}</a></div>
+    </div>`
+        : ''
+    }
+</div>
+
+<div class="section-title">Payment Information</div>
+<div class="info-card">
+    ${
+      transactionId
+        ? `
+    <div class="info-row">
+        <div class="info-label">Payment ID</div>
+        <div class="info-value">${transactionId}</div>
+    </div>`
+        : ''
+    }
+    <div class="info-row">
+        <div class="info-label">Price</div>
+        <div class="info-value" style="font-weight: 600;">${price}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Payment Status</div>
+        <div class="info-value" style="font-weight: 600; color: #10b981;">${paymentStatus}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Payment Method</div>
+        <div class="info-value">${paymentMethod}</div>
+    </div>
+</div>
+`
+
+      if (remark) {
+        additionalContent += `
+<div class="section-title">Message from ${institutionName}</div>
+<div class="info-card">
+    <div style="font-size: 14px; color: #475569; line-height: 1.6; white-space: pre-wrap;">${remark}</div>
+</div>
+`
+      }
+
+      const html = template({
+        subject: emailSubject,
+        title: 'Application Confirmed',
+        subtitle: 'ENROLLED',
+        subtitleColor: '#10b981',
+        headerAccent: 'linear-gradient(90deg, #10b981, #4f46e5)',
+        schoolLogo,
+        studentName,
+        institutionName,
+        body,
+        additionalContent,
+        ctaUrl: successPaymentLink,
+        ctaText: 'View Application Page',
+        ctaBgColor: '#4f46e5',
+        ctaShadowColor: 'rgba(79, 70, 229, 0.2)',
+        showFallbackLink: true,
+        adminEmail: adminEmail || 'info@flowclass.io',
+        currentYear: new Date().getFullYear(),
+      })
+
+      emailPayload = {
+        emailSubject,
+        emailAddress: effectiveEmail,
+        recipientUserId: recipientUser.id,
+        recipientName: recipientUser.studentName,
+        html,
+        notificationType: NotificationType.ENROLLED_IN_COURSE,
+        institutionId,
+        institutionName,
+        siteId,
+        attachments,
+      }
+    }
+
     await this.sendEmail({
       emailPayload,
+      automationFlow,
       enrollCourse,
     })
   }
@@ -889,7 +1127,7 @@ export class EmailService {
       emailAddress: enrollCourse.preferredEmail,
       studentPhone: enrollCourse.preferredPhone,
       studentName: enrollCourse.preferredName,
-      courseName: enrollCourse.course.name,
+      courseName: enrollCourse.course?.name ?? '',
       price: `${invoice.currency} ${transaction.amountTotal}`,
       paymentAmount: `${invoice.currency} ${transaction.amountTotal}`,
       paymentMethod: this.getPaymentMethodString({
@@ -950,106 +1188,155 @@ export class EmailService {
       institutionId,
       siteId,
     } = payload
-    const personalization = [
-      {
-        email: emailAddress,
-        substitutions: this.convertValuesToString([
-          {
-            var: 'price',
-            value: price,
-          },
-          {
-            var: 'remark',
-            value: remark,
-          },
-          {
-            var: 'enrolId',
-            value: enrolId,
-          },
-          {
-            var: 'location',
-            value: location,
-          },
-          {
-            var: 'className',
-            value: className?.replace(/\n/g, '<br />'),
-          },
-          {
-            var: 'courseName',
-            value: courseName,
-          },
-          {
-            var: 'studentName',
-            value: studentName,
-          },
-          {
-            var: 'studentEmail',
-            value: studentEmail,
-          },
-          {
-            var: 'studentPhone',
-            value: parsePhoneNumber(`+${studentPhone}`)?.formatInternational() ?? '',
-          },
-          {
-            var: 'classDateTime',
-            value: classDateTime?.replace(/\n/g, '<br />'),
-          },
-          {
-            var: 'paymentMethod',
-            value: paymentMethod,
-          },
-          {
-            var: 'paymentStatus',
-            value: paymentStatus,
-          },
-          {
-            var: 'transactionId',
-            value: transactionId,
-          },
-          {
-            var: 'institutionName',
-            value: institutionName,
-          },
-          {
-            var: 'adminEmail',
-            value: adminEmail,
-          },
-          {
-            var: 'adminPhone',
-            value: parsePhoneNumber(`+${adminPhone}`)?.formatInternational() ?? '',
-          },
-          {
-            var: 'timeZone',
-            value: timeZone,
-          },
 
-          {
-            var: 'flowclassCrmLink',
-            value: process.env.NEXT_PUBLIC_WEB_BASE_URL,
-          },
-        ]),
-      },
-    ]
+    const template = Handlebars.compile(baseEmailLayout)
 
-    const advancePersonalization: Personalization[] = [
-      {
-        email: emailAddress,
-        data: {
-          enrollmentForm,
-          schoolLogo: await this.checkDisplayEmailLogo(institutionId),
-        },
-      },
-    ]
+    const schoolLogo = await this.checkDisplayEmailLogo(institutionId)
 
-    const emailSubject = `${studentName} has applied for ${courseName}`
+    const emailSubject = `A new applicant applied for ${courseName} !`
+
+    const body = `<p>We’re happy to say that a new applicant applied for <strong>${courseName}</strong>!</p>
+<p>Please be reminded that they have not yet completed the payment. We will send you another email once the payment is confirmed. Stay tuned!</p>`
+
+    const formattedClassName = className?.replace(/\n/g, '<br />')
+    const formattedClassDateTime = classDateTime?.replace(/\n/g, '<br />')
+    const formattedStudentPhone = studentPhone
+      ? parsePhoneNumber(`+${studentPhone}`)?.formatInternational() ?? ''
+      : ''
+    const formattedAdminPhone = adminPhone
+      ? parsePhoneNumber(`+${adminPhone}`)?.formatInternational() ?? ''
+      : ''
+
+    let additionalContent = `
+<div class="section-title">Application Information</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">Application ID</div>
+        <div class="info-value" style="font-weight: 600;">${enrolId}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Course Name</div>
+        <div class="info-value">${courseName}</div>
+    </div>
+    ${
+      className
+        ? `
+    <div class="info-row">
+        <div class="info-label">Option Name</div>
+        <div class="info-value">${formattedClassName}</div>
+    </div>`
+        : ''
+    }
+    <div class="info-row">
+        <div class="info-label">Date & Time</div>
+        <div class="info-value">${formattedClassDateTime}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Time Zone</div>
+        <div class="info-value">${timeZone}</div>
+    </div>
+    ${
+      location
+        ? `
+    <div class="info-row">
+        <div class="info-label">Location</div>
+        <div class="info-value">${location}</div>
+    </div>`
+        : ''
+    }
+</div>
+
+<div class="section-title">Personal Information</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">Applicant's Name</div>
+        <div class="info-value" style="font-weight: 600;">${studentName}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Applicant's Email</div>
+        <div class="info-value"><a href="mailto:${studentEmail}" style="color: #4f46e5; text-decoration: none;">${studentEmail}</a></div>
+    </div>
+    ${
+      studentPhone
+        ? `
+    <div class="info-row">
+        <div class="info-label">Applicant's Phone</div>
+        <div class="info-value">${formattedStudentPhone}</div>
+    </div>`
+        : ''
+    }
+</div>
+
+<div class="section-title">Payment Information</div>
+<div class="info-card">
+    ${
+      transactionId
+        ? `
+    <div class="info-row">
+        <div class="info-label">Payment ID</div>
+        <div class="info-value">${transactionId}</div>
+    </div>`
+        : ''
+    }
+    <div class="info-row">
+        <div class="info-label">Price</div>
+        <div class="info-value" style="font-weight: 600;">${price}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Payment Status</div>
+        <div class="info-value">${paymentStatus}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Payment Method</div>
+        <div class="info-value">${paymentMethod}</div>
+    </div>
+</div>
+`
+
+    if (enrollmentForm && enrollmentForm.length > 0) {
+      additionalContent += `
+<div class="section-title">Questions & Answers</div>
+<div class="info-card">
+`
+      for (const instance of enrollmentForm) {
+        if (instance.question && instance.answer) {
+          additionalContent += `
+    <div class="info-row" style="border-bottom: 1px solid #cbd5e1; padding-bottom: 10px; margin-bottom: 10px;">
+        <div class="info-label" style="text-transform: none; color: #475569; font-size: 13px;">${instance.question}</div>
+        <div class="info-value" style="font-weight: 600;">${instance.answer}</div>
+    </div>
+`
+        }
+      }
+      additionalContent += `</div>`
+    }
+
+    const html = template({
+      subject: emailSubject,
+      title: 'New Applicant Applied',
+      subtitle: 'Enrollment Request',
+      subtitleColor: '#4f46e5',
+      headerAccent: 'linear-gradient(90deg, #4f46e5, #3b82f6)',
+      schoolLogo,
+      studentName: institutionName,
+      institutionName,
+      body,
+      additionalContent,
+      ctaUrl: process.env.LINK_FLOWCLASS_CMS,
+      ctaText: 'Visit your Flowclass dashboard',
+      ctaBgColor: '#3b82f6',
+      ctaShadowColor: 'rgba(59, 130, 246, 0.2)',
+      showFallbackLink: true,
+      adminEmail: 'info@flowclass.io',
+      currentYear: new Date().getFullYear(),
+    })
+
     const emailPayload = {
       emailSubject,
       emailAddress,
       recipientUserId: recipientId,
       recipientName: institutionName,
-      templateId: 'admin-new-registration',
-      personalization,
-      advancePersonalization,
+      html,
       notificationType: NotificationType.STUDENT_REGISTERED,
       institutionId,
       institutionName,
@@ -1089,118 +1376,190 @@ export class EmailService {
       adminPhone,
       timeZone,
       instructor,
+      attachments,
     } = payload
-    const personalization = [
-      {
-        email: emailAddress,
-        substitutions: this.convertValuesToString([
-          {
-            var: 'price',
-            value: price,
-          },
-          {
-            var: 'remark',
-            value: remark,
-          },
-          {
-            var: 'enrolId',
-            value: enrolId,
-          },
-          {
-            var: 'location',
-            value: location,
-          },
-          {
-            var: 'instructor',
-            value: instructor,
-          },
-          {
-            var: 'className',
-            value: className?.replace(/\n/g, '<br />'),
-          },
-          {
-            var: 'courseName',
-            value: courseName,
-          },
-          {
-            var: 'studentName',
-            value: studentName,
-          },
-          {
-            var: 'studentEmail',
-            value: studentEmail,
-          },
-          {
-            var: 'studentPhone',
-            value: parsePhoneNumber(`+${studentPhone}`)?.formatInternational() ?? '',
-          },
-          {
-            var: 'classDateTime',
-            value: classDateTime?.replace(/\n/g, '<br />'),
-          },
-          {
-            var: 'paymentMethod',
-            value: paymentMethod,
-          },
-          {
-            var: 'paymentStatus',
-            value: paymentStatus,
-          },
-          {
-            var: 'transactionId',
-            value: transactionId,
-          },
-          {
-            var: 'institutionName',
-            value: institutionName,
-          },
-          {
-            var: 'adminEmail',
-            value: adminEmail,
-          },
-          {
-            var: 'adminPhone',
-            value: parsePhoneNumber(`+${adminPhone}`)?.formatInternational() ?? '',
-          },
-          {
-            var: 'timeZone',
-            value: timeZone,
-          },
 
-          {
-            var: 'flowclassCrmLink',
-            value: process.env.NEXT_PUBLIC_WEB_BASE_URL,
-          },
-        ]),
-      },
-    ]
+    const template = Handlebars.compile(baseEmailLayout)
 
-    const advancePersonalization: Personalization[] = [
-      {
-        email: emailAddress,
-        data: {
-          schoolLogo: await this.checkDisplayEmailLogo(institutionId),
-          enrollmentForm,
-        },
-      },
-    ]
+    const schoolLogo = await this.checkDisplayEmailLogo(institutionId)
 
-    const emailSubject = `${
-      studentName ?? 'A student'
-    } has uploaded payment receipt for ${courseName}`
+    const emailSubject = `${studentName ?? 'A student'} has finished payment for ${courseName}!`
+
+    const body = `<p><strong>${studentName}</strong> has just paid for <strong>${courseName}</strong>! The payment will be transferred into your Stripe account which is linked to Flowclass.</p>
+<p>If the applicant paid by credit card, you can visit the dashboard and click on "Visit Dashboard" to check your balance.</p>`
+
+    const formattedClassName = className?.replace(/\n/g, '<br />')
+    const formattedClassDateTime = classDateTime?.replace(/\n/g, '<br />')
+    const formattedStudentPhone = studentPhone
+      ? parsePhoneNumber(`+${studentPhone}`)?.formatInternational() ?? ''
+      : ''
+    const formattedAdminPhone = adminPhone
+      ? parsePhoneNumber(`+${adminPhone}`)?.formatInternational() ?? ''
+      : ''
+
+    let additionalContent = `
+<div class="section-title">Application Information</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">Application ID</div>
+        <div class="info-value" style="font-weight: 600;">${enrolId}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Course Name</div>
+        <div class="info-value">${courseName}</div>
+    </div>
+    ${
+      className
+        ? `
+    <div class="info-row">
+        <div class="info-label">Option Name</div>
+        <div class="info-value">${formattedClassName}</div>
+    </div>`
+        : ''
+    }
+    <div class="info-row">
+        <div class="info-label">Date & Time</div>
+        <div class="info-value">${formattedClassDateTime}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Time Zone</div>
+        <div class="info-value">${timeZone}</div>
+    </div>
+    ${
+      instructor
+        ? `
+    <div class="info-row">
+        <div class="info-label">Instructor</div>
+        <div class="info-value">${instructor}</div>
+    </div>`
+        : ''
+    }
+    ${
+      location
+        ? `
+    <div class="info-row">
+        <div class="info-label">Location</div>
+        <div class="info-value">${location}</div>
+    </div>`
+        : ''
+    }
+</div>
+
+<div class="section-title">Contact Information</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">School Name</div>
+        <div class="info-value" style="font-weight: 600;">${institutionName}</div>
+    </div>
+    ${
+      adminPhone
+        ? `
+    <div class="info-row">
+        <div class="info-label">Phone</div>
+        <div class="info-value">${formattedAdminPhone}</div>
+    </div>`
+        : ''
+    }
+    ${
+      adminEmail
+        ? `
+    <div class="info-row">
+        <div class="info-label">Email</div>
+        <div class="info-value"><a href="mailto:${adminEmail}" style="color: #10b981; text-decoration: none;">${adminEmail}</a></div>
+    </div>`
+        : ''
+    }
+</div>
+
+<div class="section-title">Applicant's Information</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">Student Name</div>
+        <div class="info-value" style="font-weight: 600;">${studentName}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Student Email</div>
+        <div class="info-value"><a href="mailto:${studentEmail}" style="color: #10b981; text-decoration: none;">${studentEmail}</a></div>
+    </div>
+    ${
+      studentPhone
+        ? `
+    <div class="info-row">
+        <div class="info-label">Student Phone</div>
+        <div class="info-value">${formattedStudentPhone}</div>
+    </div>`
+        : ''
+    }
+</div>
+
+<div class="section-title">Payment Information</div>
+<div class="info-card">
+    ${
+      transactionId
+        ? `
+    <div class="info-row">
+        <div class="info-label">Payment ID</div>
+        <div class="info-value">${transactionId}</div>
+    </div>`
+        : ''
+    }
+    <div class="info-row">
+        <div class="info-label">Price</div>
+        <div class="info-value" style="font-weight: 600;">${price}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Payment Status</div>
+        <div class="info-value" style="font-weight: 600; color: #10b981;">${paymentStatus}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Payment Method</div>
+        <div class="info-value">${paymentMethod}</div>
+    </div>
+</div>
+`
+
+    if (remark) {
+      additionalContent += `
+<div class="section-title">Message Left for Applicant</div>
+<div class="info-card">
+    <div style="font-size: 14px; color: #475569; line-height: 1.6; white-space: pre-wrap;">${remark}</div>
+</div>
+`
+    }
+
+    const html = template({
+      subject: emailSubject,
+      title: 'Payment Confirmed',
+      subtitle: courseName,
+      subtitleColor: '#10b981',
+      headerAccent: 'linear-gradient(90deg, #10b981, #059669)',
+      schoolLogo,
+      studentName: institutionName,
+      institutionName,
+      body,
+      additionalContent,
+      ctaUrl: process.env.LINK_FLOWCLASS_CMS,
+      ctaText: 'Visit Dashboard',
+      ctaBgColor: '#10b981',
+      ctaShadowColor: 'rgba(16, 185, 129, 0.2)',
+      showFallbackLink: true,
+      adminEmail: 'info@flowclass.io',
+      currentYear: new Date().getFullYear(),
+    })
+
     const emailPayload = {
       emailSubject,
       emailAddress,
       recipientUserId,
       recipientName: institutionName,
-      templateId: 'admin-payment-confirmation',
-      personalization,
-      advancePersonalization,
+      html,
       notificationType: NotificationType.STUDENT_PAID,
       institutionId,
       institutionName,
       siteId,
+      attachments,
     }
+
     return await this.sendEmail({
       emailPayload,
       enrollCourse,
@@ -1243,7 +1602,7 @@ export class EmailService {
       studentName: enrollCourse.preferredName,
       studentEmail: enrollCourse.preferredEmail,
       studentPhone: enrollCourse.preferredPhone,
-      courseName: enrollCourse.course.name,
+      courseName: enrollCourse.course?.name ?? '',
       className: enrollCourse.enrollInto?.map((info) => enrollIntoInfoToString(info)).join('\n'),
       classDateTime,
       location: Array.from(new Set(location)).join(', '),
@@ -1303,96 +1662,172 @@ export class EmailService {
       timeZone,
       instructor,
     } = payload
-    const personalization = [
-      {
-        email: emailAddress,
-        substitutions: this.convertValuesToString([
-          {
-            var: 'price',
-            value: price,
-          },
-          {
-            var: 'enrolId',
-            value: enrolId,
-          },
-          {
-            var: 'location',
-            value: location,
-          },
-          {
-            var: 'instructor',
-            value: instructor,
-          },
-          {
-            var: 'className',
-            value: className?.replace(/\n/g, '<br />'),
-          },
-          {
-            var: 'courseName',
-            value: courseName,
-          },
-          {
-            var: 'studentName',
-            value: studentName,
-          },
-          {
-            var: 'studentEmail',
-            value: studentEmail,
-          },
-          {
-            var: 'studentPhone',
-            value: parsePhoneNumber(`+${studentPhone}`)?.formatInternational() ?? '',
-          },
-          {
-            var: 'classDateTime',
-            value: classDateTime?.replace(/\n/g, '<br />'),
-          },
-          {
-            var: 'paymentMethod',
-            value: paymentMethod,
-          },
-          {
-            var: 'paymentStatus',
-            value: paymentStatus,
-          },
-          {
-            var: 'institutionName',
-            value: institutionName,
-          },
-          {
-            var: 'transactionId',
-            value: transactionId,
-          },
-          {
-            var: 'adminEmail',
-            value: adminEmail,
-          },
-          {
-            var: 'adminPhone',
-            value: parsePhoneNumber(`+${adminPhone}`)?.formatInternational() ?? '',
-          },
-          {
-            var: 'timeZone',
-            value: timeZone,
-          },
 
-          {
-            var: 'flowclassCrmLink',
-            value: process.env.NEXT_PUBLIC_WEB_BASE_URL,
-          },
-        ]),
-      },
-    ]
+    const template = Handlebars.compile(baseEmailLayout)
 
-    const advancePersonalization: Personalization[] = [
-      {
-        email: emailAddress,
-        data: {
-          paymentReceipt,
-          schoolLogo: await this.checkDisplayEmailLogo(institutionId),
-        },
-      },
-    ]
+    const schoolLogo = await this.checkDisplayEmailLogo(institutionId)
+
+    const emailSubject = `${studentName} has uploaded payment proof for ${courseName}`
+
+    const body = `<p><strong>${studentName}</strong> (<strong>${studentEmail}</strong>) has just uploaded a payment receipt for <strong>${courseName}</strong>!</p>
+<p>The receipt has been attached to this email. You can also click the button below to check the payment status and review the record.</p>
+<p>If the applicant paid by credit card, you can visit <a href="https://${
+      process.env.LINK_FLOWCLASS_CMS || 'cms.flowclass.io'
+    }/settings/payments" style="color: #ea580c; text-decoration: none; font-weight: 500;">settings/payments</a> and click on "Visit Dashboard" to check your balance.</p>`
+
+    const formattedClassName = className?.replace(/\n/g, '<br />')
+    const formattedClassDateTime = classDateTime?.replace(/\n/g, '<br />')
+    const formattedStudentPhone = studentPhone
+      ? parsePhoneNumber(`+${studentPhone}`)?.formatInternational() ?? ''
+      : ''
+    const formattedAdminPhone = adminPhone
+      ? parsePhoneNumber(`+${adminPhone}`)?.formatInternational() ?? ''
+      : ''
+
+    const additionalContent = `
+<div class="section-title">Application Information</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">Application ID</div>
+        <div class="info-value" style="font-weight: 600;">${enrolId}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Course Name</div>
+        <div class="info-value">${courseName}</div>
+    </div>
+    ${
+      className
+        ? `
+    <div class="info-row">
+        <div class="info-label">Option name</div>
+        <div class="info-value">${formattedClassName}</div>
+    </div>`
+        : ''
+    }
+    <div class="info-row">
+        <div class="info-label">Date & Time</div>
+        <div class="info-value">${formattedClassDateTime}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Time Zone</div>
+        <div class="info-value">${timeZone}</div>
+    </div>
+    ${
+      instructor
+        ? `
+    <div class="info-row">
+        <div class="info-label">Instructor</div>
+        <div class="info-value">${instructor}</div>
+    </div>`
+        : ''
+    }
+    ${
+      location
+        ? `
+    <div class="info-row">
+        <div class="info-label">Location</div>
+        <div class="info-value">${location}</div>
+    </div>`
+        : ''
+    }
+</div>
+
+<div class="section-title">Contact Information of ${institutionName}</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">Name</div>
+        <div class="info-value" style="font-weight: 600;">${institutionName}</div>
+    </div>
+    ${
+      adminPhone
+        ? `
+    <div class="info-row">
+        <div class="info-label">Phone</div>
+        <div class="info-value">${formattedAdminPhone}</div>
+    </div>`
+        : ''
+    }
+    ${
+      adminEmail
+        ? `
+    <div class="info-row">
+        <div class="info-label">Email</div>
+        <div class="info-value"><a href="mailto:${adminEmail}" style="color: #ea580c; text-decoration: none;">${adminEmail}</a></div>
+    </div>`
+        : ''
+    }
+</div>
+
+<div class="section-title">Personal Information</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">Application ID</div>
+        <div class="info-value">${enrolId}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Applicant's Name</div>
+        <div class="info-value" style="font-weight: 600;">${studentName}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Applicant's Email</div>
+        <div class="info-value"><a href="mailto:${studentEmail}" style="color: #ea580c; text-decoration: none;">${studentEmail}</a></div>
+    </div>
+    ${
+      studentPhone
+        ? `
+    <div class="info-row">
+        <div class="info-label">Applicant's Phone</div>
+        <div class="info-value">${formattedStudentPhone}</div>
+    </div>`
+        : ''
+    }
+</div>
+
+<div class="section-title">Payment Information</div>
+<div class="info-card">
+    ${
+      transactionId
+        ? `
+    <div class="info-row">
+        <div class="info-label">Payment ID</div>
+        <div class="info-value">${transactionId}</div>
+    </div>`
+        : ''
+    }
+    <div class="info-row">
+        <div class="info-label">Price</div>
+        <div class="info-value" style="font-weight: 600;">${price}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Payment Status</div>
+        <div class="info-value" style="font-weight: 600; color: #ea580c;">${paymentStatus}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Payment Method</div>
+        <div class="info-value">${paymentMethod}</div>
+    </div>
+</div>
+`
+
+    const html = template({
+      subject: emailSubject,
+      title: 'Payment Proof Uploaded',
+      subtitle: courseName,
+      subtitleColor: '#ea580c',
+      headerAccent: 'linear-gradient(90deg, #f59e0b, #ea580c)',
+      schoolLogo,
+      studentName: institutionName,
+      institutionName,
+      body,
+      additionalContent,
+      ctaUrl: process.env.LINK_FLOWCLASS_CMS,
+      ctaText: 'Check the payment record',
+      ctaBgColor: '#ea580c',
+      ctaShadowColor: 'rgba(234, 88, 12, 0.2)',
+      showFallbackLink: true,
+      adminEmail: 'info@flowclass.io',
+      currentYear: new Date().getFullYear(),
+    })
 
     const attachments = [
       {
@@ -1402,21 +1837,19 @@ export class EmailService {
       },
     ]
 
-    const emailSubject = `${studentName} has submitted a payment receipt for ${courseName}!`
     const emailPayload = {
       emailSubject,
       emailAddress,
       recipientUserId,
       recipientName: institutionName,
-      templateId: 'admin-payment-submitted',
-      personalization,
+      html,
       notificationType: NotificationType.CONFIRM_PAYMENT,
-      advancePersonalization,
       attachments,
       institutionId,
       institutionName,
       siteId,
     }
+
     return await this.sendEmail({ emailPayload })
   }
 
@@ -1429,43 +1862,55 @@ export class EmailService {
     couponCode,
     discountAmountUnit,
     expiredDate,
+    institutionId,
   }: SendAssignCouponParams): Promise<void | APIResponse> {
-    const personalization = [
-      {
-        email: studentEmail,
-        substitutions: [
-          {
-            var: 'studentName',
-            value: studentName,
-          },
-          {
-            var: 'institutionName',
-            value: institutionName,
-          },
-          {
-            var: 'couponCode',
-            value: couponCode,
-          },
-          {
-            var: 'discountAmountUnit',
-            value: discountAmountUnit,
-          },
-          {
-            var: 'expiredDate',
-            value: timeslotFormat(expiredDate),
-          },
-        ],
-      },
-    ]
+    const template = Handlebars.compile(baseEmailLayout)
+
+    const schoolLogo = institutionId ? await this.checkDisplayEmailLogo(institutionId) : undefined
 
     const emailSubject = `Hello ${studentName}, you have received a coupon from ${institutionName}`
+
+    const body = `<p>We are delighted to let you know that <strong>${institutionName}</strong> has assigned you a special discount coupon!</p>
+<p>You can apply this coupon code during checkout to save on your next enrollment.</p>`
+
+    const additionalContent = `
+<div class="section-title">Coupon Details</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">Coupon Code</div>
+        <div class="info-value" style="font-size: 18px; font-weight: 700; color: #059669; letter-spacing: 0.05em;">${couponCode}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Discount Value</div>
+        <div class="info-value" style="font-weight: 600;">${discountAmountUnit}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Expiration Date</div>
+        <div class="info-value">${timeslotFormat(expiredDate)}</div>
+    </div>
+</div>`
+
+    const html = template({
+      subject: emailSubject,
+      title: "You've Received a Coupon!",
+      subtitle: 'Special Offer',
+      subtitleColor: '#10b981',
+      headerAccent: 'linear-gradient(90deg, #10b981, #059669)',
+      schoolLogo,
+      studentName,
+      institutionName,
+      body,
+      additionalContent,
+      adminEmail: 'support@flowclass.io',
+      currentYear: new Date().getFullYear(),
+    })
+
     const emailPayload = {
       emailSubject,
       emailAddress: studentEmail,
       recipientUserId: userId,
       recipientName: studentName,
-      templateId: 'assign-coupon',
-      personalization,
+      html,
       notificationType: NotificationType.RECEIVED_COUPON,
       institutionName,
     }
@@ -1477,29 +1922,38 @@ export class EmailService {
     emailAddress,
     resetLink,
   }: SendForgetPasswordParams): Promise<void | APIResponse> {
-    const recipients = [new Recipient(emailAddress)]
-
-    const personalization = [
-      {
-        email: emailAddress,
-        substitutions: this.convertValuesToString([
-          {
-            var: 'resetPasswordLink',
-            value: resetLink,
-          },
-        ]),
-      },
-    ]
+    const template = Handlebars.compile(baseEmailLayout)
 
     const emailSubject = 'You have requested to reset your password'
+
+    const body = `<p>We all forget our password sometimes. Don’t worry, click the button below to reset your password. This link is only valid for the next 24 hours.</p>`
+
+    const html = template({
+      subject: emailSubject,
+      title: 'Forgot your password?',
+      subtitle: 'Password Reset',
+      subtitleColor: '#6366f1',
+      headerAccent: 'linear-gradient(90deg, #6366f1, #4f46e5)',
+      studentName: 'fellow instructor',
+      institutionName: 'Flowclass',
+      body,
+      ctaUrl: resetLink,
+      ctaText: 'Reset my password',
+      ctaBgColor: '#4f46e5',
+      ctaShadowColor: 'rgba(79, 70, 229, 0.2)',
+      showFallbackLink: true,
+      adminEmail: 'support@flowclass.io',
+      currentYear: new Date().getFullYear(),
+    })
+
     const emailPayload = {
       emailSubject,
       emailAddress,
       recipientUserId: userId,
-      recipientName: '',
-      templateId: 'forgot-password',
-      personalization,
+      recipientName: 'fellow instructor',
+      html,
       notificationType: NotificationType.FORGET_PASSWORD,
+      institutionName: 'Flowclass',
     }
     return await this.sendEmail({ emailPayload })
   }
@@ -1508,6 +1962,7 @@ export class EmailService {
   public async sendStudentLessonReminderEmail({
     data,
     enrollCourse,
+    automationFlow,
     customTemplateId,
   }: StudentLessonReminderDto): Promise<void | APIResponse> {
     const {
@@ -1651,7 +2106,7 @@ export class EmailService {
       emailAddress: studentEmail,
       recipientUserId,
       recipientName: studentName,
-      templateId: customTemplateId || 'student-course-reminder',
+      templateId: customTemplateId || emailTemplates.CLASS_STUDENT_COURSE_REMINDER,
       personalization,
       advancePersonalization,
       notificationType: NotificationType.REMINDER,
@@ -1662,6 +2117,7 @@ export class EmailService {
     }
     return await this.sendEmail({
       emailPayload,
+      automationFlow,
       enrollCourse,
     })
   }
@@ -1670,38 +2126,37 @@ export class EmailService {
     userId,
     emailAddress,
   }: ResetPasswordParams): Promise<void | APIResponse> {
-    const recipients = [new Recipient(emailAddress)]
+    const template = Handlebars.compile(baseEmailLayout)
 
     const emailSubject = 'You have successfully reset your password!'
 
-    const emailParams = new EmailParams()
-      .setFrom(this.defaultSentFrom)
-      .setTo(recipients)
-      .setReplyTo(this.defaultSentFrom)
-      .setSubject(emailSubject)
-      .setTemplateId('0r83ql327104zw1j')
+    const body = `<p>You have successfully reset your password!</p>
+<p>Please use the following button to log back into Flowclass and continue automating your operations.</p>`
 
-    await this.emailTransport.email
-      .send(emailParams)
-      .then((msg) => {
-        if (msg.statusCode === 202) {
-          const log = this.notificationRecordRepository.create({
-            channel: NotificationChannel.EMAIL,
-            recipientUserId: userId,
-            recipientUserEmail: emailAddress,
-            messageId: msg.headers['x-message-id'],
-            subject: emailSubject,
-            notificationType: NotificationType.FORGET_PASSWORD,
-          })
-          this.notificationRecordRepository.save(log)
-        }
-        this.logger.log(JSON.stringify(msg))
-        return msg
-      }) // logs response data
-      .catch((err) => {
-        this.logger.error('sendEmail', JSON.stringify(err.body))
-        // throw new ServiceUnavailableException(EmailServiceErrorMessage.DELIVERY_FAILED);
-      })
+    const html = template({
+      subject: emailSubject,
+      title: 'Password Reset Success',
+      headerAccent: 'linear-gradient(90deg, #3b82f6, #1d4ed8)',
+      studentName: 'fellow educator',
+      body,
+      ctaUrl: `${process.env.FRONTEND_URL}/login`,
+      ctaText: 'Login to Flowclass',
+      ctaBgColor: '#3b82f6',
+      adminEmail: 'info@flowclass.io',
+      institutionName: 'The Flowclass Team',
+      currentYear: new Date().getFullYear(),
+    })
+
+    const emailPayload = {
+      emailSubject,
+      emailAddress,
+      recipientUserId: userId,
+      recipientName: 'fellow educator',
+      html,
+      notificationType: NotificationType.FORGET_PASSWORD,
+    }
+
+    return await this.sendEmail({ emailPayload })
   }
 
   public async sendVerificationEmail({
@@ -1745,26 +2200,33 @@ export class EmailService {
       .setTags([`Phone: ${parsedPhoneNumber}`])
       .setVariables(personalization)
 
-    await this.emailTransport.email
-      .send(emailParams)
+    await this.sendMailerSendEmail(emailParams)
       .then((msg) => {
-        if (msg.statusCode === 202) {
-          const log = this.notificationRecordRepository.create({
-            channel: NotificationChannel.EMAIL,
-            recipientUserId: userId,
-            recipientUserEmail: emailAddress,
-            messageId: msg.headers['x-message-id'],
-            subject: emailSubject,
-            notificationType: NotificationType.APPLICATION_EMAIL_VERIFICATION,
-          })
-          this.notificationRecordRepository.save(log)
-        }
+        const log = this.notificationRecordRepository.create({
+          channel: NotificationChannel.EMAIL,
+          recipientUserId: userId,
+          recipientUserEmail: emailAddress,
+          messageId: msg.headers?.['x-message-id'],
+          subject: emailSubject,
+          notificationStatus:
+            msg.statusCode === 202 ? NotificationStatus.SENT : NotificationStatus.FAILED,
+          notificationType: NotificationType.APPLICATION_EMAIL_VERIFICATION,
+        })
+        this.notificationRecordRepository.save(log)
         this.logger.log(JSON.stringify(msg))
         return msg
       }) // logs response data
       .catch((err) => {
-        this.logger.error('sendEmail', JSON.stringify(err.body))
-        // throw new ServiceUnavailableException(EmailServiceErrorMessage.DELIVERY_FAILED);
+        this.logger.error('sendEmail', JSON.stringify(err?.body ?? err?.message ?? err))
+        const log = this.notificationRecordRepository.create({
+          channel: NotificationChannel.EMAIL,
+          recipientUserId: userId,
+          recipientUserEmail: emailAddress,
+          subject: emailSubject,
+          notificationStatus: NotificationStatus.FAILED,
+          notificationType: NotificationType.APPLICATION_EMAIL_VERIFICATION,
+        })
+        this.notificationRecordRepository.save(log)
       })
   }
 
@@ -1858,7 +2320,7 @@ export class EmailService {
       emailAddress: studentEmail,
       recipientUserId: Number(recipientUserId),
       recipientName: studentFirstName,
-      templateId: 'student-assigned-course',
+      templateId: emailTemplates.CLASS_STUDENT_ASSIGNED_COURSE,
       personalization,
       notificationType: NotificationType.ASSIGN_COURSE,
       institutionName,
@@ -1904,7 +2366,7 @@ export class EmailService {
       emailAddress: invitedUserEmail,
       recipientUserId: Number(recipientUserId),
       recipientName: invitedUserEmail,
-      templateId: 'invitation-institution-to-user',
+      templateId: emailTemplates.ADMIN_INVITATION,
       personalization,
       notificationType: NotificationType.INVITATION,
     }
@@ -1963,7 +2425,7 @@ export class EmailService {
       emailAddress: params.studentEmail,
       recipientUserId: params.recipientUserId,
       recipientName: params.studentFirstName,
-      templateId: 'student-new-lesson',
+      templateId: emailTemplates.CLASS_STUDENT_NEW_LESSON,
       personalization,
       notificationType: NotificationType.ASSIGN_COURSE,
       institutionName: params.institutionName,
@@ -1972,67 +2434,118 @@ export class EmailService {
   }
 
   public async sendStudentChangeLessonEmail(params: ChangeLessonEmailDTO) {
-    const personalization = [
-      {
-        email: params.studentEmail,
-        substitutions: this.convertValuesToString([
-          {
-            var: 'location',
-            value: params.location,
-          },
-          {
-            var: 'instructor',
-            value: params.instructor,
-          },
-          {
-            var: 'timeZone',
-            value: params.timeZone,
-          },
-          {
-            var: 'className',
-            value: params.className,
-          },
-          {
-            var: 'adminEmail',
-            value: params.adminEmail,
-          },
-          {
-            var: 'adminPhone',
-            value: parsePhoneNumber(`+${params.adminPhone}`)?.formatInternational() ?? '',
-          },
-          {
-            var: 'courseName',
-            value: params.courseName,
-          },
-          {
-            var: 'institutionName',
-            value: params.institutionName,
-          },
-          {
-            var: 'studentName',
-            value: params.studentFirstName,
-          },
-          {
-            var: 'newClassDateTime',
-            value: lessonDateToString(params.newClassLessonDate, params.timeZone),
-          },
-          {
-            var: 'originalClassDateTime',
-            value: lessonDateToString(params.classLessonDate, params.timeZone),
-          },
-        ]),
-      },
-    ]
+    const template = Handlebars.compile(baseEmailLayout)
+
+    const schoolLogo = await this.checkDisplayEmailLogo(params.institutionId)
 
     const emailSubject = `The status of your change request for ${params.courseName} has been updated`
+
+    const body = `<p>Your lesson schedule for <strong>${params.courseName}</strong> has been updated by the institution. Please review the updated schedule details below.</p>`
+
+    const additionalContent = `
+<div class="section-title">Updated Schedule</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">Course Name</div>
+        <div class="info-value" style="font-weight: 600;">${params.courseName}</div>
+    </div>
+    ${
+      params.className
+        ? `
+    <div class="info-row">
+        <div class="info-label">Class Name</div>
+        <div class="info-value">${params.className}</div>
+    </div>`
+        : ''
+    }
+    <div class="info-row">
+        <div class="info-label">Original Date & Time</div>
+        <div class="info-value" style="text-decoration: line-through; color: #64748b;">${lessonDateToString(
+          params.classLessonDate,
+          params.timeZone
+        )}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label" style="color: #2563eb;">New Date & Time</div>
+        <div class="info-value" style="font-weight: 700; color: #1d4ed8;">${lessonDateToString(
+          params.newClassLessonDate,
+          params.timeZone
+        )}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Time Zone</div>
+        <div class="info-value">${params.timeZone}</div>
+    </div>
+    ${
+      params.location
+        ? `
+    <div class="info-row">
+        <div class="info-label">Location</div>
+        <div class="info-value">${params.location}</div>
+    </div>`
+        : ''
+    }
+    ${
+      params.instructor
+        ? `
+    <div class="info-row">
+        <div class="info-label">Instructor</div>
+        <div class="info-value">${params.instructor}</div>
+    </div>`
+        : ''
+    }
+</div>
+
+<div class="section-title">Contact Information of ${params.institutionName}</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">Institution Name</div>
+        <div class="info-value" style="font-weight: 600;">${params.institutionName}</div>
+    </div>
+    ${
+      params.adminPhone
+        ? `
+    <div class="info-row">
+        <div class="info-label">Phone</div>
+        <div class="info-value">${
+          parsePhoneNumber(`+${params.adminPhone}`)?.formatInternational() ?? ''
+        }</div>
+    </div>`
+        : ''
+    }
+    ${
+      params.adminEmail
+        ? `
+    <div class="info-row">
+        <div class="info-label">Email</div>
+        <div class="info-value"><a href="mailto:${params.adminEmail}" style="color: #2563eb; text-decoration: none;">${params.adminEmail}</a></div>
+    </div>`
+        : ''
+    }
+</div>`
+
+    const html = template({
+      subject: emailSubject,
+      title: 'Lesson Time Updated',
+      subtitle: 'Schedule Change',
+      subtitleColor: '#3b82f6',
+      headerAccent: 'linear-gradient(90deg, #3b82f6, #1d4ed8)',
+      schoolLogo,
+      studentName: params.studentFirstName,
+      institutionName: params.institutionName,
+      body,
+      additionalContent,
+      adminEmail: params.adminEmail || 'support@flowclass.io',
+      currentYear: new Date().getFullYear(),
+    })
+
     const emailPayload = {
       emailSubject,
       emailAddress: params.studentEmail,
       recipientUserId: params.recipientUserId,
       recipientName: params.studentFirstName,
-      templateId: 'student-change-lesson',
+      html,
       institutionName: params.institutionName,
-      personalization,
       notificationType: NotificationType.UPDATE_ON_COURSE_STATUS,
     }
     return await this.sendEmail({ emailPayload })
@@ -2050,51 +2563,125 @@ export class EmailService {
     originalDateTime,
     newDateTime,
   }: StudentPostPoneParams): Promise<void | APIResponse> {
-    const personalization = [
-      {
-        email: studentEmail,
-        substitutions: this.convertValuesToString([
-          {
-            var: 'courseName',
-            value: courseName,
-          },
-          {
-            var: 'studentName',
-            value: studentName,
-          },
-          {
-            var: 'originalDateTime',
-            value: originalDateTime,
-          },
-          {
-            var: 'newDateTime',
-            value: newDateTime,
-          },
-          {
-            var: 'schoolPhone',
-            value: schoolPhone,
-          },
-          {
-            var: 'schoolEmail',
-            value: schoolEmail,
-          },
-        ]),
-      },
-    ]
+    const template = Handlebars.compile(baseEmailLayout)
 
-    const emailSubject = `The time of ${courseName} has been postponed`
+    const institution = await this.institutionsRepository.findOneById(institutionId)
+    const institutionName = institution?.name || 'our institution'
+
+    const schoolLogo = await this.checkDisplayEmailLogo(institutionId)
+
+    const emailSubject = `Update: ${courseName} lesson has been postponed`
+
+    const body = `<p>We hope this message finds you well! We wanted to let you know about a change to the schedule for your <strong>${courseName}</strong> lesson.</p>
+<p>We appreciate your understanding regarding this change and look forward to seeing you in class at the new time.</p>`
+
+    const parsedPhone = schoolPhone
+      ? parsePhoneNumber(`+${schoolPhone}`)?.formatInternational() ?? schoolPhone
+      : ''
+
+    const additionalContent = `
+<div class="section-title">Schedule Changes</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">Course Name</div>
+        <div class="info-value" style="font-weight: 600;">${courseName}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Original Lesson Time</div>
+        <div class="info-value" style="text-decoration: line-through; color: #64748b;">${originalDateTime}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label" style="color: #e11d48;">New Lesson Time</div>
+        <div class="info-value" style="font-weight: 700; color: #be123c;">${newDateTime}</div>
+    </div>
+</div>
+
+<div class="section-title">Contact Information</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">School Name</div>
+        <div class="info-value" style="font-weight: 600;">${institutionName}</div>
+    </div>
+    ${
+      schoolPhone
+        ? `
+    <div class="info-row">
+        <div class="info-label">Phone</div>
+        <div class="info-value">${parsedPhone}</div>
+    </div>`
+        : ''
+    }
+    ${
+      schoolEmail
+        ? `
+    <div class="info-row">
+        <div class="info-label">Email</div>
+        <div class="info-value"><a href="mailto:${schoolEmail}" style="color: #3b82f6; text-decoration: none;">${schoolEmail}</a></div>
+    </div>`
+        : ''
+    }
+</div>`
+
+    const html = template({
+      subject: emailSubject,
+      title: 'Lesson Postponed',
+      subtitle: 'Schedule Update',
+      subtitleColor: '#e11d48',
+      headerAccent: 'linear-gradient(90deg, #f43f5e, #e11d48)',
+      schoolLogo,
+      studentName,
+      institutionName,
+      body,
+      additionalContent,
+      adminEmail: schoolEmail || 'support@flowclass.io',
+      currentYear: new Date().getFullYear(),
+    })
 
     const emailPayload = {
       emailSubject,
       emailAddress: studentEmail,
       recipientUserId,
       recipientName: studentName,
-      templateId: 'student-postpone',
-      institutionName: courseName,
-      personalization,
+      html,
       notificationType: NotificationType.LESSON_POSTPONE,
+      institutionId,
+      institutionName,
+      siteId,
     }
+
     return await this.sendEmail({ emailPayload })
+  }
+
+  public async linkSocialConfirmationEmail({
+    emailAddress,
+    userName,
+    displayName,
+    phone,
+  }: {
+    emailAddress: string
+    userName: string
+    displayName: string
+    phone: string
+  }): Promise<void | APIResponse> {
+    // this.mailgunClient.messages
+    //   .create('flowclass.io', {
+    //     from: 'Flowclass <>no-reply@flowclass.io',
+    //     to: emailAddress,
+    //     // cc: 'admin@flowsophic.com;',
+    //     subject: 'Your Flowclass account has been linked.',
+    //     template: 'link_social_confirmation',
+    //     'v:userName': userName,
+    //     'v:displayName': displayName,
+    //     'v:phone': phone,
+    //   })
+    //   .then((msg) => {
+    //     this.logger.log(msg.toString());
+    //     return msg;
+    //   }) // logs response data
+    //   .catch((err) => {
+    //     this.logger.error('sendEmail', err.stack);
+    //     throw new ServiceUnavailableException(EmailServiceErrorMessage.DELIVERY_FAILED);
+    //   });
   }
 
   async buildStudentUploadPaymentReceiptPayload(
@@ -2176,125 +2763,311 @@ export class EmailService {
 
   public async sendClassStudentUploadPaymentReceiptEmail(
     recipientUserId: number, // <== this should be userAliasId
-    params: SendEmailFunctionBuildParams
+    params: SendEmailFunctionBuildParams,
+    automationFlow?: AutomationFlow
   ): Promise<APIResponse | void> {
     const payload = await this.buildStudentUploadPaymentReceiptPayload(params)
-    const personalization = [
-      {
-        email: payload.emailAddress,
-        substitutions: this.convertValuesToString([
-          {
-            var: 'studentName',
-            value: payload.studentName,
-          },
-          {
-            var: 'price',
-            value: payload.price,
-          },
-          {
-            var: 'enrolId',
-            value: payload.enrolId,
-          },
-          {
-            var: 'courseName',
-            value: payload.courseName,
-          },
-          {
-            var: 'className',
-            value: payload.className?.replace(/\n/g, '<br />'),
-          },
-          {
-            var: 'classDateTime',
-            value: payload.classDateTime?.replace(/\n/g, '<br />'),
-          },
-          {
-            var: 'location',
-            value: payload.location,
-          },
-          {
-            var: 'instructor',
-            value: payload.instructor,
-          },
-          {
-            var: 'studentEmail',
-            value: removeEmailPlusPart(payload.studentEmail),
-          },
-          {
-            var: 'studentPhone',
-            value: parsePhoneNumber(`+${payload.studentPhone}`)?.formatInternational() ?? '',
-          },
-          {
-            var: 'remark',
-            value: payload.remark,
-          },
-          {
-            var: 'timeZone',
-            value: payload.timeZone,
-          },
-          {
-            var: 'institutionName',
-            value: payload.institutionName,
-          },
-          {
-            var: 'uploadReceiptLink',
-            value: payload.paymentReceiptUploadLink,
-          },
-          {
-            var: 'adminEmail',
-            value: payload.adminEmail,
-          },
-          {
-            var: 'adminPhone',
-            value: parsePhoneNumber(`+${payload.adminPhone}`)?.formatInternational() ?? '',
-          },
-
-          {
-            var: 'paymentStatus',
-            value: payload.paymentStatus,
-          },
-          {
-            var: 'transactionId',
-            value: payload.transactionId,
-          },
-        ]),
-      },
-    ]
-    const advancePersonalization: Personalization[] = [
-      {
-        email: payload.emailAddress,
-        data: {
-          schoolLogo: await this.checkDisplayEmailLogo(params.institutionId),
-          enrollmentForm: payload.enrollmentForm,
-        },
-      },
-    ]
-
     const courseEmailSettings = this.getEmailSettingsForCourse(params.course)
 
     const emailSubject =
       courseEmailSettings?.emailTitle?.trim?.() ||
       `You have applied for ${payload.courseName}. Please upload your payment receipt`
 
-    const templateId = this.hasCustomEmailTemplate(params.course)
-      ? courseEmailSettings.emailId
-      : 'student-upload-receipt'
+    const hasCustom = this.hasCustomEmailTemplate(params.course)
+    let emailPayload: any
 
-    const emailPayload = {
-      emailSubject,
-      emailAddress: payload.emailAddress,
-      recipientUserId,
-      recipientName: payload.studentName,
-      templateId,
-      institutionName: payload.institutionName,
-      personalization,
-      advancePersonalization,
-      notificationType: NotificationType.APPLIED_FOR_COURSE,
-      institutionId: params.institutionId,
-      siteId: params.site.id,
+    if (hasCustom) {
+      const personalization = [
+        {
+          email: payload.emailAddress,
+          substitutions: this.convertValuesToString([
+            {
+              var: 'studentName',
+              value: payload.studentName,
+            },
+            {
+              var: 'price',
+              value: payload.price,
+            },
+            {
+              var: 'enrolId',
+              value: payload.enrolId,
+            },
+            {
+              var: 'courseName',
+              value: payload.courseName,
+            },
+            {
+              var: 'className',
+              value: payload.className?.replace(/\n/g, '<br />'),
+            },
+            {
+              var: 'classDateTime',
+              value: payload.classDateTime?.replace(/\n/g, '<br />'),
+            },
+            {
+              var: 'location',
+              value: payload.location,
+            },
+            {
+              var: 'instructor',
+              value: payload.instructor,
+            },
+            {
+              var: 'studentEmail',
+              value: removeEmailPlusPart(payload.studentEmail),
+            },
+            {
+              var: 'studentPhone',
+              value: parsePhoneNumber(`+${payload.studentPhone}`)?.formatInternational() ?? '',
+            },
+            {
+              var: 'remark',
+              value: payload.remark,
+            },
+            {
+              var: 'timeZone',
+              value: payload.timeZone,
+            },
+            {
+              var: 'institutionName',
+              value: payload.institutionName,
+            },
+            {
+              var: 'uploadReceiptLink',
+              value: payload.paymentReceiptUploadLink,
+            },
+            {
+              var: 'adminEmail',
+              value: payload.adminEmail,
+            },
+            {
+              var: 'adminPhone',
+              value: parsePhoneNumber(`+${payload.adminPhone}`)?.formatInternational() ?? '',
+            },
+            {
+              var: 'paymentStatus',
+              value: payload.paymentStatus,
+            },
+            {
+              var: 'transactionId',
+              value: payload.transactionId,
+            },
+          ]),
+        },
+      ]
+      const advancePersonalization: Personalization[] = [
+        {
+          email: payload.emailAddress,
+          data: {
+            schoolLogo: await this.checkDisplayEmailLogo(params.institutionId),
+            enrollmentForm: payload.enrollmentForm,
+          },
+        },
+      ]
+
+      emailPayload = {
+        emailSubject,
+        emailAddress: payload.emailAddress,
+        recipientUserId,
+        recipientName: payload.studentName,
+        templateId: courseEmailSettings.emailId,
+        institutionName: payload.institutionName,
+        personalization,
+        advancePersonalization,
+        notificationType: NotificationType.APPLIED_FOR_COURSE,
+        institutionId: params.institutionId,
+        siteId: params.site.id,
+      }
+    } else {
+      const template = Handlebars.compile(baseEmailLayout)
+
+      const schoolLogo = await this.checkDisplayEmailLogo(params.institutionId)
+
+      const formattedClassName = payload.className?.replace(/\n/g, '<br />')
+      const formattedClassDateTime = payload.classDateTime?.replace(/\n/g, '<br />')
+      const formattedStudentPhone = payload.studentPhone
+        ? parsePhoneNumber(`+${payload.studentPhone}`)?.formatInternational() ?? ''
+        : ''
+      const formattedAdminPhone = payload.adminPhone
+        ? parsePhoneNumber(`+${payload.adminPhone}`)?.formatInternational() ?? ''
+        : ''
+
+      let additionalContent = `
+<div class="section-title">Application Information</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">Application ID</div>
+        <div class="info-value" style="font-weight: 600;">${payload.enrolId}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Course Name</div>
+        <div class="info-value">${payload.courseName}</div>
+    </div>
+    ${
+      payload.className
+        ? `
+    <div class="info-row">
+        <div class="info-label">Option Name</div>
+        <div class="info-value">${formattedClassName}</div>
+    </div>`
+        : ''
     }
-    console.log('emailPayload', emailPayload)
+    <div class="info-row">
+        <div class="info-label">Date & Time</div>
+        <div class="info-value">${formattedClassDateTime}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Time Zone</div>
+        <div class="info-value">${payload.timeZone}</div>
+    </div>
+    ${
+      payload.instructor
+        ? `
+    <div class="info-row">
+        <div class="info-label">Instructor</div>
+        <div class="info-value">${payload.instructor}</div>
+    </div>`
+        : ''
+    }
+    ${
+      payload.location
+        ? `
+    <div class="info-row">
+        <div class="info-label">Location</div>
+        <div class="info-value">${payload.location}</div>
+    </div>`
+        : ''
+    }
+</div>
+
+<div class="section-title">Contact Information of ${payload.institutionName}</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">Name</div>
+        <div class="info-value" style="font-weight: 600;">${payload.institutionName}</div>
+    </div>
+    ${
+      payload.adminPhone
+        ? `
+    <div class="info-row">
+        <div class="info-label">Phone</div>
+        <div class="info-value">${formattedAdminPhone}</div>
+    </div>`
+        : ''
+    }
+    ${
+      payload.adminEmail
+        ? `
+    <div class="info-row">
+        <div class="info-label">Email</div>
+        <div class="info-value"><a href="mailto:${payload.adminEmail}" style="color: #4f46e5; text-decoration: none;">${payload.adminEmail}</a></div>
+    </div>`
+        : ''
+    }
+</div>
+
+<div class="section-title">Personal Information</div>
+<div class="info-card">
+    <div class="info-row">
+        <div class="info-label">Applicant's Name</div>
+        <div class="info-value" style="font-weight: 600;">${payload.studentName}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Applicant's Email</div>
+        <div class="info-value"><a href="mailto:${
+          payload.studentEmail
+        }" style="color: #4f46e5; text-decoration: none;">${payload.studentEmail}</a></div>
+    </div>
+    ${
+      payload.studentPhone
+        ? `
+    <div class="info-row">
+        <div class="info-label">Applicant's Phone</div>
+        <div class="info-value">${formattedStudentPhone}</div>
+    </div>`
+        : ''
+    }
+</div>
+
+<div class="section-title">Payment Information</div>
+<div class="info-card">
+    ${
+      payload.transactionId
+        ? `
+    <div class="info-row">
+        <div class="info-label">Payment ID</div>
+        <div class="info-value">${payload.transactionId}</div>
+    </div>`
+        : ''
+    }
+    <div class="info-row">
+        <div class="info-label">Price</div>
+        <div class="info-value" style="font-weight: 600;">${payload.price}</div>
+    </div>
+    <div class="info-row">
+        <div class="info-label">Payment Status</div>
+        <div class="info-value">${payload.paymentStatus}</div>
+    </div>
+</div>
+`
+
+      if (payload.enrollmentForm && payload.enrollmentForm.length > 0) {
+        additionalContent += `
+<div class="section-title">Questions & Answers</div>
+<div class="info-card">
+`
+        for (const instance of payload.enrollmentForm) {
+          if (instance.question && instance.answer) {
+            additionalContent += `
+    <div class="info-row" style="border-bottom: 1px solid #cbd5e1; padding-bottom: 10px; margin-bottom: 10px;">
+        <div class="info-label" style="text-transform: none; color: #475569; font-size: 13px;">${instance.question}</div>
+        <div class="info-value" style="font-weight: 600;">${instance.answer}</div>
+    </div>
+`
+          }
+        }
+        additionalContent += `</div>`
+      }
+
+      const html = template({
+        subject: emailSubject,
+        title: 'One more step to complete the application',
+        subtitle: 'Payment Receipt Required',
+        subtitleColor: '#e11d48',
+        headerAccent: 'linear-gradient(90deg, #4f46e5, #f59e0b)',
+        schoolLogo,
+        studentName: payload.studentName,
+        institutionName: payload.institutionName,
+        body: `<p>Your application has been sent to <strong>${payload.institutionName}</strong>. This email functions as an invoice.</p>
+<p>You can choose the preferred payment method and complete the payment by visiting the page below:</p>`,
+        additionalContent:
+          additionalContent +
+          `<p style="margin-top: 24px; font-size: 14px; color: #64748b; line-height: 1.6;">If you have already completed the payment, please ignore this email. Thank you for applying.</p>`,
+        ctaUrl: payload.paymentReceiptUploadLink,
+        ctaText: 'Visit Payment Page',
+        ctaBgColor: '#2563eb',
+        ctaShadowColor: 'rgba(37, 99, 235, 0.2)',
+        showFallbackLink: true,
+        adminEmail: payload.adminEmail || 'info@flowclass.io',
+        currentYear: new Date().getFullYear(),
+      })
+
+      emailPayload = {
+        emailSubject,
+        emailAddress: payload.emailAddress,
+        recipientUserId,
+        recipientName: payload.studentName,
+        html,
+        institutionName: payload.institutionName,
+        notificationType: NotificationType.APPLIED_FOR_COURSE,
+        institutionId: params.institutionId,
+        siteId: params.site.id,
+      }
+    }
     return await this.sendEmail({
       emailPayload,
+      automationFlow,
       enrollCourse: params.enrollCourses.at(0),
     })
   }
@@ -2352,7 +3125,7 @@ export class EmailService {
       advancePersonalization,
       recipientUserId: 0,
       recipientName: 'Applicant',
-      templateId: 'application-email-verification',
+      templateId: emailTemplates.APPLICATION_EMAIL_VERIFICATION,
       institutionId: params.institutionId,
       institutionName: params.institutionName,
       personalization,
@@ -2365,6 +3138,7 @@ export class EmailService {
 
   async remindEnrollCourseT4({
     emailData,
+    automationFlow,
     enrollCourse,
   }: ReminderEnrollCourseParams<RemindPaymentT4>): Promise<void | APIResponse> {
     const variable = await this._buildEmailData(emailData, true)
@@ -2382,13 +3156,14 @@ export class EmailService {
       emailAddress: emailData.studentEmail,
       recipientUserId: emailData.recipientUserId,
       recipientName: emailData.studentName,
-      templateId: 'remind-enroll-course-t4',
+      templateId: emailTemplates.REMIND_ENROLL_COURSE_T4,
       institutionName: emailData.courseName,
       personalization,
       notificationType: NotificationType.REMINDER,
     }
     return await this.sendEmail({
       emailPayload,
+      automationFlow,
       enrollCourse,
     })
   }
@@ -2396,6 +3171,7 @@ export class EmailService {
   async remindEnrollCourseT0({
     emailData,
     enrollCourse,
+    automationFlow,
   }: ReminderEnrollCourseParams<RemindPaymentT0>): Promise<void | APIResponse> {
     const variable = await this._buildEmailData(emailData)
     const personalization = [
@@ -2413,13 +3189,14 @@ export class EmailService {
       recipientUserId: emailData.recipientUserId,
       recipientName: emailData.studentName,
       institutionName: emailData.courseName,
-      templateId: 'remind-enroll-course-t0',
+      templateId: emailTemplates.REMIND_ENROLL_COURSE_T0,
       personalization,
       notificationType: NotificationType.REMINDER,
     }
 
     return await this.sendEmail({
       emailPayload,
+      automationFlow,
       enrollCourse,
     })
   }
@@ -2532,32 +3309,35 @@ export class EmailService {
   }
 
   async saveEmailResponse(
-    msg: APIResponse,
+    msg: any,
     recipientUserId: number,
     emailAddress: string,
     emailSubject: string,
     notificationType: SupportedType | NotificationType,
     institutionId?: number,
     siteId?: number,
+    automationFlow?: AutomationFlow,
     enrollCourse?: EnrollCourse
   ) {
-    const failedStatusCodes = [400, 401, 403, 404, 405, 408, 422, 429, 500]
     const sentStatusCodes = [200, 201, 202, 204]
     const classIds = enrollCourse?.multipleClassMapping
       ? enrollCourse.multipleClassMapping?.map((d) => d.classId)
       : (enrollCourse?.studentSchedule || [])?.map((d) => d.classId)
-    const classIdsSet = Array.from(new Set(classIds))
-    const classes = await this.classRepository.findBy({
-      id: In(classIdsSet),
-    })
+    const classIdsSet = Array.from(new Set(classIds?.filter(Boolean) || []))
+    const classes =
+      classIdsSet.length > 0
+        ? await this.classRepository.findBy({
+            id: In(classIdsSet),
+          })
+        : []
 
-    let status
-    if (sentStatusCodes.includes(msg.statusCode)) {
+    let status = NotificationStatus.FAILED
+    if (msg?.statusCode && sentStatusCodes.includes(msg.statusCode)) {
       status = NotificationStatus.SENT
       this.logger.log(JSON.stringify(msg))
-    } else if (failedStatusCodes.includes(msg.statusCode)) {
+    } else {
       status = NotificationStatus.FAILED
-      this.logger.error('sendEmail', JSON.stringify(msg.body))
+      this.logger.error('sendEmail', JSON.stringify(msg?.body ?? msg?.message ?? msg))
     }
     const log = this.notificationRecordRepository.create({
       channel: NotificationChannel.EMAIL,
@@ -2565,10 +3345,17 @@ export class EmailService {
       institutionId,
       siteId,
       recipientUserEmail: emailAddress,
-      messageId: msg.headers?.['x-message-id'],
+      messageId:
+        msg?.headers?.['x-message-id'] || msg?.headers?.get?.('x-message-id') || msg?.messageId,
       subject: emailSubject,
+      message:
+        status === NotificationStatus.FAILED
+          ? msg?.message || (typeof msg?.body === 'string' ? msg.body : JSON.stringify(msg?.body ?? msg))
+          : undefined,
       notificationStatus: status,
+      sentAt: status === NotificationStatus.SENT ? new Date() : undefined,
       notificationType,
+      automationFlowId: automationFlow?.id,
       associatedClass: (classes || []).map((d) =>
         shallow({
           source: d,
@@ -2576,13 +3363,97 @@ export class EmailService {
         })
       ),
     })
-
-    console.log('SAVING EMAIL RESPONSE', log)
-
     await this.notificationRecordRepository.save(log)
   }
 
-  private async sendEmail({ emailPayload, enrollCourse }: SendEmailParams) {
+  public async sendMailerSendEmail(emailParams: EmailParams, htmlContent?: string) {
+    const from = (emailParams as any).from
+    const to = (emailParams as any).to as any[]
+    const subject = (emailParams as any).subject
+    const templateId = (emailParams as any).template_id
+    const toEmails = to ? to.map((r) => r.email).join(', ') : ''
+
+    const channelName = 'Custom SMTP Service'
+    this.logger.log(
+      `[Email Dispatch] Initiating send via ${channelName} | To: "${toEmails}" | Subject: "${subject}" | TemplateId: "${
+        templateId || 'N/A'
+      }"`
+    )
+
+    const replyTo = (emailParams as any).reply_to
+    const attachments = (emailParams as any).attachments as any[]
+
+    const smtpFromEmail =
+      process.env.SMTP_FROM_EMAIL ||
+      process.env.SMTP_USER ||
+      process.env.MAIL_FROM ||
+      (from?.email || 'info@flowclass.io')
+    const senderDisplayName = from?.name || process.env.SMTP_FROM_NAME || 'Flowclass'
+    const replyToEmail = replyTo?.email || from?.email || smtpFromEmail
+    const replyToName = replyTo?.name || from?.name || senderDisplayName
+
+    const mailOptions: nodemailer.SendMailOptions = {
+      from: `"${senderDisplayName}" <${smtpFromEmail}>`,
+      to: to
+        ? to.map((r) => (r.name ? `"${r.name}" <${r.email}>` : r.email)).join(', ')
+        : undefined,
+      replyTo: `"${replyToName}" <${replyToEmail}>`,
+      subject,
+      attachments: attachments
+        ? attachments.map((att) => ({
+            filename: att.filename,
+            content: Buffer.from(att.content, 'base64'),
+            contentType: att.contentType,
+          }))
+        : undefined,
+    }
+
+    const html = htmlContent || (emailParams as any).html
+    if (html) {
+      mailOptions.html = html
+    } else {
+      const personalization = (emailParams as any).variables || (emailParams as any).personalization
+      mailOptions.html = `
+        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+          <h2 style="color: #4f46e5;">[SMTP Template Email]</h2>
+          <p><strong>To:</strong> ${
+            to ? to.map((r) => `${r.name || ''} (&lt;${r.email}&gt;)`).join(', ') : ''
+          }</p>
+          <p><strong>Subject:</strong> ${subject}</p>
+          <p><strong>Template ID:</strong> <code>${templateId}</code></p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+          <h3>Personalization / Variables:</h3>
+          <pre style="background: #f4f4f5; padding: 15px; border-radius: 6px; overflow-x: auto;">${JSON.stringify(
+            personalization,
+            null,
+            2
+          )}</pre>
+        </div>
+      `
+    }
+
+    try {
+      const info = await this.nodemailerTransporter.sendMail(mailOptions)
+      this.logger.log(
+        `[Email Success] Sent via SMTP | MessageId: "${info.messageId}" | Response: "${info.response}"`
+      )
+      return {
+        statusCode: 202,
+        headers: {
+          get: (headerName: string) => {
+            if (headerName.toLowerCase() === 'x-message-id') return info.messageId
+            return null
+          },
+        },
+        body: 'Sent via custom SMTP transporter',
+      } as any
+    } catch (err) {
+      this.logger.error(`[Email Error] Failed to send via SMTP | Error: ${err.message}`, err.stack)
+      throw err
+    }
+  }
+
+  private async sendEmail({ emailPayload, enrollCourse, automationFlow }: SendEmailParams) {
     const {
       emailSubject,
       emailAddress,
@@ -2596,10 +3467,24 @@ export class EmailService {
       institutionId,
       siteId,
       attachments,
+      html,
     } = emailPayload
 
     if (!emailAddress) {
       this.logger.warn('Email sending skipped: no recipient address provided')
+      const log = this.notificationRecordRepository.create({
+        channel: NotificationChannel.EMAIL,
+        recipientUserId,
+        institutionId,
+        siteId,
+        recipientUserEmail: '',
+        subject: emailSubject,
+        message: 'Email sending skipped: no recipient email address provided',
+        notificationStatus: NotificationStatus.FAILED,
+        notificationType,
+        automationFlowId: automationFlow?.id,
+      })
+      await this.notificationRecordRepository.save(log)
       return
     }
 
@@ -2614,12 +3499,8 @@ export class EmailService {
         })
 
         if (notiSetting && notiSetting.customEmailSender && institutionName) {
-          const institution = await this.institutionsRepository.findOneById(institutionId)
-          if (institution?.email) {
-            sentFrom = new Sender(institution.email, institution.name ?? institutionName)
-          } else {
-            sentFrom = new Sender(this.defaultSentFrom.email, institutionName)
-          }
+          // The reason is that the user must first have the domain verified in our MailerSend before we can use the domain as the sender
+          sentFrom = new Sender('no-reply@flowclass.io', institutionName)
         }
       } catch (e) {
         if (e instanceof NotFoundException) {
@@ -2638,26 +3519,49 @@ export class EmailService {
       .setTo(recipients)
       .setReplyTo(sentFrom)
       .setSubject(emailSubject)
-      .setTemplateId(templateId)
-      .setVariables(personalization)
-      .setPersonalization(advancePersonalization)
       .setAttachments(attachments)
+
+    if (html) {
+      emailParams.setHtml(html)
+    } else {
+      if (templateId) {
+        emailParams.setTemplateId(templateId)
+      }
+      if (personalization) {
+        emailParams.setVariables(personalization)
+      }
+      if (advancePersonalization) {
+        emailParams.setPersonalization(advancePersonalization)
+      }
+    }
 
     const studentNotifSetting = await this.studentNotifSettingRepository.findOne({
       where: {
         studentId: recipientUserId,
         institutionId,
-        notificationType: notificationType as unknown as SupportedType,
+        notificationType: notificationType as SupportedType,
       },
     })
 
     if (studentNotifSetting && !studentNotifSetting?.email) {
-      return this.logger.log(
-        `Email: ${studentNotifSetting.notificationType} is not enabled for this user`
-      )
+      this.logger.log(`Email: ${studentNotifSetting.notificationType} is not enabled for this user`)
+      const log = this.notificationRecordRepository.create({
+        channel: NotificationChannel.EMAIL,
+        recipientUserId,
+        institutionId,
+        siteId,
+        recipientUserEmail: emailAddress,
+        subject: emailSubject,
+        message: `Email notification is disabled for this user (${studentNotifSetting.notificationType})`,
+        notificationStatus: NotificationStatus.FAILED,
+        notificationType,
+        automationFlowId: automationFlow?.id,
+      })
+      await this.notificationRecordRepository.save(log)
+      return
     }
     try {
-      const msg = await this.emailTransport.email.send(emailParams)
+      const msg = await this.sendMailerSendEmail(emailParams)
 
       await this.saveEmailResponse(
         msg,
@@ -2667,6 +3571,7 @@ export class EmailService {
         notificationType,
         institutionId,
         siteId,
+        automationFlow,
         enrollCourse
       )
       return msg
@@ -2679,6 +3584,7 @@ export class EmailService {
         notificationType,
         institutionId,
         siteId,
+        automationFlow,
         enrollCourse
       )
     }
@@ -2708,88 +3614,39 @@ export class EmailService {
       timeZone,
     }: ClassStudentRejectPaymentEmailParams
   ) {
-    const personalization = [
-      {
-        email: emailAddress,
-        substitutions: this.convertValuesToString([
-          {
-            var: 'price',
-            value: price,
-          },
-          {
-            var: 'enrolId',
-            value: enrolId,
-          },
-          {
-            var: 'courseName',
-            value: courseName,
-          },
-          {
-            var: 'studentName',
-            value: studentName,
-          },
-          {
-            var: 'paymentMethod',
-            value: paymentMethod,
-          },
-          {
-            var: 'paymentStatus',
-            value: paymentStatus,
-          },
-          {
-            var: 'institutionName',
-            value: institutionName,
-          },
-          {
-            var: 'reUploadPaymentUrl',
-            value: reUploadPaymentUrl,
-          },
-          {
-            var: 'className',
-            value: className?.replace(/\n/g, '<br />'),
-          },
-          {
-            var: 'classDateTime',
-            value: classDateTime
-              ?.split('\n')
-              .map(
-                (slot) =>
-                  `<div style="color: #333 !important; text-decoration: none !important;">${slot}</div>`
-              )
-              .join(''),
-          },
-          {
-            var: 'location',
-            value: location,
-          },
-          {
-            var: 'adminEmail',
-            value: adminEmail,
-          },
-          {
-            var: 'adminPhone',
-            value: parsePhoneNumber(`+${adminPhone}`)?.formatInternational() ?? '',
-          },
-          {
-            var: 'transactionId',
-            value: transactionId,
-          },
-          {
-            var: 'timeZone',
-            value: timeZone,
-          },
-        ]),
-      },
-    ]
+    const template = Handlebars.compile(paymentRejectedTemplate)
 
-    const advancePersonalization: Personalization[] = [
-      {
-        email: emailAddress,
-        data: {
-          schoolLogo: await this.checkDisplayEmailLogo(institutionId),
-        },
-      },
-    ]
+    const formattedClassName = className?.replace(/\n/g, '<br />')
+    const formattedClassDateTime = classDateTime
+      ?.split('\n')
+      .map(
+        (slot) =>
+          `<div style="color: #333 !important; text-decoration: none !important;">${slot}</div>`
+      )
+      .join('')
+    const formattedAdminPhone = parsePhoneNumber(`+${adminPhone}`)?.formatInternational() ?? ''
+
+    const schoolLogo = await this.checkDisplayEmailLogo(institutionId)
+
+    const html = template({
+      price,
+      enrolId,
+      courseName,
+      studentName,
+      paymentMethod,
+      paymentStatus,
+      institutionName,
+      reUploadPaymentUrl,
+      className: formattedClassName,
+      classDateTime: formattedClassDateTime,
+      location,
+      adminEmail,
+      adminPhone: formattedAdminPhone,
+      transactionId,
+      timeZone,
+      schoolLogo,
+      currentYear: new Date().getFullYear(),
+    })
 
     const emailSubject = `Your payment receipt for ${courseName} has been rejected`
 
@@ -2798,9 +3655,7 @@ export class EmailService {
       emailAddress,
       recipientUserId,
       recipientName: institutionName,
-      templateId: 'student-reject-payment',
-      personalization,
-      advancePersonalization,
+      html,
       notificationType: NotificationType.REJECT_PAYMENT,
       institutionId,
       institutionName,
@@ -2846,17 +3701,15 @@ export class EmailService {
         ]),
       },
     ]
-    const sentFrom = await this.getSenderForInstitution(institutionId, institutionName)
     const emailParams = new EmailParams()
-      .setFrom(sentFrom)
+      .setFrom(this.defaultSentFrom)
       .setTo(recipients)
-      .setReplyTo(sentFrom)
+      .setReplyTo(this.defaultSentFrom)
       .setSubject(`Institution ${institutionName} request ${aiCreditDeposit} more AI attempts`)
       .setTemplateId('k68zxl2pp6e4j905')
       .setVariables(personalization)
 
-    return await this.emailTransport.email
-      .send(emailParams)
+    return await this.sendMailerSendEmail(emailParams)
       .then((msg) => {
         this.logger.log(JSON.stringify(msg))
         return msg
@@ -2885,7 +3738,25 @@ export class EmailService {
         ...defaultSettingNotifications,
       })
     }
-    // Own branding disabled when subscription is not configured
+    // check if tier is free
+    const subscriptionPlanRecords = await this.subscriptionPlanRecordsRepository.findOneBy({
+      siteId: institution.siteId,
+    })
+
+    if (!subscriptionPlanRecords) return false
+    const plan = await this.subscriptionPlanRecordsRepository.findOneWithExpiryDate(
+      institution.siteId
+    )
+    let isFeatureEnable = false
+
+    if (plan) {
+      isFeatureEnable = plan.featureEnable?.OWN_BRANDING ?? false
+    }
+
+    if (isFeatureEnable) {
+      return this.s3ClientFactory.getS3ObjectUrl(institution.logo)
+    }
+
     return false
   }
 
@@ -2911,7 +3782,6 @@ export class EmailService {
     } = payload
     const institution = await this.institutionsRepository.findOneById(institutionId)
     const userAdmin = await this.usersRepository.findOne({ where: { email: institution.email } })
-    const sentFrom = await this.getSenderForInstitution(institutionId, institution.name)
     const recipients = [new Recipient(studentEmail)]
     const personalization = [
       {
@@ -2949,20 +3819,18 @@ export class EmailService {
       },
     ]
     const emailParams = new EmailParams()
-      .setFrom(sentFrom)
+      .setFrom(this.defaultSentFrom)
       .setTo(recipients)
-      .setReplyTo(sentFrom)
+      .setReplyTo(this.defaultSentFrom)
       .setSubject(emailSubject)
       .setTemplateId('jy7zpl9wvj545vx6')
       .setVariables(personalization)
 
-    return await this.emailTransport.email.send(emailParams)
+    return await this.sendMailerSendEmail(emailParams)
   }
 
   async requestTimeChangeEmail(payload: RequestTimeChangeEmailProps) {
-    const { emailSubject, studentEmail, studentName, status, institutionId, institutionName } =
-      payload
-    const sentFrom = await this.getSenderForInstitution(institutionId, institutionName)
+    const { emailSubject, studentEmail, studentName, status } = payload
     const recipients = [new Recipient(studentEmail)]
     const personalization = [
       {
@@ -3010,20 +3878,11 @@ export class EmailService {
       .setTemplateId('jy7zpl9wpr345vx6')
       .setVariables(personalization)
 
-    return await this.emailTransport.email.send(emailParams)
+    return await this.sendMailerSendEmail(emailParams)
   }
 
   async sendClassMaterialsEmail(payload: SendClassMaterialsEmailProps) {
-    const {
-      emailAddress,
-      courseName,
-      className,
-      institutionId,
-      institutionName,
-      studentName,
-      siteLink,
-    } = payload
-    const sentFrom = await this.getSenderForInstitution(institutionId, institutionName)
+    const { emailAddress, courseName, className, institutionName, studentName, siteLink } = payload
     const recipients = [new Recipient(emailAddress)]
     const personalization = [
       {
@@ -3053,14 +3912,14 @@ export class EmailService {
       },
     ]
     const emailParams = new EmailParams()
-      .setFrom(sentFrom)
+      .setFrom(this.defaultSentFrom)
       .setTo(recipients)
-      .setReplyTo(sentFrom)
+      .setReplyTo(this.defaultSentFrom)
       .setSubject(`New materials uploaded to ${courseName}`)
       .setTemplateId('jy7zpl9xxvpl5vx6')
       .setVariables(personalization)
 
-    return await this.emailTransport.email.send(emailParams)
+    return await this.sendMailerSendEmail(emailParams)
   }
 
   /**
@@ -3080,5 +3939,89 @@ export class EmailService {
   ): boolean {
     const emailSettings = this.getEmailSettingsForCourse(course)
     return !!emailSettings.emailId
+  }
+
+  public async resendNotificationRecord(record: NotificationRecord): Promise<NotificationRecord> {
+    const recipientEmail =
+      record.recipientUserEmail || record.user?.email
+    if (!recipientEmail) {
+      record.notificationStatus = NotificationStatus.FAILED
+      record.message = 'No recipient email address available to resend.'
+      await this.notificationRecordRepository.save(record)
+      return record
+    }
+
+    const institutionId = record.institutionId
+    const institutionName = record.institution?.name || ''
+    let sentFrom = this.defaultSentFrom
+
+    if (institutionId) {
+      try {
+        const notiSetting = await this.settingNotificationsService.findOneBy({
+          institutionId,
+        })
+        if (notiSetting && notiSetting.customEmailSender && institutionName) {
+          sentFrom = new Sender('no-reply@flowclass.io', institutionName)
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    const emailSubject = record.subject || `Notification from ${institutionName || 'Flowclass'}`
+    const userName = record.user?.firstName
+      ? `${record.user.firstName} ${record.user.lastName || ''}`.trim()
+      : ''
+    const recipientName = userName || institutionName || 'Valued User'
+
+    const recipients = [new Recipient(recipientEmail, recipientName)]
+
+    // Build HTML email layout
+    const template = Handlebars.compile(baseEmailLayout)
+    const schoolLogo = institutionId ? await this.checkDisplayEmailLogo(institutionId) : undefined
+
+    const html = template({
+      subject: emailSubject,
+      title: emailSubject,
+      subtitle: institutionName,
+      schoolLogo,
+      body: `<p>This is a notification regarding: <strong>${emailSubject}</strong></p>`,
+      ctaUrl: process.env.LINK_FLOWCLASS_CMS || 'https://app.flowclass.io',
+      ctaText: 'View Details',
+      ctaBgColor: '#3b82f6',
+      showFallbackLink: true,
+      adminEmail: 'info@flowclass.io',
+      currentYear: new Date().getFullYear(),
+    })
+
+    const emailParams = new EmailParams()
+      .setFrom(sentFrom)
+      .setTo(recipients)
+      .setReplyTo(sentFrom)
+      .setSubject(emailSubject)
+      .setHtml(html)
+
+    try {
+      const msg = await this.sendMailerSendEmail(emailParams, html)
+      const sentStatusCodes = [200, 201, 202, 204]
+      if (msg?.statusCode && sentStatusCodes.includes(msg.statusCode)) {
+        record.notificationStatus = NotificationStatus.SENT
+        record.sentAt = new Date()
+        record.messageId =
+          msg?.headers?.['x-message-id'] || msg?.headers?.get?.('x-message-id') || msg?.messageId
+        record.message = null // clear error
+      } else {
+        record.notificationStatus = NotificationStatus.FAILED
+        record.message =
+          msg?.message || (typeof msg?.body === 'string' ? msg.body : JSON.stringify(msg?.body ?? msg))
+      }
+    } catch (err: any) {
+      record.notificationStatus = NotificationStatus.FAILED
+      record.message =
+        err?.message || (typeof err?.body === 'string' ? err.body : JSON.stringify(err?.body ?? err))
+    }
+
+    await this.notificationRecordRepository.save(record)
+    return record
   }
 }

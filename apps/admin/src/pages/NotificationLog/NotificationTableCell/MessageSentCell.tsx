@@ -7,11 +7,27 @@ import Box from '@/components/ui/Box'
 import Text from '@/components/ui/Text'
 import { replaceLinksWithAnchorTags } from '@/utils/string'
 
-const MessageSentCell = ({ message }: { message: string }): JSX.Element => {
+interface MessageSentCellProps {
+  message?: string
+  subject?: string
+  status?: string
+}
+
+const MessageSentCell = ({
+  message,
+  subject,
+  status,
+}: MessageSentCellProps): JSX.Element => {
   const { t } = useTranslation()
 
-  if (!message) {
-    return <></>
+  const isFailed = status === 'FAILED'
+  const displayContent =
+    isFailed && message && subject && message !== subject
+      ? `${subject}\n\n[Error Details]:\n${message}`
+      : subject || message || ''
+
+  if (!displayContent) {
+    return <span>-</span>
   }
 
   return (
@@ -20,7 +36,12 @@ const MessageSentCell = ({ message }: { message: string }): JSX.Element => {
         <Popover
           trigger={
             <div>
-              <Button variants="subtle" size="small" iconAfter={<TiEye />}>
+              <Button
+                variants="subtle"
+                className={isFailed ? 'text-red-500 hover:text-red-600' : ''}
+                size="small"
+                iconAfter={<TiEye />}
+              >
                 <Text className="block">
                   {t(`recordLogs:notificationLogs.cell.view`)}
                 </Text>
@@ -32,10 +53,15 @@ const MessageSentCell = ({ message }: { message: string }): JSX.Element => {
             className="!max-w-96 !text-wrap whitespace-pre-wrap p-2 rounded-md"
             direction="col"
           >
+            {isFailed && (
+              <Text className="text-red-500 font-semibold mb-1 block">
+                Delivery Failed
+              </Text>
+            )}
             <Text
               className="w-full overflow-hidden"
               dangerouslySetInnerHTML={{
-                __html: replaceLinksWithAnchorTags(message),
+                __html: replaceLinksWithAnchorTags(displayContent),
               }}
             />
           </Box>

@@ -17,7 +17,6 @@ import {
   uploadTeacherFeedback,
 } from '@/api/student-submission'
 import { QUERY_KEY } from '@/constants/queryKey'
-import { API_BASE_URL } from '@/lib/config'
 import {
   currentUploadProgressState,
   uploadProgressState,
@@ -42,7 +41,7 @@ const useStudentSubmissionData = () => {
   )
   const startEvent = (uploadProgress: UploadProgress): void => {
     const eventSource = new EventSource(
-      `${API_BASE_URL}/stream/${uploadProgress.uploadId}`
+      `${import.meta.env.VITE_API_BASE_URL}/stream/${uploadProgress.uploadId}`
     )
     eventSource.onerror = () => {
       eventSource.close()

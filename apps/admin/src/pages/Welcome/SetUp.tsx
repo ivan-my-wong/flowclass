@@ -62,6 +62,7 @@ import { ProgressIndicator } from '@/components/ui/ProgressIndicator'
 import { TIMEOUT_TIME } from '@/constants/common'
 import { countryConfig } from '@/constants/countryConfig'
 import { defaultRepeatFormat, RepeatUnit } from '@/constants/course'
+import { extractSubdomain, getFreeDomainList } from '@/constants/domain'
 import { QUERY_KEY } from '@/constants/queryKey'
 import { defaultThemeColor, WebsiteTemplate } from '@/constants/websiteTemplate'
 import { useUserCountry } from '@/hooks/useLocalization'
@@ -84,13 +85,14 @@ import { QuizStep } from '@/types/onboarding'
 import { WebpageInstitutionSettingProps } from '@/types/settingWebpageInstitution'
 import { getUserRoleFromArray } from '@/utils/convert'
 import { defaultRegularPeriod } from '@/utils/convert-class.utils'
-import { validateFreeFormDomain } from '@/utils/validate'
+import { validateCustomDomain } from '@/utils/validate'
 
 import { initializeSchoolSectionValues } from '../School/Description'
 import { CountryOption } from '../Setting/Site/RegionLanguageSetting'
 import { initializeCourseSectionValues } from '../TeachingService/EditCourse/PageContent'
 
 import OnboardingPreview from './components/OnboardingPreview'
+import ConnectWhatsAppStep from './steps/ConnectWhatsAppStep'
 import CreateClassStep from './steps/CreateClassStep'
 import FinishSetupStep from './steps/FinishSetupStep'
 import MobilePreviewStep from './steps/MobilePreviewStep'
@@ -98,6 +100,8 @@ import PaymentMethodStep from './steps/PaymentMethodStep'
 import SetCountryStep from './steps/SetCountryStep'
 import SetDomainStep from './steps/SetDomainStep'
 import StartSetUpStep from './steps/StartSetUpStep'
+import SubscriptionStep from './steps/SubscriptionStep'
+import TrialLimitationStep from './steps/TrialLimitationStep'
 
 const countries = countryConfig.map(obj => ({
   name: obj.name,
@@ -121,8 +125,11 @@ const ONBOARDING_STEPS = {
   COUNTRY_SETTINGS: 2,
   CLASS_SETUP: 3,
   PAYMENT_METHOD: 4,
-  STUDENT_ENROLLMENT: 5,
-  SUCCESS: 6, // This is the last step (finishSetupSection)
+  CONNECT_WHATSAPP: 5,
+  STUDENT_ENROLLMENT: 6,
+  SUBSCRIPTION: 7,
+  TRIAL_LIMITATION: 8,
+  SUCCESS: 9, // This is the last step (finishSetupSection)
 } as const
 
 type OnboardingStep = (typeof ONBOARDING_STEPS)[keyof typeof ONBOARDING_STEPS]
@@ -136,8 +143,14 @@ const isMobilePreviewStep = (step: number) =>
 const isClassSetupStep = (step: number) => step === ONBOARDING_STEPS.CLASS_SETUP
 const isPaymentMethodStep = (step: number) =>
   step === ONBOARDING_STEPS.PAYMENT_METHOD
+const isWhatsAppStep = (step: number) =>
+  step === ONBOARDING_STEPS.CONNECT_WHATSAPP
 const isStudentEnrollmentStep = (step: number) =>
   step === ONBOARDING_STEPS.STUDENT_ENROLLMENT
+const isSubscriptionStep = (step: number) =>
+  step === ONBOARDING_STEPS.SUBSCRIPTION
+const isTrialLimitationStep = (step: number) =>
+  step === ONBOARDING_STEPS.TRIAL_LIMITATION
 
 const shouldShowExitButton = (step: number) =>
   step >= ONBOARDING_STEPS.CLASS_SETUP
@@ -145,6 +158,9 @@ const shouldShowExitButton = (step: number) =>
 const getWrapperClassName = (step: number) => {
   if (isFirstStep(step) || isLastStep(step) || isMobilePreviewStep(step)) {
     return 'w-full max-w-2xl'
+  }
+  if (isSubscriptionStep(step) || isTrialLimitationStep(step)) {
+    return 'w-full max-w-6xl'
   }
   return 'w-full lg:w-[70%] xl:w-[50%]'
 }
@@ -236,6 +252,8 @@ const SetUpPage: React.FC = () => {
     generatedTimeSlots: any[]
   } | null>(null)
   const [hasReachedUploadReceipt, setHasReachedUploadReceipt] = useState(false)
+
+  const selectedDomain = getFreeDomainList[0]
 
   const [selectedWebsiteTemplate] = useState<WebsiteTemplate>(
     WebsiteTemplate.Hero
@@ -366,9 +384,8 @@ const SetUpPage: React.FC = () => {
   const selectedCountry = formSchool.watch('country')
 
   const url = useMemo(() => {
-    const domain = siteDomain?.trim().toLowerCase()
-    return domain || 'localhost'
-  }, [siteDomain])
+    return `${siteDomain.toLowerCase()}.${selectedDomain}`
+  }, [siteDomain, selectedDomain])
 
   const schoolDescValues = formSchoolDetails.watch('schoolDesc')
   const schoolLogo = formSchoolDetails.watch('schoolLogo')
@@ -401,7 +418,7 @@ const SetUpPage: React.FC = () => {
     if (currentSectionIndex === ONBOARDING_STEPS.DOMAIN_SETTINGS) {
       return (
         !formSchool.formState.isValid ||
-        !validateFreeFormDomain(url) ||
+        !validateCustomDomain(url) ||
         !schoolName ||
         isValidatingDomain
       )
@@ -422,9 +439,24 @@ const SetUpPage: React.FC = () => {
       return !formPaymentMethod.formState.isValid
     }
 
+    // WhatsApp step - always allow next (optional step)
+    if (isWhatsAppStep(currentSectionIndex)) {
+      return false
+    }
+
     // Student enrollment step - only allow next when upload receipt is reached
     if (isStudentEnrollmentStep(currentSectionIndex)) {
       return !hasReachedUploadReceipt
+    }
+
+    // Subscription step - always allow next (optional step)
+    if (isSubscriptionStep(currentSectionIndex)) {
+      return false
+    }
+
+    // Trial limitation step - always allow next (informational step)
+    if (isTrialLimitationStep(currentSectionIndex)) {
+      return false
     }
 
     // Legacy steps (8-11) - keeping for backward compatibility
@@ -509,7 +541,7 @@ const SetUpPage: React.FC = () => {
 
       formSchool.reset({
         schoolName: schoolData.currentSchool.name || '',
-        siteDomain: siteData.currentSite?.url || '',
+        siteDomain: extractSubdomain(siteData.currentSite?.url) || '',
         email: schoolData.currentSchool.email || user.email || '',
         phone: schoolData.currentSchool.phone || user.phone || '',
         country: country || schoolData.currentSchool.siteSetting?.countryCode,
@@ -952,9 +984,9 @@ const SetUpPage: React.FC = () => {
     2: formSchool,
     3: formClass,
     4: formPaymentMethod,
-    5: formPaymentMethod,
+    5: formSchool,
     6: formPaymentMethod,
-    7: formSchool,
+    7: formPaymentMethod,
     8: formSchool,
     9: formSchool,
     10: formSchool,
@@ -1006,10 +1038,29 @@ const SetUpPage: React.FC = () => {
           total: sectionFormFields.paymentMethod.length,
         }
       case 5:
+        return {
+          fields: ['subscriptionPlan'],
+          total: 1,
+        }
       case 6:
         return {
-          fields: [],
-          total: 0,
+          fields: ['subscriptionPlan'],
+          total: 1,
+        }
+      case 7:
+        return {
+          fields: ['subscriptionPlan'],
+          total: 1,
+        }
+      case 8:
+        return {
+          fields: ['subscriptionPlan'],
+          total: 1,
+        }
+      case 9:
+        return {
+          fields: ['subscriptionPlan'],
+          total: 1,
         }
 
       default:
@@ -1047,8 +1098,8 @@ const SetUpPage: React.FC = () => {
             existingPaymentMethods?.content &&
             existingPaymentMethods.content.length > 0
           ) {
-            // User has payment methods, skip to student enrollment step
-            setCurrentSectionIndex(ONBOARDING_STEPS.STUDENT_ENROLLMENT)
+            // User has payment methods, skip to subscription step
+            setCurrentSectionIndex(ONBOARDING_STEPS.CONNECT_WHATSAPP)
             return
           }
           if (existingCourses.length > 0 || existingClasses.length > 0) {
@@ -1137,8 +1188,26 @@ const SetUpPage: React.FC = () => {
       return
     }
 
+    // WhatsApp step - always allow next (optional step)
+    if (isWhatsAppStep(currentSectionIndex)) {
+      setCurrentSectionIndex(currentSectionIndex + 1)
+      return
+    }
+
     // Student enrollment step - always allow next (testing step)
     if (isStudentEnrollmentStep(currentSectionIndex)) {
+      setCurrentSectionIndex(currentSectionIndex + 1)
+      return
+    }
+
+    // Subscription step - always allow next (optional step)
+    if (isSubscriptionStep(currentSectionIndex)) {
+      setCurrentSectionIndex(currentSectionIndex + 1)
+      return
+    }
+
+    // Trial limitation step - always allow next (informational step)
+    if (isTrialLimitationStep(currentSectionIndex)) {
       setCurrentSectionIndex(currentSectionIndex + 1)
       return
     }
@@ -1198,6 +1267,12 @@ const SetUpPage: React.FC = () => {
     ),
   }
 
+  const connectWhatsAppSection = {
+    title: t('onboarding:newUserSetup.connectWhatsApp.title'),
+    subtitle: t('onboarding:newUserSetup.connectWhatsApp.subtitle'),
+    content: <ConnectWhatsAppStep />,
+  }
+
   const handleSkipMobilePreview = () => {
     setCurrentSectionIndex(currentSectionIndex + 1)
   }
@@ -1212,6 +1287,14 @@ const SetUpPage: React.FC = () => {
       />
     ),
   }
+
+  const subscriptionSection = {
+    title: t('onboarding:newUserSetup.subscription.title'),
+    subtitle: t('onboarding:newUserSetup.subscription.subtitle'),
+    content: <SubscriptionStep />,
+  }
+
+  // trialLimitationSection will be defined after handlePrevSection
 
   const paymentMethodSection = {
     title: t('onboarding:newUserSetup.registerPaymentMethod'),
@@ -1276,6 +1359,12 @@ const SetUpPage: React.FC = () => {
     content: <FinishSetupStep />,
   }
 
+  /* 
+       THIS IS WHERE THE USER CHOOSES HOW TO USE FLOWCLASS
+  */
+
+  // setUpSectionList will be defined after trialLimitationSection
+
   const handlePrevSection = () => {
     if (currentSectionIndex > 0) {
       // Reset upload receipt state when entering student enrollment step
@@ -1290,6 +1379,12 @@ const SetUpPage: React.FC = () => {
     navigate('/home')
   }
 
+  const trialLimitationSection = {
+    title: t('onboarding:trialLimitation.title'),
+    subtitle: t('onboarding:trialLimitation.description'),
+    content: <TrialLimitationStep onBack={handlePrevSection} />,
+  }
+
   const setUpSectionList: {
     title: string
     subtitle: string
@@ -1301,7 +1396,10 @@ const SetUpPage: React.FC = () => {
     countrySection,
     classSetupSection,
     paymentMethodSection,
+    connectWhatsAppSection,
     studentEnrollmentSection,
+    subscriptionSection,
+    trialLimitationSection,
     // schoolDetailsSection,
     // createCourseSection,
     // createClassSection,
@@ -1414,6 +1512,12 @@ const SetUpPage: React.FC = () => {
         'onboarding:newUserSetup.waitingForUploadReceipt',
         'Complete the enrollment process to continue'
       )
+    }
+    if (isSubscriptionStep(currentSectionIndex)) {
+      return t('common:action.skipForNow')
+    }
+    if (isTrialLimitationStep(currentSectionIndex)) {
+      return t('common:action.decideLater')
     }
     return t('common:action.next')
   }
@@ -1560,9 +1664,12 @@ const SetUpPage: React.FC = () => {
                 t('onboarding:newUserSetup.stepIndicators.countrySettings'),
                 t('onboarding:newUserSetup.stepIndicators.classSetup'),
                 t('onboarding:newUserSetup.stepIndicators.paymentSetup'),
+                t('onboarding:newUserSetup.stepIndicators.connectWhatsApp'),
                 t(
                   'onboarding:newUserSetup.stepIndicators.tryStudentEnrollment'
                 ),
+                t('onboarding:newUserSetup.stepIndicators.subscription'),
+                t('onboarding:newUserSetup.stepIndicators.trialLimitation'),
                 t('onboarding:newUserSetup.stepIndicators.success'),
               ]}
               currentStep={currentSectionIndex}
@@ -1670,16 +1777,17 @@ const SetUpPage: React.FC = () => {
                   <div className="sticky w-full bottom-2 mt-4 left-0 right-0 shadow-md rounded-lg bg-white border-gray-200 p-4 lg:relative lg:border-t-0">
                     <Box direction="row" className="my-2 h-[34px] gap-3">
                       {/* Back button - hide for class setup step */}
-                      {!isClassSetupStep(currentSectionIndex) && (
-                        <Button
-                          onClick={handlePrevSection}
-                          variant="outline"
-                          iconBefore={<LuArrowLeft />}
-                          className="w-[99px] h-full"
-                        >
-                          {t(`common:action.back`)}
-                        </Button>
-                      )}
+                      {!isClassSetupStep(currentSectionIndex) &&
+                        !isWhatsAppStep(currentSectionIndex) && (
+                          <Button
+                            onClick={handlePrevSection}
+                            variant="outline"
+                            iconBefore={<LuArrowLeft />}
+                            className="w-[99px] h-full"
+                          >
+                            {t(`common:action.back`)}
+                          </Button>
+                        )}
 
                       {/* Next button - hide for last step */}
                       {!isLastStep(currentSectionIndex) && (
@@ -1728,17 +1836,19 @@ const SetUpPage: React.FC = () => {
                 )}
             </Box>
             {/* Hide right side preview for mobile preview steps */}
-            {!isMobilePreviewStep(currentSectionIndex) && (
-              <OnboardingPreview
-                currentSectionIndex={currentSectionIndex}
-                siteDomain={siteDomain}
-                demoImages={demoImages}
-                page2Demo={page2Demo}
-                isPayoutUploading={isPayoutUploading}
-                payoutPreview={payoutPreview}
-                classUrl={classUrl}
-              />
-            )}
+            {!isMobilePreviewStep(currentSectionIndex) &&
+              !isSubscriptionStep(currentSectionIndex) &&
+              !isTrialLimitationStep(currentSectionIndex) && (
+                <OnboardingPreview
+                  currentSectionIndex={currentSectionIndex}
+                  siteDomain={siteDomain}
+                  demoImages={demoImages}
+                  page2Demo={page2Demo}
+                  isPayoutUploading={isPayoutUploading}
+                  payoutPreview={payoutPreview}
+                  classUrl={classUrl}
+                />
+              )}
           </div>
         </div>
       </Box>

@@ -43,24 +43,48 @@ export const CouponSection = ({
   const { t } = useTranslation()
   const [invoicesData, setInvoicesData] = useRecoilState(invoicesState)
   const invoiceData = useMemo(() => invoicesData.find(inv => inv.id === invoice.id), [invoicesData])
-  const [activeCouponCode, setActiveCouponCode] = useState<string>()
-  const [couponStatus, setCouponStatus] = useState<CouponStatus>(CouponStatus.INACTIVE)
+  const [activeCouponCode, setActiveCouponCode] = useState<string | undefined>(
+    invoice.promotionUsed?.coupon?.code
+  )
+  const [couponStatus, setCouponStatus] = useState<CouponStatus>(
+    invoice.promotionUsed?.coupon ? CouponStatus.ACTIVE : CouponStatus.INACTIVE
+  )
   const [isAutoApplying, setIsAutoApplying] = useState<boolean>(false)
+  const [errorMessage, setErrorMessage] = useState<string>('')
   const initialPrice = useMemo(() => +invoice.payAmount, [invoice.payAmount])
+
+  const getCouponErrorMessage = useCallback(
+    (message?: string): string => {
+      switch (message) {
+        case CouponErrorMessage.COUPON_USED_UP:
+          return t('errors:COUPON.USED_UP') as string
+        case CouponErrorMessage.COUPON_NOT_APPLY_FOR_THIS_COURSE:
+          return t('errors:COUPON.NOT_APPLY_FOR_THIS_COURSE') as string
+        case CouponErrorMessage.COUPON_NOT_APPLY_FOR_USER:
+          return t('errors:COUPON.NOT_APPLY_FOR_USER') as string
+        case CouponErrorMessage.COUPON_IS_NOT_ACTIVE:
+          return t('errors:COUPON.IS_NOT_ACTIVE') as string
+        case CouponErrorMessage.COUPON_NOT_FOUND:
+          return t('errors:COUPON.NOT_FOUND') as string
+        case CouponErrorMessage.COUPON_HAS_EXPIRED:
+        default:
+          return t('errors:COUPON.EXPIRED') as string
+      }
+    },
+    [t]
+  )
 
   const { mutateAsync: validateCouponData, isLoading } = useMutation({
     mutationFn: (data: ValidateCouponDto) => validateCoupon(data),
     onSuccess: async (data: ValidateCouponResponse) => {
       if (data && data.valid && data.coupon) {
+        setErrorMessage('')
         await calculateCouponPriceFn(data.coupon.code)
         setCouponStatus(CouponStatus.ACTIVE)
       } else {
-        if (data.message === CouponErrorMessage.COUPON_USED_UP) {
-          toast.error(t('errors:COUPON.USED_UP') as string)
-        } else {
-          toast.error(t('errors:COUPON.EXPIRED') as string)
-        }
-
+        const errorMsg = getCouponErrorMessage(data?.message)
+        toast.error(errorMsg)
+        setErrorMessage(errorMsg)
         setCouponStatus(CouponStatus.INVALID)
 
         const resetInvoice = (inv: InvoiceState) => ({
@@ -76,7 +100,9 @@ export const CouponSection = ({
       }
     },
     onError: (e: any) => {
-      toast.error(t('errors:COUPON.EXPIRED') as string)
+      const errorMsg = t('errors:COUPON.EXPIRED') as string
+      toast.error(errorMsg)
+      setErrorMessage(errorMsg)
       setCouponStatus(CouponStatus.INVALID)
 
       const resetInvoice = (inv: InvoiceState) => ({
@@ -106,18 +132,23 @@ export const CouponSection = ({
       mutationFn: (data: CalculateCouponPriceDto) => calculateCouponPrice(data),
       onSuccess: (data: CalculateCouponPriceResponse) => {
         if (data && data.couponPrice >= 0 && data.amountReduced > 0) {
-          toast.success(`${t('enrol:coupon.applied')}: ${activeCouponCode}`)
+          const appliedCode = data.coupon?.code || activeCouponCode || ''
+          if (appliedCode) {
+            setActiveCouponCode(appliedCode)
+          }
+          setErrorMessage('')
+          toast.success(`${t('enrol:coupon.applied')}: ${appliedCode}`)
           // This part to calculate the price afterward
           setInvoicesData(prev =>
             prev.map(inv =>
-              inv.id === invoice.id && activeCouponCode
+              inv.id === invoice.id && appliedCode
                 ? {
                     ...calculateInvoiceWithCoupon({
                       invoice: inv,
                       coupon: data.coupon,
                       data,
                       initialPrice,
-                      activeCouponCode,
+                      activeCouponCode: appliedCode,
                     }),
                     autoCouponApplied: isAutoApplying ? true : inv.autoCouponApplied || false,
                   }
@@ -127,12 +158,16 @@ export const CouponSection = ({
 
           setCouponStatus(CouponStatus.ACTIVE)
         } else {
+          const errorMsg = t('errors:COUPON.EXPIRED') as string
+          setErrorMessage(errorMsg)
           setCouponStatus(CouponStatus.INVALID)
         }
         setIsAutoApplying(false)
       },
       onError: e => {
-        toast.error(t('enrol:coupon.expired') as string)
+        const errorMsg = t('errors:COUPON.EXPIRED') as string
+        toast.error(errorMsg)
+        setErrorMessage(errorMsg)
         setCouponStatus(CouponStatus.INVALID)
       },
     })
@@ -140,6 +175,7 @@ export const CouponSection = ({
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -156,12 +192,14 @@ export const CouponSection = ({
     ) {
       const code = availableCouponData[0].code
       setActiveCouponCode(code)
+      setValue('couponCode', code)
       setIsAutoApplying(true)
       validateCouponData({
         couponCode: code,
         enrolToken: invoice.proofToken,
         institutionId: school.id,
         invoiceId: invoice.id,
+        userAliasId: invoice.userAliasId,
       })
     }
   }, [
@@ -170,14 +208,22 @@ export const CouponSection = ({
     couponStatus,
     validateCouponData,
     invoice.proofToken,
+    invoice.userAliasId,
     school.id,
     invoice.id,
+    setValue,
   ])
 
-  const [amountReduced, setAmountReduced] = useState(0)
+  const [amountReduced, setAmountReduced] = useState(invoiceData?.couponDiscount || 0)
+  useEffect(() => {
+    if (invoiceData?.couponDiscount && invoiceData.couponDiscount > 0) {
+      setAmountReduced(invoiceData.couponDiscount)
+    }
+  }, [invoiceData?.couponDiscount])
   const calculateCouponPriceFn = useCallback(
     async (couponCode: string) => {
       if (couponCode) {
+        setActiveCouponCode(couponCode)
         const calculateCouponPriceData = {
           couponCode,
           courseId: course.id,
@@ -185,24 +231,27 @@ export const CouponSection = ({
           initialPrice: Number(invoice.payAmount),
         } as CalculateCouponPriceDto
         await mutateAsyncCalculatePrice(calculateCouponPriceData).then(res => {
-          setAmountReduced(res.amountReduced)
+          if (res?.amountReduced) {
+            setAmountReduced(res.amountReduced)
+          }
         })
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [course, school, invoice]
+    [course, school, invoice, mutateAsyncCalculatePrice]
   )
 
   const submitCheckCoupon = async (data: any) => {
-    if (data.couponCode) {
+    if (data?.couponCode) {
       setIsAutoApplying(false)
       setActiveCouponCode(data.couponCode)
-      // setValue('couponCode', data.couponCode)
+      setValue('couponCode', data.couponCode)
       const checkCouponData = {
         couponCode: data.couponCode,
         enrolToken: invoice.proofToken,
         institutionId: school.id,
         invoiceId: invoice.id,
+        userAliasId: invoice.userAliasId,
       }
 
       await validateCouponData(checkCouponData)
@@ -229,7 +278,6 @@ export const CouponSection = ({
               </Button>
             }
             couponData={availableCouponData}
-            onSubmit={handleSubmit}
             onCheckCoupon={submitCheckCoupon}
           />
         )}
@@ -255,7 +303,7 @@ export const CouponSection = ({
           </Button>
         </div>
         {couponStatus === CouponStatus.INVALID && (
-          <AlertBlock message={t('enrol:coupon.expired')} />
+          <AlertBlock message={errorMessage || t('enrol:coupon.expired')} />
         )}
         {couponStatus === CouponStatus.ACTIVE && (
           <div className="box-responsive-full justify-between pb-2">

@@ -3,15 +3,13 @@
 import React, { useEffect, useState } from 'react'
 
 import * as Progress from '@radix-ui/react-progress'
-
-import { cn } from '@/utils/cn'
+import { styled } from '@stitches/react'
 
 type ProgressBarProps = {
   percentage: number
-  className?: string
+  css?: any
 }
-
-const ProgressBar = ({ percentage, className }: ProgressBarProps) => {
+const ProgressBar = ({ percentage, css }: ProgressBarProps) => {
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
@@ -20,19 +18,34 @@ const ProgressBar = ({ percentage, className }: ProgressBarProps) => {
   }, [percentage])
 
   return (
-    <Progress.Root
-      value={progress}
-      className={cn(
-        'relative overflow-hidden bg-shadow rounded-full w-full h-3 translate-z-0',
-        className
-      )}
-    >
-      <Progress.Indicator
-        className="bg-primary w-full h-full transition-transform duration-[660ms] ease-[cubic-bezier(0.65,0,0.35,1)]"
+    <ProgressRoot value={progress} css={css}>
+      <ProgressIndicator
         style={{ transform: `translateX(-${100 - progress}%)` }}
       />
-    </Progress.Root>
+    </ProgressRoot>
   )
 }
+
+const ProgressRoot = styled(Progress.Root, {
+  position: 'relative',
+  overflow: 'hidden',
+  background: '$shadowColor',
+  borderRadius: '99999px',
+  width: '100%',
+  height: '$3',
+
+  '@md': {
+    width: '100%',
+  },
+
+  transform: 'translateZ(0)',
+})
+
+const ProgressIndicator = styled(Progress.Indicator, {
+  backgroundColor: '$primary',
+  width: '100%',
+  height: '100%',
+  transition: 'transform 660ms cubic-bezier(0.65, 0, 0.35, 1)',
+})
 
 export default ProgressBar

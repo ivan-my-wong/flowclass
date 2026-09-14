@@ -38,6 +38,7 @@ import { ClassRepository } from '@/models/classes.repository'
 import { StudentPrimaryIdentifier } from '@/models/enums'
 import { InvoiceRepository } from '@/models/invoice.repository'
 import { StudentLessonRepository } from '@/models/student-lesson.repository'
+import { StudentMemo } from '@/models/student-memo.entity'
 import { StudentScheduleRepository } from '@/models/student-schedule.repository'
 import { UserAlias } from '@/models/user-aliases.entity'
 import { UserAliasesRepository } from '@/models/user-aliases.repository'
@@ -49,7 +50,7 @@ import {
   HttpStatus,
   Injectable,
 } from '@nestjs/common'
-import * as bcrypt from 'bcryptjs'
+import * as bcrypt from 'bcrypt'
 import { plainToInstance } from 'class-transformer'
 import * as dayjs from 'dayjs'
 import {
@@ -475,6 +476,23 @@ export class UsersService extends BaseService<User> {
             isStudent: true,
           }
         )
+      }
+
+      const studentMemo = await transactionalEntityManager.findOne(StudentMemo, {
+        where: {
+          userId: baseUserToBeCreatedUserRole.id,
+          institutionId,
+        },
+      })
+
+      if (!studentMemo) {
+        await transactionalEntityManager.save(StudentMemo, {
+          userId: baseUserToBeCreatedUserRole.id,
+          institutionId,
+          contactEmail: registerDto.email,
+          contactPhone: registerDto.phone,
+          contactName: registerDto.firstName,
+        })
       }
 
       let studentAlias: UserAlias | null = null
@@ -909,6 +927,15 @@ export class UsersService extends BaseService<User> {
     return true
   }
 
+  async updateFirebaseId(userId: number, firebaseId: string) {
+    const user = await this.findOne(userId)
+    if (!user) {
+      throw new BadRequestException(UserErrorMessage.USER_NOT_FOUND)
+    }
+    const userInstance = plainToInstance(User, { ...user, firebaseId })
+    return await this.usersRepository.save(userInstance)
+  }
+
   async findOneByEmail(email: string): Promise<User> {
     const retrievedUsers = await this.usersRepository.find({
       where: {
@@ -1046,27 +1073,76 @@ export class UsersService extends BaseService<User> {
         user: true,
       },
     })
+    if (userRoleWithInstitutionManager?.user) {
+      return userRoleWithInstitutionManager.user
+    }
 
-    if (!userRoleWithInstitutionManager) {
-      const userRoleWithSiteManager = await this.userRolesRepository.findOne({
-        where: {
-          institutionId,
-          isSiteManager: true,
-          user: {
-            id: Not(IsNull()),
+    const userRoleWithSiteManager = await this.userRolesRepository.findOne({
+      where: {
+        institutionId,
+        isSiteManager: true,
+        user: {
+          id: Not(IsNull()),
+        },
+      },
+      relations: {
+        user: true,
+      },
+    })
+    if (userRoleWithSiteManager?.user) {
+      return userRoleWithSiteManager.user
+    }
+
+    const institution = await this.institutionsRepository.findOne({
+      where: { id: institutionId },
+    })
+
+    if (institution) {
+      if (institution.contactPerson) {
+        const contactUser = await this.usersRepository.findOne({
+          where: { id: institution.contactPerson },
+        })
+        if (contactUser) {
+          return contactUser
+        }
+      }
+
+      if (institution.siteId) {
+        const siteManagerRole = await this.userRolesRepository.findOne({
+          where: {
+            siteId: institution.siteId,
+            isSiteManager: true,
+            user: {
+              id: Not(IsNull()),
+            },
           },
-        },
-        relations: {
-          user: true,
-        },
-      })
+          relations: {
+            user: true,
+          },
+        })
+        if (siteManagerRole?.user) {
+          return siteManagerRole.user
+        }
 
-      if (userRoleWithSiteManager) {
-        return userRoleWithSiteManager.user
+        const masterAdminRole = await this.userRolesRepository.findOne({
+          where: {
+            siteId: institution.siteId,
+            isMasterAdmin: true,
+            user: {
+              id: Not(IsNull()),
+            },
+          },
+          relations: {
+            user: true,
+          },
+        })
+        if (masterAdminRole?.user) {
+          return masterAdminRole.user
+        }
       }
     }
 
-    return userRoleWithInstitutionManager?.user
+    return null
   }
 
   async changeAliasPassword(changeAliasPasswordDto: ChangeAliasPasswordDto): Promise<boolean> {

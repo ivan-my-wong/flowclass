@@ -1,0 +1,864 @@
+import { expect, test } from '@playwright/test'
+
+import moment from 'moment'
+
+import { testAdminUrl, testLoginPayload } from './testData/admin'
+import {
+  className,
+  classPrice,
+  courseName,
+  fixCoupon,
+  linkSocialMedia,
+  studentEmail,
+  studentEmail2,
+  studentName,
+  studentName2,
+  studentPhone,
+  studentPhone2,
+  testUrl,
+  timestamp,
+  trialLessonPrice,
+} from './testData/data'
+
+test.describe.serial('Enroll Course', () => {
+  // admin
+  test('Admin: create course and class', async ({ page }) => {
+
+    // Admin login
+    await page.goto(`${testAdminUrl}/login`)
+    await page.locator('#email').fill(testLoginPayload.email)
+    await page.locator('#password').fill(testLoginPayload.password)
+    await page.getByRole('button', { name: 'Login' }).click()
+
+    // Delete old data test courses
+    await page.locator('#teachingService').click()
+    await page.waitForTimeout(3000)
+
+    // Get all courses
+    const courses = await page.getByTestId('course-card').count()
+
+    for (let i = 0; i < courses; i++) {
+      const course = page.getByTestId('course-card').first()
+      const dropdown = course.getByTestId('toggle-dropdown').getByRole('img').first()
+      if (await dropdown.isVisible()) {
+        await dropdown.click()
+        await page.getByRole('menuitem', { name: 'Delete' }).first().click()
+        await page.getByText('Yes, delete course').first().click()
+        await page.waitForTimeout(3000)
+      }
+    }
+
+    // Create courses
+    await page.getByRole('button', { name: 'Create course' }).click()
+    await page.locator('#name').fill(courseName)
+    await page.getByRole('button', { name: 'Create' }).click()
+    await page.waitForTimeout(1000)
+
+    // Create tag search
+    // click on an empty space to close the dropdown
+    await page.locator('.reactour__close-button').click()
+    await page.getByTestId('tab-settings').click()
+    await page.getByText('Course Tags').click()
+    await page.getByTestId('add-tag-btn').click()
+    await page.getByTestId('input-tag-name-0').fill(timestamp)
+    await page.locator('#tagSelector').locator('input').first().fill(`tag-${timestamp}`)
+    await page.keyboard.press('Enter')
+    await page.getByTestId('save-changes-btn').click()
+    await page.waitForTimeout(1000)
+
+    // Go to class tab
+    await page.getByRole('tab', { name: 'Class' }).click()
+
+    // Create class recurring
+    await page.getByTestId('toggle-group-add-btn').click()
+    await page.getByTestId('recurring').click()
+    await page.locator('#tuition').fill(classPrice)
+    await page.locator('#name').fill(`recurring${className}`)
+    await page.locator('#quota').fill('100')
+    await page.locator('#times').fill('1')
+    await page.getByTestId('confirm-class-btn').click()
+    await page.waitForTimeout(3000)
+    await page.locator('#times').fill('1')
+    await page.locator('#Sunday').click()
+    await page.fill(
+      'id=startTime',
+      moment().add(1, 'day').startOf('day').add(7, 'h').format('YYYY-MM-DD HH:mm:ss')
+    )
+    await page.locator('#mins').click()
+    await page.getByRole('option').locator('span').getByText('30').click()
+    await page.getByRole('button', { name: 'Confirm' }).click()
+    await page.getByTestId('multiple-classes-switch').locator('button').first().click()
+    await page.getByTestId('save-changes-btn').click()
+    await page.waitForTimeout(1000)
+
+    // Create class regular
+    for (let i = 0; i < 5; i++) {
+      await page.getByTestId('toggle-group-add-btn').click()
+      await page.getByTestId('regular').click()
+      await page.locator('#tuition').fill(classPrice)
+      await page.locator('#name').fill(`regular${i}${className}`)
+      await page.locator('#quota').fill('100')
+      await page.getByTestId('confirm-class-btn').click()
+      await page.waitForTimeout(3000)
+
+      if (await page.getByTestId('noLessonYet-txt').isVisible()) {
+        await page.getByTestId('add-lesson-btn').click()
+      }
+
+      if (i < 3) {
+        await page.getByTestId('multiple-classes-switch').locator('button').first().click()
+        await page.getByTestId('multiple-applicant-switch').getByRole('switch').click()
+      } else if (i === 3) {
+        await page.getByTestId('dropin-switch').locator('button').click()
+      } else if (i === 4) {
+        await page.getByTestId('free-lesson-switch').locator('button').click()
+      }
+
+      await page.getByTestId('save-changes-btn').click()
+      await page.waitForTimeout(1000)
+    }
+
+    // Create class event & workshop
+    for (let i = 0; i < 2; i++) {
+      await page.getByTestId('toggle-group-add-btn').click()
+      await page.getByTestId('workshop').click()
+      await page.locator('#tuition').fill(classPrice)
+      await page.locator('#name').fill(`event${i}${className}`)
+      await page.locator('#quota').fill('100')
+      await page.getByTestId('confirm-class-btn').click()
+      await page.waitForTimeout(3000)
+
+      if (await page.getByTestId('noSessionYet-txt').isVisible()) {
+        await page.getByTestId('add-session-btn').click()
+      }
+
+      if (i < 1) {
+        await page.getByTestId('multiple-classes-switch').locator('button').first().click()
+      } else if (i === 1) {
+        await page.getByTestId('free-lesson-switch').locator('button').click()
+      }
+
+      await page.getByTestId('save-changes-btn').click()
+      await page.waitForTimeout(1000)
+    }
+
+    // Create class subscription
+    await page.getByTestId('toggle-group-add-btn').click()
+    await page.getByTestId('subscription').click()
+    await page.locator('#tuition').fill(classPrice)
+    await page.locator('#name').fill(`subscription${className}`)
+    await page.locator('#quota').fill('100')
+    await page.getByTestId('confirm-class-btn').click()
+    await page.waitForTimeout(3000)
+    if (await page.locator('#cycle').isVisible()) {
+      await page.locator('#cycle').fill('1')
+      await page.locator('#every').fill('1')
+    }
+    await page.getByTestId('multiple-classes-switch').locator('button').first().click()
+    await page.getByTestId('save-changes-btn').click()
+    await page.waitForTimeout(1000)
+
+    // Publish course
+    await page.getByTestId('publish').click()
+    await page.waitForTimeout(1000)
+    await page.getByTestId('confirm-btn').click()
+
+    // Create coupon
+    await page.locator('#promotion').click()
+    await page.getByTestId('promotion-coupon').click()
+    await page.waitForTimeout(3000)
+
+    const coupons = await page.getByTestId('coupon-card').count()
+    for (let i = 0; i < coupons; i++) {
+      const coupon = page.getByTestId('coupon-card').first()
+      const dropdown = coupon.getByTestId('toggle-dropdown').getByRole('img').first()
+      if (await dropdown.isVisible()) {
+        await dropdown.click()
+        // delete old data test coupon
+        await page.getByRole('menuitem', { name: 'Delete Coupon' }).first().click()
+        await page.getByTestId('confirm-btn').first().click()
+        await page.waitForTimeout(3000)
+      }
+    }
+
+    for (let i = 0; i < 2; i++) {
+      await page.getByTestId('add-coupon-btn').click()
+      await page.locator('#code').fill(`${timestamp}${i}`)
+      if (i === 1) {
+        await page.getByText('%').first().click()
+      }
+      await page.getByTestId('tag-customize').first().click()
+      await page.locator('#amount').fill(fixCoupon)
+      await page.getByTestId('save-coupon-btn').click()
+      await page.waitForTimeout(3000)
+    }
+
+    // Create trial lesson
+    await page.locator('#promotion').click()
+    await page.getByTestId('promotion-trial-lesson').click()
+    await page.waitForTimeout(3000)
+
+    // delete old data test trial lesson
+    const trialLessons = await page.getByTestId('trial-lesson-card').count()
+    for (let i = 0; i < trialLessons; i++) {
+      await page.getByTestId('delete-trial-lesson-btn').first().click()
+      await page.waitForTimeout(1000)
+    }
+
+    // Create trial lesson
+    await page.getByTestId('add-trial-btn').click()
+    await page.getByTestId('trial-lesson-price-input').fill(trialLessonPrice)
+
+    await page.getByTestId('trial-lesson-course-select').locator("button").click()
+    await page.getByTestId('trial-lesson-course-select').locator('div').getByText(courseName).first().click()
+
+    await page.getByTestId('trial-lesson-class-select').click()
+    await page.getByTestId('trial-lesson-class-select').locator('div').getByText(className).first().click()
+
+    await page.getByTestId('save-trial-lesson-btn').click()
+    await page.waitForTimeout(3000)
+
+    // Create social media link
+    await page.locator('#contact').click()
+    await page.getByRole('tab', { name: 'Social Media Links' }).click()
+    await page.waitForTimeout(3000)
+
+    const sosialMedia = await page.getByTestId('social-media-card').count()
+    for (let i = 0; i < sosialMedia; i++) {
+      // delete old data test sosial media
+      await page.getByTestId('delete-icon').first().click()
+      await page.waitForTimeout(1000)
+    }
+    await page.getByTestId('add-social-media-btn').click()
+    await page.getByTestId('input-link-social-media').first().fill(linkSocialMedia)
+    await page.getByTestId('check-icon').first().click()
+  })
+
+  test('Open courses page', async ({ page }) => {
+    await page.goto(`${testUrl}/#courses`)
+    await page.waitForTimeout(3000)
+
+    // course card
+    const card = page.getByTestId(`course-card-${courseName}`)
+
+    await expect(card).toBeVisible()
+    await expect(card.locator('h3').filter({ hasText: courseName })).toBeVisible()
+
+    // check start date
+    const startDate = moment().add(1, 'days').format('YYYY/MM')
+    await expect(card.getByText(`Start at ${startDate}`).first()).toBeVisible()
+
+    // check price
+    await expect(card.getByText(`${classPrice}`)).toBeVisible()
+
+    // check sosial media link
+    await expect(page.getByTestId('link-instagram').first()).toBeVisible()
+
+    // check filter
+    const formFilter = page.locator(`#multi-grouped-select-${timestamp}`).first()
+    await formFilter.click()
+    await formFilter.locator('div').getByText(`tag-${timestamp}`).first().click()
+    await page.getByTestId('search-courses-btn').first().click()
+    await expect(card.locator('h3').filter({ hasText: courseName })).toBeVisible()
+  })
+
+  test('Enroll recurring course with single class', async ({ page }) => {
+    await page.goto(`${testUrl}/@/${courseName}`)
+    await page.waitForTimeout(3000)
+
+    // enroll / open details course
+    await expect(page.getByTestId('enroll-btn').first()).not.toBeEmpty()
+    await expect(page.locator('h1').filter({ hasText: courseName })).not.toBeEmpty()
+    await page.getByTestId('enroll-btn').first().click()
+    await page.waitForTimeout(3000)
+
+    // select options
+    const regularClass = page
+      .locator('button#option')
+      .filter({ hasText: className })
+      .filter({ hasText: 'Recurring' })
+      .first()
+    await expect(regularClass).not.toBeDisabled()
+    await regularClass.click()
+
+    // select weekday
+    await expect(
+      page.getByText('Select the time slot when you want to start your class')
+    ).toBeVisible()
+    await page.locator('button#option').first().click()
+
+    // select first lesson
+    await expect(
+      page.getByText('Select the time slot when you want to start your class')
+    ).toBeVisible()
+    await page.locator('button#option').first().click()
+
+    // select price
+    await expect(page.getByText('Pick a tuition option')).toBeVisible()
+    await expect(
+      page.locator('button#option').filter({ hasText: `${1 * Number(classPrice)}` })
+    ).toBeVisible()
+    await page.locator('button#option').first().click()
+
+    // application form
+    await page.locator("input[name='applicant[0].Name']").fill(studentName)
+    await page.locator("input[name='applicant[0].Email']").fill(studentEmail)
+    await page.locator("input[id='phone']").fill(studentPhone)
+    await page.getByRole('button', { name: 'Confirm' }).click()
+
+    // confirm form
+    await expect(page.getByText('The price is not final yet.')).toBeVisible()
+    await expect(page.getByText(classPrice).first()).toBeVisible()
+    await page.getByRole('button', { name: 'Register and proceed to payment' }).click()
+    await page.waitForTimeout(5000)
+
+    // upload-receipt
+    await expect(page.getByText('Please complete the payment to secure the seat.')).toBeVisible()
+    await expect(page.getByText(studentName).first()).toBeVisible()
+    await expect(page.getByText(studentEmail)).toBeVisible()
+    await expect(page.getByText(courseName).first()).toBeVisible()
+    await expect(page.getByText(classPrice).first()).toBeVisible()
+  })
+
+  test('Enroll regular course with single class', async ({ page }) => {
+    await page.goto(`${testUrl}/@/${courseName}`)
+    await page.waitForTimeout(3000)
+
+    // enroll / open details course
+    await expect(page.getByTestId('enroll-btn').first()).not.toBeEmpty()
+    await expect(page.locator('h1').filter({ hasText: courseName })).not.toBeEmpty()
+    await page.getByTestId('enroll-btn').first().click()
+    await page.waitForTimeout(3000)
+
+    // select options
+    const regularClass = page
+      .locator('button#option')
+      .filter({ hasText: `regular0${className}` })
+      .filter({ hasText: 'Regular' })
+      .first()
+    await expect(regularClass).not.toBeDisabled()
+    await regularClass.click()
+
+    // select timeslot
+    await expect(
+      page.getByText('Select the first lesson for the class you are going to apply for')
+    ).toBeVisible()
+    await page.locator('button#option').first().click()
+
+    // select price
+    await expect(page.getByText('Pick a tuition option')).toBeVisible()
+    await expect(
+      page.locator('button#option').filter({ hasText: `${1 * Number(classPrice)}` })
+    ).toBeVisible()
+    await page.locator('button#option').first().click()
+
+    // application form
+    await page.locator("input[name='applicant[0].Name']").fill(studentName)
+    await page.locator("input[name='applicant[0].Email']").fill(studentEmail)
+    await page.locator("input[id='phone']").fill(studentPhone)
+    await page.getByRole('button', { name: 'Confirm' }).click()
+
+    // confirm form
+    await expect(page.getByText('The price is not final yet.')).toBeVisible()
+    await expect(page.getByText(classPrice).first()).toBeVisible()
+    await page.getByRole('button', { name: 'Register and proceed to payment' }).click()
+    await page.waitForTimeout(5000)
+
+    // upload-receipt
+    await expect(page.getByText('Please complete the payment to secure the seat.')).toBeVisible()
+    await expect(page.getByText(studentName).first()).toBeVisible()
+    await expect(page.getByText(studentEmail)).toBeVisible()
+    await expect(page.getByText(courseName).first()).toBeVisible()
+    await expect(page.getByText(classPrice).first()).toBeVisible()
+  })
+
+  test('Enroll event course with single class', async ({ page }) => {
+    await page.goto(`${testUrl}/@/${courseName}`)
+    await page.waitForTimeout(3000)
+
+    // enroll / open details course
+    await expect(page.getByTestId('enroll-btn').first()).not.toBeEmpty()
+    await expect(page.locator('h1').filter({ hasText: courseName })).not.toBeEmpty()
+    await page.getByTestId('enroll-btn').first().click()
+    await page.waitForTimeout(3000)
+
+    // select options
+    const regularClass = page
+      .locator('button#option')
+      .filter({ hasText: `event0${className}` })
+      .filter({ hasText: 'Event' })
+      .first()
+    await expect(regularClass).not.toBeDisabled()
+    await regularClass.click()
+
+    // select timeslot
+    await expect(
+      page.getByText('Select the time slot of the event which you are applying for')
+    ).toBeVisible()
+    await page.locator('button#option').first().click()
+
+    // application form
+    await page.locator("input[name='applicant[0].Name']").fill(studentName)
+    await page.locator("input[name='applicant[0].Email']").fill(studentEmail)
+    await page.locator("input[id='phone']").fill(studentPhone)
+    await page.getByRole('button', { name: 'Confirm' }).click()
+
+    // confirm form
+    await expect(page.getByText('The price is not final yet.')).toBeVisible()
+    await expect(page.getByText(classPrice).first()).toBeVisible()
+    await page.getByRole('button', { name: 'Register and proceed to payment' }).click()
+    await page.waitForTimeout(5000)
+
+    // upload-receipt
+    await expect(page.getByText('Please complete the payment to secure the seat.')).toBeVisible()
+    await expect(page.getByText(studentName).first()).toBeVisible()
+    await expect(page.getByText(studentEmail)).toBeVisible()
+    await expect(page.getByText(courseName).first()).toBeVisible()
+    await expect(page.getByText(classPrice).first()).toBeVisible()
+  })
+
+  test('Enroll subscription course with single class', async ({ page }) => {
+    await page.goto(`${testUrl}/@/${courseName}`)
+    await page.waitForTimeout(3000)
+
+    // enroll / open details course
+    await expect(page.getByTestId('enroll-btn').first()).not.toBeEmpty()
+    await expect(page.locator('h1').filter({ hasText: courseName })).not.toBeEmpty()
+    await page.getByTestId('enroll-btn').first().click()
+    await page.waitForTimeout(3000)
+
+    // select options
+    const regularClass = page
+      .locator('button#option')
+      .filter({ hasText: className })
+      .filter({ hasText: 'Subscription' })
+      .first()
+    await expect(regularClass).not.toBeDisabled()
+    await regularClass.click()
+
+    // application form
+    await page.locator("input[name='applicant[0].Name']").fill(studentName)
+    await page.locator("input[name='applicant[0].Email']").fill(studentEmail)
+    await page.locator("input[id='phone']").fill(studentPhone)
+    await page.getByRole('button', { name: 'Confirm' }).click()
+
+    // confirm form
+    await expect(page.getByText('The price is not final yet.')).toBeVisible()
+    await expect(page.getByText(classPrice).first()).toBeVisible()
+    await page.getByRole('button', { name: 'Register and proceed to payment' }).click()
+    await page.waitForTimeout(5000)
+
+    // upload-receipt
+    await expect(page.getByText('Please complete the payment to secure the seat.')).toBeVisible()
+    await expect(page.getByText(studentName).first()).toBeVisible()
+    await expect(page.getByText(studentEmail)).toBeVisible()
+    await expect(page.getByText(courseName).first()).toBeVisible()
+    await expect(page.getByText(classPrice).first()).toBeVisible()
+  })
+
+  test('Enroll Course with multiple student', async ({ page }) => {
+    await page.goto(`${testUrl}/@/${courseName}`)
+    await page.waitForTimeout(3000)
+
+    // enroll / open details course
+    await expect(page.getByTestId('enroll-btn').first()).not.toBeEmpty()
+    await expect(page.locator('h1').filter({ hasText: courseName })).not.toBeEmpty()
+    await page.getByTestId('enroll-btn').first().click()
+    await page.waitForTimeout(3000)
+
+    await page
+      .locator('button#option')
+      .filter({ hasText: `regular0${className}` })
+      .filter({ hasText: 'Regular' })
+      .first()
+      .click()
+    await page.locator('button#option').first().click()
+    await page.locator('#numberOfApplicant').fill('2')
+    await page.locator('button#option').first().click()
+
+    // application form
+    await page.locator("input[name='applicant[0].Name']").fill(studentName)
+    await page.locator("input[name='applicant[0].Email']").fill(studentEmail)
+    await page.locator("input[id='phone']").fill(studentPhone)
+
+    await page.getByTestId('next-applicant').first().click()
+
+    await page.locator("input[name='applicant[1].Name']").fill(studentName2)
+    await page.locator("input[name='applicant[1].Email']").fill(studentEmail2)
+    await page.locator("input[id='phone']").fill(studentPhone2)
+
+    await page.getByRole('button', { name: 'Confirm' }).click()
+
+    const totalPrice = `${Number(classPrice) * 2}` // 2 classes
+
+    // confirm form
+    await expect(page.getByText('The price is not final yet.')).toBeVisible()
+    await expect(page.getByText(classPrice).first()).toBeVisible()
+    await expect(page.getByText(totalPrice).first()).toBeVisible()
+    await page.getByRole('button', { name: 'Register and proceed to payment' }).click()
+    await page.waitForTimeout(5000)
+
+    // upload-receipt
+    await expect(page.getByText('Please complete the payment to secure the seat.')).toBeVisible()
+    await expect(page.getByText(studentName).first()).toBeVisible()
+    await expect(page.getByText(studentEmail)).toBeVisible()
+    await expect(page.getByText(courseName).first()).toBeVisible()
+    await expect(page.getByText(classPrice).first()).toBeVisible()
+    await expect(page.getByText(totalPrice).first()).toBeVisible()
+  })
+
+  test('Enroll Course with multiple class: 3 regular classes', async ({ page }) => {
+    await page.goto(`${testUrl}/@/${courseName}`)
+    await page.waitForTimeout(3000)
+
+    // enroll / open details course
+    await expect(page.getByTestId('enroll-btn').first()).not.toBeEmpty()
+    await expect(page.locator('h1').filter({ hasText: courseName })).not.toBeEmpty()
+    await page.getByTestId('enroll-btn').first().click()
+    await page.waitForTimeout(3000)
+
+    // enable multi class
+    await expect(page.locator('#selected-multi-class')).not.toBeVisible()
+    await page.getByTestId('multiple-class-switch').locator('button').click()
+    await expect(page.locator('#selected-multi-class')).toBeVisible()
+
+    for (let i = 0; i < 3; i++) {
+      await page
+        .locator('button#option')
+        .filter({ hasText: `regular${i}${className}` })
+        .filter({ hasText: 'Regular' })
+        .first()
+        .click()
+      await page.locator('button#option').first().click()
+      await page.locator('button#option').first().click()
+    }
+
+    // proceed
+    await page.getByTestId('proceed-btn').click()
+
+    // application form
+    await page.locator("input[name='applicant[0].Name']").fill(studentName)
+    await page.locator("input[name='applicant[0].Email']").fill(studentEmail)
+    await page.locator("input[id='phone']").fill(studentPhone)
+    await page.getByRole('button', { name: 'Confirm' }).click()
+
+    const totalPrice = `${Number(classPrice) * 3}` // 3 classes
+
+    // confirm form
+    await expect(page.getByText('The price is not final yet.')).toBeVisible()
+    await expect(page.getByText(classPrice).first()).toBeVisible()
+    await expect(page.getByText(totalPrice).first()).toBeVisible()
+    await page.getByRole('button', { name: 'Register and proceed to payment' }).click()
+    await page.waitForTimeout(5000)
+
+    // upload-receipt
+    await expect(page.getByText('Please complete the payment to secure the seat.')).toBeVisible()
+    await expect(page.getByText(studentName).first()).toBeVisible()
+    await expect(page.getByText(studentEmail)).toBeVisible()
+    await expect(page.getByText(courseName).first()).toBeVisible()
+    await expect(page.getByText(classPrice).first()).toBeVisible()
+    await expect(page.getByText(totalPrice).first()).toBeVisible()
+  })
+
+  test('Enroll Course with multiple class: regular, event, recurring + coupon', async ({
+    page,
+  }) => {
+    await page.goto(`${testUrl}/@/${courseName}`)
+    await page.waitForTimeout(3000)
+
+    // enroll / open details course
+    await expect(page.getByTestId('enroll-btn').first()).not.toBeEmpty()
+    await expect(page.locator('h1').filter({ hasText: courseName })).not.toBeEmpty()
+    await page.getByTestId('enroll-btn').first().click()
+    await page.waitForTimeout(3000)
+
+    // enable multi class
+    await expect(page.locator('#selected-multi-class')).not.toBeVisible()
+    await page.getByTestId('multiple-class-switch').locator('button').click()
+    await expect(page.locator('#selected-multi-class')).toBeVisible()
+
+    // data 1: select options
+    await page
+      .locator('button#option')
+      .filter({ hasText: className })
+      .filter({ hasText: 'Regular' })
+      .first()
+      .click()
+    // data 1: select timeslot
+    await page.locator('button#option').first().click()
+    // data 1: select price
+    await page.locator('button#option').first().click()
+
+    // data 2: select options
+    await page
+      .locator('button#option')
+      .filter({ hasText: className })
+      .filter({ hasText: 'Event' })
+      .first()
+      .click()
+    // data 2: select timeslot
+    await page.locator('button#option').first().click()
+
+    // data 3: select options
+    await page
+      .locator('button#option')
+      .filter({ hasText: className })
+      .filter({ hasText: 'Recurring' })
+      .first()
+      .click()
+
+    // data 3: select weekday
+    await page.locator('button#option').first().click()
+
+    // data 3: select first lesson
+    await page.locator('button#option').first().click()
+
+    // data 3: select price
+    await page.locator('button#option').first().click()
+
+    // proceed
+    await page.getByTestId('proceed-btn').click()
+
+    // application form
+    await page.locator("input[name='applicant[0].Name']").fill(studentName)
+    await page.locator("input[name='applicant[0].Email']").fill(studentEmail)
+    await page.locator("input[id='phone']").fill(studentPhone)
+    await page.getByRole('button', { name: 'Confirm' }).click()
+
+    const totalPrice = `${Number(classPrice) * 3}` // 3 classes
+
+    // confirm form
+    await expect(page.getByText('The price is not final yet.')).toBeVisible()
+    await expect(page.getByText(classPrice).first()).toBeVisible()
+    await expect(page.getByText(totalPrice).first()).toBeVisible()
+    await page.getByRole('button', { name: 'Register and proceed to payment' }).click()
+    await page.waitForTimeout(5000)
+
+    // upload-receipt
+    await expect(page.getByText('Please complete the payment to secure the seat.')).toBeVisible()
+    await expect(page.getByText(studentName).first()).toBeVisible()
+    await expect(page.getByText(studentEmail)).toBeVisible()
+    await expect(page.getByText(courseName).first()).toBeVisible()
+    await expect(page.getByText(classPrice).first()).toBeVisible()
+    await expect(page.getByText(totalPrice).first()).toBeVisible()
+    await page.waitForTimeout(1000)
+
+    // input coupon
+    await page.locator('#couponCode').fill(`${timestamp}1`)
+    await page.getByTestId('check-coupon-btn').click()
+    await page.waitForTimeout(1000)
+    // check after coupon is applied
+    await expect(
+      page.getByText(`The coupon is successfully applied: ${timestamp}1`).first()
+    ).toBeVisible()
+    await expect(page.locator('#price-0').first()).toBeVisible()
+  })
+
+  test('Enroll Course: Regular Course + Drop In', async ({ page }) => {
+    await page.goto(`${testUrl}/@/${courseName}`)
+    await page.waitForTimeout(3000)
+
+    // enroll / open details course
+    await expect(page.getByTestId('enroll-btn').first()).not.toBeEmpty()
+    await expect(page.locator('h1').filter({ hasText: courseName })).not.toBeEmpty()
+    await page.getByTestId('enroll-btn').first().click()
+    await page.waitForTimeout(3000)
+
+    // select options
+    const regularClass = page
+      .locator('button#option')
+      .filter({ hasText: `regular3${className}` })
+      .filter({ hasText: 'Regular' })
+      .first()
+    await expect(regularClass).not.toBeDisabled()
+    await regularClass.click()
+
+    // select timeslot
+    await expect(
+      page.getByText('Select the first lesson for the class you are going to apply for')
+    ).toBeVisible()
+    await page.locator('button#option').first().click()
+
+    // select price
+    await expect(page.getByText('Pick a tuition option')).toBeVisible()
+    await expect(
+      page.locator('button#option').filter({ hasText: `${1 * Number(classPrice)}` })
+    ).toBeVisible()
+    await page.locator('button#option').first().click()
+
+    // application form
+    await page.locator("input[name='applicant[0].Name']").fill(studentName)
+    await page.locator("input[name='applicant[0].Email']").fill(studentEmail)
+    await page.locator("input[id='phone']").fill(studentPhone)
+    await page.getByRole('button', { name: 'Confirm' }).click()
+
+    // confirm form
+    await expect(page.getByText('The price is not final yet.')).toBeVisible()
+    await expect(page.getByText(classPrice).first()).toBeVisible()
+    await page.getByRole('button', { name: 'Register and proceed to payment' }).click()
+    await page.waitForTimeout(5000)
+
+    // upload-receipt
+    await expect(page.getByText('Please complete the payment to secure the seat.')).toBeVisible()
+    await expect(page.getByText(studentName).first()).toBeVisible()
+    await expect(page.getByText(studentEmail)).toBeVisible()
+    await expect(page.getByText(courseName).first()).toBeVisible()
+    await expect(page.getByText(classPrice).first()).toBeVisible()
+  })
+
+  test('Enroll Course: Free Regular Course', async ({ page }) => {
+    await page.goto(`${testUrl}/@/${courseName}`)
+    await page.waitForTimeout(3000)
+
+    // enroll / open details course
+    await expect(page.getByTestId('enroll-btn').first()).not.toBeEmpty()
+    await expect(page.locator('h1').filter({ hasText: courseName })).not.toBeEmpty()
+    await page.getByTestId('enroll-btn').first().click()
+    await page.waitForTimeout(3000)
+
+    // select options
+    const regularClass = page
+      .locator('button#option')
+      .filter({ hasText: `regular4${className}` })
+      .filter({ hasText: 'Regular' })
+      .first()
+    await expect(regularClass).not.toBeDisabled()
+    await regularClass.click()
+
+    // select timeslot
+    await expect(
+      page.getByText('Select the first lesson for the class you are going to apply for')
+    ).toBeVisible()
+    await page.locator('button#option').first().click()
+
+    // select price
+    await expect(page.getByText('Pick a tuition option')).toBeVisible()
+    await expect(page.locator('button#option').filter({ hasText: `0` })).toBeVisible()
+    await page.locator('button#option').first().click()
+
+    // application form
+    await page.locator("input[name='applicant[0].Name']").fill(studentName)
+    await page.locator("input[name='applicant[0].Email']").fill(studentEmail)
+    await page.locator("input[id='phone']").fill(studentPhone)
+    await page.getByRole('button', { name: 'Confirm' }).click()
+
+    // confirm form
+    await expect(page.getByText('The price is not final yet.')).toBeVisible()
+    await page.getByRole('button', { name: 'Complete application' }).click()
+    await page.waitForTimeout(5000)
+
+    // upload-receipt
+    await expect(page.getByText('Your application is successful.').first()).toBeVisible()
+    await expect(page.getByText(studentName).first()).toBeVisible()
+    await expect(page.getByText(studentEmail).first()).toBeVisible()
+    await expect(page.getByText(courseName).first()).toBeVisible()
+  })
+
+  test('Enroll Course: Free Event', async ({ page }) => {
+    await page.goto(`${testUrl}/@/${courseName}`)
+    await page.waitForTimeout(3000)
+
+    // enroll / open details course
+    await expect(page.getByTestId('enroll-btn').first()).not.toBeEmpty()
+    await expect(page.locator('h1').filter({ hasText: courseName })).not.toBeEmpty()
+    await page.getByTestId('enroll-btn').first().click()
+    await page.waitForTimeout(3000)
+
+    // select options
+    const regularClass = page
+      .locator('button#option')
+      .filter({ hasText: `event1${className}` })
+      .filter({ hasText: 'Event' })
+      .first()
+    await expect(regularClass).not.toBeDisabled()
+    await regularClass.click()
+
+    // select timeslot
+    await expect(
+      page.getByText('Select the time slot of the event which you are applying for')
+    ).toBeVisible()
+    await page.locator('button#option').first().click()
+
+    // application form
+    await page.locator("input[name='applicant[0].Name']").fill(studentName)
+    await page.locator("input[name='applicant[0].Email']").fill(studentEmail)
+    await page.locator("input[id='phone']").fill(studentPhone)
+    await page.getByRole('button', { name: 'Confirm' }).click()
+
+    // confirm form
+    await expect(page.getByText('The price is not final yet.')).toBeVisible()
+    await page.getByRole('button', { name: 'Complete application' }).click()
+    await page.waitForTimeout(5000)
+
+    // upload-receipt
+    await expect(page.getByText('Your application is successful.').first()).toBeVisible()
+    await expect(page.getByText(studentName).first()).toBeVisible()
+    await expect(page.getByText(studentEmail).first()).toBeVisible()
+    await expect(page.getByText(courseName).first()).toBeVisible()
+  })
+
+  test('Enroll Course: Regular class + coupon', async ({ page }) => {
+    await page.goto(`${testUrl}/@/${courseName}`)
+    await page.waitForTimeout(3000)
+
+    // check apply button is available
+    await expect(page.getByTestId('enroll-btn').first()).not.toBeEmpty()
+
+    // enroll / open details course
+    await expect(page.getByTestId('enroll-btn').first()).not.toBeEmpty()
+    await expect(page.locator('h1').filter({ hasText: courseName })).not.toBeEmpty()
+    await page.getByTestId('enroll-btn').first().click()
+    await page.waitForTimeout(3000)
+
+    // select options
+    const regularClass = page
+      .locator('button#option')
+      .filter({ hasText: `regular0${className}` })
+      .filter({ hasText: 'Regular' })
+      .first()
+    await expect(regularClass).not.toBeDisabled()
+    await regularClass.click()
+
+    // select timeslot
+    await expect(
+      page.getByText('Select the first lesson for the class you are going to apply for')
+    ).toBeVisible()
+    await page.locator('button#option').first().click()
+
+    // select price
+    await expect(page.getByText('Pick a tuition option')).toBeVisible()
+    await expect(
+      page.locator('button#option').filter({ hasText: `${1 * Number(classPrice)}` })
+    ).toBeVisible()
+    await page.locator('button#option').first().click()
+
+    // application form
+    await page.locator("input[name='applicant[0].Name']").fill(studentName)
+    await page.locator("input[name='applicant[0].Email']").fill(studentEmail)
+    await page.locator("input[id='phone']").fill(studentPhone)
+    await page.getByRole('button', { name: 'Confirm' }).click()
+
+    // confirm form
+    await expect(page.getByText('The price is not final yet.')).toBeVisible()
+    await expect(page.getByText(classPrice).first()).toBeVisible()
+    await page.getByRole('button', { name: 'Register and proceed to payment' }).click()
+    await page.waitForTimeout(5000)
+
+    // upload-receipt
+    await expect(page.getByText('Please complete the payment to secure the seat.')).toBeVisible()
+    await expect(page.getByText(studentName).first()).toBeVisible()
+    await expect(page.getByText(studentEmail)).toBeVisible()
+    await expect(page.getByText(courseName).first()).toBeVisible()
+    await expect(page.getByText(classPrice).first()).toBeVisible()
+
+    // input coupon
+    await page.locator('#couponCode').fill(`${timestamp}0`)
+    await page.getByTestId('check-coupon-btn').click()
+    await page.waitForTimeout(1000)
+    // check after coupon is applied
+    await expect(
+      page.getByText(`The coupon is successfully applied: ${timestamp}0`).first()
+    ).toBeVisible()
+    await expect(page.getByText(`${Number(classPrice) - Number(fixCoupon)}`).first()).toBeVisible()
+  })
+})

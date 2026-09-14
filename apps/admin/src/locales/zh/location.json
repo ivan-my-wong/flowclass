@@ -18,7 +18,6 @@
     "newLocation": "新增地點",
     "updateLocation": "更新地點",
     "saveAction": "儲存",
-    "cancelAction": "取消",
     "name": "名稱",
     "namePlaceholder": "輸入地點名稱",
     "capacity": "容納人數",
@@ -35,10 +34,7 @@
   "messages": {
     "createLocationSuccess": "地點創建成功",
     "updateLocationSuccess": "地點更新成功",
-    "deleteLocationSuccess": "地點刪除成功",
-    "createLocationError": "創建地點失敗",
-    "updateLocationError": "更新地點失敗",
-    "deleteLocationError": "刪除地點失敗"
+    "deleteLocationSuccess": "地點刪除成功"
   },
   "confirm": {
     "deleteLocation": "刪除地點",

@@ -12,7 +12,7 @@ import googleCalendarLogo from '@/assets/companies/google_calendar_logo.png'
 import googleMeetLogo from '@/assets/companies/google_meet_logo.png'
 import googleSheetLogo from '@/assets/companies/google_sheet_logo.png'
 import stripeLogo from '@/assets/companies/stripe_logo.png'
-import twilioLogo from '@/assets/companies/twilio_logo.png'
+import whatsappLogo from '@/assets/companies/whatsapp_logo.png'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -24,13 +24,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog'
-import { STALE_TIME } from '@/constants/common'
 import { useIntegrationGoogle } from '@/hooks/useIntegrationGoogle'
+import useMetaEmbeddedSignup from '@/hooks/useMetaEmbeddedSignup'
 import usePayoutData from '@/hooks/usePayoutData'
 import useSchoolData from '@/hooks/useSchoolData'
 import ContentLayout from '@/layouts/ContentLayout'
 import { schoolSubscriptionState } from '@/stores/schoolSubscriptionData'
-import { StripeConnectStatus } from '@/types/stripe-connect'
+import { userState } from '@/stores/userData'
+import { userPermissionState } from '@/stores/userPermissionData'
+import { StripeConnectStatus } from '@/types/schoolSubscriptionPlan'
+import { hasWhatsappAccess } from '@/utils/subscription-plan.utils'
 
 export enum IntegrationType {
   ALL = 'types.all',
@@ -39,12 +42,11 @@ export enum IntegrationType {
   CALENDAR = 'types.calendar',
   COMMUNICATION = 'types.communication',
   STORAGE = 'types.storage',
-  ACCOUNTING = 'types.accounting',
   // ANALYTICS = 'types.analytics',
 }
 
 export enum IntegrationPlatform {
-  TWILIO = 'twilio',
+  WHATSAPP = 'whatsapp',
   STRIPE = 'stripe',
   GOOGLE_CALENDAR = 'googleCalendar',
   GOOGLE_MEET = 'googleMeet',
@@ -76,13 +78,13 @@ export const defaultIntegrations: Integration[] = [
     isEnabled: true,
   },
   {
-    id: IntegrationPlatform.TWILIO,
-    name: 'Twilio WhatsApp',
+    id: IntegrationPlatform.WHATSAPP,
+    name: 'WhatsApp Business (Meta)',
     type: IntegrationType.COMMUNICATION,
     description: 'descriptions.twilioWhatsapp',
-    logo: twilioLogo,
+    logo: whatsappLogo,
     isActive: false,
-    configureUrl: '/integrations/twilio',
+    configureUrl: '/integrations/whatsapp',
     isEnabled: true,
   },
   // {
@@ -131,6 +133,8 @@ const IntegrationsPage = (): JSX.Element => {
   const { t } = useTranslation(['integration'])
   const [isOpenTwilioDialog, setOpenTwilioDialog] = useState<boolean>(false)
   const { activePlan } = useRecoilValue(schoolSubscriptionState)
+  const userPermission = useRecoilValue(userPermissionState)
+  const currentUser = useRecoilValue(userState)
   const navigate = useNavigate()
   const { useFetchStripeConnectDetail } = usePayoutData()
   const stripeDetailResult = useFetchStripeConnectDetail()
@@ -138,8 +142,8 @@ const IntegrationsPage = (): JSX.Element => {
   const { schoolData } = useSchoolData()
   const currentInstitutionId = schoolData.currentSchool?.id || 0
 
-  const { useFetchCurrentSchoolNotificationsSetting } = useSchoolData()
-  const { data: wtsSetting } = useFetchCurrentSchoolNotificationsSetting()
+  const { useGetEmbeddedSignup } = useMetaEmbeddedSignup()
+  const metaEmbeddedSignupQuery = useGetEmbeddedSignup()
 
   const { driveIntegrationStatus } = useIntegrationGoogle()
 
@@ -149,8 +153,8 @@ const IntegrationsPage = (): JSX.Element => {
   const checkPermission = (integration: Integration) => {
     const { id, configureUrl } = integration
     if (configureUrl) {
-      if (id === 'twilio') {
-        if (activePlan.notificationChannels?.TWILIO_WHATSAPP) {
+      if (id === IntegrationPlatform.WHATSAPP) {
+        if (hasWhatsappAccess(userPermission, currentUser, activePlan)) {
           navigate(configureUrl)
         } else {
           setOpenTwilioDialog(true)
@@ -162,11 +166,9 @@ const IntegrationsPage = (): JSX.Element => {
   }
 
   useEffect(() => {
-    const isTwilioActive =
-      !!wtsSetting &&
-      wtsSetting?.wtsApiToken !== '' &&
-      wtsSetting?.wtsApiSid !== '' &&
-      wtsSetting?.wtsApiPhoneNumber !== ''
+    const isWhatsappActive =
+      metaEmbeddedSignupQuery.data?.status?.toLowerCase() === 'connected' ||
+      metaEmbeddedSignupQuery.data?.status?.toLowerCase() === 'completed'
 
     const isStripeActive =
       stripeDetailResult.data?.status === StripeConnectStatus.COMPLETE
@@ -174,6 +176,7 @@ const IntegrationsPage = (): JSX.Element => {
     const isGoogleDriveActive = !!driveIntegrationStatus.data?.isConnected
 
     const isGoogleDriveAvailable = !!driveIntegrationStatus.data
+
     setIntegrationList(
       defaultIntegrations.map(integration => {
         let isActive = false
@@ -181,8 +184,8 @@ const IntegrationsPage = (): JSX.Element => {
 
         if (integration.id === IntegrationPlatform.STRIPE) {
           isActive = isStripeActive
-        } else if (integration.id === IntegrationPlatform.TWILIO) {
-          isActive = isTwilioActive
+        } else if (integration.id === IntegrationPlatform.WHATSAPP) {
+          isActive = isWhatsappActive
         } else if (integration.id === IntegrationPlatform.GOOGLE_DRIVE) {
           isActive = isGoogleDriveActive
           isEnabled = isGoogleDriveAvailable
@@ -195,13 +198,34 @@ const IntegrationsPage = (): JSX.Element => {
         }
       })
     )
-  }, [wtsSetting, stripeDetailResult.data, driveIntegrationStatus.data])
+  }, [
+    metaEmbeddedSignupQuery.data,
+    stripeDetailResult.data,
+    driveIntegrationStatus.data,
+  ])
 
   return (
     <>
       <ContentLayout
         leftHeader={<h1 className="text-2xl font-bold">{t('title')}</h1>}
       >
+        {/* <div className="flex gap-2 border-b border-gray-200 mb-6">
+        {Object.values(IntegrationType).map(type => (
+          <button
+            key={type}
+            type="button"
+            className={`px-4 py-2 border-b-2 ${
+              activeTab === type
+                ? 'border-blue-500 text-blue-500'
+                : 'border-transparent'
+            } bg-transparent cursor-pointer`}
+            onClick={() => setActiveTab(type)}
+          >
+            {getTranslatedType(type)}
+          </button>
+        ))}
+      </div> */}
+
         <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
           {integrationList.map(integration => {
             const getCardClassName = () => {

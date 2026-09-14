@@ -12,8 +12,10 @@ import { HeaderBackButtonStatus } from '@/components/TabWithListAndButton/Header
 import { Button } from '@/components/ui/Button'
 import { QUERY_KEY } from '@/constants/queryKey'
 import usePromotionData from '@/hooks/usePromotionData'
+import usePlanData from '@/hooks/useSubscriptionPlanData'
 import ContentLayout from '@/layouts/ContentLayout'
 import { promotionState } from '@/stores/promotionData'
+import { subscriptionDialogOpenState } from '@/stores/schoolSubscriptionData'
 import { CouponStatusEnum, DiscountType, PromotionType } from '@/types/coupon'
 
 import CouponCard from '../components/CouponCard'
@@ -27,7 +29,17 @@ const CouponCodePage = (): JSX.Element => {
   const fetchCouponDataResult = useFetchAllCouponData()
   const [isOpenCreatePage, setIsOpenCreatePage] = useState<boolean>(false)
   const { isLoading, isError, isSuccess, isIdle, data } = fetchCouponDataResult
+  const { checkSubscriptionAccess } = usePlanData()
+  const [, setShowSubscriptionPopup] = useRecoilState(
+    subscriptionDialogOpenState
+  )
+
   const hasCouponAccess = true
+  // Coupon should be free for all users
+  // const hasCouponAccess = checkSubscriptionAccess(
+  //   'promotionTier',
+  //   PromotionType.COUPON_DISCOUNT
+  // )
 
   const [searchParams] = useSearchParams()
   const idStudent = searchParams.get('student')
@@ -54,7 +66,16 @@ const CouponCodePage = (): JSX.Element => {
     <Box>
       <Button
         data-testid="add-coupon-btn"
-        onClick={() => setIsOpenCreatePage(!isOpenCreatePage)}
+        onClick={() => {
+          if (hasCouponAccess) {
+            setIsOpenCreatePage(!isOpenCreatePage)
+          } else {
+            setShowSubscriptionPopup({
+              open: true,
+              message: t(`subscription:subscriptionDialog.upgradePlan`),
+            })
+          }
+        }}
       >
         {t('common:action.add')}
       </Button>

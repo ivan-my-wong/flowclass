@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import { useTranslation } from 'react-i18next'
 
 import { PaymentMethodsEnum, PaymentState } from '@/constants/payment'
+import { theme } from '@/styles'
 import { ChartDate } from '@/types/chartDate.type'
 import { EnrollConfirmState, Invoice } from '@/types/enrollCourse'
 import { CalculatedMetrics, ChartDataType, MetricConfig } from '@/types/metrics'
@@ -240,7 +241,7 @@ const buildChartOptions = (
         type: 'line',
         data: chartData.data,
         name: title,
-        color: 'var(--color-primary)',
+        color: theme.colors.primary.toString(), // Primary color (blue[600])
         marker: {
           enabled: false,
           radius: 4,
@@ -357,7 +358,7 @@ const useStudentMetrics = (
                   return (
                     checkDateBetween(new Date(invoice.createdAt), chartDate) &&
                     [
-                      PaymentState.PENDING,
+                      PaymentState.UNPAID,
                       PaymentState.PENDING,
                       PaymentState.SUBMITTED,
                     ].includes(invoice.paymentState)

@@ -1,48 +1,30 @@
 import { Root } from '@radix-ui/react-separator'
-
-import { cn } from '@/utils/cn'
+import { ComponentProps, styled } from '@stitches/react'
 
 type SeparatorProps = {
   orientation?: 'horizontal' | 'vertical'
   margin?: 'small' | 'medium' | 'large'
   thickness?: 'small' | 'medium' | 'large'
-} & React.ComponentProps<typeof Root>
+} & ComponentProps<typeof SeparatorRoot>
 
-const marginClasses = {
-  small: 'my-1',
-  medium: 'my-2',
-  large: 'my-4',
-}
+const Separator = (props: SeparatorProps) => <SeparatorRoot {...props} />
 
-const thicknessClasses = {
-  small: 'py-0.5',
-  medium: 'py-px',
-  large: 'py-0.5',
-}
-
-const Separator = (props: SeparatorProps) => {
-  const {
-    orientation = 'horizontal',
-    margin,
-    thickness,
-    className,
-    ...rest
-  } = props
-
-  return (
-    <Root
-      orientation={orientation}
-      className={cn(
-        'bg-text-disabled',
-        orientation === 'horizontal' && 'h-px w-full',
-        orientation === 'vertical' && 'h-full w-px',
-        margin && marginClasses[margin],
-        thickness && thicknessClasses[thickness],
-        className
-      )}
-      {...rest}
-    />
-  )
-}
+const SeparatorRoot = styled(Root, {
+  backgroundColor: '$textDisabled',
+  '&[data-orientation=horizontal]': { height: 1, width: '100%' },
+  '&[data-orientation=vertical]': { height: '100%', width: 1 },
+  variants: {
+    margin: {
+      small: { margin: '$1 0' },
+      medium: { margin: '$2 0' },
+      large: { margin: '$4 0' },
+    },
+    thickness: {
+      small: { padding: '0.5px 0' },
+      medium: { padding: '1px 0' },
+      large: { padding: '2px 0' },
+    },
+  },
+})
 
 export default Separator

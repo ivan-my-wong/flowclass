@@ -35,6 +35,8 @@ const AvailabilityListCard = ({
     UserRole.MasterAdmin,
     UserRole.SiteAdmin,
     UserRole.SchoolAdmin,
+    UserRole.Instructor,
+    UserRole.Operations,
   ].includes(userPermission)
 
   const formatDateRange = (availability: Availability): string => {

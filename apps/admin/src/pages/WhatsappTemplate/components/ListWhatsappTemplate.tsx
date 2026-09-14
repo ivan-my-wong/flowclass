@@ -88,7 +88,7 @@ const ListWhatsappTemplate = (): JSX.Element => {
       <AlertBox
         content={t('setting:whatsappSetting.reminder')}
         actionText={t('setting:whatsappSetting.whatsAppApiSettings') as string}
-        actionLink="/integrations/twilio"
+        actionLink="/integrations/whatsapp"
       />
       <FilterWhatsappTemplate params={params} setParams={setParams} />
       <div className="flex flex-col gap-4 justify-start items-start w-full">

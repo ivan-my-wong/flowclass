@@ -13,7 +13,6 @@ import {
 } from './enrollCourse'
 import { type PriceOption } from './regularClass'
 import { type StudentSchedule } from './student'
-import { BulkSendDocumentStatus } from './templateManagement'
 
 // Minimal interface to break circular reference with templateManagement.ts
 export interface PickedInvoiceCampaign {
@@ -45,10 +44,6 @@ export type InvoiceStudent = {
   email: string
   phone: string
   subTotal?: number
-  /** Actual stored discount amount from the linked invoice row (edit mode only) */
-  discountAmount?: number
-  /** Actual stored additional fee from the linked invoice row (edit mode only) */
-  additionalFee?: number
   totalDiscount?: number
   total: number
   invoiceRemark: string
@@ -56,18 +51,11 @@ export type InvoiceStudent = {
   invoiceSplitType: InvoiceSplitType
   invoiceSplitItems: InvoiceSplit[]
   isSendToParent: boolean
-  isSendToStudent?: boolean
   isPayByCredit: boolean
   usedBalance: number
   isStudentParent: boolean
   childOfUserAliasId: number | null
   enrollMetaId?: string
-  paymentDate?: Date | null
-  invoicePromotionsUsed?: Array<{
-    promotionType: string
-    promotionId: number | null
-    amount: number
-  }>
 }
 
 export type InvoiceClassType = {
@@ -110,7 +98,6 @@ export enum PromotionTypeItem {
   BUNDLE = 'bundle',
   REFERRAL = 'referral',
   MANUAL = 'manual',
-  PACKAGE = 'package',
 }
 export enum InvoiceSplitType {
   SINGLE = 'single',
@@ -148,10 +135,6 @@ export type AppliedPromotion = {
   // Bundle discount specific fields
   retroactiveDiscount?: number // Discount amount on past payments
   courseNames?: string[] // List of course names used for the discount
-  // Package discount specific fields
-  packageDiscountPerLesson?: number // Per-lesson discount amount
-  classId?: number // Class this package discount applies to
-  qualifiedLessonCount?: number // Number of lessons that qualified for package discount
 }
 
 export type AllPromotionsType = PossiblePromotionsType
@@ -282,11 +265,9 @@ export type InvoiceCampaignDetailDto = {
     userId: number
     userAliasId: number
   }[]
-  paymentDate?: string | null
 }
 
 export interface RecipientDto {
-  userAliasId?: number
   name: string
   email?: string
   phone: string
@@ -306,7 +287,6 @@ export type InvoiceCampaignDto = SendInvoiceBaseDto & {
   isCombined: boolean
   title: string
   isDraft: boolean
-  status?: BulkSendDocumentStatus
   invoices: InvoiceCampaignDetailDto[]
   combinedInvoice?: InvoiceCampaignDetailDto
   splitType?: InvoiceSplitType
@@ -340,11 +320,6 @@ export interface SendingInvoiceData {
   amount?: string
   status: SendingCampaignStatus
   message?: string
-  invoiceId?: number
-  proofToken?: string
-  userAliasId?: number
-  userId?: number
-  institutionId?: number
 }
 export interface SendingInvoiceCampaignState {
   eventSource: EventSource | null
@@ -415,10 +390,4 @@ export type ResendInvoiceDto = {
 
 export type SendInvoiceDirectlyDto = SendInvoiceBaseDto & {
   invoiceId: number
-}
-
-export type SyncEnrollCoursesDiffItemDto = {
-  invoiceId: number
-  addedClasses?: MetaRef[]
-  removedClassIds?: number[]
 }

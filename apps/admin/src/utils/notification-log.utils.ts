@@ -8,20 +8,25 @@ export const filterNotifications = (
   filters: FilterCriteriaType
 ): NotificationRecordItem[] => {
   const {
+    selectedNotificationAutomationFlow,
     selectedNotificationWhatsappTemplate,
     selectedNotificationType,
     selectedNotificationStatus,
   } = filters
+  const notificationAutomationFlow = selectedNotificationAutomationFlow || []
   const notificationWhatsappTemplate =
     selectedNotificationWhatsappTemplate || []
-  if (notifications.some(n => !n)) {
-    console.warn(
-      'Unexpected null notifications detected:',
-      notifications.filter(n => !n)
-    )
-  }
-  return notifications
+
+  return (notifications || [])
     .filter(item => {
+      if (!item) return false
+
+      const isAutomationFlowMatches =
+        notificationAutomationFlow.length > 0
+          ? notificationAutomationFlow.some(
+              data => data.value === item.automationFlow?.id
+            )
+          : true
       const isWhatsappTemplateMatches =
         notificationWhatsappTemplate.length > 0
           ? notificationWhatsappTemplate.some(
@@ -30,23 +35,29 @@ export const filterNotifications = (
           : true
 
       const isTypeMatches =
-        selectedNotificationType.length > 0
+        selectedNotificationType && selectedNotificationType.length > 0
           ? selectedNotificationType.some(
               type => type.value === item.notificationType
             )
           : true
 
       const isStatusMatches =
-        selectedNotificationStatus.length > 0
+        selectedNotificationStatus && selectedNotificationStatus.length > 0
           ? selectedNotificationStatus.some(
               status => status.value === item.notificationStatus
             )
           : true
-      return isWhatsappTemplateMatches && isTypeMatches && isStatusMatches
+
+      return (
+        isAutomationFlowMatches &&
+        isWhatsappTemplateMatches &&
+        isTypeMatches &&
+        isStatusMatches
+      )
     })
     .sort((a, b) => {
-      const dateA = dayjs(a.createdAt)
-      const dateB = dayjs(b.createdAt)
+      const dateA = dayjs(a.sentAt || a.createdAt)
+      const dateB = dayjs(b.sentAt || b.createdAt)
       return dateB.diff(dateA)
     })
 }

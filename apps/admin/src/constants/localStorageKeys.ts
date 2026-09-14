@@ -5,5 +5,6 @@ export const LocalStorageKeys = {
   Localities: 'localities',
   FfSessionId: 'ff-session-id',
   FfBrowserId: 'ff-browser-id',
+  Firebase: 'Firebase',
   GoogleCalendarTokens: 'google-calendar-tokens',
 }

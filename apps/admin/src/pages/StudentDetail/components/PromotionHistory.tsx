@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 
+import { styled } from '@stitches/react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useQueryClient } from 'react-query'
 import { useRecoilState, useRecoilValue } from 'recoil'
@@ -13,12 +14,14 @@ import Heading from '@/components/Texts/Heading'
 import Box from '@/components/ui/Box'
 import { Button } from '@/components/ui/Button'
 import { QUERY_KEY } from '@/constants/queryKey'
+import usePlanData from '@/hooks/useSubscriptionPlanData'
 import CouponCard from '@/pages/Promotion/components/CouponCard'
 import CreateCouponCode from '@/pages/Promotion/Coupons/CreateCouponCode'
 import WhatsappButton from '@/pages/StudentCRM/components/WhatsappButton'
 import { promotionState } from '@/stores/promotionData'
 import { requiredParamsState } from '@/stores/requiredParamsData'
-import { Coupon, CouponStatusEnum } from '@/types/coupon'
+import { subscriptionDialogOpenState } from '@/stores/schoolSubscriptionData'
+import { Coupon, CouponStatusEnum, PromotionType } from '@/types/coupon'
 import { StudentUser } from '@/types/user'
 import { formatTs } from '@/utils/timeFormat'
 
@@ -35,11 +38,17 @@ const Promotion = ({ personalInfo, tabName }: Props): React.ReactElement => {
   const [isLoadData, setIsLoadData] = useState(false)
   const { t } = useTranslation()
   const requiredParams = useRecoilValue(requiredParamsState)
+  const { checkSubscriptionAccess } = usePlanData()
+  const [, setShowSubscriptionPopup] = useRecoilState(
+    subscriptionDialogOpenState
+  )
+
   const handleCreateCoupon = () => {
     const urlSearchParams = searchParams.toString()
     setSearchParams(prev => ({
       ...prev,
       back: `/student-record/${studentId}?${urlSearchParams}`,
+      userAliasId: studentId || requiredParams.userId,
       userId: requiredParams.userId,
       name: personalInfo.firstName,
     }))
@@ -53,6 +62,7 @@ const Promotion = ({ personalInfo, tabName }: Props): React.ReactElement => {
     () => {
       const params = {
         institutionId: requiredParams.institutionId,
+        userAliasId: Number(studentId) || undefined,
         userId: requiredParams.userId,
         siteId: requiredParams.siteId ?? 0,
       }
@@ -79,9 +89,9 @@ const Promotion = ({ personalInfo, tabName }: Props): React.ReactElement => {
 
   if (isLoading)
     return (
-      <div className="flex justify-center text-center">
+      <Loading>
         <Spinner size="small" />
-      </div>
+      </Loading>
     )
 
   return (
@@ -90,7 +100,21 @@ const Promotion = ({ personalInfo, tabName }: Props): React.ReactElement => {
         <Heading size="smallMedium">{t('student:coupon.title')}</Heading>
         <Button
           disabled={personalInfo.isDeleted ?? false}
-          onClick={handleCreateCoupon}
+          onClick={() => {
+            if (
+              !checkSubscriptionAccess(
+                'promotionTier',
+                PromotionType.COUPON_DISCOUNT
+              )
+            ) {
+              setShowSubscriptionPopup({
+                open: true,
+                message: t(`subscription:subscriptionDialog.upgradePlan`),
+              })
+            } else {
+              handleCreateCoupon()
+            }
+          }}
         >
           {t('student:coupon.add')}
         </Button>
@@ -153,4 +177,9 @@ const Promotion = ({ personalInfo, tabName }: Props): React.ReactElement => {
     </Box>
   )
 }
+const Loading = styled('div', {
+  display: 'flex',
+  justifyContent: 'center',
+  textAlign: 'center',
+})
 export default Promotion

@@ -10,6 +10,7 @@ import ChangeUserPassword from './ChangeUserPassword'
 import CreateLoginToken from './CreateLoginToken'
 import CreateStripeAccount from './CreateStripeAccount'
 import DuplicateSchool from './DuplicateSchool'
+import ImpersonateUser from './ImpersonateUser'
 import SendWhatsappMessage from './SendWhatsappMessage'
 import SitesFeatureEnabled from './SitesFeatureEnabled'
 
@@ -21,6 +22,7 @@ const AdminPage = (): JSX.Element => {
     | 'duplicateSchool'
     | 'changeUserPassword'
     | 'siteFeatureEnabled'
+    | 'impersonateUser'
 
   const [currentTab, setCurrentTab] = useState<AdminTabs>('createStripeAccount')
   const headerBackButton: HeaderBackButtonStatus = {
@@ -53,6 +55,10 @@ const AdminPage = (): JSX.Element => {
       label: 'Sites Feature',
       value: 'siteFeatureEnabled',
     },
+    {
+      label: 'Impersonate User',
+      value: 'impersonateUser',
+    },
   ]
 
   return (
@@ -70,6 +76,7 @@ const AdminPage = (): JSX.Element => {
           {currentTab === 'sendWtsMsg' && <SendWhatsappMessage />}
           {currentTab === 'duplicateSchool' && <DuplicateSchool />}
           {currentTab === 'siteFeatureEnabled' && <SitesFeatureEnabled />}
+          {currentTab === 'impersonateUser' && <ImpersonateUser />}
         </BoxWithToggleGroup>
       </Box>
     </ContentLayout>

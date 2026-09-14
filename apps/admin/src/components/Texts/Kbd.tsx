@@ -1,15 +1,15 @@
-import { cn } from '@/utils/cn'
+import { styled } from '../../styles'
 
-type KbdProps = React.ComponentProps<'kbd'>
-
-const Kbd = ({ className, ...props }: KbdProps) => (
-  <kbd
-    className={cn(
-      'text-sm font-bold p-1 border border-solid border-border border-x-[1px] border-b-[3px] rounded-sm bg-primary inline-block',
-      className
-    )}
-    {...props}
-  />
-)
+const Kbd = styled('kbd', {
+  fontSize: '$small',
+  fontWeight: 'bold',
+  padding: '$min',
+  borderStyle: 'solid',
+  borderColor: '$borderColor',
+  borderWidth: '1px 1px 3px',
+  borderRadius: '$small',
+  backgroundColor: '$primary',
+  display: 'inline-block',
+})
 
 export default Kbd

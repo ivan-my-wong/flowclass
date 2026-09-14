@@ -4,11 +4,11 @@ import { Portal, Root, Title, Trigger } from '@radix-ui/react-dialog'
 import { useTranslation } from 'react-i18next'
 import { LuFileWarning } from 'react-icons/lu'
 
-import { StyledContent, StyledOverlay } from '@/components/Popups/Modal'
 import ModalCloseButton from '@/components/Popups/ModalCloseButton'
 import Separator from '@/components/Separators/Separator'
 import { Button } from '@/components/ui/Button'
 import useLessonDateTimeData from '@/hooks/useLessonDateTimeData'
+import { StyledContent, StyledOverlay } from '@/pages/School/CreateSchoolModal'
 import { CheckConflictClassLesson } from '@/types/fullCalendar.type'
 
 import ConflictItem from './ConflictItem'

@@ -3,6 +3,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import Select, { StylesConfig } from 'react-select'
 
+import { styled, theme } from '@/styles'
 import {
   CourseSelectorItemProps,
   OptionProps,
@@ -12,25 +13,27 @@ import { getCourseIcon } from '@/utils/options'
 const selectCustomStyles = (
   width: string
 ): StylesConfig<OptionProps, true> => ({
-  option: styles => ({
-    ...styles,
-    backgroundColor: 'var(--color-background)',
-    color: 'var(--color-text)',
-  }),
+  option: styles => {
+    return {
+      ...styles,
+      backgroundColor: theme.colors.background.toString(),
+      color: theme.colors.text.toString(),
+    }
+  },
   control: styles => ({
     ...styles,
-    backgroundColor: 'var(--color-background)',
-    color: 'var(--color-text)',
-    borderColor: 'var(--color-text-subtle)',
+    backgroundColor: theme.colors.background.toString(),
+    color: theme.colors.text.toString(),
+    borderColor: theme.colors.textSubtle.toString(),
   }),
   singleValue: styles => ({
     ...styles,
     padding: '0.25rem',
-    color: 'var(--color-text)',
+    color: theme.colors.text.toString(),
   }),
   input: styles => ({
     ...styles,
-    color: 'var(--color-text)',
+    color: theme.colors.text.toString(),
   }),
   container: styles => ({
     ...styles,
@@ -40,6 +43,15 @@ const selectCustomStyles = (
     ...styles,
     padding: 0,
   }),
+})
+
+const Wrapper = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: '100%',
+  height: '100%',
+  color: '$text',
 })
 
 const CourseAndClassSingleSelector: React.FC<CourseSelectorItemProps> = ({
@@ -71,16 +83,16 @@ const CourseAndClassSingleSelector: React.FC<CourseSelectorItemProps> = ({
       isLoading={isLoading}
       isMulti={isMulti !== undefined ? (isMulti as any) : true}
       formatOptionLabel={(data: OptionProps) => (
-        <div className="flex items-center justify-between w-full h-full text-text">
-          <div className="flex items-center gap-2">
+        <Wrapper className="country-option">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             {data.type && (
-              <div className="flex items-center">
+              <div style={{ display: 'flex', alignItems: 'center' }}>
                 {getCourseIcon(data.type)}
               </div>
             )}
-            <span className="p-1">{data.label}</span>
+            <span style={{ padding: '$4' }}>{data.label}</span>
           </div>
-        </div>
+        </Wrapper>
       )}
       styles={selectCustomStyles(width)}
       onChange={(newValue: any) => onChange(newValue)}

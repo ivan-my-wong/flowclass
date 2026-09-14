@@ -1,19 +1,21 @@
 import React from 'react'
 
+import { mauve } from '@radix-ui/colors'
 // eslint-disable-next-line no-restricted-syntax
 import * as Accordion from '@radix-ui/react-accordion'
 import { ChevronDownIcon } from '@radix-ui/react-icons'
-
-import { cn } from '@/utils/cn'
+import { CSS, keyframes, styled } from '@stitches/react'
 
 import Text from '../Texts/Text'
 
 type AccordionTriggerProps = {
   children: React.ReactNode
+  // other props
 }
 
 type AccordionContentProps = {
   children: React.ReactNode
+  // other props
 }
 
 export type AccordionItemProps = {
@@ -24,51 +26,127 @@ export type AccordionItemProps = {
 
 type AccordionProps = {
   items: AccordionItemProps[]
-  className?: string
+  css?: CSS
 }
 
-const CustomAccordion: React.FC<AccordionProps> = ({ items, className }) => (
-  <Accordion.Root
-    type="single"
-    collapsible
-    className={cn('rounded-md w-full', className)}
-  >
+const CustomAccordion: React.FC<AccordionProps> = ({ items, css }) => (
+  <AccordionRoot type="single" collapsible css={css}>
     {items.map(item => (
-      <Accordion.Item
-        key={item.itemValue}
-        value={item.itemValue}
-        className="overflow-hidden mt-px first:mt-0 first:rounded-t-md last:rounded-b-md focus-within:relative focus-within:z-10 focus-within:shadow-[0_0_0_2px_hsl(var(--mauve-12))]"
-      >
-        <Accordion.Header className="flex justify-center w-full">
-          <Accordion.Trigger
-            className={cn(
-              'flex flex-1 items-center justify-center w-full h-11 px-5',
-              'font-inherit text-[15px] leading-none',
-              'rounded border border-border',
-              'text-text hover:bg-background-layer-3',
-              'data-[state=open]:[&>svg]:rotate-180'
-            )}
-          >
-            <Text align="center">{item.triggerTitle}</Text>
-            <ChevronDownIcon
-              className="text-text transition-transform duration-300 ease-[cubic-bezier(0.87,0,0.13,1)] shrink-0"
-              aria-hidden
-            />
-          </Accordion.Trigger>
-        </Accordion.Header>
-        <Accordion.Content
-          className={cn(
-            'overflow-hidden text-[15px] text-text bg-background-layer-2',
-            'data-[state=open]:animate-accordion-down',
-            'data-[state=closed]:animate-accordion-up',
-            'overflow-hidden'
-          )}
-        >
-          <div className="py-4 px-5">{item.triggerContent}</div>
-        </Accordion.Content>
-      </Accordion.Item>
+      <AccordionItem key={item.itemValue} value={item.itemValue}>
+        <AccordionTrigger>
+          <Text align="center">{item.triggerTitle}</Text>
+        </AccordionTrigger>
+        <AccordionContent>{item.triggerContent}</AccordionContent>
+      </AccordionItem>
     ))}
-  </Accordion.Root>
+  </AccordionRoot>
 )
+
+const AccordionRoot = styled(Accordion.Root, {
+  borderRadius: 6,
+  width: '100%',
+})
+
+const AccordionItem = styled(Accordion.Item, {
+  overflow: 'hidden',
+  marginTop: 1,
+
+  '&:first-child': {
+    marginTop: 0,
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
+  },
+
+  '&:last-child': {
+    borderBottomLeftRadius: 4,
+    borderBottomRightRadius: 4,
+  },
+
+  '&:focus-within': {
+    position: 'relative',
+    zIndex: 1,
+    boxShadow: `0 0 0 2px ${mauve.mauve12}`,
+  },
+})
+
+const AccordionTrigger = React.forwardRef<
+  HTMLButtonElement,
+  AccordionTriggerProps
+>(({ children, ...props }: AccordionTriggerProps, forwardedRef) => (
+  <StyledHeader>
+    <StyledTrigger {...props} ref={forwardedRef}>
+      {children}
+      <StyledChevron aria-hidden />
+    </StyledTrigger>
+  </StyledHeader>
+))
+
+const AccordionContent = React.forwardRef<
+  HTMLDivElement,
+  AccordionContentProps
+>(({ children, ...props }: AccordionContentProps, forwardedRef) => (
+  <StyledContent {...props} ref={forwardedRef}>
+    <StyledContentText>{children}</StyledContentText>
+  </StyledContent>
+))
+
+const StyledHeader = styled(Accordion.Header, {
+  all: 'unset',
+  display: 'flex',
+  justifyContent: 'center',
+  width: '100%',
+})
+
+const StyledTrigger = styled(Accordion.Trigger, {
+  all: 'unset',
+  fontFamily: 'inherit',
+  padding: '0 20px',
+  height: 45,
+  flex: 1,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: 15,
+  lineHeight: 1,
+  width: '100%',
+  color: '$text',
+  borderRadius: '$1',
+  border: '1px solid $colors$borderColor',
+  '&:hover': { backgroundColor: '$backgroundLayer3' },
+})
+
+const StyledChevron = styled(ChevronDownIcon, {
+  color: '$text',
+  transition: 'transform 300ms cubic-bezier(0.87, 0, 0.13, 1)',
+  '[data-state=open] &': { transform: 'rotate(180deg)' },
+})
+
+const slideDown = keyframes({
+  from: { height: 0 },
+  to: { height: 'var(--radix-accordion-content-height)' },
+})
+
+const slideUp = keyframes({
+  from: { height: 'var(--radix-accordion-content-height)' },
+  to: { height: 0 },
+})
+
+const StyledContent = styled(Accordion.Content, {
+  overflow: 'hidden',
+  fontSize: 15,
+  color: '$text',
+  backgroundColor: '$backgroundLayer2',
+
+  '&[data-state="open"]': {
+    animation: `${slideDown} 300ms cubic-bezier(0.87, 0, 0.13, 1)`,
+  },
+  '&[data-state="closed"]': {
+    animation: `${slideUp} 300ms cubic-bezier(0.87, 0, 0.13, 1)`,
+  },
+})
+
+const StyledContentText = styled('div', {
+  padding: '15px 20px',
+})
 
 export default CustomAccordion

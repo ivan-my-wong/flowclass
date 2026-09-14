@@ -12,6 +12,7 @@ import Box from '@/components/ui/Box'
 import Form from '@/components/ui/Form'
 import { useLocationRoom } from '@/hooks/useRoomLocation'
 import ContentLayout from '@/layouts/ContentLayout'
+import { css } from '@/styles'
 import { LocationRoomForm } from '@/types/classes'
 import { createOption } from '@/utils/class-options.utils'
 
@@ -58,6 +59,10 @@ const UpdateLocation = (): JSX.Element => {
     }
   }, [locationRoom, form])
 
+  const leftHeaderCSS = css({
+    maxHeight: '100%',
+  })
+
   const headerBackButton: HeaderBackButtonStatus = {
     mode: 'back',
     action: () => handleCloseAndRemove(),
@@ -96,7 +101,7 @@ const UpdateLocation = (): JSX.Element => {
   return (
     <Drawer open={isOpen} onClose={handleCloseAndRemove}>
       <ContentLayout
-        leftHeaderCSS="max-h-full"
+        leftHeaderCSS={leftHeaderCSS}
         headerBackButton={headerBackButton}
         leftHeader={leftHeaderContent}
         rightHeader={rightHeaderContent}

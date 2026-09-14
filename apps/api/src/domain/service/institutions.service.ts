@@ -7,7 +7,7 @@ import {
 import { instanceToPlain, plainToInstance } from 'class-transformer'
 import * as crypto from 'crypto'
 import { pick } from 'lodash'
-import * as path from 'path'
+import path from 'path'
 import { FindOptionsOrder, FindOptionsWhere, ILike, In, ObjectLiteral } from 'typeorm'
 import { Transactional } from 'typeorm-transactional'
 
@@ -27,7 +27,6 @@ import {
 } from '@/application/admin/institutions/dto/institution-pagination.dto'
 import { UpdateGalleryDto } from '@/application/admin/institutions/dto/update-gallery.dto'
 import { UploadGalleryDto } from '@/application/admin/institutions/dto/upload-gallery.dto'
-import { WorkflowDto } from '@/application/admin/institutions/dto/workflow.dto'
 import { ApiError } from '@/common/api-formats/api-error'
 import { PageDto } from '@/common/pagination/page.dto'
 import { ErrorCode } from '@/exceptions/error-message/errors'
@@ -35,6 +34,10 @@ import { InstitutionErrorMessage } from '@/exceptions/error-message/institution'
 import { NotFoundErrorMessage } from '@/exceptions/error-message/not-found'
 import { SiteErrorMessage } from '@/exceptions/error-message/site'
 import { UserErrorMessage } from '@/exceptions/error-message/user'
+import {
+  AutomationFlowRepository,
+  InstitutionAutomationFlowRepository,
+} from '@/models/automation-flow.repository'
 import { ClassRepository } from '@/models/classes.repository'
 import { RecurringSchedulesRepository } from '@/models/course-recurring-schedules.entity'
 import { RegularPeriodsRepository } from '@/models/course-regular-periods.entity'
@@ -53,6 +56,7 @@ import { SettingNotificationsRepository } from '@/models/setting-notifications.e
 import { SettingWebpageInstitutionRepository } from '@/models/setting-webpage-institutions.repository'
 import { Site } from '@/models/site.entity'
 import { SitesRepository } from '@/models/sites.repository'
+import { StudentMemoRepository } from '@/models/student-memo.repository'
 import { User } from '@/models/user.entity'
 import { UserAliasesRepository } from '@/models/user-aliases.repository'
 import { UsersRepository } from '@/models/users.repository'
@@ -81,14 +85,17 @@ export class InstitutionsService extends BaseService<Institution> {
     private readonly institutionGalleryRepository: InstitutionGalleryRepository,
     private readonly settingWebpageInstitutionRepository: SettingWebpageInstitutionRepository,
     private readonly userRepository: UsersRepository,
-    private readonly userAliasesRepository: UserAliasesRepository,
+    private readonly studentMemoRepository: StudentMemoRepository,
     private readonly courseRepository: CoursesRepository,
     private readonly classRepository: ClassRepository,
     private readonly recurringSchedulesRepository: RecurringSchedulesRepository,
     private readonly regularPeriodsRepository: RegularPeriodsRepository,
     private readonly periodLessonsRepository: PeriodLessonsRepository,
     private readonly settingNotificationsRepository: SettingNotificationsRepository,
-    private readonly customMessageService: CustomMessageService
+    private readonly customMessageService: CustomMessageService,
+    private readonly institutionAutomationFlowRepository: InstitutionAutomationFlowRepository,
+    private readonly automationFlowRepository: AutomationFlowRepository,
+    private readonly userAliasesRepository: UserAliasesRepository
   ) {
     super(institutionsRepository)
     this.logger = new Logger(InstitutionsService.name)
@@ -121,7 +128,7 @@ export class InstitutionsService extends BaseService<Institution> {
 
         media = {
           ...media,
-          url: `${process.env.API_BASE_URL}/media/get/${name}/${ext}`,
+          url: `${process.env.APP_HOSTNAME}/media/get/${name}/${ext}`,
           type: 'Institution',
         }
 
@@ -154,6 +161,7 @@ export class InstitutionsService extends BaseService<Institution> {
     }
 
     // ✅ Remove workflow creation logic from institution creation
+    // Workflows will be created when automation flows are added via AutomationFlowService
     // This prevents multiple workflow creation for the same institution
     return {
       ...plainToInstance(InstitutionDetailDto, institutionInstance),
@@ -231,6 +239,10 @@ export class InstitutionsService extends BaseService<Institution> {
   async findOne(id: number): Promise<InstitutionWithSettingsDTO> {
     const institution = await this.institutionsRepository.findOne({
       where: { id },
+      // relations: {
+      //   plan: true,
+      //   galleries: true,
+      // },
     })
 
     if (!institution) {
@@ -250,7 +262,7 @@ export class InstitutionsService extends BaseService<Institution> {
 
     const listMedia = mediaSerializer(media)
 
-    const userAliases = await this.userAliasesRepository.find({
+    const studentMemo = await this.studentMemoRepository.find({
       where: {
         institutionId: institution.id,
       },
@@ -260,40 +272,12 @@ export class InstitutionsService extends BaseService<Institution> {
       ...plainToInstance(InstitutionDetailDto, institution),
       siteSetting: await site.siteSettings,
       medias: listMedia,
-      studentMemo: userAliases,
+      studentMemo,
     }
   }
 
   async findOneByUrl(domain: string, url?: string) {
-    let site = await this.sitesRepository.findOneBy({ url: domain })
-
-    if (!site && domain.endsWith('.v2.flowclass.io')) {
-      const legacyDomain = domain.replace('.v2.flowclass.io', '.flowclass.io')
-      site = await this.sitesRepository.findOneBy({ url: legacyDomain })
-    }
-
-    if (!site && domain.endsWith('.flowclass.io')) {
-      const v2Domain = domain.replace('.flowclass.io', '.v2.flowclass.io')
-      site = await this.sitesRepository.findOneBy({ url: v2Domain })
-    }
-
-    if (!site) {
-      site = await this.sitesRepository.findOneBy({ customDomain: domain })
-    }
-
-    if (!site && domain.endsWith('.v2.flowclass.io')) {
-      const legacyDomain = domain.replace('.v2.flowclass.io', '.flowclass.io')
-      site = await this.sitesRepository.findOneBy({ customDomain: legacyDomain })
-    }
-
-    if (!site && domain.endsWith('.flowclass.io')) {
-      const v2Domain = domain.replace('.flowclass.io', '.v2.flowclass.io')
-      site = await this.sitesRepository.findOneBy({ customDomain: v2Domain })
-    }
-
-    if (!site) {
-      site = await this.sitesRepository.findOne({ where: {}, order: { id: 'ASC' } })
-    }
+    const site = await this.sitesRepository.findOneBy({ url: domain })
 
     if (!site) {
       throw new BadRequestException(SiteErrorMessage.SITE_NOT_FOUND)
@@ -316,9 +300,14 @@ export class InstitutionsService extends BaseService<Institution> {
         throw new InternalServerErrorException(InstitutionErrorMessage.INSTITUTION_NOT_FOUND)
       }
 
+      // institutionList = institutionList as InstitutionPageDto
+      //
+      // if (!institutionList || !institutionList.content || institutionList.content.length === 0) {
+      //   throw new BadRequestException(InstitutionErrorMessage.INSTITUTION_NOT_FOUND)
+      // }
+
       if (url && url !== '') {
-        // Fall back to the first institution if the URL doesn't match any school
-        institution = institutionList.find((school) => school.url === url) ?? institutionList[0]
+        institution = institutionList.find((school) => school.url === url)
       } else {
         // Return the default institution of the site by taking the first one that is created
         institution = institutionList[0]
@@ -389,7 +378,7 @@ export class InstitutionsService extends BaseService<Institution> {
 
         media = {
           ...media,
-          url: `${process.env.API_BASE_URL}/media/get/${name}/${ext}`,
+          url: `${process.env.APP_HOSTNAME}/media/get/${name}/${ext}`,
           type: 'Institution',
         }
 
@@ -431,6 +420,19 @@ export class InstitutionsService extends BaseService<Institution> {
     const institution = await this.institutionsRepository.findOneBy({ id })
     if (!institution) {
       throw new BadRequestException(InstitutionErrorMessage.INSTITUTION_NOT_FOUND)
+    }
+
+    // Remove automation flows linked to the institution
+    const links = await this.institutionAutomationFlowRepository.find({
+      where: { institutionId: id },
+      relations: { automationFlow: { steps: true, conditions: true } },
+      loadEagerRelations: true,
+    })
+    for (const link of links) {
+      if (link.automationFlow) {
+        await this.automationFlowRepository.remove(link.automationFlow) // steps/conditions cascade
+      }
+      await this.institutionAutomationFlowRepository.remove(link)
     }
 
     const whereDeleteObject: FindOptionsWhere<ObjectLiteral> = {
@@ -510,7 +512,26 @@ export class InstitutionsService extends BaseService<Institution> {
     const userInvite = await this.usersService.findOneByEmail(dto.email)
 
     if (!userInvite) {
-      await this.createInviteSiteMember(dto, siteId, institutionId)
+      const invite = await this.createInviteSiteMember(dto, siteId, institutionId)
+
+      // this.mailerService.sendMail({
+      //   to: dto.email,
+      //   subject: 'Invite User To Become Member Of Site',
+      //   template: 'invitation-institution-to-user',
+      //   context: {
+      //     email: dto.email,
+      //     data: [
+      //       {
+      //         institutionName: institution.name,
+      //         inviterName: user.firstName,
+      //         inviteLink: `https://${site.url}.flowclass.io/invite-institution?token=${invite.token}`,
+      //         roleName: RoleName[dto.role],
+      //         siteBaseUrl: `https://${site.url}.flowclass.io/`,
+      //       },
+      //     ],
+      //   },
+      // });
+
       return true
     }
 
@@ -539,10 +560,45 @@ export class InstitutionsService extends BaseService<Institution> {
         isOperator: dto.role == RoleInInstitution.OPERATOR,
         isStudent: false,
       })
+
+      // this.mailerService.sendMail({
+      //   to: dto.email,
+      //   subject: 'Change Role Of User In Institution',
+      //   template: 'institution-role-changed',
+      //   context: {
+      //     email: dto.email,
+      //     data: [
+      //       {
+      //         institutionName: institution.name,
+      //         inviterName: user.firstName,
+      //         newRoleName: RoleName[dto.role],
+      //         siteBaseUrl: `https://${site.url}.flowclass.io/`,
+      //       },
+      //     ],
+      //   },
+      // });
+
       return true
     }
 
-    await this.createInviteSiteMember(dto, siteId, institutionId)
+    const invite = await this.createInviteSiteMember(dto, siteId, institutionId)
+    // this.mailerService.sendMail({
+    //   to: dto.email,
+    //   subject: 'Invite User To Become Member Of Site',
+    //   template: 'invitation-institution-to-user',
+    //   context: {
+    //     email: dto.email,
+    //     data: [
+    //       {
+    //         institutionName: institution.name,
+    //         inviterName: user.firstName,
+    //         inviteLink: `https://${site.url}.flowclass.io/invite-institution?token=${invite.token}`,
+    //         roleName: RoleName[dto.role],
+    //         siteBaseUrl: `https://${site.url}.flowclass.io/`,
+    //       },
+    //     ],
+    //   },
+    // });
     return true
   }
 
@@ -573,12 +629,24 @@ export class InstitutionsService extends BaseService<Institution> {
 
   async removeInstitutionMember(site: Site, institution: Institution, userId: number) {
     await this.userRolesService.deleteByInstitutionAndUser(institution.id, userId)
+
+    // this.mailerService.sendMail({
+    //   to: user.email,
+    //   subject: 'Delete User Of Institution',
+    //   template: 'delete-user-of-institution',
+    //   context: {
+    //     email: user.email,
+    //     institutionName: institution.name,
+    //     siteBaseUrl: site.url,
+    //   },
+    // });
+
     return true
   }
 
   async uploadGallery(
     uploadGalleryDto: UploadGalleryDto,
-    file: Express.Multer.File & { key: string },
+    file: Express.MulterS3.File,
     currentInstitution: Institution
   ) {
     const institutionGalleryInstance = this.institutionGalleryRepository.create({
@@ -684,34 +752,40 @@ export class InstitutionsService extends BaseService<Institution> {
     params?: { limit: string; page: string; search: string }
   ) {
     const { limit, page, search } = params || {}
-    const usersResult = await this.userRepository.find({
+    const userAliases = await this.userAliasesRepository.find({
       where: {
-        userRoles: {
-          institutionId,
-          isStudent: true,
-        },
+        institutionId,
         deletedAt: null,
-        ...(search ? { firstName: ILike(`%${search}%`) } : {}),
+        ...(search ? { name: ILike(`%${search}%`) } : {}),
       },
       relations: {
-        userRoles: true,
+        user: true,
       },
-      select: ['id', 'firstName', 'lastName', 'email', 'phone'],
+      order: {
+        id: 'DESC',
+      },
       take: limit ? Number(limit) : undefined,
       skip: page ? (Number(page) - 1) * (limit ? Number(limit) : 10) : undefined,
     })
 
-    const users = await Promise.all(
-      usersResult.map(async (user) => {
-        const userRoles = await user.userRoles
-        return {
-          ...user,
-          checked: false,
-          userRoles,
-        }
-      })
-    )
-    return users
+    const students = userAliases.map((ua) => {
+      const names = (ua.name || '').trim().split(' ')
+      const firstName = names[0] || ua.user?.firstName || ''
+      const lastName = names.slice(1).join(' ') || ua.user?.lastName || ''
+      return {
+        id: ua.id,
+        userAliasId: ua.id,
+        userId: ua.userId,
+        firstName,
+        lastName,
+        name: ua.name || ua.user?.fullName || `${firstName} ${lastName}`.trim(),
+        email: ua.email || ua.user?.email || '',
+        phone: ua.user?.phone || '',
+        checked: false,
+        userRoles: [],
+      }
+    })
+    return students
   }
 
   async getListCourse(institutionId: number) {
@@ -875,14 +949,6 @@ export class InstitutionsService extends BaseService<Institution> {
       isStudent: false,
     })
     return [newInstitution]
-  }
-
-  async getWorkflow(_institutionId: number) {
-    throw new BadRequestException('Automation workflow is disabled')
-  }
-
-  async updateWorkflow(_institutionId: number, _payload: WorkflowDto) {
-    throw new BadRequestException('Automation workflow is disabled')
   }
 }
 

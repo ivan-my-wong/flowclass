@@ -20,7 +20,7 @@ export class BaseRegisterDto {
   lastName?: string
 
   @ApiProperty({
-    example: 'user@example.com',
+    example: 'flowclass@gmail.com',
   })
   @IsNotEmpty()
   @MaxLength(255)

@@ -20,7 +20,7 @@ import { useCourseEditSave } from '@/hooks/useCourseEditSave'
 import useFileUpload from '@/hooks/useFileUpload'
 import { MediaUploadResponse } from '@/types/apiResponse'
 import { Course, FormCourseMessage } from '@/types/course'
-import { getMediaFileUrl } from '@/utils/generate-link.utils'
+import { getS3FileUrl } from '@/utils/generate-link.utils'
 
 interface IMessageProps {
   tabName: string
@@ -63,7 +63,7 @@ const Message = ({
       if (range) {
         quillRef.current
           ?.getEditor()
-          .insertEmbed(range.index, 'image', getMediaFileUrl(data.url))
+          .insertEmbed(range.index, 'image', getS3FileUrl(data.url))
       }
     }
   )

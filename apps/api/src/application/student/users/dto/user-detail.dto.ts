@@ -18,6 +18,9 @@ export class StudentUserDetailDto {
   isEmailVerified: boolean
 
   @Expose()
+  firebaseId: string
+
+  @Expose()
   phone: string
 
   @Expose()

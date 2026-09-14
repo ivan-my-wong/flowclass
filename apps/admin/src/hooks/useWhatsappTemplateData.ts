@@ -11,6 +11,7 @@ import {
   deleteWhatsappTemplate,
   getDetailWhatsappTemplate,
   getListWhatsappTemplates,
+  getWhatsappTemplateByAutomationFlowStep,
   updateWhatsappTemplate,
 } from '@/api/whatsappTemplate'
 import { QUERY_KEY } from '@/constants/queryKey'
@@ -72,7 +73,7 @@ const useWhatsappTemplateData = () => {
           await queryClient.invalidateQueries({
             queryKey: [QUERY_KEY.whatsappTemplate.whatsappTemplatesKey],
           })
-          navigate('/whatsapp-templates')
+          navigate('/custom-messages?tab=whatsapp-templates')
         },
         onError: (error: ApiError) => {
           handleApiError({ error, t })
@@ -91,7 +92,7 @@ const useWhatsappTemplateData = () => {
           await queryClient.invalidateQueries({
             queryKey: [QUERY_KEY.whatsappTemplate.whatsappTemplatesKey],
           })
-          navigate('/whatsapp-templates')
+          navigate('/custom-messages?tab=whatsapp-templates')
         },
         onError: (error: ApiError) => {
           handleApiError({ error, t })
@@ -119,12 +120,36 @@ const useWhatsappTemplateData = () => {
     )
   }
 
+  const useGetWhatsappByAutomationStep = (
+    stepId?: number,
+    successfulCallback?: (data: WhatsappTemplate[]) => void
+  ) => {
+    return useQuery({
+      queryKey: [
+        QUERY_KEY.whatsappTemplate.templateByAutomationFlowStepKey,
+        stepId,
+      ],
+      queryFn: () =>
+        getWhatsappTemplateByAutomationFlowStep(
+          currentSchoolId,
+          stepId as number
+        ),
+      onSuccess: data => {
+        successfulCallback?.(data)
+      },
+      onError: (error: ApiError) => {
+        handleApiError({ error, t })
+      },
+      enabled: !!stepId,
+    })
+  }
   return {
     useUpdateWhatsappTemplate,
     useCreateWhatsappTemplate,
     useFetchDetailWhatsappTemplate,
     useFetchListWhatsappTemplate,
     useDeleteWhatsappTemplate,
+    useGetWhatsappByAutomationStep,
   }
 }
 export default useWhatsappTemplateData

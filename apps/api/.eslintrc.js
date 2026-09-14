@@ -22,9 +22,10 @@ module.exports = {
   root: true,
   env: {
     node: true,
+    jest: true,
   },
 
-  ignorePatterns: ['.eslintrc.js'],
+  ignorePatterns: ['.eslintrc.js', 'test/*'],
   rules: {
     'no-use-before-define': 'off',
     'no-underscore-dangle': 'off',

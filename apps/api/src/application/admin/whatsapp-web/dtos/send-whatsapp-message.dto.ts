@@ -62,7 +62,7 @@ export class WhatsAppMessageResponseDto {
   timestamp?: string
 }
 
-type WhatsappResponse<T> = {
+type EzchatWhatsappResponse<T> = {
   data: T
   statusCode: number
   message: string
@@ -83,20 +83,20 @@ export type WhatsAppConnection = {
   webhookUrl: string
 }
 
-export type WhatsAppInitResponse = WhatsappResponse<{
+export type WhatsAppInitResponse = EzchatWhatsappResponse<{
   sessionId: string
   token: string
   message: string
   whatsAppConnection: WhatsAppConnection
 }>
 
-export type WhatsAppQrResponse = WhatsappResponse<{
+export type WhatsAppQrResponse = EzchatWhatsappResponse<{
   qrCode: string
   webhook: string
   message: string
 }>
 
-export type WhatsAppStatusResponse = WhatsappResponse<{
+export type WhatsAppStatusResponse = EzchatWhatsappResponse<{
   status: 'connected' | 'disconnected' | 'connecting' | string
   sessionName: string
   accessToken: string

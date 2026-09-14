@@ -1,13 +1,14 @@
 import { lazy, Suspense, useEffect, useMemo } from 'react'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 
+import TagManager, { TagManagerArgs } from 'react-gtm-module'
 import { HeadProvider, Link } from 'react-head'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from 'react-query'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { v4 as uuidv4 } from 'uuid'
 
-import defaultLogo from '@/assets/logos/flowclass_icon.png'
+import FacebookSdk from '@/components/common/FacebookSdk'
 import FullScreenLoading from '@/components/FullScreen/FullScreenLoading'
 import { LocalStorageKeys } from '@/constants/localStorageKeys'
 import useCourseData from '@/hooks/useCourseData'
@@ -16,6 +17,7 @@ import useSiteData from '@/hooks/useSiteData'
 import AppLayout from '@/layouts/AppLayout'
 import DefaultContentLayout from '@/layouts/ContentLayout/DefaultContentLayout'
 import Preview from '@/pages/Embed/Preview'
+import MySchool from '@/pages/Legacy/MySchool'
 import CouponDetailPage from '@/pages/Promotion/Coupons/CouponDetailPage'
 import AdditionalFee from '@/pages/Setting/AdditionalFee'
 import StudentInfomationField from '@/pages/Setting/CustomDataField'
@@ -27,8 +29,10 @@ import AcceptInvitePage from '@/pages/Welcome/AcceptInvitePage'
 import ProtectedRoute from '@/routes/ProtectedRoute'
 import { darkModeState } from '@/stores/darkMode'
 import { displayLanguageState } from '@/stores/displayLanguage'
+import { darkTheme } from '@/styles'
+import { globalStyles } from '@/styles/globalStyle'
 import dayjs from '@/utils/dayjs'
-import { getMediaFileUrl } from '@/utils/generate-link.utils'
+import { getS3FileUrl } from '@/utils/generate-link.utils'
 
 import { getWebpageStyle } from './api/settingSite'
 import GlobalConfirm from './components/Popups/GlobalConfirm'
@@ -65,12 +69,24 @@ const PageNotFound = lazy(() => import('@/pages/PageNotFound'))
 
 const RegisterPage = lazy(() => import('@/pages/Register'))
 const RegisterEBookPage = lazy(() => import('@/pages/Register/eBook'))
+const CheckoutPage = lazy(() => import('./pages-public/CheckoutPage'))
+const QuizPage = lazy(() => import('./pages-public/LandingQuiz'))
+const PricingPublic = lazy(() => import('./pages-public/PricingPublic'))
 
 const School = lazy(() => import('@/pages/School'))
 const StudentCRM = lazy(() => import('@/pages/StudentCRM/index'))
 
 const Setting = lazy(() => import('@/pages/Setting'))
 // const SocialMediaPage = lazy(() => import('@/pages/Setting/SocialMediaPage'))
+const SubscriptionPresetPlans = lazy(
+  () => import('@/pages/Subscription/SubscribePresetPlan')
+)
+const SubscriptionPaymentCompleted = lazy(
+  () => import('@/pages/Subscription/SubscriptionFlows/PaymentCompleted')
+)
+const CreateSubscriptionPage = lazy(
+  () => import('@/pages/Subscription/SubscriptionFlows/CreateSubscriptionPage')
+)
 
 const LocationsPage = lazy(() => import('@/pages/Locations'))
 const CreateLocation = lazy(() => import('@/pages/Locations/CreateLocation'))
@@ -78,18 +94,22 @@ const UpdateLocation = lazy(() => import('@/pages/Locations/UpdateLocation'))
 
 const Integrations = lazy(() => import('@/pages/Integrations'))
 const WhatsappSetting = lazy(
-  () => import('@/pages/Integrations/TwilioWhatsApp/WhatsappSetting')
+  () => import('@/pages/Integrations/WhatsApp/WhatsappSetting')
 )
 
 const SiteSetting = lazy(() => import('@/pages/Setting/Site/SiteSettings'))
 const PaymentSettings = lazy(
   () => import('@/pages/PaymentMethods/PaymentMethodList')
 )
+const CourseCalendar = lazy(() => import('@/pages/Legacy/CourseCalendar'))
 const DetailLessonPage = lazy(
   () => import('@/pages/FullCalendar/components/LessonDetail')
 )
 const ChangeEntireLessonPage = lazy(
   () => import('@/pages/FullCalendar/ChangeEntireLesson')
+)
+const DelayFollowingLessonsPage = lazy(
+  () => import('@/pages/FullCalendar/DelayFollowingLessons')
 )
 
 const CreateTeachingService = lazy(
@@ -115,9 +135,15 @@ const ConfirmSendPaymentProof = lazy(
   () => import('@/pages/PaymentProofTable/components/ConfirmSendPaymentProof')
 )
 
+const AutomationCreateInvoice = lazy(
+  () => import('@/pages/PaymentProofTable/components/AutomationCreateInvoice')
+)
+
 const SendCustomMessages = lazy(
   () => import('@/pages/PaymentProofTable/SendCustomMessages')
 )
+
+const SubscriptionManagement = lazy(() => import('@/pages/Subscription/index'))
 
 const Promotion = lazy(() => import('@/pages/Promotion'))
 const CouponCodePage = lazy(
@@ -158,19 +184,11 @@ const CreateBundleDiscount = lazy(
 const EditBundleDiscount = lazy(
   () => import('@/pages/Promotion/BundleDiscounts/EditBundleDiscount')
 )
-const PackageDiscountsPage = lazy(
-  () => import('@/pages/Promotion/PackageDiscounts')
-)
-const PackageDiscountDetail = lazy(
-  () => import('@/pages/Promotion/PackageDiscountDetail')
-)
-const CreatePackageDiscount = lazy(
-  () => import('@/pages/Promotion/CreatePackageDiscount')
-)
-const EditPackageDiscount = lazy(
-  () => import('@/pages/Promotion/EditPackageDiscount')
-)
 const AdminPage = lazy(() => import('@/pages/Admin'))
+
+const ManageClients = lazy(
+  () => import('@/pages/Admin/ManageClients/ManageClients')
+)
 
 const Embed = lazy(() => import('@/pages/Embed'))
 const SetUpPage = lazy(() => import('@/pages/Welcome/SetUp'))
@@ -178,7 +196,11 @@ const ResetPassword = lazy(() => import('@/pages/Login/ResetPassword'))
 const EmailSetting = lazy(
   () => import('@/pages/Setting/FeatureEnable/EmailSetting')
 )
-const WhatsappTemplate = lazy(() => import('@/pages/WhatsappTemplate'))
+const ListBlockTime = lazy(() => import('@/pages/Legacy/ListBlockTime'))
+const SuccessSubscription = lazy(
+  () => import('@/pages/Subscription/SubscriptionFlows/SuccessSubscription')
+)
+
 const ManageWhatsappTemplate = lazy(
   () => import('@/pages/WhatsappTemplate/ManageWhatsappTemplateModal')
 )
@@ -187,8 +209,9 @@ const CustomMessages = lazy(() => import('@/pages/CustomMessages'))
 const ManageCustomMessages = lazy(
   () => import('@/pages/CustomMessages/ManageCustomMessageModal')
 )
-
 const NotificationLog = lazy(() => import('@/pages/NotificationLog'))
+
+const AiTools = lazy(() => import('@/pages-public/AiTools'))
 
 const ApplicationForm = lazy(() => import('@/pages/Setting/ApplicationForm'))
 
@@ -226,10 +249,16 @@ const CampaignRecipientsPage = lazy(
 const InvoiceEditor = lazy(
   () => import('@/pages/TemplateManagement/InvoiceTemplates/Editor')
 )
-const DialogSendInvoice = lazy(
+const DialogSendMultipleInvoice = lazy(
   () =>
     import(
-      '@/pages/TemplateManagement/InvoiceTemplates/Editor/DialogSendInvoice'
+      '@/pages/TemplateManagement/InvoiceTemplates/Editor/DialogSendMultipleInvoice'
+    )
+)
+const DialogSendSingleInvoice = lazy(
+  () =>
+    import(
+      '@/pages/TemplateManagement/InvoiceTemplates/Editor/DialogSendSingleInvoice'
     )
 )
 const SendingProgressPage = lazy(
@@ -266,6 +295,12 @@ const CampaignDocumentDetails = lazy(
   () => import('@/pages/TemplateManagement/BulkSendDocuments/Select')
 )
 
+const tagManagerArgs: TagManagerArgs = {
+  gtmId: import.meta.env.VITE_GTM_TAG_ID as string,
+  dataLayerName: 'PageDataLayer',
+}
+
+const defaultLogo = '@/assets/logos/flowclass_icon.png'
 const themeRoot = document.body
 
 /**
@@ -318,19 +353,6 @@ const App = (): JSX.Element => {
     )
   }, [sitesFeatureEnabled, currentSite?.id])
 
-  const enabledPackageDiscounts = useMemo(() => {
-    if (!currentSite?.id) return false
-    if (!sitesFeatureEnabled) return true
-    const packageDiscounts = sitesFeatureEnabled.find(
-      o => o.feature === SiteFeature.PackageDiscounts
-    )
-    return (
-      !packageDiscounts ||
-      packageDiscounts.siteIds.length === 0 ||
-      packageDiscounts.siteIds.includes(currentSite.id)
-    )
-  }, [sitesFeatureEnabled, currentSite?.id])
-
   const { data: currentSchoolData } = useFetchCurrentSchool()
   const { data: webpageStyle } = useQuery(
     [QUERY_KEY.settings.getWebpageSettingSchoolKey, currentSchoolData?.id],
@@ -353,11 +375,14 @@ const App = (): JSX.Element => {
     i18n.changeLanguage(lang)
   }, [webpageStyle?.textVersion, changeTextVersion, lang, i18n])
 
+  globalStyles()
+
   useFetchAllSiteData()
   useFetchAllSchoolData()
   useFetchAllCourseData()
 
   useEffect(() => {
+    TagManager.initialize(tagManagerArgs)
     if (!localStorage.getItem(LocalStorageKeys.FfBrowserId)) {
       const ffBrowserId = uuidv4() // replace this with your ID generation logic
       localStorage.setItem(LocalStorageKeys.FfBrowserId, ffBrowserId)
@@ -370,8 +395,10 @@ const App = (): JSX.Element => {
 
   useEffect(() => {
     if (isDarkMode) {
+      themeRoot.classList.add(darkTheme)
       themeRoot.classList.add('dark')
     } else {
+      themeRoot.classList.remove(darkTheme)
       themeRoot.classList.remove('dark')
     }
   }, [isDarkMode])
@@ -387,8 +414,8 @@ const App = (): JSX.Element => {
         rel="icon"
         type="image/png"
         href={
-          getMediaFileUrl(currentSite?.logo) !== ''
-            ? getMediaFileUrl(currentSite?.logo)
+          getS3FileUrl(currentSite?.logo) !== ''
+            ? getS3FileUrl(currentSite?.logo)
             : defaultLogo
         }
       />
@@ -410,7 +437,19 @@ const App = (): JSX.Element => {
                 path="preview"
                 element={<ProtectedRoute element={<Preview />} />}
               />
+              <Route path="c">
+                <Route path="ai" element={<AiTools />} />
+                <Route path="pricing" element={<PricingPublic />} />
+                <Route path="pricing/zh" element={<PricingPublic />} />
+                <Route path="quiz" element={<QuizPage />} />
+                <Route path="checkout" element={<CheckoutPage />} />
+              </Route>
+
               <Route path="welcome/set-up" element={<SetUpPage />} />
+              <Route
+                path="checkout/success"
+                element={<SubscriptionPaymentCompleted />}
+              />
             </Route>
 
             {/* Public Routes with preset layout */}
@@ -437,7 +476,10 @@ const App = (): JSX.Element => {
                 element={<ProtectedRoute element={<SchoolList />} />}
               />
 
-              <Route path="admin" element={<Navigate to="/site" replace />} />
+              <Route
+                path="admin"
+                element={<ProtectedRoute element={<MySchool />} />}
+              />
 
               <Route path="settings" element={<SiteSetting />} />
             </Route>
@@ -475,16 +517,22 @@ const App = (): JSX.Element => {
 
               <Route
                 path="subscription"
-                element={<Navigate to="/home" replace />}
+                element={
+                  <ProtectedRoute element={<SubscriptionManagement />} />
+                }
               />
               <Route
                 path="subscription/create-subscription"
-                element={<Navigate to="/home" replace />}
+                element={
+                  <ProtectedRoute element={<CreateSubscriptionPage />} />
+                }
               />
 
               <Route
                 path="/subscription/preset"
-                element={<Navigate to="/home" replace />}
+                element={
+                  <ProtectedRoute element={<SubscriptionPresetPlans />} />
+                }
               />
               <Route
                 path="/subscription/manage"
@@ -493,7 +541,14 @@ const App = (): JSX.Element => {
 
               <Route
                 path="/subscription/management"
-                element={<Navigate to="/home" replace />}
+                element={
+                  <ProtectedRoute element={<SubscriptionManagement />} />
+                }
+              />
+
+              <Route
+                path="subscription/success"
+                element={<ProtectedRoute element={<SuccessSubscription />} />}
               />
               <Route
                 path="home"
@@ -510,6 +565,19 @@ const App = (): JSX.Element => {
                   />
                 }
               />
+              {/* <Route
+                path="dashboard"
+                element={
+                  <ProtectedRoute
+                    element={<DashboardChart />}
+                    roleAllowed={[
+                      UserRole.MasterAdmin,
+                      UserRole.SiteAdmin,
+                      UserRole.SchoolAdmin,
+                    ]}
+                  />
+                }
+              /> */}
               <Route
                 path="dashboard"
                 element={
@@ -540,6 +608,12 @@ const App = (): JSX.Element => {
                   path="send-reminder"
                   element={
                     <ProtectedRoute element={<ConfirmSendPaymentProof />} />
+                  }
+                />
+                <Route
+                  path="automation"
+                  element={
+                    <ProtectedRoute element={<AutomationCreateInvoice />} />
                   }
                 />
               </Route>
@@ -612,8 +686,10 @@ const App = (): JSX.Element => {
               />
               <Route
                 path="course-calendar"
-                element={<Navigate to="/full-calendar" replace />}
-              />
+                element={<ProtectedRoute element={<CourseCalendar />} />}
+              >
+                {LessonRoutes('course-calendar')}
+              </Route>
 
               {enabledBundleDiscounts && (
                 <>
@@ -644,35 +720,6 @@ const App = (): JSX.Element => {
                 </>
               )}
 
-              {enabledPackageDiscounts && (
-                <>
-                  <Route
-                    path="promotion/package-discounts"
-                    element={
-                      <ProtectedRoute element={<PackageDiscountsPage />} />
-                    }
-                  />
-                  <Route
-                    path="promotion/package-discounts/detail/:packageDiscountId"
-                    element={
-                      <ProtectedRoute element={<PackageDiscountDetail />} />
-                    }
-                  />
-                  <Route
-                    path="promotion/package-discounts/add"
-                    element={
-                      <ProtectedRoute element={<CreatePackageDiscount />} />
-                    }
-                  />
-                  <Route
-                    path="promotion/package-discounts/edit/:packageDiscountId"
-                    element={
-                      <ProtectedRoute element={<EditPackageDiscount />} />
-                    }
-                  />
-                </>
-              )}
-
               <Route
                 path="promotion/coupon-code/detail"
                 element={<ProtectedRoute element={<CouponDetailPage />} />}
@@ -683,12 +730,12 @@ const App = (): JSX.Element => {
                 element={<ProtectedRoute element={<AdminPage />} />}
               />
               <Route
-                path="admin/subscription-plans"
-                element={<Navigate to="/admin" replace />}
+                path="admin/manage-clients"
+                element={<ProtectedRoute element={<ManageClients />} />}
               />
               <Route
-                path="admin/subscription-plans/plan-assignment"
-                element={<Navigate to="/admin" replace />}
+                path="admin/manage-clients/plan-assignment"
+                element={<ProtectedRoute element={<ManageClients />} />}
               />
 
               <Route
@@ -696,23 +743,6 @@ const App = (): JSX.Element => {
                 element={<ProtectedRoute element={<NotificationLog />} />}
               />
 
-              <Route
-                path="whatsapp-templates"
-                element={<ProtectedRoute element={<WhatsappTemplate />} />}
-              >
-                <Route
-                  path="add"
-                  element={
-                    <ProtectedRoute element={<ManageWhatsappTemplate />} />
-                  }
-                />
-                <Route
-                  path="edit"
-                  element={
-                    <ProtectedRoute element={<ManageWhatsappTemplate />} />
-                  }
-                />
-              </Route>
               <Route
                 path="custom-messages"
                 element={<ProtectedRoute element={<CustomMessages />} />}
@@ -723,7 +753,46 @@ const App = (): JSX.Element => {
                     <ProtectedRoute element={<ManageCustomMessages />} />
                   }
                 />
+                <Route
+                  path="whatsapp-templates/add"
+                  element={
+                    <ProtectedRoute element={<ManageWhatsappTemplate />} />
+                  }
+                />
+                <Route
+                  path="whatsapp-templates/edit"
+                  element={
+                    <ProtectedRoute element={<ManageWhatsappTemplate />} />
+                  }
+                />
               </Route>
+              <Route
+                path="whatsapp-templates"
+                element={
+                  <Navigate
+                    to="/custom-messages?tab=whatsapp-templates"
+                    replace
+                  />
+                }
+              />
+              <Route
+                path="whatsapp-templates/add"
+                element={
+                  <Navigate
+                    to="/custom-messages/whatsapp-templates/add?tab=whatsapp-templates"
+                    replace
+                  />
+                }
+              />
+              <Route
+                path="whatsapp-templates/edit"
+                element={
+                  <Navigate
+                    to="/custom-messages/whatsapp-templates/edit?tab=whatsapp-templates"
+                    replace
+                  />
+                }
+              />
               <Route path="integrations">
                 <Route
                   path=""
@@ -738,7 +807,19 @@ const App = (): JSX.Element => {
                     />
                   }
                 />
-
+                <Route
+                  path="whatsapp"
+                  element={
+                    <ProtectedRoute
+                      element={<WhatsappSetting />}
+                      roleAllowed={[
+                        UserRole.MasterAdmin,
+                        UserRole.SiteAdmin,
+                        UserRole.SchoolAdmin,
+                      ]}
+                    />
+                  }
+                />
                 <Route
                   path="twilio"
                   element={
@@ -881,8 +962,11 @@ const App = (): JSX.Element => {
                   path=":classId/add-subscription-class"
                   element={<ModalAddSubscriptionClass />}
                 />
-                <Route path="send-multiple" element={<DialogSendInvoice />} />
-                <Route path="send" element={<DialogSendInvoice />} />
+                <Route
+                  path="send-multiple"
+                  element={<DialogSendMultipleInvoice />}
+                />
+                <Route path="send" element={<DialogSendSingleInvoice />} />
                 <Route
                   path="sending-progress"
                   element={<SendingProgressPage />}
@@ -952,6 +1036,11 @@ const App = (): JSX.Element => {
                 element={<ProtectedRoute element={<Setting />} />}
               />
 
+              {/* <Route
+                path="social-media"
+                element={<ProtectedRoute element={<SocialMediaPage />} />}
+              /> */}
+
               <Route
                 path="website-panel"
                 element={<ProtectedRoute element={<WebsitePanel />} />}
@@ -959,7 +1048,7 @@ const App = (): JSX.Element => {
 
               <Route
                 path="block-time"
-                element={<Navigate to="/settings" replace />}
+                element={<ProtectedRoute element={<ListBlockTime />} />}
               />
 
               <Route
@@ -1065,6 +1154,7 @@ const App = (): JSX.Element => {
               />
             </Route>
           </Routes>
+          <FacebookSdk />
           <GlobalConfirm />
         </Suspense>
       </ConfirmContextProvider>

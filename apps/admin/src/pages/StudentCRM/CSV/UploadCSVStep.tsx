@@ -12,8 +12,8 @@ import Box from '@/components/Containers/Box'
 import SvgIcon from '@/components/Images/SvgIcon'
 import Text from '@/components/Texts/Text'
 import { Button } from '@/components/ui/Button'
+import { styled } from '@/styles'
 import { TypeDataColumnName, TypeParamsGetColumnName } from '@/types/student'
-import { cn } from '@/utils/cn'
 
 const UploadCSV = ({
   refFile,
@@ -89,30 +89,42 @@ const UploadCSV = ({
     </Button>
   )
   return (
-    <Box direction="column" className="mt-6">
+    <Box direction="column" css={{ marginTop: '$6' }}>
       <Box align="flex-start" direction="column">
-        <Text className="font-bold">{t('student:importCsv.fileToUpload')}</Text>
-        <Text className="text-text-sub text-sm mb-2">
+        <Text css={{ fontWeight: 'bold' }}>
+          {t('student:importCsv.fileToUpload')}
+        </Text>
+        <Text
+          css={{
+            color: '$textSecondary',
+            fontSize: '$3',
+            marginBottom: '$2',
+          }}
+        >
           {t('student:importCsv.instructionColumnNameMapping')}
         </Text>
 
-        <div
-          className={cn(
-            'flex flex-col transition-[border,background] duration-200',
-            isDragActive
-              ? 'border-2 border-primary bg-primary/10'
-              : 'border border-dashed border-text-disabled bg-transparent'
-          )}
+        <DropZone
+          direction="column"
+          css={{
+            border: isDragActive
+              ? '2px solid $primary'
+              : '1px dashed $textDisabled',
+            background: isDragActive ? '$primaryLight' : 'transparent',
+          }}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
-          <Box direction="column" className="my-16">
+          <Box direction="column" css={{ margin: '$16 0' }}>
             <Box direction="column">
               <SelectFileIcon />
             </Box>
             {file ? (
-              <Box className="text-base font-bold" justify="center">
+              <Box
+                css={{ fontSize: '$4', fontWeight: 'bold' }}
+                justify="center"
+              >
                 <SvgIcon
                   className="hover:cursor-pointer hover:opacity-80"
                   onClick={() => {
@@ -137,26 +149,37 @@ const UploadCSV = ({
                   {t('student:importCsv.downloadTemplate')}
                 </DownloadLink>
                 <label htmlFor="dropzone-file">
-                  <Text className="cursor-pointer text-primary p-2 border-2 border-primary rounded">
+                  <Text
+                    css={{
+                      cursor: 'pointer',
+                      color: '$primary',
+                      padding: '$2',
+                      border: '2px solid $primary',
+                      borderRadius: '$1',
+                    }}
+                  >
                     {t('student:importCsv.selectfile')}
                   </Text>
                 </label>
-                <Text className="text-text-disabled">
+                <Text
+                  css={{
+                    color: '$textDisabled',
+                  }}
+                >
                   {t('student:importCsv.orDropHere', 'or drop file here')}
                 </Text>
               </Box>
             )}
           </Box>
-          <input
+          <InputFile
             ref={refFileSelect}
             id="dropzone-file"
             type="file"
             accept=".csv, .xlsx, .xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
             multiple={false}
             onChange={handleChooseFile}
-            className="hidden"
           />
-        </div>
+        </DropZone>
       </Box>
       <Button
         disabled={!file}
@@ -180,3 +203,11 @@ const UploadCSV = ({
 }
 
 export default UploadCSV
+
+const InputFile = styled('input', {
+  display: 'none',
+})
+
+const DropZone = styled(Box, {
+  transition: 'border 0.2s, background 0.2s',
+})

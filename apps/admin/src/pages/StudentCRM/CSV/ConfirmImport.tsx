@@ -32,9 +32,11 @@ import { QUERY_KEY } from '@/constants/queryKey'
 import usePayoutData from '@/hooks/usePayoutData'
 import useSchoolData from '@/hooks/useSchoolData'
 import useSiteData from '@/hooks/useSiteData'
+import usePlanData from '@/hooks/useSubscriptionPlanData'
 import { RegisterSiteResponse } from '@/stores/siteData'
 import { userState } from '@/stores/userData'
 import { userPermissionState } from '@/stores/userPermissionData'
+import { theme } from '@/styles'
 import { InformationFieldTypes } from '@/types/applicationForm'
 import { Payout, PayoutMethodType } from '@/types/payout'
 import {
@@ -71,6 +73,9 @@ const ConfirmImport = ({
   const { register, getValues } = useForm()
   // Dummy ref for QuickFilterTable
   const quickFilterTableRef = useRef<AgGridReact>(null)
+  const { schoolSubscription } = usePlanData()
+  const { planQuotas, activePlan } = schoolSubscription || {}
+
   const [importedLength, setImportedLength] = useState<number>(0)
 
   const { t } = useTranslation()
@@ -208,7 +213,7 @@ const ConfirmImport = ({
           const isNameEqualEmail =
             studentObj.dataFoundInDb.studentEmail === studentObj.StudentEmail
           if (isNameEqualEmail) {
-            return { color: 'var(--color-warn)' }
+            return { color: theme.colors.warn.toString() }
           }
           return null
         }
@@ -226,7 +231,7 @@ const ConfirmImport = ({
           const isNameEqualPhone =
             studentObj.dataFoundInDb.studentPhone === studentObj.StudentPhone
           if (isNameEqualPhone) {
-            return { color: 'var(--color-warn)' }
+            return { color: theme.colors.warn.toString() }
           }
         }
         return null
@@ -412,7 +417,24 @@ const ConfirmImport = ({
     },
   ]
 
-  const isQuotaExceeded = false
+  const availableQuota = useMemo(() => {
+    if (planQuotas && planQuotas.activeStudents && activePlan) {
+      const numberOfNewStudents = filteredImportValidationResult.filter(
+        student => student.importError.length === 0
+      ).length
+
+      return (
+        planQuotas.activeStudents.quota -
+        planQuotas.activeStudents.used -
+        numberOfNewStudents
+      )
+    }
+    return 0
+  }, [planQuotas, filteredImportValidationResult])
+
+  const isQuotaExceeded = useMemo(() => {
+    return availableQuota <= 0
+  }, [availableQuota])
 
   const CheckImportResult = () => {
     return (
@@ -420,26 +442,28 @@ const ConfirmImport = ({
         {!isAllErrorsAbsentOrEmpty || isQuotaExceeded ? (
           <AlertBox
             icon={
-              <span className="text-warn">
-                <MdOutlineError size="24px" color="currentColor" />
-              </span>
+              <MdOutlineError
+                size="24px"
+                color={theme.colors.warn.toString()}
+              />
             }
             content={t(
               isQuotaExceeded
                 ? 'student:importCsv.quotaExceeded'
                 : 'student:importCsv.problemsExist'
             )}
-            className="font-medium"
+            css={{ fontWeight: 500 }}
           />
         ) : (
           <AlertBox
             icon={
-              <span className="text-success">
-                <IoIosCheckmarkCircle size="24px" color="currentColor" />
-              </span>
+              <IoIosCheckmarkCircle
+                size="24px"
+                color={theme.colors.success.toString()}
+              />
             }
             content={t('student:importCsv.noError')}
-            className="font-medium"
+            css={{ fontWeight: 500 }}
           />
         )}
 

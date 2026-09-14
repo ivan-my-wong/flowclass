@@ -61,6 +61,8 @@ import { ClassPriceOption } from '@/models/class-price-options.entity'
 import { ClassEntity } from '@/models/classes.entity'
 import { ClassRepository } from '@/models/classes.repository'
 import { Coupon } from '@/models/coupons.entity'
+import { CoursePromotionUsed } from '@/models/course-promotion-used.entity'
+import { CoursePromotionUsedRepository } from '@/models/course-promotion-used.repository'
 import { Course, CustomField } from '@/models/courses.entity'
 import {
   ClassAdminNewRegistrationEmailParams,
@@ -81,9 +83,10 @@ import {
 import {
   AdditionalFeeConditions,
   ClassTypeEnum,
+  DiscountType,
   PaymentMethod,
   PriceType,
-  PromotionType as PromotionTypeEnum,
+  PromotionType,
   RecordLogType,
   STRIPE_CURRENCY,
   StripeCheckoutSessionType,
@@ -98,7 +101,6 @@ import {
 } from '@/models/enums/status'
 import { InstitutionsRepository } from '@/models/institutions.repository'
 import { Invoice } from '@/models/invoice.entity'
-import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
 import { LocationRoom } from '@/models/location-room.entity'
 import { RecordLog } from '@/models/record-log.entity'
@@ -153,7 +155,7 @@ import { PaymentService } from './payment.service'
 import { RegularPeriodsService } from './regular-periods.service'
 import { SettingSiteService } from './setting-site.service'
 import { UsersService } from './users.service'
-import { WhatsappWebService } from './whatsapp-web.service'
+import { MetaWhatsappService } from '@/domain/external/meta-whatsapp.service'
 
 /**
  * Service responsible for handling enrollment of courses.
@@ -170,7 +172,7 @@ import { WhatsappWebService } from './whatsapp-web.service'
  * @param course - The course for which the user is enrolling.
  * @returns A promise that resolves to an StudentEnrollCourseResponse or PayNowResponse object,
  *          representing the enrollment record or payment link, respectively.
- * @throws BadRequestException if the class is full or there is a duplicate enrollment record.
+ * @throws BadRequestException if the class https://onefivezero.staging.flowclass.io/enrol/upload-receipt?schoolId=356&school=&course=Miss-Lau&enrolId=1105&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGZsb3djbGFzcy5pbyIsImlhdCI6MTcwMjU2OTU4NCwiZXhwIjoxNzA1MTYxNTg0fQ.CbKkK_P_fcmNc6xWScBF6IDg9F4TCFbTqybGO1krDu0 is full or there is a duplicate enrollment record.
  */
 @Injectable()
 export class EnrollCoursesService {
@@ -179,7 +181,7 @@ export class EnrollCoursesService {
   constructor(
     private readonly enrollCourseRepository: EnrollCourseRepository,
     private readonly enrollClassMappingRepository: EnrollClassMappingRepository,
-    private readonly invoicePromotionUsedRepository: InvoicePromotionUsedRepository,
+    private readonly coursePromotionUsedRepository: CoursePromotionUsedRepository,
     private readonly transactionRepository: TransactionRepository,
     private readonly classLessonService: ClassLessonService,
     private readonly invoiceRepository: InvoiceRepository,
@@ -212,7 +214,7 @@ export class EnrollCoursesService {
     @InjectRepository(StudentForm)
     private readonly studentFormRepository: Repository<StudentForm>,
     private readonly customMessageService: CustomMessageService,
-    private readonly whatsappWebService: WhatsappWebService,
+    private readonly whatsappService: MetaWhatsappService,
     private readonly notificationRecordService: NotificationRecordService,
     private readonly studentNotificationSettingRepository: StudentNotificationSettingRepository,
     private readonly classTrialLessonRepository: ClassTrialLessonRepository,
@@ -220,8 +222,8 @@ export class EnrollCoursesService {
     private readonly creditManagementService: CreditManagementService
   ) {
     this.jwtOption = {
-      secret: process.env.JWT_SECRET,
-      expiresIn: '1d',
+      secret: process.env.JWT_TOKEN_ENROLL_COURSE_SECRET_KEY,
+      expiresIn: process.env.JWT_TOKEN_ENROLL_COURSE_EXPRIED,
     }
   }
 
@@ -530,6 +532,51 @@ export class EnrollCoursesService {
       invoice.paymentLinkId = stripeSession.id
     } else if (stripeSession.clientSecret.id) {
       invoice.paymentLinkId = stripeSession.clientSecret.id
+    }
+
+    if (reCreateClientSecretDto.coupon) {
+      const couponCheck = await this.couponsService.isCouponValid({
+        couponCode: reCreateClientSecretDto.coupon,
+        enrolToken: invoice.proofToken,
+        institutionId: reCreateClientSecretDto.institutionId,
+        invoiceId: invoice.id,
+      })
+
+      if (couponCheck.valid && couponCheck.coupon) {
+        const coupon = couponCheck.coupon
+        let couponDiscount = 0
+        if (coupon.discountType === DiscountType.PERCENTAGE) {
+          couponDiscount = (originalFee * coupon.amount) / 100
+        } else {
+          couponDiscount = Math.min(coupon.amount * (invoice.numOfApplicant || 1), originalFee)
+        }
+
+        invoice.discountAmount = couponDiscount
+        invoice.payAmount = reCreateClientSecretDto.paymentAmount
+        invoice.discounts = PromotionType.COUPON_DISCOUNT
+
+        let coursePromotionUsed = await this.coursePromotionUsedRepository.findOneBy({
+          invoiceId: invoice.id,
+        })
+        if (!coursePromotionUsed) {
+          coursePromotionUsed = this.coursePromotionUsedRepository.create({
+            couponId: coupon.id,
+            courseId: course.id,
+            siteId: course.siteId,
+            institutionId: course.institutionId,
+            enrollId: invoice.enrollCourses[0]?.id || 0,
+            invoiceId: invoice.id,
+            studentId: invoice.userId || invoice.enrollCourses[0]?.userId || 0,
+            usedStatus: PromotionUsedStatus.REDEEMED,
+          })
+        } else {
+          coursePromotionUsed.couponId = coupon.id
+          coursePromotionUsed.usedStatus = PromotionUsedStatus.REDEEMED
+        }
+        await this.coursePromotionUsedRepository.save(coursePromotionUsed)
+      }
+    } else {
+      invoice.payAmount = reCreateClientSecretDto.paymentAmount
     }
 
     await this.invoiceRepository.save(invoice)
@@ -874,7 +921,7 @@ export class EnrollCoursesService {
     const successfulAccounts: StudentEnrollCourseAlias[] = listStudentAccount
       .filter((result) => result.status === 'fulfilled')
       // eslint-disable-next-line no-undef
-      .map((result) => (result as PromiseFulfilledResult<StudentEnrollCourseAlias>).value)
+      .map((result: PromiseFulfilledResult<StudentEnrollCourseAlias>) => result.value)
 
     const failedAccounts = listStudentAccount
       .filter((result) => result.status === 'rejected')
@@ -1122,7 +1169,7 @@ export class EnrollCoursesService {
       ...pricingInfoWithAdditionalFee,
       priceType: pickedClass.priceType,
       discountInfo: isTrialLesson
-        ? [pricingInfoWithAdditionalFee.discountInfo, PromotionTypeEnum.TRIAL_LESSON]
+        ? [pricingInfoWithAdditionalFee.discountInfo, PromotionType.TRIAL_LESSON]
             .filter(Boolean)
             .join(',')
         : pricingInfoWithAdditionalFee.discountInfo,
@@ -1151,7 +1198,7 @@ export class EnrollCoursesService {
       numberOfLesson: lessonCount,
       feePerLesson: meta.lessonPrice / lessonCount,
       originalFee: meta.lessonPrice,
-      discountInfo: isTrialLesson ? PromotionTypeEnum.TRIAL_LESSON : '',
+      discountInfo: isTrialLesson ? PromotionType.TRIAL_LESSON : '',
       couponDiscount: 0,
       additionalFee: 0,
       directDiscount: 0,
@@ -2291,9 +2338,11 @@ export class EnrollCoursesService {
           .join(', ')
 
         const siteAdminUser = await this.usersService.getUserOwnerOfInstitution(institution.id)
+        const adminEmail = contactEmail || siteAdminUser?.email
+        const adminPhone = contactPhone || siteAdminUser?.phone
 
         const classAdminPaymentConfirmation: ClassAdminNewRegistrationEmailParams = {
-          emailAddress: contactEmail,
+          emailAddress: adminEmail,
           studentEmail: enrollCourse.preferredEmail,
           studentName: enrollCourse.preferredName,
           studentPhone: enrollCourse.preferredPhone,
@@ -2310,9 +2359,9 @@ export class EnrollCoursesService {
           remark: course.registrationMes,
           enrolId: enrollCourse.id.toString(),
           enrollmentForm,
-          adminEmail: contactEmail,
-          adminPhone: contactPhone,
-          contactPhone,
+          adminEmail,
+          adminPhone,
+          contactPhone: adminPhone,
           recipientId: siteAdminUser?.id,
           institutionId: enrollCourse.institutionId,
           siteId: enrollCourse.siteId,
@@ -2355,7 +2404,7 @@ export class EnrollCoursesService {
           course,
           token: accessToken,
           classAdminPaymentConfirmation,
-          contactPhone,
+          contactPhone: adminPhone,
           studentPhone: enrollCourse.preferredPhone,
         })
       }
@@ -2380,9 +2429,9 @@ export class EnrollCoursesService {
       this.emitEnrollSseEvent({
         jobId,
         status: EnrollCourseSteps.FAILED,
-        error: (error as any).message,
+        error: error.message,
       })
-      const isCustomisedEnrollment = isCustomised || (error as any).message.includes('customised')
+      const isCustomisedEnrollment = isCustomised || error.message.includes('customised')
       if (isCustomisedEnrollment) {
         // Re throw the error
         throw error
@@ -2487,22 +2536,12 @@ export class EnrollCoursesService {
 
       const content = replaceContentVariables(customMessage.content, classAdminPaymentConfirmation)
 
-      await this.whatsappWebService.sendWhatsappMessage(
-        {
-          content,
-          institutionId: institution.id,
-          phone: studentPhone,
-        },
-        {
-          invoiceMetadata: {
-            invoiceId: invoice?.id,
-          },
-          recipientUserId: firstStudent?.studentAccount?.id,
-          recipientUserPhone: firstStudent?.phone,
-          institutionId: institution.id,
-          siteId: institution.siteId,
-        }
-      )
+      if (studentPhone) {
+        await this.whatsappService.sendDirectWhatsappMessage({
+          toPhone: studentPhone,
+          body: content,
+        })
+      }
     }
 
     const customMessageAdmin = await this.customMessageService.getCustomMessageByType(
@@ -2516,22 +2555,12 @@ export class EnrollCoursesService {
         classAdminPaymentConfirmation
       )
 
-      await this.whatsappWebService.sendWhatsappMessage(
-        {
-          content,
-          institutionId: institution.id,
-          phone: contactPhone,
-        },
-        {
-          invoiceMetadata: {
-            invoiceId: invoice?.id,
-          },
-          recipientUserId: invoice.userId,
-          recipientUserPhone: contactPhone,
-          institutionId: institution.id,
-          siteId: institution.siteId,
-        }
-      )
+      if (contactPhone) {
+        await this.whatsappService.sendDirectWhatsappMessage({
+          toPhone: contactPhone,
+          body: content,
+        })
+      }
     }
 
     if (dto.isSendEmail) {
@@ -2572,9 +2601,18 @@ export class EnrollCoursesService {
       institution,
       studentPhone,
       userAlias,
+      contactPhone,
     } = dto
     if (!classAdminPaymentConfirmation) return
 
+    // @deprecated
+    // const studentNotificationSetting =
+    //   await this.studentNotificationSettingRepository.getByStudentAndType(
+    //     firstStudent.studentAccount.id,
+    //     institution.id,
+    //     SupportedType.STUDENT_NOTIF_AFTER_PAYMENT_APPROVED
+    //   )
+    // !studentNotificationSetting || studentNotificationSetting.email !== false
     const updatedInvoice = await this.invoiceRepository.findOne({
       where: {
         id: invoice.id,
@@ -2612,6 +2650,16 @@ export class EnrollCoursesService {
       enrollmentForm,
     })
 
+    if (dto.isSendEmail) {
+      await this.emailService.sendClassAdminPaymentConfirmation({
+        recipientUserId: classAdminPaymentConfirmation.recipientId ?? -1,
+        institutionId: institution.id,
+        siteId: dto.site?.id,
+        payload: classAdminPaymentConfirmation,
+        enrollCourse: enrollCourses.at(0),
+      })
+    }
+
     const customMessage = await this.customMessageService.getCustomMessageByType(
       institution.id,
       SupportedType.STUDENT_NOTIF_AFTER_PAYMENT_APPROVED
@@ -2629,23 +2677,28 @@ export class EnrollCoursesService {
         site: institutionEntity.site,
       })
       const message = replaceContentVariables(customMessage.content, classAdminPaymentConfirmation)
-      const firstStudent = dto.successfulAccounts[0]
-      await this.whatsappWebService.sendWhatsappMessage(
-        {
-          content: message,
-          institutionId: institution.id,
-          phone: studentPhone,
-        },
-        {
-          invoiceMetadata: {
-            invoiceId: dto.invoice?.id,
-          },
-          recipientUserId: firstStudent?.studentAccount?.id,
-          recipientUserPhone: firstStudent?.phone,
-          institutionId: institution.id,
-          siteId: institution.siteId,
-        }
+      if (studentPhone) {
+        await this.whatsappService.sendDirectWhatsappMessage({
+          toPhone: studentPhone,
+          body: message,
+        })
+      }
+    }
+
+    const customMessageAdmin = await this.customMessageService.getCustomMessageByType(
+      institution.id,
+      SupportedType.ADMIN_NOTIF_AFTER_ENROLLMENT_SUBMITTED
+    )
+
+    if (customMessageAdmin && (contactPhone || dto.contactPhone)) {
+      const content = replaceContentVariables(
+        customMessageAdmin.content,
+        classAdminPaymentConfirmation
       )
+      await this.whatsappService.sendDirectWhatsappMessage({
+        toPhone: contactPhone || dto.contactPhone,
+        body: content,
+      })
     }
   }
 
@@ -2683,6 +2736,29 @@ export class EnrollCoursesService {
     } else if (dto.createEnrollCourseDto.paymentMethod === PaymentMethod.PAY_LATER) {
       await this.sendApplicationSubmittedReminder(dto)
     } else if (dto.isSendEmail) {
+      if (dto.classAdminPaymentConfirmation) {
+        await this.emailService.sendClassAdminNewRegistration({
+          payload: dto.classAdminPaymentConfirmation,
+          enrollCourse: dto.enrollCourses.at(0),
+        })
+
+        const customMessageAdmin = await this.customMessageService.getCustomMessageByType(
+          dto.institution.id,
+          SupportedType.ADMIN_NOTIF_AFTER_ENROLLMENT_SUBMITTED
+        )
+
+        if (customMessageAdmin && dto.contactPhone) {
+          const content = replaceContentVariables(
+            customMessageAdmin.content,
+            dto.classAdminPaymentConfirmation
+          )
+          await this.whatsappService.sendDirectWhatsappMessage({
+            toPhone: dto.contactPhone,
+            body: content,
+          })
+        }
+      }
+
       await this.emailService.sendClassStudentWaitingPayment({
         recipientUserId: parentUserAlias.userId,
         firstStudentAccount: dto.successfulAccounts[0],
@@ -2718,6 +2794,11 @@ export class EnrollCoursesService {
       course,
     })
     return finalResponse
+    // if (createEnrollCourseDto.setMultipleClass) {
+    //   return await this.multipleClassCreate(createEnrollCourseDto, currentUser, course);
+    // } else {
+    //   return await this.singleClassCreate(createEnrollCourseDto, currentUser, course);
+    // }
   }
 
   findAll(pageOptionsDto: EnrollCourseOptionDto): Promise<EnrollCoursePageDto> {
@@ -2871,10 +2952,10 @@ export class EnrollCoursesService {
     try {
       await this.jwtService.verify(token, { ...this.jwtOption })
     } catch (error) {
-      if ((error as any).name === 'TokenExpiredError') {
+      if (error.name === 'TokenExpiredError') {
         throw AuthorizationException.tokenExpiredException()
       }
-      throw AuthorizationException.tokenInvalidException((error as any).message)
+      throw AuthorizationException.tokenInvalidException(error.message)
     }
 
     const invoice = await this.invoiceRepository.findOne({
@@ -2901,16 +2982,15 @@ export class EnrollCoursesService {
     return plainToInstance(StudentEnrollCourseResponse, found)
   }
 
-  async findPromotion(enrolId: number): Promise<any> {
-    const enrollCourse = await this.enrollCourseRepository.findOneBy({ id: enrolId })
-    if (!enrollCourse) {
+  async findPromotion(enrolId: number): Promise<CoursePromotionUsed> {
+    const found = await this.coursePromotionUsedRepository.findOne({
+      where: { enrollId: enrolId },
+    })
+    if (!found) {
       throw new NotFoundException(EnrollCourseErrorMessage.ENROLL_COURSE_NOT_FOUND)
     }
-    const found = await this.invoicePromotionUsedRepository.findOneBy({
-      invoiceId: enrollCourse.invoiceId,
-      promotionType: PromotionTypeEnum.COUPON_DISCOUNT,
-    })
-    return found ?? null
+
+    return plainToInstance(CoursePromotionUsed, found)
   }
 
   async beforePayment(dto: StudentConfirmEnrollDto, course: Course) {
@@ -3008,6 +3088,15 @@ export class EnrollCoursesService {
         message: `Lesson for period with periodId = ${meta.periodId} is null`,
       }
     }
+    // const lessonsStr: string[] = pickedPeriod.lessons.map((ls) => ls.toString());
+    // const allClassLessons = new Set<string>(lessonsStr);
+    // const found = allClassLessons.has(firstLesson.toString());
+    // if (!found) {
+    //   return {
+    //     valid: false,
+    //     message: `Picked date is not a valid date in the period id = ${meta.periodId}`,
+    //   };
+    // }
     sortASC(lessonObjectToString(pickedPeriod.lessons))
     const periodLessonStr = lessonObjectToString(pickedPeriod.lessons).map((o) => o.toString())
     const index = periodLessonStr.indexOf(firstLesson.toString())
@@ -3054,9 +3143,45 @@ export class EnrollCoursesService {
     if (!checkResult.valid) {
       throw new BadRequestException(checkResult.message)
     }
-    lessonCount = checkResult.count
+    lessonCount = checkResult.count // lesson form picked period
 
-    const numberBundlePeriod = 1
+    // [1] in case We have min purchase was set ====================================
+    // get min purchase form class setting: MOCK
+    // const minPurchase = 10; // MOCK
+
+    // // take lessons from next period after picked period to get enough number of lesson
+    // if (lessonCount < minPurchase) {
+    //   const numberOfLessonNeedToPick = minPurchase - lessonCount;
+
+    //   // get next period of class ? // assuming that period can not overlap each other.
+    //   const nextPeriod = await this.regularPeriodsService.getNextPeriod(meta.periodId, meta.classId);
+    //   if (nextPeriod.period.lessons.length < numberOfLessonNeedToPick) {
+    //     throw new BadRequestException(EnrollCourseErrorMessage.NOT_ENOUGH_MIN_PURCHASE_LESSON);
+    //   }
+
+    //   // pick extra lesson from next period
+    //   const extraLessons = new Array<LessonString>();
+    //   for (let i = 0; i < numberOfLessonNeedToPick; i++) {
+    //     const element = nextPeriod.period.lessons[i];
+    //     extraLessons.push(element);
+    //   }
+    //   // or pick all the lessons from next period
+    //   // const extraLessons = nextPeriod.period.lessons;
+
+    //   // add up lessonCount
+    //   lessonCount = lessonCount + extraLessons.length;
+    //   const startPeriod = new PeriodDTO();
+    //   startPeriod.lessons = checkResult.lessons;
+    //   startPeriod.id = meta.periodId;
+    //   const extraPeriod = new PeriodDTO();
+    //   extraPeriod.lessons = extraLessons;
+    //   extraPeriod.id = nextPeriod.id;
+
+    //   meta.lessonCount = lessonCount;
+
+    // [2] in case user chose bundle purchase for this payment =======================================
+    // cont bundle = this.paymentService.getBundlePurchase(meta.classId);
+    const numberBundlePeriod = 1 // bundle.numberOfPeriod; <------- MOCK
 
     // get current period and all after it
     const seriesOfPeriods = await this.regularPeriodsService.getManyPeriods(
@@ -3417,22 +3542,38 @@ export class EnrollCoursesService {
         instructorId: userId ?? undefined,
       },
     })
-    const studentLessons = await this.studentLessonRepository.find({
-      where: {
-        classId: In(classes.map((classItem) => classItem.id)),
-        enrollCourse: {
-          confirmState: EnrollConfirmStatus.ACCEPTED,
-        },
-      },
-      relations: {
-        enrollCourse: true,
-      },
-    })
+
+    const classIds = classes.map((classItem) => classItem.id)
+    if (classIds.length === 0) {
+      return []
+    }
+
+    const counts = await this.studentLessonRepository
+      .createQueryBuilder('studentLesson')
+      .innerJoin(
+        'enroll_courses',
+        'enrollCourse',
+        'enrollCourse.id = studentLesson.enroll_course_id'
+      )
+      .where('studentLesson.class_id IN (:...classIds)', { classIds })
+      .andWhere('enrollCourse.confirm_state = :confirmState', {
+        confirmState: EnrollConfirmStatus.ACCEPTED,
+      })
+      .andWhere('enrollCourse.deleted_at IS NULL')
+      .andWhere('studentLesson.deleted_at IS NULL')
+      .select('studentLesson.class_id', 'classId')
+      .addSelect('COUNT(studentLesson.id)', 'count')
+      .groupBy('studentLesson.class_id')
+      .getRawMany()
+
+    const countMap = new Map<number, number>(
+      counts.map((row) => [Number(row.classId), Number(row.count)])
+    )
+
     return classes.map((classItem) => {
       return {
         classId: classItem.id,
-        classQuota: studentLessons.filter((studentLesson) => studentLesson.classId === classItem.id)
-          .length,
+        classQuota: countMap.get(classItem.id) ?? 0,
       } as EnrolledClassCountDTO
     })
   }

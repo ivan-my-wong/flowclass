@@ -12,6 +12,7 @@ import {
   Title,
   Trigger,
 } from '@radix-ui/react-alert-dialog'
+import { keyframes, styled } from '@stitches/react'
 import { DefaultTFuncReturn } from 'i18next'
 
 import TextInput from '@/components/Inputs/TextInput'
@@ -19,7 +20,6 @@ import { Spinner } from '@/components/Loaders/Spinner'
 import Box from '@/components/ui/Box'
 import { Button } from '@/components/ui/Button'
 import { AlertTypes } from '@/reducers/confirm.reducers'
-import { cn } from '@/utils/cn'
 
 type AlertDialogProps = {
   open: boolean
@@ -36,7 +36,6 @@ type AlertDialogProps = {
   isInputValid?: boolean
   loading?: boolean
 }
-
 const CustomedAlertDialog = ({
   open,
   setOpen,
@@ -67,6 +66,9 @@ const CustomedAlertDialog = ({
   const isWarning = alertType === AlertTypes.WARN
 
   useEffect(() => {
+    // We need to set style of body to empty string because:
+    // When go to edit page that the dropdown state is open, the dropdown component set style of body to cursor-pointer: none
+    // And after user back to setting payments page there is nothing the user can click. So we need to set style of body to empty string
     if (open) {
       document.body.style.cursor = 'default'
       document.body.style.pointerEvents = 'auto'
@@ -77,35 +79,27 @@ const CustomedAlertDialog = ({
     <Root open={open}>
       <Trigger asChild />
       <Portal>
-        {open && (
-          <Overlay
-            className="fixed inset-0 z-modal animate-dialog-overlay"
-            style={{ backgroundColor: blackA.blackA9 }}
-          />
-        )}
-        <Content
-          className={cn(
-            'bg-white rounded-md shadow-lg fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-            'w-[90vw] max-w-[500px] max-h-[85vh] p-6 z-modal',
-            'animate-dialog-content focus:outline-none',
-            'dark:bg-dark-background dark:text-light'
-          )}
-        >
-          <Title
-            className={cn('m-0 font-semibold dark:!text-white')}
-            style={{ color: mauve.mauve12 }}
+        {open && <AlertDialogOverlay />}
+        <AlertDialogContent className="dark:bg-dark-background dark:text-light">
+          <AlertDialogTitle
+            css={{ fontWeight: 600 }}
+            className="dark:!text-white"
           >
             {title}
-          </Title>
-          <Description
-            className="my-4 w-full whitespace-pre-line text-text"
-            style={{ color: mauve.mauve11, fontSize: 15, lineHeight: 1.5 }}
+          </AlertDialogTitle>
+          <AlertDialogDescription
+            css={{
+              margin: '$4 0',
+              width: '100%',
+              whiteSpace: 'pre-line',
+              color: '$text',
+            }}
           >
             {description}
-          </Description>
+          </AlertDialogDescription>
           {inputRequired && (
             <TextInput
-              className="mb-4 w-full"
+              css={{ marginBottom: '$4', width: '100%' }}
               id="input"
               name="input"
               onChange={e => handleInputChange(e.target.value)}
@@ -129,18 +123,72 @@ const CustomedAlertDialog = ({
                 >
                   {actionText}
                   {loading && (
-                    <span className="ml-2.5">
+                    <Loading>
                       <Spinner size="small" />
-                    </span>
+                    </Loading>
                   )}
                 </Button>
               </Action>
             )}
           </Box>
-        </Content>
+        </AlertDialogContent>
       </Portal>
     </Root>
   )
 }
+
+const overlayShow = keyframes({
+  '0%': { opacity: 0 },
+  '100%': { opacity: 1 },
+})
+
+const contentShow = keyframes({
+  '0%': { opacity: 0, transform: 'translate(-50%, -48%) scale(.96)' },
+  '100%': { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
+})
+
+const AlertDialogOverlay = styled(Overlay, {
+  backgroundColor: blackA.blackA9,
+  position: 'fixed',
+  inset: 0,
+  animation: `${overlayShow} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
+  zIndex: '$modal',
+})
+
+const AlertDialogContent = styled(Content, {
+  backgroundColor: 'white',
+  borderRadius: 6,
+  boxShadow: '$3',
+  position: 'fixed',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '90vw',
+  maxWidth: '500px',
+  maxHeight: '85vh',
+  padding: 25,
+  animation: `${contentShow} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
+  zIndex: '$modal',
+
+  '&:focus': { outline: 'none' },
+})
+
+const AlertDialogTitle = styled(Title, {
+  margin: 0,
+  color: mauve.mauve12,
+  fontSize: 17,
+  fontWeight: 500,
+})
+
+const AlertDialogDescription = styled(Description, {
+  marginBottom: 20,
+  color: mauve.mauve11,
+  fontSize: 15,
+  lineHeight: 1.5,
+})
+
+const Loading = styled('div', {
+  marginLeft: 10,
+})
 
 export default CustomedAlertDialog

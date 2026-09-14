@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { randomUUID } from 'crypto'
-import { FindOptionsOrder, FindOptionsWhere, In, IsNull, Like, Not } from 'typeorm'
+import { FindOptionsOrder, FindOptionsWhere, In, Like, Not, Raw } from 'typeorm'
 
 import {
   WhatsappTemplateDTO,
@@ -11,17 +10,33 @@ import {
   WhatsappTemplatePaginationDTO,
 } from '@/application/admin/whatsapp-template/dto/whatsapp-template-pagination.dto'
 import { ApiError } from '@/common/api-formats/api-error'
-import { WhatsappTemplateErrorMessage } from '@/exceptions/error-message/whatsapp-template'
+import { AutomationFunction, automationFunctions } from '@/common/constants/automationFlow'
+import { AutomationFlowErrorMessage } from '@/exceptions/error-message/automation-flow'
+import { AutomationFlowStepRepository } from '@/models/automation-flow.repository'
 import { WhatsappTemplateStatus } from '@/models/enums/status'
+import {
+  WhatsAppProvider,
+  WhatsAppProviderConnectionRepository,
+  WhatsAppProviderConnectionStatus,
+} from '@/models/whatsapp-provider-connection.entity'
 import {
   WhatsappTemplateEntity,
   WhatsappTemplateRepository,
 } from '@/models/whatsapp-template.entity'
 import { BaseService } from '@/modules/base/base.service'
 
+import { MetaGraphApiService } from '../external/meta/meta-graph-api.service'
+import { WhatsAppProviderCredentialService } from '../external/meta/whatsapp-provider-credential.service'
+
 @Injectable()
 export class WhatsappTemplateService extends BaseService<WhatsappTemplateEntity> {
-  constructor(private readonly repository: WhatsappTemplateRepository) {
+  constructor(
+    private readonly repository: WhatsappTemplateRepository,
+    private readonly automationFlowStepRepository: AutomationFlowStepRepository,
+    private readonly connectionRepository: WhatsAppProviderConnectionRepository,
+    private readonly credentialService: WhatsAppProviderCredentialService,
+    private readonly graphApiService: MetaGraphApiService
+  ) {
     super(repository)
   }
 
@@ -46,8 +61,12 @@ export class WhatsappTemplateService extends BaseService<WhatsappTemplateEntity>
         .forEach((key) => {
           if (key === 'name' && queryParams[key] !== '') {
             findOptionsWhere[key] = Like(`%${queryParams[key]}%`)
-          } else if (![0, '0', 'ALL', 'all'].includes(queryParams[key]) && queryParams[key]) {
-            findOptionsWhere[key] = queryParams[key]
+          } else if (![0, '0', 'ALL', 'all'].includes(queryParams[key])) {
+            if (key === 'assignedTo') {
+              findOptionsWhere[key] = automationFunctions[queryParams[key]]
+            } else if (queryParams[key]) {
+              findOptionsWhere[key] = queryParams[key]
+            }
           }
         })
     }
@@ -63,67 +82,27 @@ export class WhatsappTemplateService extends BaseService<WhatsappTemplateEntity>
     )
   }
 
-  getDefaultTemplates(institutionId: number): Promise<WhatsappTemplateEntity[]> {
-    // Get the default whatsappTemplate and should be approved wa template
+  async getDefaultTemplates(institutionId: number): Promise<WhatsappTemplateEntity[]> {
     return this.repository.find({
       where: {
         institutionId,
         isDefault: true,
         status: WhatsappTemplateStatus.APPROVED,
-        twilioContentId: Not(IsNull()),
       },
     })
   }
 
   async getTemplateById(id: number, institutionId: number): Promise<WhatsappTemplateEntity> {
-    let template = await this.repository.findOne({
+    const template = await this.repository.findOne({
       where: {
         id,
         institutionId,
       },
     })
     if (!template) {
-      throw new ApiError(WhatsappTemplateErrorMessage.TEMPLATE_NOT_FOUND)
-    }
-    template = await this.updateApprovalStatus(template)
-    return template
-  }
-
-  async getTemplateByContentSid(
-    contentSid: string,
-    institutionId: number
-  ): Promise<WhatsappTemplateEntity> {
-    const template = await this.repository.findOne({
-      where: {
-        twilioContentId: contentSid,
-        institutionId,
-      },
-    })
-    if (!template) {
-      throw new ApiError(WhatsappTemplateErrorMessage.TEMPLATE_NOT_FOUND)
+      throw new ApiError('Template not found')
     }
     return template
-  }
-
-  async approvalRequest(whatsappTemplate: WhatsappTemplateEntity): Promise<WhatsappTemplateEntity> {
-    whatsappTemplate.status = WhatsappTemplateStatus.APPROVED
-    return this.repository.save(whatsappTemplate)
-  }
-
-  async submitApprovalRequest(id: number, institutionId: number): Promise<WhatsappTemplateEntity> {
-    const whatsappTemplate = await this.getTemplateById(id, institutionId)
-    if (whatsappTemplate.twilioContentId) {
-      return this.approvalRequest(whatsappTemplate)
-    }
-    return whatsappTemplate
-  }
-
-  createWhatsappTemplateName(name: string, language: string, institutionId: number): string {
-    return `${language}_${institutionId}_${name}`
-  }
-
-  private createLocalTemplateReference(): string {
-    return `local-${randomUUID()}`
   }
 
   async createWhatsappTemplate(
@@ -131,27 +110,55 @@ export class WhatsappTemplateService extends BaseService<WhatsappTemplateEntity>
     payload: WhatsappTemplateDTO
   ): Promise<WhatsappTemplateEntity> {
     try {
-      const whatsappTemplate = await this.repository.create(payload)
-
+      const whatsappTemplate = this.repository.create(payload)
       whatsappTemplate.institutionId = institutionId
+      whatsappTemplate.provider = WhatsAppProvider.META_CLOUD
       whatsappTemplate.status = WhatsappTemplateStatus.APPROVED
-      whatsappTemplate.twilioContentId = this.createLocalTemplateReference()
 
+      // Check if Meta connection exists to create remote template
+      const connection = await this.connectionRepository.findByInstitutionId(institutionId)
+      const credential = await this.credentialService.getMeta(institutionId)
+      if (
+        connection &&
+        connection.provider === WhatsAppProvider.META_CLOUD &&
+        connection.status === WhatsAppProviderConnectionStatus.CONNECTED &&
+        connection.wabaId &&
+        credential?.accessToken
+      ) {
+        try {
+          const remote = await this.graphApiService.createMessageTemplate(
+            connection.wabaId,
+            credential.accessToken,
+            {
+              name: payload.name.toLowerCase(),
+              language: payload.language,
+              category: payload.category || 'UTILITY',
+              components: [
+                {
+                  type: 'BODY',
+                  text: payload.content,
+                },
+              ],
+            }
+          )
+          whatsappTemplate.metaTemplateId = remote.id
+          whatsappTemplate.status =
+            remote.status === 'APPROVED'
+              ? WhatsappTemplateStatus.APPROVED
+              : WhatsappTemplateStatus.PENDING
+          whatsappTemplate.metaResponse = remote as any
+        } catch (metaErr) {
+          console.error('Meta Graph API template create non-fatal warning:', metaErr)
+        }
+      }
+
+      if (whatsappTemplate.isDefault) {
+        await this.checkAndChangeDefaultTemplate(institutionId, whatsappTemplate.assignedTo)
+      }
       return this.repository.save(whatsappTemplate)
     } catch (error) {
-      throw new ApiError(WhatsappTemplateErrorMessage.TEMPLATE_NOT_CREATED)
+      throw new ApiError('Failed to create WhatsApp template')
     }
-  }
-
-  async updateApprovalStatus(
-    whatsappTemplate: WhatsappTemplateEntity
-  ): Promise<WhatsappTemplateEntity> {
-    if (!whatsappTemplate.twilioContentId) return whatsappTemplate
-    if (whatsappTemplate.status !== WhatsappTemplateStatus.APPROVED) {
-      whatsappTemplate.status = WhatsappTemplateStatus.APPROVED
-      return this.repository.save(whatsappTemplate)
-    }
-    return whatsappTemplate
   }
 
   async updateWhatsappTemplate(
@@ -163,14 +170,67 @@ export class WhatsappTemplateService extends BaseService<WhatsappTemplateEntity>
     whatsappTemplate = await this.repository.save({
       ...whatsappTemplate,
       ...payload,
-      status: WhatsappTemplateStatus.APPROVED,
-      twilioContentId: whatsappTemplate.twilioContentId || this.createLocalTemplateReference(),
     })
-    return this.repository.save(whatsappTemplate)
+
+    if (whatsappTemplate.isDefault) {
+      await this.checkAndChangeDefaultTemplate(institutionId, whatsappTemplate.assignedTo, id)
+    }
+    return whatsappTemplate
+  }
+
+  async submitApprovalRequest(id: number, institutionId: number): Promise<WhatsappTemplateEntity> {
+    const whatsappTemplate = await this.getTemplateById(id, institutionId)
+    // In Meta Cloud API, templates are automatically submitted for review upon creation/update.
+    return whatsappTemplate
+  }
+
+  async checkAndChangeDefaultTemplate(
+    institutionId: number,
+    assignedTo: AutomationFunction,
+    id?: number
+  ): Promise<void> {
+    const criteria = { institutionId, isDefault: true, assignedTo }
+    if (id) {
+      criteria['id'] = Not(id)
+    }
+    await this.repository.update(criteria, { isDefault: false })
   }
 
   async deleteWhatsappTemplate(id: number, institutionId: number): Promise<void> {
     const whatsappTemplate = await this.getTemplateById(id, institutionId)
+    if (whatsappTemplate.metaTemplateId) {
+      const connection = await this.connectionRepository.findByInstitutionId(institutionId)
+      const credential = await this.credentialService.getMeta(institutionId)
+      if (connection?.wabaId && credential?.accessToken) {
+        try {
+          await this.graphApiService.deleteMessageTemplate(
+            connection.wabaId,
+            credential.accessToken,
+            {
+              templateId: whatsappTemplate.metaTemplateId,
+              name: whatsappTemplate.name,
+            }
+          )
+        } catch (err) {
+          console.error('Meta template delete warning:', err)
+        }
+      }
+    }
     await this.repository.remove(whatsappTemplate)
+  }
+
+  async getTemplatesByAutomationStepId(stepId: number): Promise<WhatsappTemplateEntity[]> {
+    const automationFlowStep = await this.automationFlowStepRepository.findOneById(stepId)
+    if (!automationFlowStep) {
+      throw new ApiError(AutomationFlowErrorMessage.STEP_NOT_FOUND)
+    }
+    const { automationFunction } = automationFlowStep
+    const functionName = automationFunction.functionName
+    return this.repository.findBy({
+      assignedTo: Raw((alias) => `${alias} @> :value`, {
+        value: JSON.stringify({ functionName }),
+      }),
+      status: WhatsappTemplateStatus.APPROVED,
+    })
   }
 }

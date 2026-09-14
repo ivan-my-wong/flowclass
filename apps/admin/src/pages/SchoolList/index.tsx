@@ -63,7 +63,12 @@ const SchoolList = (): JSX.Element => {
         />
       )}
       {isSuccess && schoolCardList.length > 0 && (
-        <Box direction="column" className="w-full p-4 gap-4">
+        <Box
+          direction="row"
+          responsive
+          justify="flex-start"
+          css={{ padding: '1rem', flexWrap: 'wrap' }}
+        >
           {schoolCardList}
         </Box>
       )}

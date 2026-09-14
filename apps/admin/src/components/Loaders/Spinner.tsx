@@ -1,40 +1,67 @@
-import { cn } from '@/utils/cn'
+import { keyframes, styled } from '../../styles'
 
-type SpinnerProps = {
-  size?: 'small'
-  className?: string
-}
+const spin = keyframes({
+  '0%': {
+    transform: 'rotate(0deg)',
+  },
+  '100%': {
+    transform: 'rotate(360deg)',
+  },
+})
 
-const Spinner = ({ size, className }: SpinnerProps) => (
-  <div
-    className={cn(
-      'rounded-full w-16 h-16 my-8 mx-auto text-[10px] relative',
-      'border-[5px] border-[rgba(217,217,217,0.2)] border-l-[#d9d9d9]',
-      'animate-spin',
-      size === 'small' && 'w-8 h-8 text-base -my-1',
-      className
-    )}
-  />
-)
+const Spinner = styled('div', {
+  borderRadius: '50%',
+  $$spinnerSize: '4em',
+  $$spinnerWidth: '5px',
+  $$spinnerShadow: 'rgba(217,217,217, 0.2)',
+  $$spinnerFilled: '#d9d9d9',
+  width: '$$spinnerSize',
+  height: '$$spinnerSize',
+  margin: 'calc($$spinnerSize / 2) auto',
+  fontSize: '10px',
+  position: 'relative',
+  borderTop: '$$spinnerWidth solid $$spinnerShadow',
+  borderRight: '$$spinnerWidth solid $$spinnerShadow',
+  borderBottom: '$$spinnerWidth solid $$spinnerShadow',
+  borderLeft: '$$spinnerWidth solid $$spinnerFilled',
+  animation: `${spin} 1.1s infinite linear`,
 
-const Spinner2 = ({ className }: { className?: string }) => (
-  <svg
-    className={cn(
-      'animate-spin z-[2] absolute top-1/2 left-1/2 -mt-4 -ml-4 w-6 h-6',
-      '[&_.path]:stroke-[hsl(210,70%,75%)] [&_.path]:stroke-linecap-round [&_.path]:animate-dash',
-      className
-    )}
-    viewBox="0 0 50 50"
-  >
-    <circle
-      className="path"
-      cx="25"
-      cy="25"
-      r="20"
-      fill="none"
-      strokeWidth="5"
-    />
-  </svg>
-)
+  variants: {
+    size: {
+      small: {
+        $$spinnerSize: '2em',
+        fontSize: '$2',
+        margin: '-$1 0',
+      },
+    },
+  },
+})
+
+const rotate = keyframes({
+  '100%': { transform: 'rotate(360deg)' },
+})
+
+const dash = keyframes({
+  '0%': { strokeDasharray: '1, 150', strokeDashoffset: '0' },
+  '50%': { strokeDasharray: '90, 150', strokeDashoffset: '-35' },
+  '100%': { strokeDasharray: '90, 150', strokeDashoffset: '-124' },
+})
+
+const Spinner2 = styled('svg', {
+  animation: `${rotate} 2s linear infinite`,
+  zIndex: '2',
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  margin: '-$4 0 0 -$4',
+  width: '$6',
+  height: '$6',
+
+  '& .path': {
+    stroke: 'hsl(210, 70%, 75%)',
+    strokeLinecap: 'round',
+    animation: `${dash} 1.5s ease-in-out infinite`,
+  },
+})
 
 export { Spinner, Spinner2 }

@@ -44,7 +44,6 @@ import { TransactionRepository } from '@/models/transaction.repository'
 import { UserAlias } from '@/models/user-aliases.entity'
 import { User } from '@/models/user.entity'
 import { UsersRepository } from '@/models/users.repository'
-import { DivitOrder } from '@/modules/divit/entities/divit-order.entity'
 
 import {
   DashboardParams,
@@ -197,8 +196,6 @@ export class InvoiceService {
       createInvoiceDTO.payAmount = previousInvoice.payAmount
     }
 
-    createInvoiceDTO.amountPaid = createInvoiceDTO.payAmount ?? 0
-
     const updateInvoice = await this.invoiceRepository.update(
       { id: previousInvoice.id },
       {
@@ -271,7 +268,6 @@ export class InvoiceService {
         originalFee,
         numOfLesson: pricingInfo.numberOfLesson,
         payAmount: hasPresetPayAmount ? previousInvoice.payAmount : pricingInfo.paymentAmount,
-        amountPaid: 0,
         discountAmount: pricingInfo.totalDiscount,
         discounts: pricingInfo.discountInfo,
         paymentState: PaymentStatus.PENDING,
@@ -294,7 +290,6 @@ export class InvoiceService {
         ...baseDataMapping,
         feePerLesson: 0,
         payAmount: 0,
-        amountPaid: 0,
         discountAmount: pricingInfo.totalDiscount,
         discounts: pricingInfo.discountInfo,
         paymentState: PaymentStatus.PAID,
@@ -310,7 +305,6 @@ export class InvoiceService {
 
         feePerLesson: 0,
         payAmount: 0,
-        amountPaid: 0,
         discounts: '',
         paymentState: PaymentStatus.PAID,
       }
@@ -384,7 +378,9 @@ export class InvoiceService {
         course: {
           classes: true,
         },
-        invoicePromotionsUsed: true,
+        promotionUsed: {
+          coupon: true,
+        },
       },
       select: {
         studentSchedules: {
@@ -509,8 +505,9 @@ export class InvoiceService {
         course: {
           classes: true,
         },
-        invoicePromotionsUsed: true,
-        paymentEvidence: true,
+        promotionUsed: {
+          coupon: true,
+        },
       },
       select: {
         course: {
@@ -536,6 +533,16 @@ export class InvoiceService {
           multipleClassMapping: true,
         },
         payAmount: true,
+        originalFee: true,
+        additionalFee: true,
+        discountAmount: true,
+        discounts: true,
+        numOfApplicant: true,
+        feePerLesson: true,
+        numOfLesson: true,
+        paymentMethod: true,
+        paymentLinkId: true,
+        transactionId: true,
         paymentState: true,
         updatedAt: true,
         id: true,
@@ -580,7 +587,9 @@ export class InvoiceService {
           firstStudentLesson: true,
         },
         course: true,
-        invoicePromotionsUsed: true,
+        promotionUsed: {
+          coupon: true,
+        },
       },
     })
     if (!found) {
@@ -611,7 +620,9 @@ export class InvoiceService {
           firstStudentLesson: true,
         },
         course: true,
-        invoicePromotionsUsed: true,
+        promotionUsed: {
+          coupon: true,
+        },
       },
     })
 
@@ -637,7 +648,9 @@ export class InvoiceService {
           firstStudentLesson: true,
         },
         course: true,
-        invoicePromotionsUsed: true,
+        promotionUsed: {
+          coupon: true,
+        },
       },
     })
     if (!found) {
@@ -659,9 +672,6 @@ export class InvoiceService {
       throw new NotFoundException(InvoiceErrorMessage.INVOICE_NOT_FOUND)
     }
     invoice.paymentState = state
-    if (state === PaymentStatus.PAID) {
-      invoice.amountPaid = invoice.payAmount ?? 0
-    }
     // invoice.approvedBy = approvedBy;
     // invoice.approverId = approverId;
     return await this.invoiceRepository.save(invoice)
@@ -722,7 +732,9 @@ export class InvoiceService {
         course: true,
       },
       childInvoices: true,
-      invoicePromotionsUsed: true,
+      promotionUsed: {
+        coupon: true,
+      },
     }
 
     const select: FindOptionsSelect<Invoice> = {
@@ -780,7 +792,15 @@ export class InvoiceService {
         id: true,
         status: true,
       },
-      invoicePromotionsUsed: true,
+      promotionUsed: {
+        id: true,
+        coupon: {
+          id: true,
+          code: true,
+          discountType: true,
+          amount: true,
+        },
+      },
       userAlias: {
         id: true,
         userId: true,
@@ -793,7 +813,6 @@ export class InvoiceService {
         },
       },
       remark: true,
-      documentCampaignId: true,
     }
     // If current request is initial request and there is no data, we will delete the createdAt filter
     // This is to avoid the case that the user not show the data when there is no data at the first time
@@ -825,7 +844,7 @@ export class InvoiceService {
       })
     }
 
-    const pageDto = await this.invoiceRepository.paginationWithTransform(
+    return this.invoiceRepository.paginationWithTransform(
       rest,
       Invoice,
       whereCondition,
@@ -835,24 +854,6 @@ export class InvoiceService {
       true,
       additionalFilterFn
     )
-
-    const divitInvoiceIds = pageDto.content
-      .filter((invoice) => invoice.paymentMethod === 'PAY_NOW_DIVIT')
-      .map((invoice) => invoice.id)
-
-    if (divitInvoiceIds.length > 0) {
-      const divitOrders = await this.invoiceRepository.manager.find(DivitOrder, {
-        where: { invoiceId: In(divitInvoiceIds) },
-      })
-      const divitOrdersMap = _.keyBy(divitOrders, 'invoiceId')
-      pageDto.content.forEach((invoice) => {
-        if (invoice.paymentMethod === 'PAY_NOW_DIVIT') {
-          invoice.divitOrder = divitOrdersMap[invoice.id] || null
-        }
-      })
-    }
-
-    return pageDto
   }
 
   async findSingleInvoiceByInvoiceId(invoiceId: number): Promise<Invoice> {
@@ -867,14 +868,12 @@ export class InvoiceService {
       userAlias: true,
       enrollCourses: {
         course: true,
-        // Each enrollCourse can carry its own userAlias on combined invoices
-        // (one invoice ↔ many students). Loading it lets the frontend edit
-        // each student's contact info independently of the buyer's alias.
-        userAlias: true,
       },
       // course: true,
       childInvoices: true,
-      invoicePromotionsUsed: true,
+      promotionUsed: {
+        coupon: true,
+      },
     }
 
     const invoice = await this.invoiceRepository.findOne({
@@ -886,12 +885,6 @@ export class InvoiceService {
 
     if (!invoice) {
       throw new NotFoundException('CANNOT_FIND_INVOICE')
-    }
-
-    if (invoice.paymentMethod === 'PAY_NOW_DIVIT') {
-      invoice.divitOrder = await this.invoiceRepository.manager.findOne(DivitOrder, {
-        where: { invoiceId: invoice.id },
-      })
     }
 
     return invoice
@@ -1010,31 +1003,21 @@ export class InvoiceService {
     return newInvoice
   }
 
-  async updateAmountPaid(invoiceId: number, amountPaid: number): Promise<Invoice> {
-    if (amountPaid < 0 || !Number.isFinite(amountPaid)) {
-      throw new BadRequestException('Amount paid must be a non-negative number')
+  async updatePaymentDate(invoiceId: number, paymentDate: string): Promise<Invoice> {
+    if (!paymentDate) {
+      throw new BadRequestException('Payment date is required')
     }
 
-    const invoice = await this.invoiceRepository.findOneById(invoiceId)
-
-    if (!invoice) {
-      throw new NotFoundException(InvoiceErrorMessage.INVOICE_NOT_FOUND)
+    const parts = paymentDate.split(/[-T/]/)
+    if (parts.length < 3) {
+      throw new BadRequestException('Invalid payment date format. Expected YYYY-MM-DD.')
     }
+    const year = parseInt(parts[0], 10)
+    const month = parseInt(parts[1], 10) - 1
+    const day = parseInt(parts[2], 10)
+    const parsedDate = new Date(Date.UTC(year, month, day))
 
-    invoice.amountPaid = amountPaid
-    return await this.invoiceRepository.save(invoice)
-  }
-
-  async updatePaymentDate(
-    invoiceId: number,
-    payload: { paymentDate?: string; createdAt?: string; updatedAt?: string }
-  ): Promise<Invoice> {
-    const hasPaymentDate = payload.paymentDate !== undefined
-    const hasCreatedAt = payload.createdAt != null && payload.createdAt !== ''
-    const hasUpdatedAt = payload.updatedAt != null && payload.updatedAt !== ''
-
-    const parsedDate = dayjs(payload.paymentDate)
-    if (!parsedDate.isValid()) {
+    if (isNaN(parsedDate.getTime())) {
       throw new BadRequestException('Invalid payment date format. Expected YYYY-MM-DD.')
     }
 
@@ -1049,7 +1032,7 @@ export class InvoiceService {
 
     const oldPaymentDate = invoice.paymentDate
 
-    invoice.paymentDate = parsedDate.toDate()
+    invoice.paymentDate = parsedDate
 
     const updatedInvoice = await this.invoiceRepository.save(invoice)
 

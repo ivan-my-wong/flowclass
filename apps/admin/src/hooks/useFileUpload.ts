@@ -40,7 +40,7 @@ const useFileUpload = () => {
         successfulCallback?.(data)
       },
       onError: (error: ApiError) => {
-        toast.error(error.message)
+        handleApiError({ error, t, showToast: true })
       },
     })
     return mutation
@@ -57,7 +57,7 @@ const useFileUpload = () => {
         successfulCallback?.(data)
       },
       onError: (error: ApiError) => {
-        toast.error(error.message)
+        handleApiError({ error, t, showToast: true })
       },
     })
     return mutation

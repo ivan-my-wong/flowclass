@@ -1,34 +1,41 @@
 import { atom } from 'recoil'
 
 import { ATOM_KEY } from '../constants/atomKey'
-
-type ActivePlan = {
-  planIds?: number[]
-  notificationChannels?: Record<string, boolean>
-  customerSupportTier?: string
-  isTrial?: boolean
-}
-
-type PlanQuotas = {
-  activeStudents?: { used: number; quota: number }
-  reminder?: { used: number; quota: number }
-}
+import {
+  PlanWithQuotasResponse,
+  SubscriptionPlanRecord,
+} from '../types/schoolSubscriptionPlan'
 
 const defaultSubscriptionState: {
-  planRecords: unknown[]
-  activePlan: ActivePlan
-  planQuotas: PlanQuotas
+  planRecords: SubscriptionPlanRecord[]
+  activePlan: SubscriptionPlanRecord
+  planQuotas: PlanWithQuotasResponse
 } = {
-  planRecords: [],
-  activePlan: {},
-  planQuotas: {},
+  planRecords: [] as SubscriptionPlanRecord[],
+  activePlan: {} as SubscriptionPlanRecord,
+  planQuotas: {} as PlanWithQuotasResponse,
 }
 
 export const schoolSubscriptionState = atom<{
-  planRecords: unknown[]
-  activePlan: ActivePlan
-  planQuotas: PlanQuotas
+  planRecords: SubscriptionPlanRecord[]
+  activePlan: SubscriptionPlanRecord
+  planQuotas: PlanWithQuotasResponse
 }>({
   key: ATOM_KEY.SchoolSubscriptionState,
   default: defaultSubscriptionState,
+})
+
+export type SubscriptionDialogState = {
+  open: boolean
+  message: string | null
+}
+
+const defaultSubscriptionDialogState: SubscriptionDialogState = {
+  open: false,
+  message: null,
+}
+
+export const subscriptionDialogOpenState = atom<SubscriptionDialogState>({
+  key: ATOM_KEY.SubscriptionDialogOpenState,
+  default: defaultSubscriptionDialogState,
 })

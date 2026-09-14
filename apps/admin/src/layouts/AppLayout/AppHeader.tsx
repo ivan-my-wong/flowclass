@@ -3,7 +3,14 @@ import { useNavigate } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
 import { FaWhatsapp } from 'react-icons/fa'
-import { LuLogOut, LuPen, LuSchool, LuUser } from 'react-icons/lu'
+import {
+  LuCreditCard,
+  LuLogOut,
+  LuPen,
+  LuRocket,
+  LuSchool,
+  LuUser,
+} from 'react-icons/lu'
 import { MdAccountCircle } from 'react-icons/md'
 import { CSSTransition } from 'react-transition-group'
 import { useRecoilValue } from 'recoil'
@@ -28,7 +35,57 @@ import { useResponsive } from '@/hooks/useResponsive'
 import useSiteData from '@/hooks/useSiteData'
 import { userState } from '@/stores/userData'
 import { userPermissionState, UserRole } from '@/stores/userPermissionData'
+import { styled } from '@/styles'
 import { cn } from '@/utils/cn'
+
+import SubscriptionPlanInfo from './SubscriptionPlanInfo'
+
+const MobileHeader = styled('header', {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '$2 $3 $2 $3',
+  color: '$primary',
+  height: '100%',
+})
+
+const DesktopHeader = styled('header', {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '$2 $4',
+  color: '$primary',
+  height: '100%',
+})
+
+const MenuBarLayer = styled('div', {
+  width: '18rem',
+  boxShadow: '$2',
+  backgroundColor: '$backgroundLayer2',
+})
+
+const MenuBarContainer = styled('div', {
+  position: 'fixed',
+  top: '0',
+  left: '0',
+  width: '100vw',
+  height: '100vh',
+
+  '.menubar-enter': {
+    transform: 'translateX(-100%)',
+  },
+  '.menubar-enter-active': {
+    transform: 'translateX(0)',
+    transition: 'transform 300ms',
+  },
+  '.menubar-exit': {
+    transform: 'translateX(0)',
+  },
+  '.menubar-exit-active': {
+    transform: 'translateX(-100%)',
+    transition: 'transform 300ms',
+  },
+})
 
 const AppHeader: React.FC = () => {
   const { isMobile } = useResponsive()
@@ -124,10 +181,36 @@ const AppHeader: React.FC = () => {
     },
   ]
 
+  const subscriptionMenuItems: DropDownMenuItemType[] = [
+    {
+      type: 'item',
+      content: (
+        <>
+          <LuRocket className="mr-4 text-2xl" />
+
+          <p>{t('component:menubar.visitSubscription')}</p>
+        </>
+      ),
+      onClick: () => {
+        navigate('/subscription')
+      },
+    },
+    {
+      type: 'item',
+      content: <SubscriptionPlanInfo />,
+    },
+  ]
+
   const RightHeader = (): JSX.Element => {
     if (isMobile) {
       return (
         <div className="box-row-full gap-3 justify-end mr-1">
+          <DropdownMenu
+            menuItems={subscriptionMenuItems}
+            contentProps={{ minWidth: '16rem', zIndex: 999 }}
+            trigger={<LuCreditCard className="text-2xl text-text-subtle" />}
+          />
+
           <DropdownMenu
             menuItems={accountMenuItems}
             contentProps={{ minWidth: '16rem', zIndex: 999 }}
@@ -145,6 +228,16 @@ const AppHeader: React.FC = () => {
           'gap-4': !isMobile,
         })}
       >
+        {(userPermission === UserRole.MasterAdmin ||
+          userPermission === UserRole.SiteAdmin) && (
+          <Button
+            iconBefore={<LuCreditCard size={18} />}
+            variant="ghost"
+            onClick={() => navigate('/subscription')}
+          >
+            {t('subscription:headerBtnViewSubscription')}
+          </Button>
+        )}
         <DropdownMenu
           data-testid="account-top-right-menu"
           menuItems={accountMenuItems}
@@ -169,7 +262,7 @@ const AppHeader: React.FC = () => {
 
   if (!isMobile) {
     return (
-      <header className="flex items-center justify-between p-2 p-4 text-primary h-full">
+      <DesktopHeader>
         <Box align="center" justify="start">
           {currentSite?.logo ? (
             <ImageAspect
@@ -196,7 +289,7 @@ const AppHeader: React.FC = () => {
             <SiteSelector />
           ) : (
             <>
-              <SchoolSelector />
+              <SchoolSelector triggerVariant="compact" />
               {(userPermission === UserRole.MasterAdmin ||
                 userPermission === UserRole.SiteAdmin) && (
                 <Button
@@ -215,12 +308,12 @@ const AppHeader: React.FC = () => {
           <ViewSiteButton variant="primary-outline" size="sm" />
         </Box>
         <RightHeader />
-      </header>
+      </DesktopHeader>
     )
   }
   return (
     <>
-      <header className="flex items-center justify-between py-2 px-3 text-primary h-full">
+      <MobileHeader>
         <ImageAspect
           src={flowclassLogo}
           alt="Flowclass"
@@ -231,18 +324,11 @@ const AppHeader: React.FC = () => {
         <Box justify="end">
           <RightHeader />
 
-          <button
-            type="button"
-            className="cursor-pointer bg-transparent border-0 p-0"
-            onClick={toggleMenu}
-            aria-label="Toggle menu"
-          >
-            <SvgIcon>
-              <MenuIcon />
-            </SvgIcon>
-          </button>
+          <SvgIcon onClick={toggleMenu} css={{ cursor: 'pointer' }}>
+            <MenuIcon />
+          </SvgIcon>
         </Box>
-      </header>
+      </MobileHeader>
       <CSSTransition
         in={isMenuOpen}
         nodeRef={nodeRef}
@@ -250,22 +336,11 @@ const AppHeader: React.FC = () => {
         classNames="menubar"
         unmountOnExit
       >
-        <div
-          role="button"
-          tabIndex={0}
-          className="fixed top-0 left-0 w-screen h-screen [&_.menubar-enter]:-translate-x-full [&_.menubar-enter-active]:translate-x-0 [&_.menubar-enter-active]:transition-transform [&_.menubar-enter-active]:duration-300 [&_.menubar-exit]:translate-x-0 [&_.menubar-exit-active]:-translate-x-full [&_.menubar-exit-active]:transition-transform [&_.menubar-exit-active]:duration-300"
-          onClick={toggleMenu}
-          onKeyDown={e => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault()
-              toggleMenu()
-            }
-          }}
-        >
-          <div ref={nodeRef} className="w-72 shadow-lg bg-background-layer-2">
+        <MenuBarContainer onClick={toggleMenu}>
+          <MenuBarLayer ref={nodeRef}>
             <MenuBar />
-          </div>
-        </div>
+          </MenuBarLayer>
+        </MenuBarContainer>
       </CSSTransition>
     </>
   )

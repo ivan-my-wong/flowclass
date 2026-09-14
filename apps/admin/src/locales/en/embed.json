@@ -10,14 +10,10 @@
     "custom": "Code",
     "others": "Others"
   },
-
   "configuration": {
     "title": "Configuration",
     "setWidthHeightCourse": "Please select the course you want to link to, and then set the width and height of the widget:",
-    "width": "Width:",
     "height": "Height:",
-    "course": "Course:",
-    "apply": "Apply",
     "negative": "Please enter a positive number.",
     "entireSchool": "Entire School",
     "element": "Element"

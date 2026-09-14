@@ -10,6 +10,7 @@ import ScrollArea from '../../components/Containers/ScrollArea'
 import { TextInput } from '../../components/Inputs/TextInput'
 import Kbd from '../../components/Texts/Kbd'
 import Text from '../../components/Texts/Text'
+import { styled } from '../../styles'
 
 const SEARCHABLE_PATH = {}
 const PATH_OPTIONS = Object.entries(
@@ -35,6 +36,22 @@ export type SearchOptionItemProps = SimpleSelectorItemProps & {
   onSelect: (args: SearchOptionItemProps['value']) => void
 }
 
+const SelectOptionListWrapper = styled('div', {
+  width: '200px',
+  position: 'absolute',
+  transformOrigin: 'top center',
+  borderRadius: '$medium',
+  backgroundColor: '$background',
+  boxShadow: '0 0 10px $colors$shadowColor',
+  padding: '$min',
+})
+
+const SelectOptionList = styled('ul', {
+  listStyle: 'none',
+  padding: '$min',
+  margin: 0,
+})
+
 const SearchOptionItem: React.FC<SearchOptionItemProps> = ({
   label,
   value,
@@ -43,18 +60,25 @@ const SearchOptionItem: React.FC<SearchOptionItemProps> = ({
   return (
     <li>
       <Button
-        variant="ghost"
+        variants="text"
         onClick={e => {
           e.stopPropagation()
           onSelect(value)
         }}
-        className="w-full text-left p-1"
+        css={{ width: '100%', textAlign: 'left', padding: '$min' }}
       >
         {label}
       </Button>
     </li>
   )
 }
+
+const SearchKbdCombo = styled('div', {
+  position: 'absolute',
+  right: '$small',
+  top: '50%',
+  transform: 'translate(0, -50%)',
+})
 
 const NavSearchBar: React.FC = () => {
   const navigate = useNavigate()
@@ -94,16 +118,16 @@ const NavSearchBar: React.FC = () => {
 
   return (
     <div onBlur={handleBlur}>
-      <div className="absolute right-2 top-1/2 -translate-y-1/2">
+      <SearchKbdCombo>
         <Kbd>ctrl</Kbd>
         <Kbd>K</Kbd>
-      </div>
+      </SearchKbdCombo>
       <TextInput
         ref={inputRef}
         value={searchValue}
         onChange={(e: any) => setSearchValue(e.target.value)}
         onFocus={handleFocus}
-        className="w-[200px]"
+        css={{ width: '200px' }}
         placeholder="Search Page"
         onKeyDown={e => {
           if (e.key === 'Escape') {
@@ -113,11 +137,11 @@ const NavSearchBar: React.FC = () => {
       />
 
       {isSelectOpen && (
-        <div className="w-[200px] absolute origin-top-center rounded-md bg-background shadow-[0_0_10px_var(--shadow)] p-1">
-          <Kbd className="absolute top-4 right-4">Tab</Kbd>
+        <SelectOptionListWrapper>
+          <Kbd css={{ position: 'absolute', top: '$4', right: '$4' }}>Tab</Kbd>
           <ScrollArea>
             {filteredOptions.length > 0 ? (
-              <ul role="listbox" className="list-none p-1 m-0">
+              <SelectOptionList role="listbox">
                 {filteredOptions.map(opt => (
                   <SearchOptionItem
                     key={opt.label}
@@ -125,12 +149,19 @@ const NavSearchBar: React.FC = () => {
                     onSelect={handleSelect}
                   />
                 ))}
-              </ul>
+              </SelectOptionList>
             ) : (
-              <Text className="text-center p-2">No Result</Text>
+              <Text
+                css={{
+                  textAlign: 'center',
+                  padding: '$small',
+                }}
+              >
+                No Result
+              </Text>
             )}
           </ScrollArea>
-        </div>
+        </SelectOptionListWrapper>
       )}
     </div>
   )

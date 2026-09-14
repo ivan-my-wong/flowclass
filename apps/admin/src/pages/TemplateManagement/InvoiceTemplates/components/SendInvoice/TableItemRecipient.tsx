@@ -20,10 +20,8 @@ import { formatPhoneNumber } from '@/utils/misc'
 
 type Props = {
   student: InvoiceStudent
-  showTotal?: boolean
 }
-
-const TableItemRecipient: FC<Props> = ({ student, showTotal = true }) => {
+const TableItemRecipient: FC<Props> = ({ student }) => {
   const { t } = useTranslation('invoiceCampaign')
   const invoiceCampaign = useRecoilValue(invoiceCampaignState)
   const { currentSite } = useRecoilValue(siteState)
@@ -35,7 +33,6 @@ const TableItemRecipient: FC<Props> = ({ student, showTotal = true }) => {
     })
   )
   const setAllInvoiceStudents = useSetRecoilState(invoiceStudentState)
-
   const parentOfCurrentStudent = useMemo(() => {
     if (!student.childOfUserAliasId) return null
     if (studentList.length === 0) return null
@@ -44,25 +41,23 @@ const TableItemRecipient: FC<Props> = ({ student, showTotal = true }) => {
       item => item.id === student.childOfUserAliasId
     )
     if (!findParent) return null
-
-    return {
+    const parentData = {
       ...findParent,
-      email: findParent.email ?? student.email,
-      phone: findParent.user?.phone ?? student.phone,
     }
+
+    parentData.email = parentData.email ?? student.email
+    parentData.phone = parentData.user?.phone ?? student.phone
+
+    return parentData ?? null
   }, [student, studentList])
 
-  // Parent is the default recipient; toggling ON sends to student instead
-  const updateSendToStudent = (sendToStudent: boolean) => {
+  const updateInvoiceRecipient = (value: boolean) => {
     setAllInvoiceStudents(prev =>
       prev.map(item =>
-        item.id === student.id
-          ? { ...item, isSendToParent: !sendToStudent }
-          : item
+        item.id === student.id ? { ...item, isSendToParent: value } : item
       )
     )
   }
-
   return (
     <>
       <tr key={student.id} className="text-gray-600 border-t border-gray-200">
@@ -85,8 +80,9 @@ const TableItemRecipient: FC<Props> = ({ student, showTotal = true }) => {
         <td className="py-4">
           {student.phone ? formatPhoneNumber(student.phone) : '-'}
         </td>
+
         <td className="py-4">
-          {showTotal && invoiceOfStudent != null && currentSite?.currency
+          {invoiceOfStudent?.total && currentSite?.currency
             ? formatCurrency(
                 invoiceOfStudent.total ?? 0,
                 currentSite?.currency ?? DEFAULT_CURRENCY
@@ -94,49 +90,66 @@ const TableItemRecipient: FC<Props> = ({ student, showTotal = true }) => {
             : '-'}
         </td>
       </tr>
-
       {parentOfCurrentStudent && (
         <tr>
-          <td className="py-2 px-4 space-y-2" colSpan={4}>
-            {/* Parent is always the default recipient — shown unconditionally */}
-            <div className="p-3 bg-blue-50 border border-blue-300 rounded-lg">
-              <div className="flex items-center gap-3">
-                <div>
-                  <div className="font-medium text-blue-700">
-                    {parentOfCurrentStudent.name}
-                  </div>
-                  <div className="text-xs text-blue-500">
-                    {parentOfCurrentStudent.email ?? '-'}
-                    {parentOfCurrentStudent.phone
-                      ? ` · ${formatPhoneNumber(parentOfCurrentStudent.phone)}`
-                      : ''}
-                  </div>
-                </div>
-                <Badge
-                  variant="outline"
-                  className="border-primary text-primary !bg-transparent ml-1"
-                >
-                  {t('editor.invoiceTable.parentBadge')}
-                </Badge>
-
-                {/* Toggle: "Send to student [name]" — parent is default */}
-                <div className="ml-auto flex items-center gap-2 text-sm text-gray-600">
-                  <span>
-                    {t('editor.invoiceTable.sendToStudent')}{' '}
-                    <span className="font-semibold">{student.name}</span>
-                  </span>
-                  <Switch
-                    checked={!student.isSendToParent}
-                    onCheckedChange={updateSendToStudent}
-                  />
-                </div>
+          <td className="py-2 px-4 space-y-3" colSpan={4}>
+            <div className="p-3 bg-blue-50 border border-blue-300 rounded-lg flex items-center gap-2">
+              <div className="font-medium text-blue-600">
+                {t('editor.invoiceTable.sendToParent')}{' '}
+                <span className="font-semibold">
+                  {parentOfCurrentStudent.name}
+                </span>
               </div>
+              <Switch
+                className="ml-auto"
+                checked={student?.isSendToParent ?? false}
+                onCheckedChange={updateInvoiceRecipient}
+              />
             </div>
+            {student.isSendToParent && (
+              <div className="mb-4 rounded-lg border border-blue-300 overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr>
+                      <th className="py-4 bg-blue-100 rounded-tl-lg text-left pl-4">
+                        {t('editor.invoiceTable.parentName')}
+                      </th>
+                      <th className="py-4 bg-blue-100 text-left pl-4">
+                        {t('editor.invoiceTable.email')}
+                      </th>
+                      <th className="py-4 bg-blue-100 rounded-tr-lg text-left pl-4">
+                        {t('editor.invoiceTable.phone')}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="py-4 pl-4 font-medium bg-blue-50 flex items-center gap-3 text-gray-800">
+                        <div>{parentOfCurrentStudent.name}</div>
+                        <Badge
+                          variant="outline"
+                          className="border-primary text-primary !bg-transparent"
+                        >
+                          {t('editor.invoiceTable.parentBadge')}
+                        </Badge>
+                      </td>
+                      <td className="py-4 bg-blue-50">
+                        {parentOfCurrentStudent.email ?? '-'}
+                      </td>
+                      <td className="py-4 bg-blue-50">
+                        {parentOfCurrentStudent.phone
+                          ? formatPhoneNumber(parentOfCurrentStudent.phone)
+                          : '-'}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
           </td>
         </tr>
       )}
     </>
   )
 }
-
 export default TableItemRecipient

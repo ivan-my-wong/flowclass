@@ -15,7 +15,7 @@ type CouponDialogProps = {
   description: React.ReactNode
   trigger: React.ReactNode
   couponData?: Coupon[]
-  onSubmit: (data: any) => void
+  onSubmit?: (data: any) => void
   onCheckCoupon: (data: CouponValue) => void
 }
 export type CouponValue = {
@@ -27,11 +27,10 @@ const CouponDialog = ({
   description,
   trigger,
   couponData,
-  onSubmit,
   onCheckCoupon,
 }: CouponDialogProps): React.ReactElement => {
   const [selectedCouponCode, setSelectedCouponCode] = useState<CouponValue>({
-    couponCode: '',
+    couponCode: couponData?.[0]?.code || '',
   })
   const { t } = useTranslation()
   const handleCouponCodeValueChange = (value: string) => {
@@ -39,8 +38,16 @@ const CouponDialog = ({
   }
 
   useEffect(() => {
-    setSelectedCouponCode({ couponCode: couponData?.[0]?.code })
+    if (couponData?.[0]?.code) {
+      setSelectedCouponCode({ couponCode: couponData[0].code })
+    }
   }, [couponData])
+
+  const handleRedeem = () => {
+    if (selectedCouponCode.couponCode) {
+      onCheckCoupon(selectedCouponCode)
+    }
+  }
 
   return (
     <InfoDialog
@@ -49,9 +56,7 @@ const CouponDialog = ({
       trigger={trigger}
       actionButtons={
         <Dialog.Close asChild>
-          <Button onClick={() => onSubmit(onCheckCoupon(selectedCouponCode))}>
-            {t('enrol:coupon.redeem')}
-          </Button>
+          <Button onClick={handleRedeem}>{t('enrol:coupon.redeem')}</Button>
         </Dialog.Close>
       }
     >

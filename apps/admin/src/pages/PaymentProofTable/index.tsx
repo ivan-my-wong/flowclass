@@ -43,6 +43,7 @@ import useSiteData from '@/hooks/useSiteData'
 import ContentLayout from '@/layouts/ContentLayout'
 import BulkActionComponent from '@/pages/PaymentProofTable/components/BulkActionComponent'
 import { Site } from '@/stores/siteData'
+import { theme } from '@/styles'
 import { ChartDate } from '@/types/chartDate.type'
 import { Course } from '@/types/course'
 import {
@@ -59,6 +60,8 @@ import {
   filterPaymentProof,
 } from '@/utils/paymentProof.utils'
 import { formatDateRelativeToToday } from '@/utils/timeString'
+
+import { getInitialChartDateRange } from '../GoogleAnalytics/components/chartjsSetup'
 
 import ActionButtonCell from './PaymentProofTableCells/ActionButtonCell'
 import EnrollCourseScheduleCell from './PaymentProofTableCells/EnrollCourseScheduleCell'
@@ -86,10 +89,10 @@ type FilterKeys =
   | 'promotions'
 type FilterParamsType = Record<FilterKeys, SelectItemValuesProps[]>
 
-const initialDate: ChartDate = {
-  startDate: dayjs().subtract(2, 'month').startOf('month').format('YYYY-MM-DD'),
-  endDate: dayjs().add(2, 'month').endOf('month').format('YYYY-MM-DD'),
-}
+const initialDate = getInitialChartDateRange({
+  daysBeforeStart: 30,
+  daysBeforeEnd: 0,
+})
 
 const MAX_BULK_SELECTION = 50
 
@@ -430,7 +433,6 @@ const PaymentProofPage = (): JSX.Element => {
               refreshData()
               refetch()
             }}
-            navigate={navigate}
           />
         )
       },
@@ -444,87 +446,16 @@ const PaymentProofPage = (): JSX.Element => {
         params.data?.userAlias?.name ||
         '',
       filter: true,
-      minWidth: 480,
-      flex: 2,
-      autoHeight: true,
+      width: 180,
       cellRenderer: (data: ICellRendererParams) => {
+        // Ensure data is available before rendering
         if (!data || !data.data || !data.data.userAlias) return null
 
         const studentData: PaymentProofTableItem = data?.data
-        const enrollCourses = studentData?.enrollCourses || []
-        const studentSchedules = studentData?.studentSchedules || []
-
-        // Group enrollCourses by userAlias.id — don't deduplicate across aliases
-        type AliasGroup = {
-          userAlias: PaymentProofTableEnrollCourse['userAlias']
-          courses: Array<{
-            enroll: EnrollIntoInfo
-            enrollCourse: PaymentProofTableEnrollCourse
-            schedules: typeof studentSchedules
-          }>
-        }
-        const aliasMap = new Map<number, AliasGroup>()
-
-        enrollCourses.forEach((enrollCourse: PaymentProofTableEnrollCourse) => {
-          const aliasId = enrollCourse.userAlias?.id ?? studentData.userAlias.id
-          if (!aliasMap.has(aliasId))
-            aliasMap.set(aliasId, {
-              userAlias: enrollCourse.userAlias ?? studentData.userAlias,
-              courses: [],
-            })
-          const group = aliasMap.get(aliasId)!
-          let enrollIntoArray: EnrollIntoInfo[] = []
-          if (Array.isArray(enrollCourse.enrollInto)) {
-            enrollIntoArray = enrollCourse.enrollInto
-          } else if (enrollCourse.enrollInto) {
-            enrollIntoArray = [enrollCourse.enrollInto]
-          }
-          enrollIntoArray.forEach(enroll => {
-            const schedules = studentSchedules.filter(
-              s => s.enrollCourseId === enrollCourse.id
-            )
-            group.courses.push({ enroll, enrollCourse, schedules })
-          })
-        })
 
         return (
-          <div className="flex flex-col divide-y py-1 w-full overflow-hidden min-w-0">
-            {Array.from(aliasMap.entries()).map(
-              ([aliasId, { userAlias, courses }]) => {
-                const filteredData: PaymentProofTableItem = {
-                  ...studentData,
-                  userAlias: userAlias ?? studentData.userAlias,
-                  enrollCourses: enrollCourses.filter(
-                    (ec: PaymentProofTableEnrollCourse) =>
-                      (ec.userAlias?.id ?? studentData.userAlias.id) === aliasId
-                  ),
-                }
-                return (
-                  <div
-                    key={aliasId}
-                    className="flex flex-row items-center gap-3 py-1.5 overflow-hidden min-w-0"
-                  >
-                    <div className="shrink-0 w-[160px]">
-                      <NameDropdownCell data={filteredData} />
-                    </div>
-                    {courses.length > 0 && (
-                      <div className="flex flex-col gap-1 overflow-hidden min-w-0 flex-1">
-                        {courses.map(
-                          ({ enroll, enrollCourse, schedules }, i) => (
-                            <EnrollCourseScheduleCell
-                              key={`${aliasId}-${enroll.courseName}-${enroll.secondLevelName}-${i}`}
-                              enrollCourse={enrollCourse}
-                              enroll={enroll}
-                              studentSchedules={schedules}
-                            />
-                          )
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )
-              }
-            )}
+          <div className="flex flex-row items-center">
+            <NameDropdownCell data={studentData} />
           </div>
         )
       },
@@ -532,26 +463,13 @@ const PaymentProofPage = (): JSX.Element => {
         const { enrollCourses } = params.data
         const firstEnrollCourse = enrollCourses?.[0]
         if (!firstEnrollCourse) return ''
-        const courseNames = (enrollCourses ?? [])
-          .flatMap((ec: PaymentProofTableEnrollCourse) => {
-            let arr: EnrollIntoInfo[] = []
-            if (Array.isArray(ec.enrollInto)) {
-              arr = ec.enrollInto
-            } else if (ec.enrollInto) {
-              arr = [ec.enrollInto]
-            }
-            return arr.map(e => `${e.courseName} ${e.secondLevelName}`)
-          })
-          .join(' ')
-        return `${userAlias?.studentId ?? ''} ${
+        return `${
           firstEnrollCourse.preferredName || firstEnrollCourse.name || ''
         } ${
           firstEnrollCourse.preferredPhone || firstEnrollCourse.phone || ''
-        } ${
-          firstEnrollCourse.preferredEmail || firstEnrollCourse.email || ''
-        } ${courseNames}`
+        } ${firstEnrollCourse.preferredEmail || firstEnrollCourse.email || ''}`
       },
-      cellClass: '!flex !items-start overflow-hidden',
+      cellClass: '!flex !items-center',
     },
     {
       headerName: t('student:paymentAmount') as string,
@@ -567,9 +485,11 @@ const PaymentProofPage = (): JSX.Element => {
           />
         )
       },
-      cellStyle: () => ({
-        color: 'var(--color-text-subtle)',
-      }),
+      cellStyle: () => {
+        return {
+          color: String(theme.colors.textSubtle),
+        }
+      },
     },
     {
       headerName: t('student:paymentStatus.status') as string,
@@ -582,11 +502,11 @@ const PaymentProofPage = (): JSX.Element => {
       },
       cellClass: '!flex !items-center',
       cellStyle: ({ value }: { value: string }) => {
-        let color = 'var(--color-text-subtle)'
-        if (value === PaymentState.PENDING) {
-          color = 'var(--color-warn)'
+        let color = String(theme.colors.textSubtle)
+        if (value === PaymentState.PENDING || value === PaymentState.UNPAID) {
+          color = String(theme.colors.warn)
         } else if (value === PaymentState.CRITICAL) {
-          color = 'var(--color-tertiary)'
+          color = String(theme.colors.tertiary)
         }
         return { color }
       },
@@ -604,9 +524,11 @@ const PaymentProofPage = (): JSX.Element => {
       },
 
       cellClass: '!flex !items-center',
-      cellStyle: ({ data }) => ({
-        color: data?.payLaterMethod ? '' : 'var(--color-text-subtle)',
-      }),
+      cellStyle: ({ data }) => {
+        return {
+          color: data?.payLaterMethod ? '' : String(theme.colors.textSubtle),
+        }
+      },
     },
     {
       headerName: t('student:receiptImage') as string,
@@ -616,17 +538,126 @@ const PaymentProofPage = (): JSX.Element => {
           <PaymentReceiptStatusCell
             params={value.data}
             paymentEvidenceList={paymentEvidenceList}
-            onPaymentStateUpdate={() => {
-              refreshData()
-              refetch()
-            }}
-            refetch={refetch}
           />
         ) : null
       },
       cellClass: '!flex !items-center',
     },
 
+    {
+      headerName: t(`student:enrolledCourse`) as string,
+      field: 'enrollCourses',
+      filter: true,
+      autoHeight: true,
+      wrapText: false,
+      width: 300,
+      cellRenderer: (params: ICellRendererParams) => {
+        const data = params.data as PaymentProofTableItem
+        const enrollCourses = data?.enrollCourses || []
+        const studentSchedules = data?.studentSchedules || []
+        if (!enrollCourses || enrollCourses.length === 0) return null
+
+        // Step 1: Flatmap all enrollInto items from all enrollCourses
+        const allEnrollIntoItems: Array<{
+          enroll: EnrollIntoInfo
+          enrollCourse: PaymentProofTableEnrollCourse
+        }> = []
+
+        enrollCourses.forEach((enrollCourse: PaymentProofTableEnrollCourse) => {
+          let enrollIntoArray: EnrollIntoInfo[] = []
+          if (Array.isArray(enrollCourse.enrollInto)) {
+            enrollIntoArray = enrollCourse.enrollInto
+          } else if (enrollCourse.enrollInto) {
+            enrollIntoArray = [enrollCourse.enrollInto]
+          }
+
+          enrollIntoArray.forEach((enroll: EnrollIntoInfo) => {
+            allEnrollIntoItems.push({ enroll, enrollCourse })
+          })
+        })
+
+        // Step 2: Deduplicate based on courseName + secondLevelName
+        const uniqueEnrollIntoMap = new Map<
+          string,
+          {
+            enroll: EnrollIntoInfo
+            enrollCourseIds: number[]
+          }
+        >()
+
+        allEnrollIntoItems.forEach(({ enroll, enrollCourse }) => {
+          const uniqueKey = `${enroll.courseName}-${enroll.secondLevelName}`
+          if (!uniqueEnrollIntoMap.has(uniqueKey)) {
+            uniqueEnrollIntoMap.set(uniqueKey, {
+              enroll,
+              enrollCourseIds: [],
+            })
+          }
+          const entry = uniqueEnrollIntoMap.get(uniqueKey)!
+          if (!entry.enrollCourseIds.includes(enrollCourse.id)) {
+            entry.enrollCourseIds.push(enrollCourse.id)
+          }
+        })
+
+        // Step 3: Render each unique enrollInto with all relevant schedules
+        const rows: JSX.Element[] = []
+
+        uniqueEnrollIntoMap.forEach(
+          ({ enroll, enrollCourseIds }, uniqueKey) => {
+            // Find the first enrollCourse that contains this enroll (for display purposes)
+            const representativeEnrollCourse = enrollCourses.find(ec =>
+              enrollCourseIds.includes(ec.id)
+            )
+
+            if (!representativeEnrollCourse) return
+
+            // Collect all relevant schedules from all enrollCourses that have this enrollInto
+            const relevantSchedules = studentSchedules.filter(schedule =>
+              enrollCourseIds.includes(schedule.enrollCourseId)
+            )
+
+            rows.push(
+              <EnrollCourseScheduleCell
+                key={uniqueKey}
+                enrollCourse={representativeEnrollCourse}
+                enroll={enroll}
+                studentSchedules={relevantSchedules}
+              />
+            )
+          }
+        )
+
+        return (
+          <div className="flex flex-col gap-2 py-2 overflow-hidden min-w-0">
+            {rows}
+          </div>
+        )
+      },
+      cellClass: '!flex !items-start overflow-hidden',
+      getQuickFilterText: (params: { data: PaymentProofTableItem }) => {
+        const enrollCourses =
+          (params.data as PaymentProofTableItem)?.enrollCourses || []
+        if (!enrollCourses || enrollCourses.length === 0) return ''
+
+        return enrollCourses
+          .map((enrollCourse: PaymentProofTableEnrollCourse) => {
+            let enrollIntoArray: EnrollIntoInfo[] = []
+            if (Array.isArray(enrollCourse.enrollInto)) {
+              enrollIntoArray = enrollCourse.enrollInto
+            } else if (enrollCourse.enrollInto) {
+              enrollIntoArray = [enrollCourse.enrollInto]
+            }
+
+            return enrollIntoArray
+              .map(
+                (enroll: EnrollIntoInfo) =>
+                  `${enroll.courseName} ${enroll.secondLevelName}`
+              )
+              .join(' ')
+          })
+          .join(' ')
+      },
+    },
     {
       headerName: t('student:registrationForm.title') as string,
       // field: 'enrollCourses.0.registrationForm',
@@ -649,6 +680,7 @@ const PaymentProofPage = (): JSX.Element => {
     },
     {
       headerName: t('student:promotionUsed') as string,
+      field: 'promotionUsed',
       cellRenderer: ({ data }: ICellRendererParams<PaymentProofTableItem>) => {
         const currency = siteData.currentSite?.currency ?? ''
         return <PromotionCell currency={currency} data={data} t={t} />
@@ -693,7 +725,7 @@ const PaymentProofPage = (): JSX.Element => {
         )
       },
       cellStyle: () => ({
-        color: 'var(--color-text-subtle)',
+        color: String(theme.colors.textSubtle),
       }),
     },
     {
@@ -912,14 +944,14 @@ const PaymentProofPage = (): JSX.Element => {
             hasCheckboxSelection
             rowData={filteredStudentList}
             useUrlSearch
-            columns={courseStudentTable ?? []}
+            columns={courseStudentTable}
             isLoading={isLoadingStudentList || isFetchingStudentList}
             gridRef={gridRef}
             inputRef={inputRef}
             height={dynamicHeight}
             handleReset={handleReset}
             hasFilterSelection
-            filterSelector={({ handleReset: reset }) => (
+            filterSelector={
               <div className="box-responsive-full">
                 <div className="md:flex w-full flex-row items-center justify-center gap-2 p-0 space-y-1">
                   <CourseAndClassSelector
@@ -1009,12 +1041,12 @@ const PaymentProofPage = (): JSX.Element => {
                     isMulti
                   />
 
-                  <Button className="w-full md:w-[80px]" onClick={reset}>
+                  <Button className="w-full md:w-[80px]" onClick={handleReset}>
                     {t('recordLogs:notificationLogs.selectLabels.reset')}
                   </Button>
                 </div>
               </div>
-            )}
+            }
           />
         </div>
       </div>

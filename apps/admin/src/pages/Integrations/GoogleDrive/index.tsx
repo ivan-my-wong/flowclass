@@ -10,7 +10,6 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert'
 import { GOOGLE_DRIVE_AUTH_SCOPES } from '@/constants/googleAuth'
 import { useIntegrationGoogle } from '@/hooks/useIntegrationGoogle'
 import ContentLayout from '@/layouts/ContentLayout'
-import { API_BASE_URL } from '@/lib/config'
 import { userState } from '@/stores/userData'
 import { GoogleServiceType } from '@/types/external/googleIntegration.type'
 
@@ -126,7 +125,9 @@ const GoogleDriveIntegration = (): JSX.Element => {
     }
 
     // ✅ CRITICAL: redirectUri must point to BACKEND callback endpoint
-    const redirectUri = `${API_BASE_URL}/admin/integrations/google/google-drive-callback`
+    const redirectUri = `${
+      import.meta.env.VITE_API_BASE_URL
+    }/admin/integrations/google/google-drive-callback`
 
     console.log('🚀 Initiating Google OAuth with redirectUri:', redirectUri)
     console.log('👤 Current userId:', currentUser.id)

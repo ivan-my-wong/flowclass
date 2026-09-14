@@ -1,7 +1,12 @@
 import React from 'react'
 
+import { ComponentProps } from '@stitches/react'
+
 import { DataTestId } from '@/types/common'
-import { cn } from '@/utils/cn'
+
+import { styled, theme } from '../../styles'
+
+// you can custom the active and inactive state icon color by passing the props
 
 export interface ISvgIconType {
   fill?: string
@@ -9,26 +14,61 @@ export interface ISvgIconType {
   stroke?: string
 }
 
-const sizeClasses: Record<string, string> = {
-  extraSmall: 'w-2 h-2',
-  small: 'w-3 h-3',
-  smallMedium: 'w-4 h-4',
-  medium: 'w-6 h-6',
-  mediumLarge: 'w-8 h-8',
-  large: 'w-10 h-10',
-  extraLarge: 'w-12 h-12',
-  fullScreen: 'w-full h-full',
-}
+const IconWrapper = styled('span', {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+
+  variants: {
+    size: {
+      extraSmall: {
+        width: '0.5rem',
+        height: '0.5rem',
+      },
+      small: {
+        width: '0.75rem',
+        height: '0.75rem',
+      },
+      smallMedium: {
+        width: '1rem',
+        height: '1rem',
+      },
+      medium: {
+        width: '1.5rem',
+        height: '1.5rem',
+      },
+      mediumLarge: {
+        width: '2rem',
+        height: '2rem',
+      },
+      large: {
+        width: '2.5rem',
+        height: '2.5rem',
+      },
+      extraLarge: {
+        width: '3rem',
+        height: '3rem',
+      },
+      fullScreen: {
+        width: '100%',
+        height: '100%',
+      },
+    },
+  },
+  defaultVariants: {
+    size: 'medium',
+  },
+})
 
 type SvgIconProps = {
   active?: boolean
   activeColor?: string
   baseColor?: string
-  size?: keyof typeof sizeClasses | string
+  size?: string
   children: React.ReactNode
   stroke?: string
-  className?: string
-} & DataTestId
+} & ComponentProps<typeof IconWrapper> &
+  DataTestId
 
 const SvgIcon: React.FC<SvgIconProps> = ({
   children,
@@ -36,32 +76,15 @@ const SvgIcon: React.FC<SvgIconProps> = ({
   activeColor,
   baseColor,
   dataTestId,
-  size = 'medium',
-  className,
   ...props
 }) => {
   const getIconColor = () => {
-    if (activeColor) return activeColor
-    if (baseColor) return baseColor
-    return 'currentColor'
+    return active
+      ? activeColor || theme.colors.textContrast.toString()
+      : baseColor || theme.colors.textSubtle.toString()
   }
-
-  const colorClass = active ? 'text-text-contrast' : 'text-text-subtle'
-  const sizeClass =
-    typeof size === 'string' && size in sizeClasses
-      ? sizeClasses[size]
-      : sizeClasses.medium
-
   return (
-    <span
-      data-testid={dataTestId}
-      className={cn(
-        'flex items-center justify-center',
-        sizeClass,
-        !activeColor && !baseColor && colorClass,
-        className
-      )}
-    >
+    <IconWrapper data-testid={dataTestId} {...props}>
       {children &&
         React.cloneElement(children as React.ReactElement<ISvgIconType>, {
           fill:
@@ -71,7 +94,7 @@ const SvgIcon: React.FC<SvgIconProps> = ({
           size: '100%',
           stroke: props.stroke,
         })}
-    </span>
+    </IconWrapper>
   )
 }
 

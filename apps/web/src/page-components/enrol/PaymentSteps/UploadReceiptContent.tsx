@@ -124,23 +124,36 @@ const UploadReceiptContent = ({
     if (!invoices?.length || !siteSetting) return
     resetInvoicesState()
     setInvoicesData(
-      invoices.map(inv => ({
-        ...inv,
-        currency: siteSetting.currency,
-        numberOfLesson:
-          inv.studentSchedules?.reduce((sum, ss) => sum + ss.studentLessons?.length, 0) ?? 0,
-        numOfApplicant: inv.numOfApplicant,
-        feePerLesson: inv.feePerLesson,
-        originalFee: inv.originalFee,
-        additionalFee: inv.additionalFee,
-        paymentAmount: inv.payAmount,
-        couponDiscount: 0,
-        directDiscount: 0,
-        bundleDiscount: 0,
-        recurringDiscount: 0,
-        totalDiscount: 0,
-        autoCouponApplied: false,
-      }))
+      invoices.map(inv => {
+        let appliedCouponDiscount = 0
+        if (inv.promotionUsed?.coupon) {
+          const coupon = inv.promotionUsed.coupon
+          if (coupon.discountType === 'percentage') {
+            appliedCouponDiscount = (inv.originalFee * coupon.amount) / 100
+          } else {
+            appliedCouponDiscount = coupon.amount * (inv.numOfApplicant || 1)
+          }
+        }
+
+        return {
+          ...inv,
+          currency: siteSetting.currency,
+          numberOfLesson:
+            inv.studentSchedules?.reduce((sum, ss) => sum + ss.studentLessons?.length, 0) ?? 0,
+          numOfApplicant: inv.numOfApplicant,
+          feePerLesson: inv.feePerLesson,
+          originalFee: inv.originalFee,
+          additionalFee: inv.additionalFee,
+          paymentAmount: inv.payAmount,
+          couponDiscount: appliedCouponDiscount,
+          couponCode: inv.promotionUsed?.coupon?.code || '',
+          directDiscount: 0,
+          bundleDiscount: 0,
+          recurringDiscount: 0,
+          totalDiscount: 0,
+          autoCouponApplied: !!inv.promotionUsed?.coupon,
+        }
+      })
     )
   }, [invoices, resetInvoicesState, setInvoicesData, siteSetting])
 
@@ -183,9 +196,9 @@ const UploadReceiptContent = ({
       const enrollCourse = enrollCourses.at(0)
       if (!enrollCourse) return null
       const subtotalPrice =
-        typeof enrollCourse.paymentAmount === 'string'
-          ? parseFloat(enrollCourse.paymentAmount)
-          : enrollCourse.paymentAmount
+        typeof invoice.originalFee === 'string'
+          ? parseFloat(invoice.originalFee)
+          : invoice.originalFee
 
       const additionalFeeAmount =
         typeof invoice.additionalFee === 'string'
@@ -540,6 +553,7 @@ const UploadReceiptContent = ({
           >
             {shouldShowPaymentSummary && (
               <PaymentSummaryCard
+                invoiceId={invoice.id}
                 invoiceInstallment={invoiceInstallment}
                 paid={invoice.paymentState === PaymentState.PAID}
                 siteSetting={siteSetting}
@@ -581,7 +595,6 @@ const UploadReceiptContent = ({
                 invoices={invoices}
                 uploadReceiptSuccess={uploadReceiptSuccess}
                 setUploadReceiptSuccess={setUploadReceiptSuccess}
-                invoiceToken={token}
               />
             </div>
           )}

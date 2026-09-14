@@ -18,6 +18,7 @@ import {
 import { FieldTypes } from '@/constants/enrollmentFormFieldNames'
 import selectorOptions from '@/constants/selectorOptions'
 import { CustomFieldFilterOption } from '@/pages/StudentCRM/components/CustomFormFieldFilter'
+import { theme } from '@/styles'
 import { InformationFieldTypes } from '@/types/applicationForm'
 import { Operator, SelectorOption } from '@/types/options'
 import dayjs from '@/utils/dayjs'
@@ -276,13 +277,14 @@ const FieldFilterRule: React.FC<FieldFilterRuleProps> = ({
       {/* <button onClick={()=>{console.log(customFieldFilterList)}}>customFieldFilterList</button> */}
 
       <SvgIcon
+        baseColor={theme.colors.warn.toString()}
         size="large"
-        className="cursor-pointer text-warn"
+        className="cursor-pointer"
         onClick={() => {
           deleteCurrentRules()
         }}
       >
-        <RxCross1 color="currentColor" />
+        <RxCross1 color={theme.colors.warn.toString()} />
       </SvgIcon>
     </div>
   )

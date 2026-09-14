@@ -1,9 +1,22 @@
+// write a boilerplate of a component named comingsoon box
+
 import { useTranslation } from 'react-i18next'
 
-import { cn } from '@/utils/cn'
+import { styled } from '@/styles'
 
 import Text from '../Texts/Text'
 import Box from '../ui/Box'
+
+const ComingSoonText = styled(Text, {
+  position: 'absolute',
+  left: '40%',
+  top: '$4',
+  padding: '$4',
+  borderRadius: '$1',
+  backgroundColor: '$tertiary',
+  fontSize: '$6',
+  zIndex: 999,
+})
 
 const ComingSoonBox = ({
   children,
@@ -13,13 +26,7 @@ const ComingSoonBox = ({
   const { t } = useTranslation()
   return (
     <Box direction="col" className="opacity-50 pointer-events-none">
-      <Text
-        className={cn(
-          'absolute left-[40%] top-4 p-4 rounded bg-tertiary text-2xl z-[999]'
-        )}
-      >
-        {t('common:description.comingSoon')}
-      </Text>
+      <ComingSoonText>{t('common:description.comingSoon')}</ComingSoonText>
       {children}
     </Box>
   )

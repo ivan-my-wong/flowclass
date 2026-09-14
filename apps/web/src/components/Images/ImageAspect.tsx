@@ -3,8 +3,8 @@ import { HTMLAttributes, useEffect, useState } from 'react'
 import { Root } from '@radix-ui/react-aspect-ratio'
 import clsx from 'clsx'
 
-import { getPrivateFileAccessUrl } from '@/api/uploadFile'
-import { getMediaFileUrl } from '@/utils/convert'
+import { getS3PrivateFileUrl } from '@/api/uploadFile'
+import { getS3FileUrl } from '@/utils/convert'
 
 import ImageWithFallback from './ImageWithFallback'
 
@@ -43,10 +43,10 @@ const ImageAspect = ({
     if (!s3) {
       setImageSrc(src)
     } else if (s3 === 'public') {
-      setImageSrc(getMediaFileUrl(src))
+      setImageSrc(getS3FileUrl(src))
     } else {
-      const privateFileUrl = await getPrivateFileAccessUrl(src)
-      setImageSrc(privateFileUrl)
+      const s3src = await getS3PrivateFileUrl(src)
+      setImageSrc(s3src)
     }
   }
 

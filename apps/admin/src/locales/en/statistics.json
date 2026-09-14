@@ -30,20 +30,14 @@
   "invoices": {
     "activeStudents": "Active Students",
     "attendanceStatus": "Attendance Status",
-    "averageInvoiceValue": "Average Invoice Value",
     "completedLessons": "Completed Lessons",
     "creditApplied": "Credit Applied",
     "netPayments": "Net Payments",
-    "overdueInvoices": "Overdue Invoices",
-    "paidInvoices": "Paid Invoices",
     "paymentStatus": "Payment Status",
-    "revenueGenerated": "Revenue Generated",
     "searchByStudentName": "Search by student name",
     "studentPaymentsForLessons": "Student Payments for Lessons",
-    "totalInvoices": "Total Invoices",
     "totalLessonValue": "Total Lesson Value",
-    "totalRevenue": "Total Revenue",
-    "unpaidInvoices": "Unpaid Invoices"
+    "totalRevenue": "Total Revenue"
   },
   "revenue": {
     "noClassData": "No class data available",

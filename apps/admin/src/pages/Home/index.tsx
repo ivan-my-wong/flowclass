@@ -292,20 +292,7 @@ const Home = (): JSX.Element => {
         : LearningPathItemStatus.NOT_STARTED,
       action: () => navigate('/reschedule-approval'),
     },
-    {
-      id: 'whatsapp-templates',
-      title: t(
-        'onboarding:home.learningPath.multiBranch.automationFlows.title'
-      ),
-      description: t(
-        'onboarding:home.learningPath.multiBranch.automationFlows.description'
-      ),
-      type: LearningPathItemType.ACTION,
-      status: checkProgress.checkWhatsappTemplate()
-        ? LearningPathItemStatus.COMPLETE
-        : LearningPathItemStatus.NOT_STARTED,
-      action: () => navigate('/custom-messages'),
-    },
+
     {
       id: 'assign-hourly-rate',
       title: t(

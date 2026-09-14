@@ -4,6 +4,7 @@ import React from 'react'
 import Checkbox from '../../../components/Checkbox/Checkbox'
 import Box from '../../../components/Containers/Box'
 import ImageAspect from '../../../components/Images/ImageAspect'
+import { styled } from '../../../styles'
 
 export type CheckboxStudentProps = {
   items: CheckboxCourseOptionProps[]
@@ -22,10 +23,25 @@ const CheckboxStudent: React.FC<CheckboxStudentProps> = ({
   handleValueChange,
 }) => {
   return (
-    <Box className="flex gap-6 w-full flex-wrap">
+    <Box
+      css={{
+        display: 'flex',
+        gap: '$3',
+        width: '100%',
+        flexWrap: 'wrap',
+      }}
+    >
       {items.map(item => (
-        <Box key={item.id} direction="column" className="mt-4">
-          <Box className="w-full h-full flex items-center">
+        <Box key={item.id} direction="column" css={{ marginTop: '$4' }}>
+          <Box
+            css={{
+              all: 'unset',
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
             <Box gap="large" justify="flex-start">
               <Checkbox
                 name="test"
@@ -43,12 +59,17 @@ const CheckboxStudent: React.FC<CheckboxStudentProps> = ({
                   alt={item.id}
                 />
               )}
-              <label
+              <Label
                 htmlFor={item.id}
-                className="flex flex-grow items-center whitespace-nowrap text-text text-base font-semibold leading-none pl-[15px]"
+                css={{
+                  display: 'flex',
+                  flexGrow: 1,
+                  alignItems: 'center',
+                  whiteSpace: 'nowrap',
+                }}
               >
                 {item.label}
-              </label>
+              </Label>
             </Box>
           </Box>
         </Box>
@@ -56,5 +77,13 @@ const CheckboxStudent: React.FC<CheckboxStudentProps> = ({
     </Box>
   )
 }
+
+const Label = styled('label', {
+  color: '$text',
+  fontSize: '$4',
+  fontWeight: 600,
+  lineHeight: 1,
+  paddingLeft: 15,
+})
 
 export default CheckboxStudent

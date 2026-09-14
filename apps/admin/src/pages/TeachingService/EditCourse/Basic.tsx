@@ -21,8 +21,8 @@ import { MediaFileDirectory } from '@/constants/MediaFileDirectory'
 import useCourseData from '@/hooks/useCourseData'
 import { useCourseEditSave } from '@/hooks/useCourseEditSave'
 import { courseState } from '@/stores/courseData'
+import { styled } from '@/styles'
 import { Course } from '@/types/course'
-import { cn } from '@/utils/cn'
 import { validateDomain } from '@/utils/validate'
 
 interface BasicProps {
@@ -137,7 +137,9 @@ const Basic = ({
     })
   }
 
-  const handleShortDescriptionChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleShortDescriptionChange = (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
     const newValue = event.target.value
     setValue('shortDescription', newValue as any)
     setCurrentCourse({
@@ -208,14 +210,14 @@ const Basic = ({
     courseRecoilState?.currentCourse?.previewImageUrl
 
   return (
-    <div id={tabName} className="flex flex-col !important">
+    <StyledBox id={tabName}>
       {!currentCourse?.published && (
         <AlertBox
           icon={<MdPublish />}
           content={t('teachingService:alert')}
           actionLink={
             <Box>
-              <Text className="text-text-disabled">
+              <Text css={{ color: '$textDisabled' }}>
                 {t(`teachingService:publishCourse.unArchived`)}
               </Text>
               {/* no need duplicate switch button here */}
@@ -298,7 +300,9 @@ const Basic = ({
             <TextInput
               value={currentCourse?.shortDescription || ''}
               id="shortDescription"
-              label={`${t('teachingService:basic.shortDescription')} (${t('teachingService:enrollment.enrollmentModal.optional')})`}
+              label={`${t('teachingService:basic.shortDescription')} (${t(
+                'teachingService:enrollment.enrollmentModal.optional'
+              )})`}
               {...register('shortDescription' as any, {
                 onChange: e => {
                   handleShortDescriptionChange(e)
@@ -362,9 +366,9 @@ const Basic = ({
           </div>
           <div className="box-row-full lg:flex-row break-all leading-tight justify-start lg:mt-auto">
             <div className="box-col-full items-start">
-              <Text className={cn('shrink-0 lg:shrink')}>{`${t(
-                `teachingService:view.courseLink`
-              )}:`}</Text>
+              <Text
+                css={{ flexShrink: 0, '@lg': { flexShrink: 'unset' } }}
+              >{`${t(`teachingService:view.courseLink`)}:`}</Text>
               <Link href={courseBaseUrl} target="_blank" rel="noreferrer">
                 {courseBaseUrl}
               </Link>
@@ -382,9 +386,9 @@ const Basic = ({
           </div>
           <div className="box-row-full lg:flex-row break-all leading-tight justify-start">
             <div className="box-col-full items-start">
-              <Text className={cn('shrink-0 lg:shrink')}>{`${t(
-                `teachingService:view.applicationLink`
-              )}:`}</Text>
+              <Text
+                css={{ flexShrink: 0, '@lg': { flexShrink: 'unset' } }}
+              >{`${t(`teachingService:view.applicationLink`)}:`}</Text>
               <Link href={courseEnrolUrl} target="_blank" rel="noreferrer">
                 {courseEnrolUrl}
               </Link>
@@ -417,8 +421,13 @@ const Basic = ({
       icon
       autoStart={false}
     /> */}
-    </div>
+    </StyledBox>
   )
 }
+
+const StyledBox = styled(Box, {
+  display: 'flex',
+  flexDirection: 'column !important',
+})
 
 export default Basic

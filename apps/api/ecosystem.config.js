@@ -2,13 +2,12 @@ module.exports = {
   apps: [
     {
       name: 'flowclass-api',
-      script: 'pnpm',
-      args: 'start',
+      script: 'dist/src/main.js',
       instances: 1,
       exec_mode: 'fork',
-      interpreter: 'none',
       env: {
         NODE_ENV: 'production',
+        APP_ENV: 'production',
         NODE_OPTIONS: '--max-old-space-size=5120', // 5GB V8 heap size to prevent OOM crashes
       },
       autorestart: true,
@@ -34,6 +33,7 @@ module.exports = {
       ignore_watch: ['node_modules', 'logs', '.git'],
       env_production: {
         NODE_ENV: 'production',
+        APP_ENV: 'production',
         NODE_OPTIONS: '--max-old-space-size=5120', // 5GB V8 heap size to prevent OOM crashes
       },
     },

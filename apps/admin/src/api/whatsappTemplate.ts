@@ -89,3 +89,17 @@ export const deleteWhatsappTemplate = async (
   })
   return res.data.data
 }
+
+export const getWhatsappTemplateByAutomationFlowStep = async (
+  institutionId: number,
+  stepId: number
+): Promise<WhatsappTemplate[]> => {
+  const res = await apiClient.get({
+    url: `/admin/whatsapp-template/automation-flow/step/${stepId}/list`,
+    params: {
+      institutionId,
+    },
+    needAuth: true,
+  })
+  return res.data.data
+}

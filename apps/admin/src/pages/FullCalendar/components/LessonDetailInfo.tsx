@@ -32,7 +32,7 @@ import MenuItem from '@/pages/FullCalendar/components/MenuItem'
 import { AlertTypes } from '@/reducers/confirm.reducers'
 import { ClassTypeEnum } from '@/types/course'
 import { ClassLessonType } from '@/types/lessonDateTime'
-import { getMediaFileUrl } from '@/utils/generate-link.utils'
+import { getS3FileUrl } from '@/utils/generate-link.utils'
 
 type PropType = {
   data: ClassLessonType
@@ -255,7 +255,7 @@ const LessonDetailInfo = ({
       <div className="w-32">
         <ImageAspect
           width="100%"
-          src={getMediaFileUrl(data.course?.previewImageUrl ?? '')}
+          src={getS3FileUrl(data.course?.previewImageUrl ?? '')}
           alt="alt"
         />
       </div>

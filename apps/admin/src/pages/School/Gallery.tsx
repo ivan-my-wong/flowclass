@@ -18,6 +18,7 @@ import useFileUpload from '@/hooks/useFileUpload'
 import useSchoolData from '@/hooks/useSchoolData'
 import { useSchoolEditSave } from '@/hooks/useSchoolEditSave'
 import { AlertTypes } from '@/reducers/confirm.reducers'
+import { styled } from '@/styles'
 import { InstitutionMediaUploadResponse } from '@/types/apiResponse'
 import { ImageTag } from '@/types/school'
 
@@ -157,7 +158,7 @@ const Gallery = ({ tabName, allSaveMethods }: BasicProps): JSX.Element => {
   }
 
   return (
-    <div id={tabName} className="flex flex-col !important">
+    <StyledBox id={tabName}>
       <BoxWithToggleGroup
         toggleGroupLabels={tagList}
         title={t('school:selectSection')}
@@ -287,8 +288,13 @@ const Gallery = ({ tabName, allSaveMethods }: BasicProps): JSX.Element => {
           setShowDeleteImagePopup(false)
         }}
       />
-    </div>
+    </StyledBox>
   )
 }
+
+const StyledBox = styled(Box, {
+  display: 'flex',
+  flexDirection: 'column !important',
+})
 
 export default Gallery

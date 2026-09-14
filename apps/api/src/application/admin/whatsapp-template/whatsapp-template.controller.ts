@@ -149,4 +149,15 @@ export class WhatsappTemplateController {
   ): Promise<void> {
     return this.whatsappTemplateService.deleteWhatsappTemplate(whatsappTemplateId, institutionId)
   }
+
+  @Get('automation-flow/step/:step_id/list')
+  @ApiOperation({
+    summary: 'This api ' + 'for get whatsapp template by automation flow step id',
+  })
+  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @UseGuards(RolesGuard)
+  @Transactional()
+  async getTemplatesByAutomationFlowStep(@Param('step_id') stepId: number) {
+    return this.whatsappTemplateService.getTemplatesByAutomationStepId(stepId)
+  }
 }

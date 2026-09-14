@@ -39,6 +39,7 @@ export const studentCrmCsvHeaders = [
   { label: 'student:column.lastAttendanceDate', key: 'lastAttendanceDate' },
   { label: 'student:column.paymentAmount', key: 'paymentAmount' },
   { label: 'student:column.paymentState', key: 'paymentState' },
+  { label: 'student:paymentProof.paymentDate', key: 'paymentDate' },
 ] as { label: string; key: string }[]
 
 export const csvHeadersExportLessonRecords: { label: string; key: string }[] = [

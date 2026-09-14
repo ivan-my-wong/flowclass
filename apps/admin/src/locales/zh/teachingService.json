@@ -7,15 +7,11 @@
   "updateEnrollmentSuccess": "成功更新報名表格",
   "updateMessageSuccess": "成功更新注册訊息",
   "updateRecruitmentSuccess": "成功更新招生資訊",
-  "updateFail": "更新失敗",
   "createCourse": "新增課程",
-  "unnamedCourse": "未命名課程",
   "searchPlaceholder": "搜尋課程或班別名稱...",
   "view": {
     "viewSite": "查看課程頁面",
     "viewApplicationLink": "查看報名連結",
-    "courseLink": "您的課程頁面連結將是",
-    "applicationLink": "您的報名頁面連結將是",
     "copyApplicationLink": "複製報名連結",
     "copySuccess": "報名連結已複製到剪貼簿"
   },
@@ -24,26 +20,16 @@
     "description": "學生註冊課程後，將會發送QR碼到學生的電子郵件。QR碼將用於課程的點名。"
   },
   "publishCourse": {
-    "published": "已發佈",
-    "notPublish": "未發佈",
     "archived": "封存",
     "countArchived": "已封存 ({{count}})",
     "unArchived": "取消封存",
     "publishCourseSuccessfully": "成功發佈課程",
     "unpublishCourseSuccessfully": "成功取消發佈課程",
-    "archiveCourseSuccessfully": "成功封存課程",
     "unarchiveCourseSuccessfully": "成功取消封存課程",
-    "publishCourseTitle": "發佈課程",
-    "unpublishCourseTitle": "取消發佈課程",
     "archiveCourseTitle": "封存課程",
     "unarchiveCourseTitle": "取消封存課程",
-    "publishCourseDescription": "您確定要發佈此課程嗎？",
-    "unpublishCourseDescription": "您確定要取消發佈此課程嗎？",
     "archiveCourseDescription": "您確定要封存此課程嗎？\n* 所有課程記錄、時間表及付款收據將保持可供查閱。\n* 已封存的課程無法接受新的申請。\n您可以隨時在「已封存課程」部分取消封存此課程。",
     "unarchiveCourseDescription": "您確定要取消封存此課程嗎？\n* 此課程將會移回至有效課程列表。\n* 課程將重新開放申請及管理功能。\n如有需要，您隨時可以再次封存此課程。",
-    "archiveCourseDetails": "所有課程記錄、時間表及付款收據將保持可供查閱。",
-    "archiveCourseRestriction": "已封存的課程無法接受新的申請。",
-    "archiveCourseReversible": "您可以隨時在「已封存課程」部分取消封存此課程。",
     "remindLongDescriptions": "未能發佈？試試在'描述'選項卡中輸入些內容，保存後再嘗試發佈。",
     "recruitmentTimeEnded": "您設定招生完結時間在過去，請將完結時間調整為未來時間。"
   },
@@ -55,17 +41,10 @@
     "successCreate": "成功, 你可以開始編輯",
     "name": "課程名稱",
     "path": "課程網址",
-    "invalidPath": "請只輸入字母、數字或破折號 _ -",
     "duplicatePath": "該網址已被使用，請重新輸入。",
     "duplicateId": "該課程 ID 已被使用，請重新輸入。"
   },
   "deleteCourseModal": {
-    "deleteSchool": "刪除課程",
-    "title": "確定要刪除此課程嗎？",
-    "textInput": "請輸入'delete'以確認刪除此課程。",
-    "description": "此動作無法復原。這將永久刪除此課程並從我們的伺服器中移除您的資料。",
-    "cancel": "取消",
-    "confirm": "是，刪除課程",
     "successDelete": "課程已被刪除"
   },
   "courseType": {
@@ -77,10 +56,7 @@
     "subscription": "一次性付款"
   },
   "courseTabLabel": {
-    "class": "班別",
-    "session": "時段",
-    "feeNTime": "費用和時間",
-    "schedule": "時間表"
+    "class": "班別"
   },
   "courseDescription": {
     "regular": "常規課程已經被常規課程V2取代。現有的常規課程將繼續正常運作，但無法再建立新的常規課程。",
@@ -176,7 +152,6 @@
   },
   "dropDownMenu": {
     "edit": "修改課程",
-    "website": "從網站開啟",
     "delete": "刪除課程",
     "copy": "複製課程",
     "editSection": "編輯章節",
@@ -203,10 +178,7 @@
   "tabBar": {
     "basic": "基本資料",
     "description": "網頁內容",
-    "faq": "問答區",
     "class": "課程內容",
-    "payment": "付款方式",
-    "enrollment": "報名表格",
     "message": "報名後續",
     "recruitment": "招生時段",
     "settings": "設定"
@@ -214,12 +186,9 @@
   "basic": {
     "previewImage": "預覽圖片",
     "previewImageTips": "會在課程的頂部以全寬顯示。請點擊左側上載長寛比為21:9的圖片，建議長度為1,000像素或以上。",
-    "backgroundInformationTitle": "名稱與網址",
     "name": "課程名稱",
     "id": "課程編號",
     "optionalCustomIdPlaceholder": "可選自訂編號",
-    "description": "課程描述",
-    "longDescription": "詳細描述",
     "shortDescription": "簡短介紹",
     "path": "課程網址",
     "location": "地點",
@@ -229,21 +198,11 @@
     "instructorPlaceholder": "請選擇導師"
   },
   "subscriptionSetting": {
-    "productName": "產品名稱",
     "freeSubscription": "無需付費",
     "chargingMode": "收費模式",
-    "oneOff": "一次性付款",
-    "recurring": "定期訂閱",
-    "cycle": "週期",
-    "for": "為期",
-    "billingCycle": "計費週期",
     "billingCycleName": "計費週期名稱",
     "billingStartDate": "計費開始日期",
-    "billingAmount": "計費金額",
-    "chargeCycleHint": "計費日期將從註冊當天開始計算。",
-    "paymentAutomation": "付款自動化",
-    "autoCharge": "如果用戶使用信用卡支付，將自動扣款",
-    "manualCharge": "將發送電子郵件發票給用戶進行手動支付，包括使用信用卡支付的用戶"
+    "billingAmount": "計費金額"
   },
   "faq": {
     "question": "問題",
@@ -251,25 +210,11 @@
     "addQuestionPair": "+ 新增問答"
   },
   "enrollment": {
-    "enrollmentTitle": "報名",
-    "enrollmentDescription": "報名描述",
-    "enrollmentDescriptionTips": "此描述將顯示在報名頁面上。您可以使用此描述來說明報名過程或任何與報名相關的訊息。",
-    "enrollmentFormTitle": "報名表格",
-    "enrollmentFormDescription": "報名表格描述",
-    "enrollmentFormDescriptionTips": "此描述將顯示在報名表格上。您可以使用此描述來說明報名表格或任何與報名相關的訊息。",
     "enrollmentForm": {
-      "title": "報名表格問題",
-      "studentName": "* 學生姓名",
-      "schoolName": "學校名稱",
-      "email": "電子郵件",
-      "phone": "* 電話號碼",
       "specialStudy": "如有需要，請說明任何特殊學習需求",
       "specialStudyTips": "約有 9% 的學生有特殊教育需求，了解您的學生在入學前更為重要",
-      "requiredField": "* 表示必填欄位",
-      "disableField": "切換開關以禁用該欄位",
       "addNewField": "+ 新增欄位",
       "createNewApplicationForm": "新增申請表格",
-      "selectApplicationForm": "選擇申請表格",
       "editForm": "編輯表格",
       "addForm": "新增表格",
       "defaultForm": "預設表格",
@@ -278,7 +223,6 @@
     },
     "enrollmentModal": {
       "title": "編輯表格問題",
-      "field": "欄位名稱",
       "question": "問題",
       "description": "描述",
       "staticType": "靜態類型",
@@ -298,10 +242,7 @@
       "displayDescription": "描述",
       "displayImage": "圖片",
       "displayFileUpload": "上傳檔案",
-      "displayStepSeparator": "步驟分隔線",
       "addOption": "+ 新增選項",
-      "textInput": "確定要儲存報名表格嗎？",
-      "cancel": "取消",
       "confirm": "儲存",
       "addDesc": "新增標題描述",
       "addInput": "新增輸入項目",
@@ -313,7 +254,6 @@
     }
   },
   "message": {
-    "title": "報讀後訊息",
     "registrationMessage": "當學生註冊你的課程後，這個訊息將會顯示在頁面上"
   },
   "recruitment": {
@@ -323,32 +263,20 @@
     "endTime": "結束時間"
   },
   "session": {
-    "name": "時段名稱",
-    "totalFee": "總費用",
     "startTime": "開始時間",
-    "to": "至",
     "endTime": "結束時間",
-    "selectSession": "選擇時段",
-    "save": "儲存時段",
-    "createSession": "建立時段",
-    "deleteSession": "刪除時段",
     "days": "天",
     "createSessionSuccess": "成功建立時段",
     "duplicateSessionSuccess": "成功覆製時段",
     "updateSessionSuccess": "成功更新時段",
-    "deleteSessionDescription": "您確定要刪除此時段嗎？",
     "confirm": "確認",
     "deleteSessionSuccess": "成功刪除時段",
-    "repeatBy": "重複方式",
     "repeatByDay": "天",
     "repeatByWeek": "週",
-    "negFeeValueError": "場次費用數值無效",
-    "freeSession": "免費場次",
     "noSessionYet": "此活動尚無任何場次。",
     "addSession": "新增單一場次",
     "invalidEndTime": "您的部分時段的結束時間早於開始時間。請再次檢查您輸入的時間。",
-    "timeslotOverlap": "您的部分時段的開始時間與其他時段重疊。請再次檢查您輸入的時間。",
-    "validate": "檢查時間表衝突"
+    "timeslotOverlap": "您的部分時段的開始時間與其他時段重疊。請再次檢查您輸入的時間。"
   },
   "validate": {
     "title": "檢查時間表衝突",
@@ -361,32 +289,14 @@
   },
   "feeNTime": {
     "freeLesson": "免費課程",
-    "PaidLesson": "付費課程",
-    "tuitionTitle": "費用",
     "tooLow": "您輸入的貨幣值必須大於 0.5 美元。",
     "tuitionPerLesson": "每堂費用",
     "tuitionPerClass": "全班費用",
     "multiplePriceOption": "多個價格選項",
-    "minLesson": "每次最少購買課堂數量",
-    "bookingConditionTitle": "預約條件",
-    "bookingConfirmation": "學生提交預約申請後需要您的確認",
-    "studentBookingConditionTitle": "學生可以預約課程",
     "daysIntoFuture": "天之後",
     "withinDayRange": "日期範圍內",
-    "studentCannotScheduleWithin": "學生不能排定於",
-    "withinHours": "課堂開始時間前的幾小時內",
-    "ExpiryDateTitle": "到期日期",
-    "purchasedLessonsExpiredTitle": "已購課程將到期於",
     "daysAfterPurchase": "購買後的幾天內過期",
-    "onTheCertainDate": "於指定日期",
-    "addTimeSlot": "+ 新增課堂",
-    "Unavailable": "不適用",
-    "duration": "課堂時長",
     "weeklyHours": "每週上課時數",
-    "hours": "小時",
-    "createAppointment": "建立預約課程",
-    "noAppointment": "你目前還沒有預約課程。請建立一個新預約課程。",
-    "save": "儲存變更",
     "createAppointmentSuccess": "建立預約課程成功",
     "updateAppointmentSuccess": "更新預約課程成功",
     "weekName": {
@@ -502,16 +412,11 @@
     }
   },
   "tag": {
-    "createCourseTag": "課程標籤",
     "description": "標籤是您為課程指定的自定義標籤。您可以創建標籤以識別課程。",
     "addTag": "新增標籤",
     "createMultipleValues": "您可以為標籤創建多個值",
-    "value": "值",
-    "enabled": "啟用",
-    "disabled": "停用",
     "tagName": "標籤名稱",
     "updateTagsSuccess": "您已成功更新課程標籤。",
-    "updateTagsError": "更新課程標籤失敗，請稍後重試",
     "tagsDuplicateError": "標籤名稱不能重複，請再次檢查。",
     "tagsEmptyError": "標籤名稱不能為空，請再次檢查。"
   },
@@ -534,7 +439,6 @@
     "clickGuide": "您可以通過點擊",
     "clickGuideContent": "位於網頁底部的按鈕，重新參觀導覽。如果您在過程中遇到任何問題，請隨時尋求幫助。",
     "floatingButton": "點擊此按鈕，我們將為您提供創建吸引的課程頁面的建議。",
-    "ClickfloatingButton": "點擊該按鈕後，將彈出一個列表。",
     "floatingContent": "此列表將提供有關您需要採取的操作的說明，以便發布您的課程。",
     "congratulations": "恭喜！",
     "congratulationsContent": "您已完成有關如何創建課程的導覽。現在，您可以快速創建您的第一個課程頁面，並開始您的業務。",
@@ -546,7 +450,6 @@
     "previewImage": "上傳一個21:9的橫幅來展示您的課程。如果您無法自行設計，我們可以幫助您。",
     "descriptionSection": "為您的課程撰寫一個描述。這應該包括有關您所教授的內容、目標受眾和報名程序的資訊。",
     "descriptionSection2": "您可以通過點擊'三條橫線'圖標自由編輯各節標題的名稱。您還可以重新排列順序，添加新的節或刪除現有的章節。",
-    "aiChat": "需要幫助撰寫引人注目的學校描述嗎？我們的 AI 助手可以為您完成。",
     "textEditor": "您可以通過包含圖片或影片為學生提供更多資訊。我們提供了有樣式選項的文本編輯器。",
     "messageTabTextEditor": "您可能希望在學生註冊後向他們發送額外的資訊，例如您的課程鏈接或第一堂課前需要準備的任何事項。",
     "messageTabTextEditor2": "此內容將顯示在學生註冊課程後發送的電子郵件中。",
@@ -567,19 +470,11 @@
     "modalTitle": "複製課程",
     "modalDescription": "請選擇目標機構並確認課程資訊後再進行複製。",
     "destinationInstitution": "目標機構",
-    "courseName": "課程名稱",
     "status": "狀態",
-    "published": "已發佈",
-    "notPublished": "未發佈",
-    "numberOfClasses": "班級數量",
     "cancel": "取消",
     "confirmDuplicate": "確認複製",
     "successDuplicate": "課程複製成功。",
     "unknownError": "未知錯誤"
-  },
-  "duplicateClass": {
-    "successDuplicate": "成功複製課堂",
-    "copy": "複製"
   },
   "paymentStatus": {
     "title": "付款狀態",
@@ -597,45 +492,33 @@
   "rejectReceiptSuccess": "成功拒絕收據",
   "resetReceiptSuccess": "成功重設付款狀態",
   "free": "免費",
-  "courseGuide": "如何創作完整的課程？",
   "updateStatus": {
     "changeSttEnrollmentSuccess": "成功更新課程狀態",
     "updateInvoicePaymentStatusSuccess": "成功更新付款狀態"
   },
   "allCourses": "所有課程",
-  "noClassesPrice": "未設定價格",
   "enrollFormQuestions": "表格問題",
   "recurringClass": {
     "createTimeslot": "新增課堂",
-    "singleLessonDuration": "單堂課時長",
     "createMultipleClass": "建立多堂課",
-    "lessonBuffer": "課間休息時間",
-    "numOfLessonGenerate": "生成課堂數量",
     "weeklyHours": "每週時間表",
-    "repeatEvery": "每隔",
     "repeatUnit": {
       "days": "天",
       "weeks": "週",
       "months": "月"
     },
     "overlapWarning": "該時間段已經創建。",
-    "lessonDurationWarning": "課堂時長必須大於 0！",
-    "numOfLessonsWarning": "生成課堂數量必須大於 1！",
     "maxLesson": "最大課堂數量為 99"
   },
   "additionalFee": {
     "addFee": "新增額外費用",
-    "editReminder": "編輯現有費用將影響所有與此費用關聯的課程",
     "remove": "移除",
     "add": "加入",
     "noFee": "您還沒有創建任何額外費用",
     "createNewFee": "創建新費用"
   },
   "sendEmail": "發送電郵",
-  "sendApplicationLinkEmailSuccess": "已向該學生發送電郵",
-  "sendApplicationLinkEmailError": "發送電郵失敗",
   "prerequisites": {
-    "prerequisites": "先修課程",
     "description": "所有申請者必須通過系統驗證其資格，才能前往申請表格。",
     "newGroup": "新群組",
     "newCondition": "新條件",
@@ -644,27 +527,16 @@
     "courseIsRequired": "課程是必填的",
     "classIsRequired": "班別是必填的",
     "operatorIsRequired": "條件選擇是必填的",
-    "successCreate": "成功創建",
     "successUpdate": "更新成功",
     "successDelete": "刪除成功"
   },
   "SEO": {
     "description": "SEO 設定允許您優化您的課程頁面以吸引更多學生。這將幫助提高您的課程的知名度。請留空以使用默認值。",
-    "SEOSettings": "SEO 設定",
-    "addSettings": "添加設定",
-    "editSettings": "編輯設定",
-    "addSEOSettings": "添加 SEO 設定",
-    "SEOContent": "SEO 內容",
     "metaTitle": "標題",
     "metaDescription": "描述",
     "regenerate": "重新生成 SEO 設定",
-    "save": "保存",
-    "delete": "刪除",
     "noSEOSettings": "您沒有任何 SEO 設定",
     "createSuccess": "新增 SEO 設定成功",
-    "deleteSuccess": "刪除 SEO 設定成功",
-    "titleDeleteDialog": "您確定要刪除此 SEO 設定嗎",
-    "SEOSettingsDelete": "seo將會設定回預設,您確定要刪除此 SEO 設定嗎",
     "errors": {
       "descriptionTooLong": "描述太長,字數最多為"
     }
@@ -684,13 +556,9 @@
     "createUpdateSuccess": "已成功儲存電郵設定"
   },
   "updateEmailVerification": {
-    "updateEmailVerificationSuccess": "成功更新電郵驗證設定",
-    "updateEmailVerificationError": "更新電郵驗證設定失敗",
     "needEmailVerification": "需要電郵驗證才能前往報名鏈接"
   },
   "courseSettings": {
-    "title": "設定",
-    "courseSettings": "課程設定",
     "seo": "SEO 設定",
     "prerequisites": "報名條件",
     "tags": "課程標籤",

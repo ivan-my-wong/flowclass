@@ -11,14 +11,14 @@ import {
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger'
+import { Express } from 'express'
 
 import { Public } from '@/common/decorators/public.decorator'
 import { RequireParams } from '@/common/decorators/require-param.decorator'
 import {
-  StorageImageUploadInterceptor,
-  StorageTargetDirectory,
-  UploadedStorageFile,
-} from '@/config/storage/storage-image-upload-interceptor'
+  S3ImageUploadInterceptor,
+  S3TargetDirectory,
+} from '@/config/s3/s3-image-upload-interceptor'
 import { RequireParam } from '@/models/enums/'
 import { CreateMediaDto } from '@/modules/media/dto/media.dto'
 import { schema } from '@/modules/media/dto/media.swagger.schema'
@@ -71,8 +71,8 @@ export class MediaStudentController {
   // @ApiBearerAuth('access-token')
   @Post('upload-ai')
   @RequireParams(RequireParam.USER_ID)
-  @UseInterceptors(StorageImageUploadInterceptor(StorageTargetDirectory.AI_TOOL))
-  public async uploadFile(@UploadedFile() file: UploadedStorageFile) {
+  @UseInterceptors(S3ImageUploadInterceptor(S3TargetDirectory.AI_TOOL))
+  public async uploadFile(@UploadedFile() file: Express.MulterS3.File) {
     const dto: CreateMediaDto = {
       fileName: file.key,
       size: file.size,

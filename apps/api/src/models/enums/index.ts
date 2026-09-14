@@ -61,6 +61,12 @@ export enum ChargeFrequency {
   yearly = 'yearly',
 }
 
+export enum GaMeasurementEventName {
+  SIGN_UP = 'sign_up',
+  LOGIN = 'login',
+  PURCHASE = 'purchase',
+}
+
 export enum RecordLogType {
   ASSIGN_COUPON_FOR_STUDENT = 'ASSIGN_COUPON_FOR_STUDENT',
   CREATE_COUPON = 'CREATE_COUPON',
@@ -147,7 +153,6 @@ export enum STRIPE_CURRENCY {
 export enum PaymentMethod {
   PAY_LATER = 'PAY_LATER',
   PAY_NOW = 'PAY_NOW',
-  PAY_NOW_DIVIT = 'PAY_NOW_DIVIT',
   NOT_REQUIRED = 'NOT_REQUIRED',
 }
 
@@ -226,7 +231,6 @@ export enum PromotionType {
   COUPON_DISCOUNT = 'COUPON_DISCOUNT',
   RECURRING_DISCOUNT = 'RECURRING_DISCOUNT',
   TRIAL_LESSON = 'TRIAL_LESSON',
-  PACKAGE_DISCOUNT = 'PACKAGE_DISCOUNT',
 }
 
 export enum DiscountType {
@@ -320,8 +324,5 @@ export enum StudentPrimaryIdentifier {
   PHONE = 'phone',
 }
 
-export enum GaMeasurementEventName {
-  PURCHASE = 'purchase',
-}
-
+export * from './automation-flow'
 export * from './status'

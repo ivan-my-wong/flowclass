@@ -19,6 +19,7 @@ import Box from '@/components/ui/Box'
 import ShadowBox from '@/components/ui/ShadowBox'
 import { defaultRepeatFormat } from '@/constants/course'
 import useSiteData from '@/hooks/useSiteData'
+import { styled } from '@/styles'
 import { ClassesForm, PeriodLessons, RegularPeriods } from '@/types/classes'
 import dayjs from '@/utils/dayjs'
 import { addRepeatTypeToDate } from '@/utils/timeFormat'
@@ -29,6 +30,17 @@ import {
 } from '@/utils/timeString'
 
 import ValidateSessionModal from '../ValidateSessionModal'
+
+const AddButton = styled(Text, {
+  color: '$primary',
+  cursor: 'pointer',
+  fontWeight: '$bold',
+  alignSelf: 'center',
+  '&:hover': {
+    textDecoration: 'underline',
+    color: '$primaryHighlight',
+  },
+})
 
 const SessionPage = (): JSX.Element => {
   const { t } = useTranslation()
@@ -221,7 +233,12 @@ const SessionPage = (): JSX.Element => {
                       plain
                       size="medium"
                       color="warn"
-                      className="cursor-pointer pointer-events-auto opacity-100 ml-auto"
+                      css={{
+                        cursor: 'pointer',
+                        pointerEvents: 'auto',
+                        opacity: 1,
+                        marginLeft: 'auto',
+                      }}
                       onClick={() => handleDeleteDate(index)}
                       icon={<CgPlayListRemove />}
                     />
@@ -260,18 +277,16 @@ const SessionPage = (): JSX.Element => {
       >
         <SessionDateCard />
 
-        <Text
-          className="text-primary cursor-pointer font-bold self-center my-4 shrink-0 hover:underline hover:text-primary-highlight disabled:opacity-50 disabled:cursor-not-allowed"
+        <AddButton
+          css={{ margin: '$4 0', flexShrink: 0 }}
           onClick={() => {
             handleAddDate()
           }}
+          type={isOverlap ? 'disabled' : undefined}
           data-testid="add-session-btn"
-          style={
-            isOverlap ? { pointerEvents: 'none', opacity: 0.5 } : undefined
-          }
         >
           + {t('teachingService:session.addSession')}
-        </Text>
+        </AddButton>
 
         {/* {classToBeEdited?.lessons.length !== 0 && ( */}
         {/*  <AddDateButtonGroup /> */}

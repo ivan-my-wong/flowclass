@@ -1,7 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { IsArray, IsEnum, IsNotEmpty, IsOptional } from 'class-validator'
 
-class StudentMemoBaseDto {
+import { SupportedType } from '../../custom-messages/dto/custom-message.dto'
+
+export class CreateOrUpdateStudentMemoBaseDto {
   @ApiProperty({ example: 75 })
   @IsNotEmpty()
   userId: number
@@ -11,7 +13,14 @@ class StudentMemoBaseDto {
   institutionId: number
 }
 
-export class CreateAndUpdateStudentContactInfoDto extends StudentMemoBaseDto {
+export class CreateAndUpdateStudentMemoDto extends CreateOrUpdateStudentMemoBaseDto {
+  @ApiProperty({ example: 'Message' })
+  // @IsNotEmpty()
+  @IsOptional()
+  memo: string
+}
+
+export class CreateAndUpdateStudentContactInfoDto extends CreateOrUpdateStudentMemoBaseDto {
   @ApiProperty({ example: 'example@gmail.com' })
   @IsOptional()
   contactEmail: string
@@ -25,7 +34,7 @@ export class CreateAndUpdateStudentContactInfoDto extends StudentMemoBaseDto {
   contactName: string
 }
 
-export class CreateOrUpdateStudentContactInfoV2Dto extends StudentMemoBaseDto {
+export class CreateOrUpdateStudentContactInfoV2Dto extends CreateOrUpdateStudentMemoBaseDto {
   @ApiProperty({ example: 1, description: 'User alias id' })
   @IsNotEmpty()
   userAliasId: number
@@ -58,10 +67,10 @@ export class StudentNotificationSettings {
   @IsNotEmpty()
   id: number
 
-  @ApiProperty({ example: StudentNotificationType.PAYMENT_REMINDER })
+  @ApiProperty({ example: SupportedType.ADMIN_NOTIF_AFTER_ENROLLMENT_SUBMITTED })
   @IsEnum(StudentNotificationType)
   @IsNotEmpty()
-  notificationType: StudentNotificationType
+  notificationType: SupportedType
 
   @ApiProperty({ example: true })
   @IsNotEmpty()

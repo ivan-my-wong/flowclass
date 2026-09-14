@@ -1,4 +1,4 @@
-import React, {
+import {
   ComponentProps,
   forwardRef,
   useEffect,
@@ -14,43 +14,164 @@ import {
 } from '@radix-ui/react-icons'
 // eslint-disable-next-line no-restricted-syntax
 import * as SelectPrimitive from '@radix-ui/react-select'
+import { styled } from '@stitches/react'
 import { v4 as uuidv4 } from 'uuid'
-
-import { cn } from '@/utils/cn'
 
 import { DraggableCard, DraggableContainer } from '../Containers/Draggable'
 import Text from '../Texts/Text'
 
-const triggerBase =
-  'outline-none inline-flex items-center justify-center rounded px-4 text-base leading-none h-12 gap-1.5 bg-background border-2 border-background-layer-3 text-text shadow-sm whitespace-normal hover:bg-background-layer-3 hover:cursor-pointer focus:ring-2 focus:ring-border focus:ring-offset-0 data-[placeholder]:text-text'
+const SelectTrigger = styled(SelectPrimitive.SelectTrigger, {
+  all: 'unset',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: 4,
+  padding: '0 $4',
+  fontSize: '1rem',
+  lineHeight: 1,
+  height: '$12',
+  gap: 5,
+  backgroundColor: '$background',
+  border: '2px solid $backgroundLayer3',
+  color: '$text',
+  boxShadow: '$1',
+  whiteSpace: 'normal',
+  '&:hover': { backgroundColor: '$backgroundLayer3', cursor: 'pointer' },
+  '&:focus': { boxShadow: `0 0 0 2px $colors$borderColor` },
+  '&[data-placeholder]': { color: '$text' },
 
-const SelectItem = forwardRef<
-  HTMLDivElement,
-  ComponentProps<typeof SelectPrimitive.Item>
->(({ children, ...props }, forwardedRef) => (
-  <SelectPrimitive.Item
-    {...props}
-    ref={ref => {
-      const itemRef = ref
-      if (!itemRef) return
-      itemRef.ontouchstart = e => {
-        e.preventDefault()
-        e.stopPropagation()
-      }
-    }}
-    className="text-base leading-none text-text rounded flex items-center h-6 py-4 px-8 relative select-none cursor-pointer data-[disabled]:text-text-subtle data-[disabled]:pointer-events-none data-[highlighted]:outline-none data-[highlighted]:text-primary-subtle"
-  >
-    <SelectPrimitive.ItemText ref={forwardedRef}>
-      {children}
-    </SelectPrimitive.ItemText>
-    <SelectPrimitive.ItemIndicator className="absolute left-0 w-6 inline-flex items-center justify-center">
-      <CheckIcon />
-    </SelectPrimitive.ItemIndicator>
-  </SelectPrimitive.Item>
-))
+  variants: {
+    variant: {
+      compact: {
+        height: '$7',
+        fontSize: '0.9rem',
+        boxShadow: 'none',
+        border: '2px solid $backgroundLayer3',
+        '&:focus': { boxShadow: 'none' },
+      },
+      disabled: {
+        backgroundColor: '$textDisabled',
+        color: '$textSubtle',
+        boxShadow: 'none',
+        '&:hover': {
+          backgroundColor: '$textDisabled',
+          color: '$textSubtle',
+          cursor: 'not-allowed!important',
+          boxShadow: 'none',
+        },
+      },
+    },
+    fullWidth: {
+      true: {
+        width: '100%',
+        padding: 'unset',
+      },
+    },
+  },
+})
 
-SelectItem.displayName = 'SelectItem'
+const SelectIcon = styled(SelectPrimitive.SelectIcon, {
+  color: '$text',
+})
 
+const SelectContent = styled(SelectPrimitive.Content, {
+  overflow: 'hidden',
+  backgroundColor: '$background',
+  borderRadius: 6,
+  zIndex: '$selectPopup',
+})
+
+const SelectViewport = styled(SelectPrimitive.Viewport, {
+  padding: 5,
+})
+
+type SelectSingleProps = {} & ComponentProps<typeof StyledItem>
+
+const SelectItem = forwardRef<HTMLDivElement, SelectSingleProps>(
+  ({ children, ...props }, forwardedRef) => {
+    return (
+      <StyledItem {...props} ref={forwardedRef}>
+        <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+        <StyledItemIndicator>
+          <CheckIcon />
+        </StyledItemIndicator>
+      </StyledItem>
+    )
+  }
+)
+
+const StyledItem = styled(SelectPrimitive.Item, {
+  fontSize: '1rem',
+  lineHeight: 1,
+  color: '$text',
+  borderRadius: 3,
+  display: 'flex',
+  alignItems: 'center',
+  height: 25,
+  padding: '$4 $8 $4 $8',
+  position: 'relative',
+  userSelect: 'none',
+  cursor: 'pointer',
+  '&[data-disabled]': {
+    color: '$textSubtle',
+    pointerEvents: 'none',
+  },
+
+  '&[data-highlighted]': {
+    outline: 'none',
+    color: '$primarySubtle',
+  },
+})
+
+const SelectLabel = styled(SelectPrimitive.Label, {
+  padding: '0 25px',
+  fontSize: 12,
+  lineHeight: '25px',
+  color: '$text',
+})
+
+const SelectSeparator = styled(SelectPrimitive.Separator, {
+  height: 1,
+  backgroundColor: '$backgroundDisabled',
+  margin: 5,
+})
+
+const StyledItemIndicator = styled(SelectPrimitive.ItemIndicator, {
+  position: 'absolute',
+  left: 0,
+  width: 25,
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+})
+
+const scrollButtonStyles = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: 25,
+  backgroundColor: '$background',
+  color: '$primary',
+  cursor: 'default',
+}
+
+const SelectScrollUpButton = styled(
+  SelectPrimitive.ScrollUpButton,
+  scrollButtonStyles
+)
+
+const SelectScrollDownButton = styled(
+  SelectPrimitive.ScrollDownButton,
+  scrollButtonStyles
+)
+
+const StyledPortal = styled(SelectPrimitive.Portal, {
+  zIndex: '$selectPopup',
+  borderRadius: '$medium',
+  border: `1px solid $colors$borderColor`,
+})
+
+// selectItems format: [{label: string, values: [number | string]}]
 export type SelectItemValuesProps = {
   label: JSX.Element | string
   value: string | number
@@ -105,11 +226,13 @@ const SearchableSelect: React.FC<SelectInputProps> = ({
     if (status === 'highlight') {
       return <Text type="primary">{label}</Text>
     }
+
     return label
   }
 
   const filteredItems = useMemo(() => {
     if (!searchTerm) return selectItems
+
     return selectItems
       .map(group => ({
         ...group,
@@ -122,17 +245,19 @@ const SearchableSelect: React.FC<SelectInputProps> = ({
   }, [selectItems, searchTerm])
 
   const DraggableSelectItems = (): JSX.Element => {
-    const draggableItems = useMemo(
-      () =>
-        filteredItems.map(item => ({
+    const draggableItems = useMemo(() => {
+      return filteredItems.map(item => {
+        return {
           ...item,
-          itemValues: item.itemValues.map(itemValue => ({
-            ...itemValue,
-            id: uuidv4(),
-          })),
-        })),
-      []
-    )
+          itemValues: item.itemValues.map(itemValue => {
+            return {
+              ...itemValue,
+              id: uuidv4(),
+            }
+          }),
+        }
+      })
+    }, [])
 
     return (
       <>
@@ -140,31 +265,34 @@ const SearchableSelect: React.FC<SelectInputProps> = ({
           if (item?.group) {
             return (
               <SelectPrimitive.Group key={item.group}>
-                <SelectPrimitive.Label className="py-0 px-6 text-xs leading-6 text-text">
-                  {item.group}
-                </SelectPrimitive.Label>
+                <SelectLabel>{item.group}</SelectLabel>
                 <DraggableContainer
                   items={item.itemValues}
                   handleDragEnd={handleDragEnd!}
                 >
-                  {item.itemValues.map(itemValue => (
-                    <DraggableCard
-                      key={itemValue.value}
-                      id={itemValue.id.toString()}
-                      cardStyle={{ padding: '0.25rem' }}
-                    >
-                      <SelectItem
-                        value={itemValue.value.toString()}
-                        disabled={itemValue.disabled}
+                  {item.itemValues.map(itemValue => {
+                    return (
+                      <DraggableCard
+                        id={itemValue.id.toString()}
+                        key={itemValue.value}
+                        cardStyle={{
+                          padding: '$1',
+                        }}
                       >
-                        {typeof itemValue.label === 'string'
-                          ? getTextColor(itemValue.label, itemValue.status)
-                          : itemValue.label}
-                      </SelectItem>
-                    </DraggableCard>
-                  ))}
+                        <SelectItem
+                          key={itemValue.value}
+                          value={itemValue.value.toString()}
+                          disabled={itemValue.disabled}
+                        >
+                          {typeof itemValue.label === 'string'
+                            ? getTextColor(itemValue.label, itemValue.status)
+                            : itemValue.label}
+                        </SelectItem>
+                      </DraggableCard>
+                    )
+                  })}
                 </DraggableContainer>
-                <SelectPrimitive.Separator className="h-px bg-background-disabled my-1.5" />
+                <SelectSeparator />
               </SelectPrimitive.Group>
             )
           }
@@ -176,18 +304,23 @@ const SearchableSelect: React.FC<SelectInputProps> = ({
             >
               {item.itemValues.map(itemValue => (
                 <DraggableCard
-                  key={itemValue.value}
                   id={itemValue.id.toString()}
-                  cardStyle={{ padding: '0.25rem' }}
+                  key={itemValue.value}
+                  cardStyle={{
+                    padding: '$1',
+                  }}
                 >
-                  <SelectItem value={itemValue.value.toString()}>
+                  <SelectItem
+                    key={itemValue.value}
+                    value={itemValue.value.toString()}
+                  >
                     {typeof itemValue.label === 'string'
                       ? getTextColor(itemValue.label, itemValue.status)
                       : itemValue.label}
                   </SelectItem>
                 </DraggableCard>
               ))}
-              <SelectPrimitive.Separator className="h-px bg-background-disabled my-1.5" />
+              <SelectSeparator />
             </DraggableContainer>
           )
         })}
@@ -195,48 +328,49 @@ const SearchableSelect: React.FC<SelectInputProps> = ({
     )
   }
 
-  const NonDraggableSelectItems = (): JSX.Element => (
-    <>
-      {filteredItems.map((item, index) => {
-        if (item.group !== null) {
+  const NonDraggableSelectItems = (): JSX.Element => {
+    return (
+      <>
+        {filteredItems.map((item, index) => {
+          if (item.group !== null) {
+            return (
+              <SelectPrimitive.Group key={`${item.group}${index - 1}`}>
+                <SelectLabel>{item.group}</SelectLabel>
+                {item.itemValues.map((itemValue, index) => (
+                  <SelectItem
+                    key={`${itemValue.value}${index - 1}`}
+                    value={itemValue.value.toString()}
+                    disabled={itemValue.disabled}
+                  >
+                    {typeof itemValue.label === 'string'
+                      ? getTextColor(itemValue.label, itemValue.status)
+                      : itemValue.label}
+                  </SelectItem>
+                ))}
+                <SelectSeparator />
+              </SelectPrimitive.Group>
+            )
+          }
+
           return (
-            <SelectPrimitive.Group key={`${item.group}${index - 1}`}>
-              <SelectPrimitive.Label className="py-0 px-6 text-xs leading-6 text-text">
-                {item.group}
-              </SelectPrimitive.Label>
-              {item.itemValues.map((itemValue, idx) => (
+            <>
+              {item.itemValues.map((itemValue, index) => (
                 <SelectItem
-                  key={`${itemValue.value}${idx - 1}`}
+                  key={`${itemValue.value}${index - 1}`}
                   value={itemValue.value.toString()}
-                  disabled={itemValue.disabled}
                 >
                   {typeof itemValue.label === 'string'
                     ? getTextColor(itemValue.label, itemValue.status)
                     : itemValue.label}
                 </SelectItem>
               ))}
-              <SelectPrimitive.Separator className="h-px bg-background-disabled my-1.5" />
-            </SelectPrimitive.Group>
+              <SelectSeparator />
+            </>
           )
-        }
-        return (
-          <React.Fragment key={index}>
-            {item.itemValues.map((itemValue, idx) => (
-              <SelectItem
-                key={`${itemValue.value}${idx - 1}`}
-                value={itemValue.value.toString()}
-              >
-                {typeof itemValue.label === 'string'
-                  ? getTextColor(itemValue.label, itemValue.status)
-                  : itemValue.label}
-              </SelectItem>
-            ))}
-            <SelectPrimitive.Separator className="h-px bg-background-disabled my-1.5" />
-          </React.Fragment>
-        )
-      })}
-    </>
-  )
+        })}
+      </>
+    )
+  }
 
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
@@ -244,38 +378,43 @@ const SearchableSelect: React.FC<SelectInputProps> = ({
     }
   }, [isOpen])
 
+  const handleValueChange = (value: string) => {
+    document.body.style.pointerEvents = 'auto'
+    if (onValueChange) {
+      onValueChange(value)
+    }
+  }
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      document.body.style.pointerEvents = 'auto'
+    }
+    setIsOpen(open)
+  }
+
   return (
     <SelectPrimitive.Root
-      onValueChange={onValueChange}
+      onValueChange={handleValueChange}
       value={currentSelect.toString()}
       open={isOpen}
-      onOpenChange={setIsOpen}
+      onOpenChange={handleOpenChange}
     >
-      <SelectPrimitive.SelectTrigger
+      <SelectTrigger
         id={id ?? 'select-trigger'}
+        variant={disabled ? 'disabled' : triggerVariant}
+        fullWidth={fullWidth}
         disabled={disabled}
-        className={cn(
-          triggerBase,
-          triggerVariant === 'compact' &&
-            'h-7 text-sm shadow-none border-2 border-background-layer-3 focus:ring-0',
-          disabled &&
-            'bg-text-disabled text-text-subtle shadow-none hover:bg-text-disabled hover:text-text-subtle hover:cursor-not-allowed hover:shadow-none',
-          fullWidth && 'w-full p-0'
-        )}
       >
         <SelectPrimitive.Value placeholder={placeholder} />
-        <SelectPrimitive.SelectIcon className="text-text">
+        <SelectIcon>
           <ChevronDownIcon />
-        </SelectPrimitive.SelectIcon>
-      </SelectPrimitive.SelectTrigger>
-      <SelectPrimitive.Portal>
-        <SelectPrimitive.Content
-          className="overflow-hidden bg-background rounded-md border border-border z-[1060]"
-          position="popper"
-        >
-          <SelectPrimitive.ScrollUpButton className="flex items-center justify-center h-6 bg-background text-primary cursor-default">
+        </SelectIcon>
+      </SelectTrigger>
+      <StyledPortal>
+        <SelectContent>
+          <SelectScrollUpButton>
             <ChevronUpIcon />
-          </SelectPrimitive.ScrollUpButton>
+          </SelectScrollUpButton>
           <div className="p-2">
             <input
               ref={searchInputRef}
@@ -286,18 +425,18 @@ const SearchableSelect: React.FC<SelectInputProps> = ({
               className="w-full p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-primary"
             />
           </div>
-          <SelectPrimitive.Viewport className="p-1">
+          <SelectViewport>
             {draggable && handleDragEnd ? (
               <DraggableSelectItems />
             ) : (
               <NonDraggableSelectItems />
             )}
-          </SelectPrimitive.Viewport>
-          <SelectPrimitive.ScrollDownButton className="flex items-center justify-center h-6 bg-background text-primary cursor-default">
+          </SelectViewport>
+          <SelectScrollDownButton>
             <ChevronDownIcon />
-          </SelectPrimitive.ScrollDownButton>
-        </SelectPrimitive.Content>
-      </SelectPrimitive.Portal>
+          </SelectScrollDownButton>
+        </SelectContent>
+      </StyledPortal>
     </SelectPrimitive.Root>
   )
 }

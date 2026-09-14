@@ -9,4 +9,7 @@ storybook-static/
 
 vite-env.d.ts
 vite.config.ts
+jest.config.js
 tailwind.config.ts
+
+playwright.setup.ts

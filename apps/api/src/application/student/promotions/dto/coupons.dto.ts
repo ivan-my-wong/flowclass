@@ -55,6 +55,11 @@ export class StudentValidCouponDto {
   @IsNumber()
   invoiceId?: number
 
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  userAliasId?: number
+
   @ApiProperty()
   @IsNumber()
   institutionId: number

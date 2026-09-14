@@ -129,18 +129,15 @@ const AvailabilityList = (): JSX.Element => {
   }
 
   const renderCreateAvailabilityButton = () => {
-    if (isCanModifyBlockTime) {
-      return (
-        <Button
-          onClick={handleCreateNew}
-          iconBefore={<LuPlus />}
-          className="bg-blue-500 hover:bg-blue-600 text-white"
-        >
-          {t('availability:createNew')}
-        </Button>
-      )
-    }
-    return <></>
+    return (
+      <Button
+        onClick={handleCreateNew}
+        iconBefore={<LuPlus />}
+        className="bg-blue-500 hover:bg-blue-600 text-white"
+      >
+        {t('availability:createNew')}
+      </Button>
+    )
   }
 
   const renderIsLoadingSchedule = () => {

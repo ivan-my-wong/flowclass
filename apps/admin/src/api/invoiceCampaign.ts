@@ -3,7 +3,6 @@ import type {
   ResendInvoiceDto,
   SendingResponse,
   SendInvoiceDirectlyDto,
-  SyncEnrollCoursesDiffItemDto,
 } from '@/types/studentInvoice.type'
 import type { InvoiceCampaign } from '@/types/templateManagement'
 
@@ -50,21 +49,9 @@ export const sendInvoiceCampaign = async (
 ): Promise<SendingResponse> => {
   const response = await apiClient.patch({
     url: `/admin/invoice-campaign/${documentId}/send-campaign`,
-    params: { institutionId },
-    data: payload,
-  })
-  return response?.data?.data
-}
-
-/** Re-send a completed invoice campaign, preserving the original amountPaid. */
-export const editAndResendInvoiceCampaign = async (
-  institutionId: number,
-  documentId: string,
-  payload: InvoiceCampaignDto
-): Promise<SendingResponse> => {
-  const response = await apiClient.patch({
-    url: `/admin/invoice-campaign/${documentId}/edit-and-resend`,
-    params: { institutionId },
+    params: {
+      institutionId,
+    },
     data: payload,
   })
   return response?.data?.data
@@ -149,18 +136,6 @@ export const sendInvoiceDirectly = async (
   })
 }
 
-export const syncEnrollCourses = async (
-  institutionId: number,
-  documentId: string | number,
-  diffs: SyncEnrollCoursesDiffItemDto[]
-): Promise<void> => {
-  await apiClient.patch({
-    url: `/admin/invoice-campaign/${documentId}/sync-enroll-courses`,
-    params: { institutionId },
-    data: { diffs },
-  })
-}
-
 export const fetchInvoicePdf = async (
   institutionId: number,
   invoiceId: number
@@ -172,4 +147,30 @@ export const fetchInvoicePdf = async (
     },
   })
   return (res?.data?.data as string) ?? ''
+}
+
+export const fetchAutomationSettings = async (
+  institutionId: number
+): Promise<any> => {
+  const res = await apiClient.get({
+    url: '/admin/invoice-campaign/automation-settings',
+    params: {
+      institutionId,
+    },
+  })
+  return res?.data?.data ?? {}
+}
+
+export const updateAutomationSettings = async (
+  institutionId: number,
+  data: any
+): Promise<any> => {
+  const res = await apiClient.put({
+    url: '/admin/invoice-campaign/automation-settings',
+    params: {
+      institutionId,
+    },
+    data,
+  })
+  return res?.data?.data ?? {}
 }

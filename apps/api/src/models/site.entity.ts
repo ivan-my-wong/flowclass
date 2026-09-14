@@ -9,6 +9,7 @@ import { CommentEntity } from './comments.entity'
 import { Course } from './courses.entity'
 import { Institution } from './institutions.entity'
 import { SettingSite } from './setting-site.entity'
+import { SubscriptionPlanRecordsEntity } from './subscription-plan-records.entity'
 import { UserRole } from './user-role.entity'
 
 @Entity('sites')
@@ -86,6 +87,12 @@ export class Site extends BaseEntity {
 
   @OneToMany(() => NotificationRecord, (notificationRecord) => notificationRecord.site)
   notificationRecord: NotificationRecord[]
+
+  @OneToMany(
+    () => SubscriptionPlanRecordsEntity,
+    (subscriptionPlanRecords) => subscriptionPlanRecords.site
+  )
+  subscriptionPlanRecords: SubscriptionPlanRecordsEntity[]
 
   @AfterLoad()
   async setConfig(): Promise<void> {

@@ -1,5 +1,5 @@
 import {
-  type ComponentProps,
+  ComponentProps,
   forwardRef,
   useImperativeHandle,
   useState,
@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { FaTasks } from 'react-icons/fa'
 import { ImCross } from 'react-icons/im'
 
+import { styled, theme } from '../../styles'
 import Box from '../Containers/Box'
 
 type FloatingButtonProps = {
@@ -37,32 +38,41 @@ export const FloatingButton = forwardRef<
   const CloseButton = (): JSX.Element => {
     return (
       <Box
-        className="w-fit cursor-pointer justify-self-end self-end p-1"
+        css={{
+          width: 'fit-content',
+          cursor: 'pointer',
+          justifySelf: 'flex-end',
+          alignSelf: 'flex-end',
+          padding: '$1',
+        }}
         onClick={handleButtonClick}
       >
-        <span className="text-foreground">
-          <ImCross color="currentColor" />
-        </span>
+        <ImCross color={theme.colors.text.toString()} />
       </Box>
     )
   }
 
   return (
-    <Box className="fixed bottom-[15%] right-[1.5%] w-fit" {...boxProps}>
-      <motion.button
+    <Box
+      css={{
+        position: 'fixed',
+        bottom: '15%',
+        right: '1.5%',
+        width: 'fit-content',
+      }}
+      {...boxProps}
+    >
+      <MotionButton
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={handleButtonClick}
         id="floating-button"
-        className="z-[9999] bg-background border-2 border-primary outline-none rounded-full w-16 h-16 shadow-md cursor-pointer flex justify-center items-center transition-colors duration-300 hover:bg-background-layer-3"
       >
-        <span className="text-primary-highlight">
-          <FaTasks size="70%" color="currentColor" />
-        </span>
-      </motion.button>
+        <FaTasks size="70%" color={theme.colors.primaryHighlight.toString()} />
+      </MotionButton>
       <AnimatePresence>
         {showInfo && (
-          <motion.div
+          <MotionContent
             id="floating-content"
             initial={{ opacity: 0, y: '20%', x: '30%', filter: 'blur(10px)' }}
             animate={{
@@ -73,13 +83,50 @@ export const FloatingButton = forwardRef<
             }}
             exit={{ opacity: 0, y: '15%', x: '15%', filter: 'blur(10px)' }}
             transition={{ duration: 0.3 }}
-            className="absolute flex flex-col bottom-full right-0 max-w-[80vw] min-w-[30rem] w-fit bg-background p-2 rounded-md shadow-lg md:min-w-[90vw]"
           >
             <CloseButton />
             {content}
-          </motion.div>
+          </MotionContent>
         )}
       </AnimatePresence>
     </Box>
   )
+})
+
+const MotionContent = styled(motion.div, {
+  position: 'absolute',
+  display: 'flex',
+  flexDirection: 'column',
+  bottom: '100%',
+  right: '0px',
+  maxWidth: '80vw',
+  minWidth: '30rem',
+  width: 'fit-content',
+  backgroundColor: '$background',
+  padding: '$2',
+  borderRadius: '$1',
+  boxShadow: '$3',
+  // border: '1px solid $borderColor',
+  '@sm': {
+    minWidth: '90vw',
+  },
+})
+
+const MotionButton = styled(motion.button, {
+  zIndex: '9999',
+  background: '$background',
+  border: '2px solid $primary',
+  outline: 'none',
+  borderRadius: '50%',
+  width: '4rem',
+  height: '4rem',
+  boxShadow: '$3',
+  cursor: 'pointer',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  transition: 'background-color 0.3s ease',
+  '&:hover': {
+    background: '$backgroundLayer3',
+  },
 })

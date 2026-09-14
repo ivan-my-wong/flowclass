@@ -1,3 +1,5 @@
+import TagManager, { DataLayerArgs } from 'react-gtm-module'
+
 export enum GtmEvent {
   pageView = 'page_view',
   addPaymentInfo = 'add_payment_info',
@@ -25,9 +27,16 @@ export enum GtmEvent {
   connectStripeExpress = 'connect_stripe-express',
 }
 
-/** No-op: GTM/analytics disabled in OSS mode */
 export const setGtmEvent = (
-  _data: {
+  data: {
     event?: GtmEvent
-  } & Record<string, unknown>
-): void => {}
+  } & Record<string, any>
+) => {
+  const tagManagerArgs: DataLayerArgs = {
+    dataLayer: {
+      ...data,
+    },
+    dataLayerName: 'PageDataLayer',
+  }
+  TagManager.dataLayer(tagManagerArgs)
+}

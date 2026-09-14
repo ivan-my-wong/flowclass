@@ -60,7 +60,7 @@ export class UpdateInvoicePaymentDto {
   coupon?: string
 
   @ApiProperty({
-    example: 'https://example.com?school=flowclass&course=regular',
+    example: 'https://school.flowclass.io?school=flowclass&course=regular',
   })
   @IsNotEmpty()
   @IsString()
@@ -107,11 +107,18 @@ export class StudentReCreateStripeClientSecretDto {
   paymentAmount: number
 
   @ApiProperty({
-    example: 'https://example.com?school=flowclass&course=regular',
+    example: 'https://school.flowclass.io?school=flowclass&course=regular',
   })
   @IsNotEmpty()
   @IsString()
   redirectUrl: string
+
+  @ApiPropertyOptional({
+    example: 'DISCOUNT10',
+  })
+  @IsOptional()
+  @IsString()
+  coupon?: string
 }
 
 export class StudentUpdateEnrollCourseMetaDto {
@@ -138,7 +145,7 @@ export class StudentUpdateEnrollCourseMetaDto {
   enrollInto: EnrollIntoInfo
 
   @ApiProperty({
-    example: 'https://example.com',
+    example: 'https://flowclass.io',
   })
   @IsNotEmpty()
   @IsString()

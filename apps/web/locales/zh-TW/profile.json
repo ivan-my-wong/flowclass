@@ -9,8 +9,6 @@
   "sendPaymentSuccess": "您確定要向{count}名學生發送付款成功通知嗎？",
   "sendPaymentReminderSuccess": "發送付款提醒成功",
   "action": "操作",
-  "confirmReceiptSuccess": "確認收據成功",
-  "rejectReceiptSuccess": "拒絕收據成功",
   "sendPaymentProofUploadEmail": "發送付款證明上傳郵件",
   "sendPaymentReceiptEmail": "發送付款收據郵件",
   "sendLessonReminderEmail": "發送課程提醒郵件",
@@ -66,7 +64,8 @@
     "PAID": "已付款",
     "REFUNDED": "已退款",
     "FAILED": "付款失敗",
-    "SUBMITTED": "已提交"
+    "SUBMITTED": "已提交",
+    "UNPAID": "未付款"
   },
   "sendQuestion": "發送問題",
   "time": "時間",
@@ -86,10 +85,7 @@
     "logout": "登出"
   },
   "login": {
-    "title": "學生登入",
-    "subtitle": "在 {institutionName} 存取您的個人資料",
     "phoneNumber": "電話號碼",
-    "name": "姓名 (選填)",
     "password": "密碼",
     "loginButton": "登入",
     "newStudent": {
@@ -126,7 +122,6 @@
   "children": "學生帳戶",
   "lessons": {
     "loadingLessons": "載入課程中...",
-    "searchLessons": "搜尋課程",
     "materialsUploaded": "已上傳 {{count}} 項文件",
     "assignmentSubmitted": "作業已提交",
     "noLessonSelected": "未選擇課程",

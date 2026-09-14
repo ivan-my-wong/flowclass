@@ -156,7 +156,8 @@ const TeachingService = ({
 
       // Sort enroll courses within each invoice by confirmState, then by lesson start time
       invoiceMap.forEach(invoiceGroup => {
-        const sortedEnrollCourses = [...invoiceGroup.enrollCourses].sort(
+        // eslint-disable-next-line no-param-reassign
+        invoiceGroup.enrollCourses = [...invoiceGroup.enrollCourses].sort(
           (a, b) => {
             const weight = (s: EnrollConfirmState) =>
               s === EnrollConfirmState.ACCEPTED ? 0 : 1
@@ -171,11 +172,6 @@ const TeachingService = ({
             return 0
           }
         )
-
-        invoiceMap.set(invoiceGroup.invoiceId, {
-          ...invoiceGroup,
-          enrollCourses: sortedEnrollCourses,
-        })
       })
 
       // Convert map to array and sort by invoiceId (larger invoiceId first)
@@ -207,8 +203,12 @@ const TeachingService = ({
 
             // Check if any lesson overlaps with the filter date range
             return enrollCourse.lessons.some(lesson => {
-              const lessonStart = new Date(lesson.startTime).getTime()
-              const lessonEnd = new Date(lesson.endTime).getTime()
+              const lessonStart = lesson.changeStartTime
+                ? new Date(lesson.changeStartTime).getTime()
+                : new Date(lesson.startTime).getTime()
+              const lessonEnd = lesson.changeEndTime
+                ? new Date(lesson.changeEndTime).getTime()
+                : new Date(lesson.endTime).getTime()
 
               // Check if lesson overlaps with filter range
               return lessonStart <= filterEnd && lessonEnd >= filterStart
@@ -238,7 +238,6 @@ const TeachingService = ({
 
         <div className="flex items-center gap-2">
           <ChartDatePicker
-            mode="month"
             chartDate={
               dateFilter.startDate && dateFilter.endDate
                 ? dateFilter
@@ -261,7 +260,7 @@ const TeachingService = ({
                 currentStudent: student,
                 currentEnrolId: null,
                 tableDrawers: {
-                  ...prev.tableDrawers,
+                  ...studentData.tableDrawers,
                   isOpenAssignCourse: true,
                   assignCourseMode: AddTeachingServiceMode.addCourseDirectly,
                 },
@@ -303,7 +302,7 @@ const TeachingService = ({
           setStudentData(prev => ({
             ...prev,
             tableDrawers: {
-              ...prev.tableDrawers,
+              ...studentData.tableDrawers,
               isOpenAssignCourse: false,
             },
           }))

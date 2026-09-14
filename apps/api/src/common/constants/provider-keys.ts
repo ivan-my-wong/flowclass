@@ -1,2 +1,5 @@
+export const EZCHAT_CLIENT = 'EZCHAT_CLIENT'
+export const EZCHAT_TOKEN = 'EZCHAT_TOKEN'
+
 export const STRIPE_CLIENT = 'STRIPE_CLIENT'
 export const STRIPE_CONFIG_URL = 'STRIPE_CONFIG_URL'

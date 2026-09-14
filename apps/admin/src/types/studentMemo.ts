@@ -28,7 +28,6 @@ export type EditStudentContactInfoV2RequestDto = {
   phone?: string
   email?: string
   invoiceId?: number
-  secondaryEmail?: string | null
 } & StudentMemoBase
 
 export type UserAlias = {
@@ -36,7 +35,6 @@ export type UserAlias = {
   name: string
   // phone: string
   email: string
-  secondaryEmail?: string | null
   userId: number
   isStudentParent: boolean
   childOfUserAliasId?: number
@@ -50,25 +48,24 @@ export type UserAlias = {
 
 export type StudentInfoResponse = {
   id: number
-  name: string
   createdAt: string
   updatedAt: string
-  createdBy?: null
-  updatedBy?: null
+  createdBy: null
+  updatedBy: null
   institutionId: number
   userId: number
-  userAlias?: UserAlias
-  memo?: string
+  userAlias: UserAlias
+  memo: string
 
-  overdueReminder?: {
+  overdueReminder: {
     email: boolean
     whatsapp: boolean
   }
-  paymentReminder?: {
+  paymentReminder: {
     email: boolean
     whatsapp: boolean
   }
-  lessonReminder?: {
+  lessonReminder: {
     email: boolean
     whatsapp: boolean
   }

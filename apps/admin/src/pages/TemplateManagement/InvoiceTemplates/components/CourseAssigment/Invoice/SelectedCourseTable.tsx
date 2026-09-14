@@ -26,12 +26,8 @@ import ClassInfoItem from '../Course/ClassInfoItem'
 
 interface Props {
   currentClasses: InvoiceClassType[]
-  hideTotals?: boolean
 }
-const SelectedCourseTable: FC<Props> = ({
-  currentClasses,
-  hideTotals = false,
-}): JSX.Element => {
+const SelectedCourseTable: FC<Props> = ({ currentClasses }): JSX.Element => {
   const { t } = useTranslation('invoiceCampaign')
   const siteData = useSiteData()
   const currency = siteData?.currency ?? DEFAULT_CURRENCY
@@ -118,11 +114,9 @@ const SelectedCourseTable: FC<Props> = ({
           <th className="text-left py-3 font-semibold text-gray-900">
             {t('invoice.sessions')}
           </th>
-          {!hideTotals && (
-            <th className="text-right py-3 font-semibold text-gray-900">
-              {t('invoice.total')}
-            </th>
-          )}
+          <th className="text-right py-3 font-semibold text-gray-900">
+            {t('invoice.total')}
+          </th>
         </tr>
       </thead>
       <tbody className="text-sm">
@@ -160,11 +154,9 @@ const SelectedCourseTable: FC<Props> = ({
                 <div>-</div>
               )}
             </td>
-            {!hideTotals && (
-              <td className="text-right font-semibold py-3">
-                {formatTotalPriceInvoicePerItem(item, currency)}
-              </td>
-            )}
+            <td className="text-right font-semibold py-3">
+              {formatTotalPriceInvoicePerItem(item, currency)}
+            </td>
           </tr>
         ))}
       </tbody>

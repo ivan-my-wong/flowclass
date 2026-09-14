@@ -46,11 +46,10 @@ const ProgressCircle = ({
   className,
   ...restSvgProps
 }: ProgressCircleProps) => {
-  const safeTotal = total > 0 ? total : 1
-  const normalizedValue = clamp(completed, 0, safeTotal)
+  const normalizedValue = clamp(completed, 0, total)
   const radius = (size - strokeWidth) / 2
   const circumference = 2 * Math.PI * radius
-  const progress = total > 0 ? (normalizedValue / total) * circumference : 0
+  const progress = (normalizedValue / total) * circumference
   const halfSize = size / 2
 
   const commonParams = {

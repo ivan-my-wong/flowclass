@@ -1,14 +1,12 @@
 {
   "notificationLogs": {
     "title": "通知日誌",
-    "description": "此頁面顯示發送給用戶的所有通知的日誌。",
     "tableHeaders": {
       "action": "操作",
       "notificationType": "通知類型",
       "automationFlow": "自動化流程",
       "whatsappTemplate": "WhatsApp模板",
       "associatedClass": "相關班級",
-      "notificationMessage": "通知訊息",
       "recipientUserEmail": "接收者電子郵件",
       "recipientUserPhone": "接收者電話號碼",
       "messageSent": "已發送訊息",
@@ -44,28 +42,23 @@
       "timeSaved": "預估節省時間",
       "SinceLastMonth": "對比上一時期"
     },
-    "notificationChannels": {
-      "EMAIL": "電子郵件",
-      "WHATSAPP": "WhatsApp"
-    },
     "notificationStatuses": {
-      "null": "",
-      "SENT": "成功",
-      "SUCCESS": "成功",
+      "null": "處理中",
+      "SENT": "已發送",
+      "SUCCESS": "已發送",
+      "DELIVERED": "已送達",
+      "OPENED": "已打開",
+      "BOUNCED": "已退信",
       "QUEUED": "排隊中",
-      "FAILED": "失敗"
+      "FAILED": "發送失敗",
+      "PENDING": "處理中"
     },
     "selectLabels": {
-      "selectStudent": "所有學生",
-      "selectNotificationChannel": "所有通道",
       "selectNotificationType": "所有通知類型",
       "selectNotificationStatus": "所有狀態",
       "selectWhatsappTemplateOptions": "所有WhatsApp模板",
       "selectAutomationFlowOptions": "所有自動化流程",
       "reset": "重置"
-    },
-    "growthRate": {
-      "NA": "不適用"
     },
     "cell": {
       "view": "查看"

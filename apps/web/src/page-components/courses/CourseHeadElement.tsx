@@ -7,7 +7,7 @@ import imageUrls from '@/constants/imageUrls'
 import { Course, School } from '@/types/index'
 import { getPriceRangeFromCourse, getShortestDurationFromCourse } from '@/utils/calculateCourse'
 import { getCourseTimeslots, getRegularScheduleAfterTodayOnly } from '@/utils/calculateTime'
-import { getMediaFileUrl } from '@/utils/convert'
+import { getS3FileUrl } from '@/utils/convert'
 import { longDescriptionToString, nonFalsyJoin } from '@/utils/flatten'
 import { clearSeparator, stripHTML } from '@/utils/sanitize'
 import { getBaseSiteUrl } from '@/utils/string.utils'
@@ -155,9 +155,7 @@ export const CourseHeadElement = ({ school, course }: CourseHeadElementProps): J
           description: seoDesc,
           images: [
             {
-              url: course.previewImageUrl
-                ? getMediaFileUrl(course.previewImageUrl)
-                : fallbackLogoUrl,
+              url: course.previewImageUrl ? getS3FileUrl(course.previewImageUrl) : fallbackLogoUrl,
               width: 400,
               height: 400,
               alt: seoTitle,

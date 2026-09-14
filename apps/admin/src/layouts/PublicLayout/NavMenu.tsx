@@ -8,10 +8,10 @@ import {
   Root,
   Trigger,
 } from '@radix-ui/react-navigation-menu'
+import { ComponentProps, CSS } from '@stitches/react'
 import { MdArrowDropDown } from 'react-icons/md'
 
-import { cn } from '@/utils/cn'
-
+import { styled, ThemeConfig } from '../../styles'
 import {
   GroupRouteItem,
   isGroupRouteItem,
@@ -19,65 +19,106 @@ import {
   SingleRouteItem,
 } from '../../types/route'
 
-const itemBaseClasses =
-  'outline-none select-none font-bold text-base text-text hover:opacity-70'
+const itemStyles: CSS<ThemeConfig> = {
+  outline: 'none',
+  userSelect: 'none',
+  fontWeight: 'bold',
+  fontSize: '$medium',
+  color: '$text',
+  '&:hover': {
+    opacity: '0.7',
+  },
+
+  variants: {
+    noHover: {
+      true: {
+        '&:hover': {
+          opacity: 'unset',
+        },
+      },
+    },
+  },
+}
+
+const StyledCaret = styled(MdArrowDropDown, {
+  position: 'relative',
+  '[data-state=open] &': { transform: 'rotate(-180deg)' },
+  '@media (prefers-reduced-motion: no-preference)': {
+    transition: 'transform 150ms ease',
+  },
+})
+
+const StyledTrigger = styled(Trigger, {
+  all: 'unset',
+  ...itemStyles,
+  padding: '$small $small',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 2,
+})
 
 const NavMenuItemTrigger = forwardRef<
   HTMLButtonElement,
-  React.ComponentProps<typeof Trigger>
+  ComponentProps<typeof StyledTrigger>
 >(({ children, ...props }, ref) => {
   return (
-    <Trigger
-      {...props}
-      ref={ref}
-      className={cn(
-        itemBaseClasses,
-        'group p-2 flex items-center justify-between gap-2'
-      )}
-    >
+    <StyledTrigger {...props} ref={ref}>
       {children}
-      <MdArrowDropDown
-        aria-hidden
-        className="relative transition-transform duration-150 group-data-[state=open]:rotate-180"
-      />
-    </Trigger>
+      <StyledCaret aria-hidden />
+    </StyledTrigger>
   )
 })
 
-const NavMenuItemContent = ({
-  className,
-  ...props
-}: React.ComponentProps<typeof Content>) => (
-  <Content
-    className={cn(
-      'absolute origin-top rounded-lg min-w-[110px] bg-background shadow-lg',
-      className
-    )}
-    {...props}
-  />
-)
+const NavMenuItemContent = styled(Content, {
+  position: 'absolute',
+  transformOrigin: 'top center',
+  borderRadius: '$medium',
+  minWidth: '110px',
+  backgroundColor: '$background',
+  boxShadow: '0 0 10px $colors$shadowColor',
+})
 
-const NavMenuItemLink = ({
-  className,
-  ...props
-}: React.ComponentProps<typeof RouterLink>) => (
-  <RouterLink
-    className={({ isActive }) =>
-      cn(
-        itemBaseClasses,
-        'p-2 flex gap-2 no-underline text-base hover:bg-background-layer-2',
-        isActive && 'border-b-2 border-primary',
-        typeof className === 'function' ? className({ isActive }) : className
-      )
-    }
-    {...props}
-  />
-)
+const NavMenuItemLink = styled(RouterLink, {
+  ...itemStyles,
+  padding: '$small $small',
+  display: 'flex',
+  gap: '0.5rem',
+  textDecoration: 'none',
+  fontSize: '$medium',
+
+  '&:hover': {
+    backgroundColor: '$backgroundLayer2',
+  },
+
+  '&.active': {
+    borderBottom: '2px solid $colors$primary',
+  },
+})
+
+const NavMenuRoot = styled(Root, {
+  position: 'relative',
+  flexRowCenter: 'center',
+  width: '100%',
+  zIndex: 1,
+})
+
+const NavMenuList = styled(List, {
+  all: 'unset',
+  flexRowCenter: 'center',
+  gap: '$medium',
+  padding: '$min',
+  borderRadius: '$medium',
+  listStyle: 'none',
+})
 
 const SingleNavItem: React.FC<SingleRouteItem> = ({ label, url, icon }) => {
   return (
     <Item>
-      <NavMenuItemLink to={url}>
+      <NavMenuItemLink
+        to={url}
+        className={({ isActive }) => (isActive ? 'active' : 'inactive')}
+      >
         {label}
         {icon}
       </NavMenuItemLink>
@@ -107,8 +148,8 @@ const NavMenu = ({
   routes: Array<SingleRouteItem | GroupRouteItem>
 }): JSX.Element => {
   return (
-    <Root className="relative flex justify-center w-full z-[1]">
-      <List className="flex justify-center gap-4 p-1 rounded-lg list-none">
+    <NavMenuRoot>
+      <NavMenuList>
         {routes.map((el, idx) => {
           if (isSingleRouteItem(el)) {
             // eslint-disable-next-line react/no-array-index-key
@@ -120,8 +161,8 @@ const NavMenu = ({
           }
           return null
         })}
-      </List>
-    </Root>
+      </NavMenuList>
+    </NavMenuRoot>
   )
 }
 

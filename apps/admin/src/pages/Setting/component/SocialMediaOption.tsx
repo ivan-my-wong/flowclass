@@ -13,6 +13,7 @@ import { SimpleSelectorItemProps } from '@/components/Selector/Select'
 import SocialMediaSelector from '@/components/Selector/SocialMediaSelector'
 import Text from '@/components/Texts/Text'
 import { SocialMedia } from '@/constants/socialMedia'
+import { theme } from '@/styles'
 import { SocialMediaSetting } from '@/types/settingSocialMedia'
 
 type SocialMediaOptionProps = {
@@ -168,9 +169,7 @@ const SocialMediaOption = ({
               setSocialMediaSettingList(newSocialMediaSetting)
             }}
           >
-            <span className="text-warn">
-              <RxCross2 color="currentColor" />
-            </span>
+            <RxCross2 color={theme.colors.warn.toString()} />
           </SvgIcon>
         </Box>
       </Box>

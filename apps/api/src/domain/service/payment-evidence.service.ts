@@ -8,7 +8,7 @@ import { JwtService, JwtSignOptions } from '@nestjs/jwt'
 import { plainToInstance } from 'class-transformer'
 import { isUUID } from 'class-validator'
 import { randomUUID } from 'crypto'
-import * as path from 'path'
+import path from 'path'
 import { EntityNotFoundError, FindOptionsOrder, FindOptionsWhere, In, IsNull, Not } from 'typeorm'
 import { Transactional } from 'typeorm-transactional'
 
@@ -33,9 +33,9 @@ import { StudentInvoiceResponseDto } from '@/application/student/enroll-courses/
 import { StudentCreatePaymentEvidenceDto } from '@/application/student/payment-evidence/dto/create-payment-evidence.dto'
 import { StudentPaymentEvidenceDto } from '@/application/student/payment-evidence/dto/payment-evidence.dto'
 import { CloudWatchLoggerProvider } from '@/config/loggers/cloudwatch-nestjs.provider'
-import { ObjectStorageProvider } from '@/config/storage/object-storage.provider'
-import { UploadedStorageFile } from '@/config/storage/storage-image-upload-interceptor'
+import { S3ClientFactory } from '@/config/s3/s3-factory.provider'
 import { EmailService } from '@/domain/external/email.service'
+import { MetaWhatsappService } from '@/domain/external/meta-whatsapp.service'
 import { StudentScheduleService } from '@/domain/service/student-schedule.service'
 import { AuthorizationException } from '@/exceptions/authorization.exception'
 import { EnrollCourseErrorMessage } from '@/exceptions/error-message/course'
@@ -44,14 +44,16 @@ import { InvoiceErrorMessage } from '@/exceptions/error-message/invoice'
 import { PaymentEvidenceErrorMessage } from '@/exceptions/error-message/payment-evidence'
 import { SiteErrorMessage } from '@/exceptions/error-message/site'
 import { UserErrorMessage } from '@/exceptions/error-message/user'
-import { WhatsappTemplateErrorMessage } from '@/exceptions/error-message/whatsapp-template'
+import { AutomationFlowStepRepository } from '@/models/automation-flow.repository'
+import { CoursePromotionUsed } from '@/models/course-promotion-used.entity'
+import { CoursePromotionUsedRepository } from '@/models/course-promotion-used.repository'
 import { Course } from '@/models/courses.entity'
 import { CoursesRepository } from '@/models/courses.repository'
 import { CreditSourceType } from '@/models/credit-transactions.entity'
 import { ClassAdminPaymentSubmittedEmailParams } from '@/models/custom-types/email-params'
 import { EnrollCourse } from '@/models/enroll-courses.entity'
 import { EnrollCourseRepository } from '@/models/enroll-courses.repository'
-import { PaymentMethod, PromotionType as PromotionTypeEnum } from '@/models/enums/'
+import { GaMeasurementEventName, PaymentMethod } from '@/models/enums/'
 import {
   CheckoutStatus,
   EnrollConfirmStatus,
@@ -63,7 +65,6 @@ import { Institution } from '@/models/institutions.entity'
 import { InstitutionsRepository } from '@/models/institutions.repository'
 import { Invoice } from '@/models/invoice.entity'
 import { InvoiceRepository } from '@/models/invoice.repository'
-import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { NotificationStatus } from '@/models/notification-record.entity'
 import { PaymentEvidence } from '@/models/payment-evidence.entity'
 import { PaymentEvidenceRepository } from '@/models/payment-evidence.repository'
@@ -77,6 +78,7 @@ import { TransactionRepository } from '@/models/transaction.repository'
 import { User } from '@/models/user.entity'
 import { UserAliasesRepository } from '@/models/user-aliases.repository'
 import { UsersRepository } from '@/models/users.repository'
+import { WhatsappTemplateRepository } from '@/models/whatsapp-template.entity'
 import { buildSuccessPaymentLink, buildUploadReceiptLink } from '@/utils/payment-link.utils'
 import { replaceContentVariables, shallow } from '@/utils/shallow.utils'
 import {
@@ -85,6 +87,8 @@ import {
   studentScheduleToString,
 } from '@/utils/string.utils'
 import { offsetToISO } from '@/utils/time.utils'
+
+import { GaMeasurementService } from '../external/gaMeasurement.service'
 
 import { AuthService } from './auth.service'
 import { CouponsService } from './coupons.service'
@@ -95,7 +99,6 @@ import { NotificationRecordService } from './notification-log.service'
 import { SettingSiteService } from './setting-site.service'
 import { StudentNotifSettingService } from './student-notif-setting.service'
 import { UsersService } from './users.service'
-import { WhatsappWebService } from './whatsapp-web.service'
 
 @Injectable()
 export class PaymentEvidenceService {
@@ -115,25 +118,28 @@ export class PaymentEvidenceService {
     private readonly transactionRepository: TransactionRepository,
     private readonly emailService: EmailService,
     private readonly jwtService: JwtService,
-    private readonly objectStorageProvider: ObjectStorageProvider,
+    private readonly s3ClientFactory: S3ClientFactory,
     private readonly settingSiteService: SettingSiteService,
+    private readonly gaMeasurementService: GaMeasurementService,
     private readonly studentScheduleService: StudentScheduleService,
     private readonly studentScheduleRepository: StudentScheduleRepository,
     private readonly studentLessonRepository: StudentLessonRepository,
     private readonly logger: CloudWatchLoggerProvider,
     private readonly invoiceRepository: InvoiceRepository,
-    private readonly invoicePromotionUsedRepository: InvoicePromotionUsedRepository,
+    private readonly coursePromotionUsedRepository: CoursePromotionUsedRepository,
+    private readonly whatsappTemplateRepository: WhatsappTemplateRepository,
+    private readonly whatsappService: MetaWhatsappService,
+    private readonly automationFlowStepRepo: AutomationFlowStepRepository,
+    private readonly customMessageService: CustomMessageService,
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
     private readonly notificationRecordService: NotificationRecordService,
     private readonly studentNotifSettingService: StudentNotifSettingService,
-    private readonly requestTimeChangeRepository: RequestTimeChangeRepository,
-    private readonly customMessageService: CustomMessageService,
-    private readonly whatsappWebService: WhatsappWebService
+    private readonly requestTimeChangeRepository: RequestTimeChangeRepository
   ) {
     this.jwtOption = {
-      secret: process.env.JWT_SECRET,
-      expiresIn: '1d',
+      secret: process.env.JWT_TOKEN_ENROLL_COURSE_SECRET_KEY,
+      expiresIn: process.env.JWT_TOKEN_ENROLL_COURSE_EXPRIED,
     }
   }
 
@@ -176,7 +182,7 @@ export class PaymentEvidenceService {
 
     const name = path.parse(file.filename).name
     const ext = path.parse(file.originalname).ext.replace('.', '')
-    const image = `${process.env.API_BASE_URL}/media/get/${name}/${ext}`
+    const image = `${process.env.APP_HOSTNAME}/media/get/${name}/${ext}`
     const paymentEvidenceInstance = this.paymentEvidenceRepository.create({
       siteId: currentSite.id,
       institutionId: currentInstitution.id,
@@ -192,7 +198,7 @@ export class PaymentEvidenceService {
 
   async createByToken(
     createPaymentEvidenceDto: StudentCreatePaymentEvidenceDto,
-    file: UploadedStorageFile,
+    file: Express.MulterS3.File,
     siteId: number,
     institutionId: number,
     token: string
@@ -299,11 +305,9 @@ export class PaymentEvidenceService {
       },
     })
 
-    const fileKey = file?.key ?? null
-
     if (paymentEvidenceInstance) {
       // update image and status
-      if (fileKey) paymentEvidenceInstance.image = fileKey
+      paymentEvidenceInstance.image = file.key
       paymentEvidenceInstance.status = PaymentEvidenceStatus.PROCESSING
     } else {
       paymentEvidenceInstance = this.paymentEvidenceRepository.create({
@@ -312,7 +316,7 @@ export class PaymentEvidenceService {
         userId: enrollCourseInstance.userId,
         enrollCourseId: enrollId,
         invoiceId: invoice.id,
-        image: fileKey,
+        image: file.key,
         status: PaymentEvidenceStatus.PROCESSING,
       })
     }
@@ -323,27 +327,40 @@ export class PaymentEvidenceService {
       ...invoice,
       paymentState: PaymentStatus.SUBMITTED,
       ...(createPaymentEvidenceDto.paymentDate
-        ? { paymentDate: new Date(createPaymentEvidenceDto.paymentDate) }
+        ? {
+            paymentDate: (() => {
+              const parts = createPaymentEvidenceDto.paymentDate.split(/[-T/]/)
+              const year = parseInt(parts[0], 10)
+              const month = parseInt(parts[1], 10) - 1
+              const day = parseInt(parts[2], 10)
+              return new Date(Date.UTC(year, month, day))
+            })(),
+          }
         : {}),
     })
 
-    const imageBuffer = fileKey ? await this.objectStorageProvider.getObjectBuffer(fileKey) : null
+    const imageBuffer = await this.s3ClientFactory.getObjectBuffer(file.key, {
+      isPrivateBucket: true,
+    })
 
-    const imageObjectAccessUrl = fileKey
-      ? await this.objectStorageProvider.getObjectAccessUrl(fileKey)
-      : null
+    const imageS3PresignedUrl = await this.s3ClientFactory.getS3ObjectPresignedUrl(file.key)
 
     const multipleClassMapping = enrollCourseInstance.multipleClassMapping ?? []
     const location = multipleClassMapping.map((o) => o.class?.locationRoom?.name ?? '')
     const instructor = multipleClassMapping.map((o) => o.class?.instructor?.firstName ?? '')
 
+    const siteAdminUser = await this.usersService.getUserOwnerOfInstitution(
+      enrollCourseInstance.institutionId
+    )
+    const adminEmail = currentInstitution.email || currentSite.email || siteAdminUser?.email
+    const adminPhone = currentInstitution.phone || currentSite.phone || siteAdminUser?.phone
+
     const emailToAdminPaymentSubmittedParams: ClassAdminPaymentSubmittedEmailParams = {
-      emailAddress: currentInstitution.email ?? currentSite.email,
       institutionName: currentInstitution.name,
-      studentName: enrollCourseInstance.name,
-      studentEmail: enrollCourseInstance.email,
-      studentPhone: enrollCourseInstance.phone,
-      courseName: enrolledCourseInfo.name,
+      studentName: enrollCourseInstance.preferredName,
+      studentEmail: enrollCourseInstance.preferredEmail,
+      studentPhone: enrollCourseInstance.preferredPhone,
+      courseName: enrolledCourseInfo?.name ?? enrollCourseInstance.course?.name ?? '',
       className: enrollCourseInstance.enrollInto
         ?.map((info) => enrollIntoInfoToString(info))
         .join('\n'),
@@ -355,17 +372,18 @@ export class PaymentEvidenceService {
       paymentMethod: invoice.paymentMethod,
       paymentStatus: PaymentEvidenceStatus.PROCESSING,
       enrolId: enrollCourseInstance.id.toString(),
-      filename: fileKey,
+      filename: file.key,
       file: imageBuffer,
       transactionId: paymentEvidence.id.toString(),
-      paymentReceipt: imageObjectAccessUrl,
-      adminEmail: currentInstitution.email ?? currentSite.email,
-      adminPhone: currentInstitution.phone ?? currentSite.phone,
+      paymentReceipt: imageS3PresignedUrl,
+      adminEmail,
+      adminPhone,
+      emailAddress: adminEmail,
       timeZone,
     }
 
     this.emailService.sendClassAdminPaymentSubmitted({
-      recipientUserId: -1,
+      recipientUserId: siteAdminUser?.id ?? -1,
       institutionId: enrollCourseInstance.institutionId,
       siteId: enrollCourseInstance.siteId,
       payload: emailToAdminPaymentSubmittedParams,
@@ -704,22 +722,12 @@ export class PaymentEvidenceService {
 
     if (customMessage) {
       const content = replaceContentVariables(customMessage.content, whatsappReminderDto)
-      await this.whatsappWebService.sendWhatsappMessage(
-        {
-          content,
-          institutionId: institution.id,
-          phone: whatsappReminderDto.studentPhone,
-        },
-        {
-          invoiceMetadata: {
-            invoiceId: invoice?.id,
-          },
-          recipientUserId: student?.id,
-          recipientUserPhone: student?.phone,
-          institutionId: institution.id,
-          siteId: institution.siteId,
-        }
-      )
+      if (whatsappReminderDto.studentPhone) {
+        await this.whatsappService.sendDirectWhatsappMessage({
+          toPhone: whatsappReminderDto.studentPhone,
+          body: content,
+        })
+      }
     } else {
       await this.notificationRecordService.saveNotificationLog({
         messageContent: JSON.stringify(whatsappReminderDto),
@@ -750,15 +758,20 @@ export class PaymentEvidenceService {
     enrollCourse: EnrollCourse,
     user: User
   ) {
-    const invoicePromoUsed = await this.invoicePromotionUsedRepository.findOneBy({
-      invoiceId: invoice.id,
-      promotionType: PromotionTypeEnum.COUPON_DISCOUNT,
+    const promotionUsed = await this.coursePromotionUsedRepository.findOne({
+      where: { invoiceId: invoice.id },
+      relations: { coupon: true },
     })
 
-    if (invoicePromoUsed && invoicePromoUsed.usedStatus !== PromotionUsedStatus.CONFIRMED) {
-      await this.invoicePromotionUsedRepository.save({
-        ...invoicePromoUsed,
-        usedStatus: PromotionUsedStatus.CONFIRMED,
+    if (promotionUsed && promotionUsed.coupon) {
+      // Update the promotion used status to confirmed
+      await this.couponsService.updatePromotionHistory({
+        coupon: promotionUsed.coupon,
+        course,
+        enrollId: enrollCourse.id,
+        invoiceId: invoice.id,
+        student: user,
+        status: PromotionUsedStatus.CONFIRMED,
       })
     }
 
@@ -766,13 +779,19 @@ export class PaymentEvidenceService {
       // Get the time zone from the setting
       const timeZone = await this.settingSiteService.getTimeZone(siteId)
 
+      // Find the promotion used by the course ID and enroll ID
+      const promotionUsed = await this.coursePromotionUsedRepository.findOneBy({
+        courseId: enrollCourse.courseId,
+        enrollId: enrollCourse.id,
+      })
+
       // Send the Google Analytics measurement
       await this.sendGoogleAnalyticsMeasurement(
         enrollCourse,
         transaction,
         invoice,
         user,
-        invoicePromoUsed?.promotionId,
+        promotionUsed,
         timeZone
       )
     } catch (err) {
@@ -795,10 +814,43 @@ export class PaymentEvidenceService {
     transaction: Transaction,
     invoice: Invoice,
     user: User,
-    couponId?: number,
+    promotionUsed?: CoursePromotionUsed,
     timeZone?: string
   ): Promise<void> {
-    // GA measurement removed in open-source build
+    // Send the Google Analytics measurement for the purchase event
+    this.gaMeasurementService.sendToWebGa({
+      userId: enrollCourse.userId,
+      clientId: invoice.proofToken,
+      events: [
+        {
+          name: GaMeasurementEventName.PURCHASE,
+          params: {
+            value: enrollCourse.paymentAmount,
+            transaction_id: transaction.id,
+            currency: enrollCourse.currency,
+            courseId: enrollCourse.courseId,
+            schoolId: enrollCourse.institutionId,
+            paymentMethod: PaymentMethod.PAY_NOW,
+            coupon: promotionUsed?.couponId ?? undefined,
+            timeZone,
+            items: [
+              {
+                item_id: enrollCourse.courseId,
+                item_name: enrollCourse.preferredName,
+                discount: invoice.discountAmount,
+                price: enrollCourse.paymentAmount,
+                currency: enrollCourse.currency,
+                coupon: promotionUsed?.couponId ?? undefined,
+              },
+            ],
+          },
+        },
+      ],
+      userProperties: {
+        email: enrollCourse.preferredEmail,
+        firebaseId: user.firebaseId,
+      },
+    })
   }
 
   @Transactional()
@@ -911,7 +963,6 @@ export class PaymentEvidenceService {
       throw new NotFoundException(EnrollCourseErrorMessage.ENROLL_COURSE_NOT_FOUND)
     }
     invoice.paymentState = PaymentStatus.REJECTED
-    invoice.amountPaid = 0
 
     //get course info
     const course =
@@ -1198,8 +1249,8 @@ export class PaymentEvidenceService {
       studentLessonId: In(studentLessons.map((lesson) => lesson.id)),
     })
 
-    // Delete promotion records for this invoice
-    await this.invoicePromotionUsedRepository.softDelete({
+    // Find used coupon
+    await this.coursePromotionUsedRepository.softDelete({
       invoiceId: invoice.id,
     })
     try {
@@ -1284,9 +1335,6 @@ export class PaymentEvidenceService {
     // update invoice's payment state
     const invoiceRepository = this.invoiceService.getRepository()
     invoice.paymentState = status
-    if (status === PaymentStatus.PAID) {
-      invoice.amountPaid = invoice.payAmount ?? 0
-    }
     invoice.reviewed = reviewed
     invoice.approvedBy = `${user.firstName} ${user.lastName}`
     invoice.approverId = user.id
@@ -1332,20 +1380,13 @@ export class PaymentEvidenceService {
           ? status === PaymentStatus.PAID
           : child.paymentState === PaymentStatus.PAID
       )
-      const isAnyPaid = allChildren.some((child) =>
-        child.id === invoice.id
-          ? status === PaymentStatus.PAID
-          : child.paymentState === PaymentStatus.PAID
-      )
       const parentInvoice = await invoiceRepository.findOneBy({ id: invoice.invoiceParentId })
       if (parentInvoice) {
         if (isAllPaid) {
           parentInvoice.paymentState = PaymentStatus.PAID
-          parentInvoice.amountPaid = parentInvoice.payAmount ?? 0
-        } else if (isAnyPaid) {
-          parentInvoice.paymentState = PaymentStatus.PARTIALLY_PAID
-        } else {
-          parentInvoice.paymentState = PaymentStatus.PENDING
+        } else if (parentInvoice.paymentState === PaymentStatus.PAID) {
+          // optional: downgrade if any child not paid
+          parentInvoice.paymentState = PaymentStatus.UNPAID
         }
         await invoiceRepository.save(parentInvoice)
       }
@@ -1390,7 +1431,7 @@ export class PaymentEvidenceService {
       SupportedType.STUDENT_NOTIF_AFTER_ENROLLMENT_SUBMITTED
     )
     if (!customMessage) {
-      throw new NotFoundException(WhatsappTemplateErrorMessage.TEMPLATE_NOT_FOUND)
+      throw new NotFoundException('WhatsApp template not found')
     }
     const invoices = await this.collectInvoicesByIds(payload.invoices.map((d) => d.invoiceId))
 
@@ -1409,22 +1450,12 @@ export class PaymentEvidenceService {
 
       const content = replaceContentVariables(contentToBeReplaced, jobData)
 
-      await this.whatsappWebService.sendWhatsappMessage(
-        {
-          content,
-          institutionId: payload.institutionId,
-          phone: jobData['studentPhone'],
-        },
-        {
-          invoiceMetadata: {
-            invoiceId: invoice?.id,
-          },
-          recipientUserId: user?.id ?? enrollCourse?.userId,
-          recipientUserPhone: jobData['studentPhone'],
-          institutionId: payload.institutionId,
-          siteId: invoice.siteId,
-        }
-      )
+      if (jobData['studentPhone']) {
+        await this.whatsappService.sendDirectWhatsappMessage({
+          toPhone: jobData['studentPhone'],
+          body: content,
+        })
+      }
     }
   }
 
@@ -1461,7 +1492,7 @@ export class PaymentEvidenceService {
       SupportedType.STUDENT_NOTIF_AFTER_PAYMENT_APPROVED
     )
     if (!customMessage) {
-      throw new NotFoundException(WhatsappTemplateErrorMessage.TEMPLATE_NOT_FOUND)
+      throw new NotFoundException('WhatsApp template not found')
     }
     const invoices = await this.collectInvoicesByIds(payload.invoices.map((d) => d.invoiceId))
     const institution = await this.institutionsRepository.findOneById(payload.institutionId, {
@@ -1536,7 +1567,7 @@ export class PaymentEvidenceService {
         institutionName: institution.name,
         adminEmail: contactEmail,
         adminPhone: contactPhone,
-        courseName: invoice.course.name,
+        courseName: invoice.course?.name ?? '',
         className: classNames,
         classDateTime,
         location: classLocations,
@@ -1570,22 +1601,12 @@ export class PaymentEvidenceService {
 
         const content = replaceContentVariables(customMessage.content, jobData)
 
-        await this.whatsappWebService.sendWhatsappMessage(
-          {
-            content,
-            institutionId: payload.institutionId,
-            phone: jobData.studentPhone,
-          },
-          {
-            invoiceMetadata: {
-              invoiceId: invoice?.id,
-            },
-            recipientUserId: user?.id ?? applicant.id,
-            recipientUserPhone: user?.phone ?? applicant.phoneNumber,
-            institutionId: payload.institutionId,
-            siteId: invoice.siteId,
-          }
-        )
+        if (jobData.studentPhone) {
+          await this.whatsappService.sendDirectWhatsappMessage({
+            toPhone: jobData.studentPhone,
+            body: content,
+          })
+        }
       })
     }
   }

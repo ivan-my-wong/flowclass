@@ -1,6 +1,7 @@
+// import '../styles/components/phoneInput.css'
 import ReactPhoneInput from 'react-phone-input-2'
 
-import { cn } from '@/utils/cn'
+import { styled } from '../../styles'
 
 import 'react-phone-input-2/lib/style.css'
 
@@ -18,15 +19,6 @@ type PhoneNumberInputProps = {
   disabled?: boolean
 }
 
-const phoneInputClasses = cn(
-  'bg-background-layer-2 text-text',
-  '[&_.form-control]:!bg-background [&_.form-control]:text-text [&_.form-control]:border-border',
-  '[&_.country-list]:!bg-background [&_.country-list]:text-text',
-  '[&_.country.highlight]:text-text-contrast [&_.country.highlight]:!bg-primary',
-  '[&_.country:hover]:bg-background-layer-2 [&_.country:hover]:text-primary-subtle',
-  '[&_.dial-code]:unset'
-)
-
 const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
   country,
   value,
@@ -35,16 +27,42 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
   disabled = false,
 }) => {
   return (
-    <PhoneInput
+    <StyledPhoneInput
       disabled={disabled}
       inputStyle={{ width: fullWidth ? '100%' : 'auto', minHeight: '3rem' }}
       country={country}
       value={value}
       preferredCountries={['hk']}
       onChange={phone => onChange(phone)}
-      containerClass={phoneInputClasses}
     />
   )
 }
 
 export default PhoneNumberInput
+
+const StyledPhoneInput = styled(PhoneInput, {
+  backgroundColor: '$backgroundLayer2',
+  color: '$text',
+  '.form-control': {
+    backgroundColor: '$background !important',
+    color: '$text',
+    borderColor: '$borderColor',
+  },
+  '.country-list': {
+    backgroundColor: '$background !important',
+    color: '$text',
+  },
+  '.country.highlight': {
+    color: '$textContrast',
+    backgroundColor: '$primary !important',
+  },
+  '.country': {
+    '&:hover': {
+      backgroundColor: '$backgroundLayer2',
+      color: '$primarySubtle',
+    },
+  },
+  '.dial-code': {
+    css: 'unset',
+  },
+})

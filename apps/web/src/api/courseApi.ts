@@ -151,11 +151,16 @@ export const fetchSchoolAndCourse = async (
     return { errorMessage: InstitutionErrorMessage.INSTITUTION_NOT_FOUND }
   }
 
-  const course: Course = await getCourseByUrl({
-    domain,
-    schoolUrl: schoolPath,
-    courseUrl: coursePath,
-  })
+  let course: Course
+  try {
+    course = await getCourseByUrl({
+      domain,
+      schoolUrl: schoolPath,
+      courseUrl: coursePath,
+    })
+  } catch (error) {
+    return { errorMessage: DataErrorMessage.COURSE_NOT_FOUND }
+  }
 
   if (!course) {
     return { errorMessage: DataErrorMessage.COURSE_NOT_FOUND }

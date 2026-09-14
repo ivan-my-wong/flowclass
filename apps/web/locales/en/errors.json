@@ -8,7 +8,7 @@
   "SERVER_ERROR": "We cannot authenticate your account. Please refresh the page or login again.",
   "NAME_LENGTH_ERROR": "Name input is too long",
   "WRONG_DOMAIN": "This domain does not exists. Please check the link you have entered",
-
+  "PAYLOAD_TOO_LARGE": "The file you uploaded exceeds the 10MB size limit. Please try again.",
   "PAYMENT": {
     "paymentFailed": "Payment Failed",
     "failed": "Failed to proceed to the next step. You have likely applied for a class that is full. Please contact the educator directly.",
@@ -18,13 +18,11 @@
     "invalidPhone": "*The phone number is invalid. Please enter a valid phone number.",
     "creditCardNotActivated": "The educator has not activated this payment method. Please try the 'pay by cash or bank' method."
   },
-
   "AUTHENTICATE": {
     "PLEASE_AUTHENTICATE": "You are not yet logged in. Please refresh the page or try logging in again.",
     "ACCOUNT_NOT_FOUND": "Login failed. Please check your email or password.",
     "AUTHENTICATION_FAIL": "Incorrect login credentials"
   },
-
   "VALIDATE": {
     "FIELD_REQUIRED": "Please fill in this required field",
     "AT_LEAST_ONE_OPTION": "Please select at least one option",
@@ -33,16 +31,17 @@
     "INVALID_PHONE_NUMBER": "Invalid phone number",
     "INVALID_EMAIL": "Invalid email"
   },
-
   "SITE": {
     "NOT_FOUND": "Site is not found."
   },
-
   "COUPON": {
     "EXPIRED": "Coupon has expired or is invalid",
-    "USED_UP": "Coupon has been used up"
+    "USED_UP": "Coupon has been used up",
+    "NOT_FOUND": "Coupon not found",
+    "NOT_APPLY_FOR_THIS_COURSE": "This coupon is not applicable to this course or class",
+    "NOT_APPLY_FOR_USER": "This coupon is not applicable to your account",
+    "IS_NOT_ACTIVE": "This coupon is currently inactive"
   },
-
   "ENROL": {
     "PLEASE_PICK_CLASS": "Please pick your class first.",
     "CLASS_QUOTA_IS_FULL": "The class you have chosen is full. Please pick another class.",

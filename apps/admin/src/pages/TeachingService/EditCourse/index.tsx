@@ -18,6 +18,7 @@ import TabWithListAndButton, {
 import { Button } from '@/components/ui/Button'
 import EditCourseContext from '@/contexts/EditCourseContext'
 import useCourseData from '@/hooks/useCourseData'
+import usePlanData from '@/hooks/useSubscriptionPlanData'
 import ContentLayout from '@/layouts/ContentLayout'
 import { AlertTypes } from '@/reducers/confirm.reducers'
 import {
@@ -191,11 +192,23 @@ const EditCourse = (): JSX.Element => {
   const tabWithListAndButtonHandle = useRef<TabWithListAndButtonHandle>(null)
   const saveMethodsRef = useRef<{ [key: string]: () => Promise<void> }>({})
 
+  const { checkSubscriptionAccess } = usePlanData()
+  const publishedCourseCount = courseData.courses.filter(
+    course => course.published
+  ).length
+
   const setIsSaving = useCallback(
     (state: boolean) => {
       dispatch({ type: SET_IS_SAVING, payload: state })
     },
     [dispatch]
+  )
+
+  const { handlePublishCourse } = usePublishCourseHandlingDeprecated(
+    editCourseState,
+    dispatch,
+    courseRecoilState,
+    setCourseRecoilState
   )
 
   const { handleArchiveCourse } = useArchiveCourseHandling(

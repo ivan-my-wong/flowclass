@@ -9,6 +9,7 @@ import useNavigateDialogPage from '@/hooks/useNavigateDialogPage'
 import usePayoutData from '@/hooks/usePayoutData'
 import { useResponsive } from '@/hooks/useResponsive'
 import useSchoolData from '@/hooks/useSchoolData'
+import usePlanData from '@/hooks/useSubscriptionPlanData'
 
 const ModalPaymentInfo = (): React.ReactElement => {
   const { t } = useTranslation()

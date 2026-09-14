@@ -3,8 +3,8 @@ import { forwardRef, useMemo } from 'react'
 import { Root } from '@radix-ui/react-toggle-group'
 
 import { DataTestId } from '@/types/common'
-import { cn } from '@/utils/cn'
 
+import { styled } from '../../styles'
 import { DraggableCard, DraggableContainer } from '../Containers/Draggable'
 import { SimpleSelectorItemProps } from '../Selector/Select'
 
@@ -77,15 +77,11 @@ const ToggleGroup = forwardRef<HTMLDivElement, ToggleGroupProps>(
         {
           // The component when the toggle group is draggable.
           draggable && handleDragEnd ? (
-            <Root
+            <ToggleGroupRoot
               ref={ref}
               type="single"
-              className={cn(
-                'flex flex-wrap gap-2 rounded',
-                direction === 'row' && 'flex-row justify-evenly',
-                direction === 'column' && 'flex-col',
-                'w-full'
-              )}
+              css={{ width: '100%' }}
+              direction={direction}
               value={currentItem}
             >
               <DraggableContainer
@@ -96,12 +92,16 @@ const ToggleGroup = forwardRef<HTMLDivElement, ToggleGroupProps>(
                   <DraggableCard
                     id={item.id.toString()}
                     key={item.id}
-                    cardClassName={cn(
-                      'p-1',
-                      currentItem === item.value &&
-                        'outline outline-3 outline-primary',
-                      'hover:outline hover:outline-3 hover:outline-primary-subtle'
-                    )}
+                    cardStyle={{
+                      padding: '$1',
+                      outline:
+                        currentItem === item.value
+                          ? '3px solid $colors$primary'
+                          : undefined,
+                      '&:hover': {
+                        outline: '3px solid $colors$primarySubtle',
+                      },
+                    }}
                   >
                     <ToggleGroupItemComponent
                       index={index}
@@ -118,17 +118,14 @@ const ToggleGroup = forwardRef<HTMLDivElement, ToggleGroupProps>(
                   </DraggableCard>
                 ))}
               </DraggableContainer>
-            </Root>
+            </ToggleGroupRoot>
           ) : (
             // The component when the toggle group is NOT draggable.
-            <Root
+            <ToggleGroupRoot
               ref={ref}
               type="single"
-              className={cn(
-                'flex flex-wrap gap-2 rounded w-full',
-                direction === 'row' && 'flex-row justify-evenly',
-                direction === 'column' && 'flex-col'
-              )}
+              css={{ width: '100%' }}
+              direction={direction}
               value={currentItem}
             >
               {items.map((item: ToggleGroupLabelsProps, index: number) => {
@@ -148,12 +145,31 @@ const ToggleGroup = forwardRef<HTMLDivElement, ToggleGroupProps>(
                   />
                 )
               })}
-            </Root>
+            </ToggleGroupRoot>
           )
         }
       </>
     )
   }
 )
+
+const ToggleGroupRoot = styled(Root, {
+  display: 'flex',
+  flexDirection: 'column',
+  flexWrap: 'wrap',
+  borderRadius: 4,
+  gap: '$2',
+  variants: {
+    direction: {
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+      },
+      column: {
+        flexDirection: 'column',
+      },
+    },
+  },
+})
 
 export default ToggleGroup

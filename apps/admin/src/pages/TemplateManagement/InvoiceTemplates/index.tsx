@@ -1,16 +1,21 @@
+import { useState } from 'react'
+
 import { useTranslation } from 'react-i18next'
 import { IoMdAdd } from 'react-icons/io'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
+import AlertBox from '@/components/Boxes/AlertBox'
 import { Button } from '@/components/ui/Button'
 import ContentLayout from '@/layouts/ContentLayout'
 import { InvoiceCampaign } from '@/types/templateManagement'
 
+import { AutomationSettingsModal } from './components/AutomationSettingsModal'
 import ListInvoices from './components/ListInvoices'
 
 const InvoiceTemplates = (): JSX.Element => {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const [showSettings, setShowSettings] = useState(false)
   const onShowRecipients = (invoiceCampaign: InvoiceCampaign) => {
     if (!invoiceCampaign.id) return
     navigate(`/invoice-templates/${invoiceCampaign.id}/recipients`)
@@ -27,6 +32,9 @@ const InvoiceTemplates = (): JSX.Element => {
       }
       rightHeader={
         <div className="flex gap-2 mt-2">
+          <Button variant="outline" onClick={() => setShowSettings(true)}>
+            Automation Settings
+          </Button>
           <Button
             iconBefore={<IoMdAdd />}
             onClick={() => navigate('/invoice-templates/editor')}
@@ -40,6 +48,12 @@ const InvoiceTemplates = (): JSX.Element => {
         <AlertBox content={t('invoiceCampaign:beta.description')} />
       </div> */}
       <ListInvoices onShowRecipients={onShowRecipients} />
+      {showSettings && (
+        <AutomationSettingsModal
+          open={showSettings}
+          onClose={() => setShowSettings(false)}
+        />
+      )}
     </ContentLayout>
   )
 }

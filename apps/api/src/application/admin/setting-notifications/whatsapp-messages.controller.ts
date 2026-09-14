@@ -7,6 +7,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { APIResponse } from 'mailersend/lib/services/request.service'
 
 import {
   AddLessonEmailDTO,
@@ -15,13 +16,12 @@ import {
   ChangeLessonWtsDTO,
   SendWtsDTO,
 } from '@/application/admin/setting-notifications/setting-notifications.dto'
-import { ActionTypeLessonWts } from '@/common/constants/whatsappTemplate'
+import { ActionTypeLessonWts } from '@/common/constants/automationFlow'
 import { CurrentUser } from '@/common/decorators/current-user.decorator'
 import { Roles } from '@/common/decorators/roles.decorator'
 import { AdminAuthGuard } from '@/common/guards/admin-auth.guard'
 import { EmailService } from '@/domain/external/email.service'
-import { APIResponse } from '@/domain/external/email-transport.provider'
-import { WhatsappService } from '@/domain/external/whatsapp.service'
+import { MetaWhatsappService } from '@/domain/external/meta-whatsapp.service'
 import { Role } from '@/models/enums/'
 import { User } from '@/models/user.entity'
 
@@ -33,7 +33,7 @@ import { User } from '@/models/user.entity'
 @UseInterceptors(ClassSerializerInterceptor)
 export class WhatsappMessagesController {
   constructor(
-    private readonly whatsappService: WhatsappService,
+    private readonly whatsappService: MetaWhatsappService,
     private readonly emailService: EmailService
   ) {}
 

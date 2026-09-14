@@ -5,7 +5,6 @@
     "discountAmount": "Discount amount (numbers only)"
   },
   "errors": {
-    "pleaseSelectCourse": "Please select course first",
     "trialLessonIdRequired": "Trial lesson ID is required",
     "nameRequired": "Campaign name is required",
     "datesRequired": "Start date and end date are required",
@@ -17,8 +16,6 @@
     "promotion": "Promotion",
     "coupon": "Coupon",
     "bundleDiscount": "Bundles",
-    "packageDiscount": "Package Discounts",
-    "recurrDiscount": "Recurring",
     "directDiscount": "Direct Discount",
     "trial": "Trial Lesson"
   },
@@ -29,59 +26,40 @@
   "coupons": {
     "createCouponCode": "Create Coupon Code",
     "createCouponSuccess": "You have created coupon code successfully",
-    "createCouponFor": "Create coupon for",
     "deleteCoupon": "Delete Coupon",
     "history": {
       "createdCoupon": "created the coupon"
     }
   },
   "bundleDiscount": {
-    "purchaseAmount": "Number of classes",
     "steps": {
       "editRules": "Edit Rules",
       "editSettings": "Edit Settings",
       "discountRules": "Discount Rules",
       "settings": "Settings"
     },
-    "discountAmount": "Discount per lesson",
     "noBundles": "You have no bundles yet. Please create a new bundle discount.",
     "createSuccess": "You have created bundle discount successfully",
-    "addBundleOption": "Add bundle discount option",
-    "applicableCourse": "Applicable Courses",
-    "canApplyTo": "Can apply to",
     "deleteBundleSuccess": "Deleted bundle discount successfully",
     "selectDiscountType": "Select discount type",
     "typeExplanation": "If you select 'percentage', the discount amount will be reduced by the percentage of the total price you entered.",
     "typeExplanation2": "If you select 'fixed amount', the discount amount will be a fixed number, deducted directly from the price.",
-    "description": "Here you can set up class bundles that offer students a discounted rate per lesson when they purchase a certain number of classes. This encourages bulk purchases and helps you fill your schedule.",
-    "table": "Set up bundle discount table",
-    "numOfLessonExplanation": "Number of Classes - The minimum number of classes the student must purchase to qualify for this bundle.",
-    "discountExplanation": "Discount - The discount students will receive on each individual lesson within this bundle. For example, '10' would mean 10% off each lesson if 'percentage' is selected.",
-    "confirmDeleteBundle": "Are you sure you want to delete this bundle discount?",
     "confirmCreateBundle": "Are you sure you want to create this bundle discount?",
     "confirmUpdateBundle": "Are you sure you want to update this bundle discount?",
     "confirmUpdate": "Confirm update?",
     "cannotChange": "You cannot change anything after the bundle discount is created.",
-    "featureInBeta": "Bundle Discount is currently in Beta. It only applies to course type 'Regular Course'",
-    "notFound": "No bundle discount promotion found. Please check your details or try again later.",
-    "successAddMessage": "The bundle discount was successfully added.",
     "successUpdateMessage": "The bundle discount was successfully updated.",
     "activateSuccess": "Bundle discount activated successfully",
     "deactivateSuccess": "Bundle discount deactivated successfully",
     "deleteAction": {
       "title": "Delete bundle discount",
-      "description": "Are you sure you want to delete '{{bundleName}}'? This action cannot be undone.",
-      "message": "The bundle discount '{{bundleName}}' was successfully deleted."
+      "description": "Are you sure you want to delete '{{bundleName}}'? This action cannot be undone."
     },
     "form": {
       "name": "Name",
       "minimumQty": "Minimum Quantity",
       "discountType": "Discount Type",
       "discountAmount": "Discount Amount",
-      "purchaseAmount": "Purchase Amount",
-      "createBundle": "Create Bundle",
-      "updateBundle": "Update Bundle",
-      "deleteBundle": "Delete Bundle",
       "applicableTo": {
         "title": "Applicable To",
         "allClasses": "All Classes",
@@ -104,9 +82,6 @@
         "minimumQty": "Minimum Quantity",
         "discountType": "Discount Type",
         "discountAmount": "Discount Amount",
-        "purchaseAmount": "Purchase Amount",
-        "startDate": "Start Date",
-        "endDate": "End Date",
         "autoApply": "Auto Apply",
         "retroactive": "Retroactive",
         "applyTo": "Apply To"
@@ -144,53 +119,6 @@
       "off": "off"
     }
   },
-  "packageDiscount": {
-    "createSuccess": "Package discount created successfully",
-    "updateSuccess": "Package discount updated successfully",
-    "deleteSuccess": "Package discount deleted successfully",
-    "activateSuccess": "Package discount activated successfully",
-    "deactivateSuccess": "Package discount deactivated successfully",
-    "noPackageDiscounts": "No package discounts yet. Create one to offer per-lesson discounts when students select all lessons in a month.",
-    "perLesson": "per lesson discount",
-    "perLessonDiscount": "{{amount}} off per lesson",
-    "applicableTo": "Applicable to",
-    "allClasses": "All classes",
-    "classes": "classes",
-    "activeCount": "Active Package Discounts ({{count}})",
-    "inactiveCount": "Inactive Package Discounts ({{count}})",
-    "badge": "Package Discount",
-    "autoApplied": "Package discount automatically applied",
-    "editTitle": "Edit Package Discount",
-    "detailTitle": "Package Discount Detail",
-    "notFound": "Package discount not found.",
-    "confirmCreate": "Are you sure you want to create this package discount?",
-    "confirmCreateTitle": "Create Package Discount",
-    "confirmUpdate": "Are you sure you want to update this package discount?",
-    "confirmUpdateTitle": "Update Package Discount",
-    "deleteAction": {
-      "title": "Delete Package Discount",
-      "description": "Are you sure you want to delete '{{name}}'? This action cannot be undone."
-    },
-    "errors": {
-      "amountRequired": "Discount amount per lesson must be greater than 0"
-    },
-    "form": {
-      "name": "Name",
-      "namePlaceholder": "e.g. Monthly Full Package",
-      "amountPerLesson": "Discount per Lesson",
-      "amountPerLessonHint": "Absolute amount deducted from each lesson when all lessons in a month are selected",
-      "applyToAllClasses": "Apply to All Classes",
-      "applyToAllClassesHint": "When enabled, this discount applies to every class",
-      "selectClasses": "Select Classes",
-      "noClassesAvailable": "No classes available",
-      "noMatchingClasses": "No classes match your search",
-      "searchClasses": "Search classes...",
-      "selected": "selected",
-      "selectAllVisible": "Select all ({{count}})",
-      "startDate": "Start Date",
-      "endDate": "End Date"
-    }
-  },
   "trialLesson": {
     "priceLabel": "Lesson Price",
     "pricePlaceholder": "Price [Enter 0 if it a free trial !]",
@@ -198,9 +126,6 @@
     "addModalTitle": "Add new trial lesson option",
     "updateModalTitle": "Update trial lesson option",
     "applyTo": "Apply to",
-    "selectCourses": "Select Courses",
-    "selectClasses": "Select Classes",
-    "searchClasses": "Search Classes",
     "free": "Free",
     "notFound": "No trial lesson promotion found. Please check your details or try again later.",
     "successAddMessage": "The trial lesson was successfully added.",
@@ -213,10 +138,6 @@
   },
   "percentage": "Percentage",
   "fixedAmount": "Fixed Amount",
-  "redeemableTimes": "No. of redeemable times",
-  "unlimited": "Unlimited",
-  "limitedTo": "Limited to",
-  "applicableTo": "The code is also be applicable to",
   "cancel": "Cancel",
   "save": "Save",
   "amount": "Amount",
@@ -224,37 +145,13 @@
   "validUntil": "Valid until",
   "select": "Select",
   "couponCodeNotFound": "You have not created any coupon codes. Click 'Add' to create your first one.",
-  "createCouponError": "There exists an error when creating coupon code. Please try again later",
   "expireDate": "Expiry Date",
   "time": "Time",
-  "discountPercentageOutOfRange": "The discount percentage you enter should be between 0 and 100",
-  "discountAmountOutOfRange": "The discount amount you enter should be larger than 0",
-  "datePickRemind": "The time will be saved in the default timezone which is set in your site settings",
   "comingSoon": "Coming Soon",
   "totalUsage": "Total usage",
   "sendEmailNotifyStudent": "Notify student by email",
-  "dialog": {
-    "titleAlertDialog": "Do you want to delete coupon code:",
-    "descriptionAlertDialog": "This action is irreversible.",
-    "titleCopyMessage": "The following message will be copied",
-    "descriptionCopyMessage": "is offering you a discount of",
-    "descriptionCopyMessage1": "Use the coupon code",
-    "descriptionCopyMessage2": "and redeem before",
-    "titleActiveDialog": "Do you want to activate code:",
-    "descriptionActiveDialog": "Users can redeem the coupon when it is inactive",
-    "titleInactiveDialog": "Do you want to deactivate code:",
-    "descriptionInactivelog": "Users cannot redeem the coupon when it is inactive"
-  },
   "action": {
-    "viewDetail": "View detail",
-    "detail": "Detail",
-    "copyMessage": "Copy Message",
-    "setAsInactive": "Set as Inactive",
-    "setAsActive": "Set as Active",
-    "backToList": "Back",
-    "delete": "Delete",
-    "active": "Activate",
-    "inactive": "Deactivate"
+    "setAsInactive": "Set as Inactive"
   },
   "deleteCouponSuccess": "Delete coupon successfully",
   "noCoupon": "You have no coupon yet. Please create a new coupon.",
@@ -269,7 +166,6 @@
   "couponOption3": "This coupon can be used on all courses",
   "couponOption4": "An email will be sent to him after the coupon is assigned",
   "change": "Change",
-  "close": "Close",
   "history": "History",
   "basicInfor": "Coupon Settings",
   "CouponCodeDetail": "Coupon Code Detail",
@@ -281,17 +177,5 @@
   "createInputplaceholder": "Fill in number only, i.e. 500",
   "updateCouponSuccess": "Update coupon successfully",
   "historyCreateCouponCode": "created the coupon",
-  "historyInactive": "inactive the coupon",
-  "historyCreated": "created the coupon",
-  "historyPay": "paid for the course",
-  "historyUsing": "using coupon code",
-  "historyClass": "class",
-  "historyLesson": "Lesson",
-  "studentDialog": {
-    "searchPlaceholder": "Search and select a student to add...",
-    "noStudentsFound": "No students found",
-    "eligibleStudents": "Eligible Students",
-    "selectedCount": "selected",
-    "removeAll": "Remove All"
-  }
+  "historyInactive": "inactive the coupon"
 }

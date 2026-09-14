@@ -39,15 +39,23 @@ import {
   NotificationsSettingProps,
 } from '@/types/notifications'
 import { CopySchool, School } from '@/types/school'
+import {
+  PlanWithQuotasResponse,
+  SubscriptionPlanRecord,
+} from '@/types/schoolSubscriptionPlan'
 import { WebpageInstitutionSettingProps } from '@/types/settingWebpageInstitution'
 import { getUserRoleFromArray } from '@/utils/convert'
 import { siteDomainIfCustom } from '@/utils/string'
 
 import useAuth from './useAuth'
+import usePlanData from './useSubscriptionPlanData'
 
 const useSchoolData = () => {
   const [schoolData, setSchoolData] = useRecoilState(schoolState)
   const [, setSchoolSubscription] = useRecoilState(schoolSubscriptionState)
+
+  const { useCreateTrialPlan } = usePlanData()
+  const createTrialPlan = useCreateTrialPlan()
 
   const userPermission = useRecoilValue(userPermissionState)
   const setNotificationSetting = useSetRecoilState(notificationSettingState)
@@ -58,6 +66,12 @@ const useSchoolData = () => {
   const { isLogin, setUserAndPermissions } = useAuth()
   const currentSchoolId = schoolData.currentSchool?.id || 0
   const currentSiteId = siteData.currentSite?.id || 0
+
+  const {
+    useGetActiveSubscriptionPlanRecord,
+    useFetchSubscriptionPlanRecords,
+    useGetPlanAndQuotas,
+  } = usePlanData()
 
   const domain = siteDomainIfCustom(
     siteData.currentSite?.customDomain,
@@ -153,6 +167,10 @@ const useSchoolData = () => {
   const useFetchCurrentSchool = (
     successfulCallback?: (data: School) => void
   ): UseQueryResult<School, unknown> => {
+    const { data: activePlan } = useGetActiveSubscriptionPlanRecord()
+    const { data: planRecords } = useFetchSubscriptionPlanRecords()
+    const { data: planQuotas } = useGetPlanAndQuotas()
+
     const result = useQuery(
       [QUERY_KEY.site.getCurrentSchoolKey, currentSchoolId],
       () => getCurrentSchool(currentSchoolId),
@@ -161,17 +179,12 @@ const useSchoolData = () => {
           setSchoolData(prev => ({ ...prev, currentSchool }))
           successfulCallback?.(currentSchool)
 
+          // set subscription plan
           if (currentSchool) {
             setSchoolSubscription({
-              planRecords: [],
-              activePlan: {
-                planIds: [1],
-                notificationChannels: {
-                  TWILIO_WHATSAPP: true,
-                  UNOFFICIAL_WHATSAPP: true,
-                },
-              } as any,
-              planQuotas: null,
+              planRecords: planRecords ?? [],
+              activePlan: activePlan as SubscriptionPlanRecord,
+              planQuotas: planQuotas as PlanWithQuotasResponse,
             })
           }
 
@@ -274,6 +287,7 @@ const useSchoolData = () => {
           currentSchool: data,
         }))
         setUserAndPermissions()
+        createTrialPlan.mutate(data.id)
         successfulCallback?.(false)
       },
       onError: (error: ApiError) => {

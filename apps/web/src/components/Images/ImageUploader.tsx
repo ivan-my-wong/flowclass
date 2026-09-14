@@ -1,14 +1,13 @@
-// import { Close, Title } from '@radix-ui/react-dialog'
-// import heic2any from 'heic2any'
 import { useRef, useState } from 'react'
 
 import useTranslation from 'next-translate/useTranslation'
 import { BsUpload } from 'react-icons/bs'
 import { centerCrop, Crop, makeAspectCrop } from 'react-image-crop'
+import { toast } from 'sonner'
 
-// import { styled } from 'react-query/types/devtools/utils'
 import Button from '@/components/Buttons/Button'
 import imageUrls from '@/constants/imageUrls'
+import { compressImageFile, MAX_FILE_SIZE_BYTES } from '@/utils/imageCompression'
 
 import SkeletonLoader from '../Loaders/SkeletonLoader'
 
@@ -31,69 +30,45 @@ const ImageUploader = ({
   const { t } = useTranslation()
   const [processing, setProcessing] = useState(false)
 
-  const onSelectImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onSelectImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setProcessing(true)
       onProcessingChange?.(true)
       const originalFile = e.target.files[0]
-      let imgName = originalFile.name.toLowerCase()
-      const fileType = originalFile.type.toLowerCase()
-      const isHeic =
-        imgName.endsWith('.heic') ||
-        imgName.endsWith('.heif') ||
-        fileType.includes('heic') ||
-        fileType.includes('heif')
 
-      if (isHeic) {
-        const blob = new Blob([originalFile], { type: originalFile.type || 'image/heic' })
-        if (typeof window !== 'undefined') {
-          // eslint-disable-next-line @typescript-eslint/no-var-requires
-          const heic2any = require('heic2any')
-          heic2any({ blob })
-            .then((convertedFile: any) => {
-              // Handle array response (heic2any can return array)
-              const blobResult = Array.isArray(convertedFile) ? convertedFile[0] : convertedFile
-              imgName = imgName.replace(/\.(HEIC|HEIF)$/i, '.png')
-              const convertedBlob = blobResult as Blob
-              const file = new File([convertedBlob], imgName, {
-                type: convertedBlob.type || 'image/png',
-              })
-              setImgSrc(URL.createObjectURL(convertedBlob))
-              setCrop(undefined)
-              setImgName(imgName)
-              onSuccess(file)
-              setProcessing(false)
-              onProcessingChange?.(false)
-            })
-            .catch((error: any) => {
-              console.error('HEIC conversion failed:', error)
-              // Fallback: try to use original file if conversion fails
-              const reader = new FileReader()
-              reader.addEventListener('load', () => {
-                setImgSrc(reader.result?.toString() ?? '')
-                setCrop(undefined)
-                setImgName(imgName)
-                onSuccess(originalFile)
-                setProcessing(false)
-                onProcessingChange?.(false)
-              })
-              reader.readAsDataURL(originalFile)
-            })
-        } else {
+      try {
+        // Compress & resize image (HEIC -> JPEG, downscale to max 1920px, 80% quality)
+        const processedFile = await compressImageFile(originalFile)
+
+        // Validate max file size (10MB)
+        if (processedFile.size > MAX_FILE_SIZE_BYTES) {
+          toast.error(t('errors:PAYLOAD_TOO_LARGE') as string)
           setProcessing(false)
           onProcessingChange?.(false)
+          if (inputRef.current) inputRef.current.value = ''
+          return
         }
-      } else {
-        const reader = new FileReader()
-        reader.addEventListener('load', async () => {
-          setImgSrc(reader.result?.toString() ?? '')
+
+        const isPdf =
+          processedFile.type === 'application/pdf' ||
+          processedFile.name.toLowerCase().endsWith('.pdf')
+
+        if (isPdf) {
+          setImgName(processedFile.name)
           setCrop(undefined)
-          setImgName(imgName)
-          onSuccess(originalFile)
-          setProcessing(false)
-          onProcessingChange?.(false)
-        })
-        reader.readAsDataURL(originalFile)
+          onSuccess(processedFile)
+        } else {
+          setImgSrc(URL.createObjectURL(processedFile))
+          setCrop(undefined)
+          setImgName(processedFile.name)
+          onSuccess(processedFile)
+        }
+      } catch (error) {
+        console.error('Image processing failed:', error)
+        toast.error(t('enrol:uploadReceipt.uploadFailed') as string)
+      } finally {
+        setProcessing(false)
+        onProcessingChange?.(false)
       }
     }
   }
@@ -153,20 +128,41 @@ const ImageUploader = ({
         >
           <input
             type="file"
-            accept="image/*"
+            accept="image/*,application/pdf"
             ref={inputRef}
             onChange={onSelectImage}
             id="image-upload"
             hidden
           />
           <div className="box-responsive-full my-4 max-w-2xl justify-center rounded-md border border-gray-100">
-            <img
-              ref={imgRef}
-              alt=""
-              src={imgSrc}
-              onLoad={onImageLoad}
-              className="h-full w-full object-contain md:w-2/3 lg:w-1/2"
-            />
+            {imgName.endsWith('.pdf') ? (
+              <div className="flex h-48 w-full flex-col items-center justify-center bg-gray-50 text-gray-500 md:w-2/3 lg:w-1/2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="mb-2 h-16 w-16"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                  />
+                </svg>
+                <span className="px-4 text-center text-sm font-medium">{imgName}</span>
+                <span className="mt-1 text-xs">(PDF Selected)</span>
+              </div>
+            ) : (
+              <img
+                ref={imgRef}
+                alt=""
+                src={imgSrc}
+                onLoad={onImageLoad}
+                className="h-full w-full object-contain md:w-2/3 lg:w-1/2"
+              />
+            )}
           </div>
         </div>
       )}

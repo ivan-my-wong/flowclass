@@ -33,6 +33,14 @@ export class CouponDTO {
   })
   @IsArray()
   @IsOptional()
+  userAliasIds: number[]
+
+  @ApiPropertyOptional({
+    nullable: true,
+    example: [1],
+  })
+  @IsArray()
+  @IsOptional()
   userIds: number[]
 
   @ApiProperty()

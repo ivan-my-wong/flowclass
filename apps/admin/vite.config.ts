@@ -5,19 +5,12 @@ import { defineConfig, loadEnv, UserConfig } from 'vite';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  const root = path.resolve(__dirname, '../..');
-  const env = loadEnv(mode, root, '');
-  const webBaseUrl = env.NEXT_PUBLIC_WEB_BASE_URL || env.VITE_WEB_BASE_URL || 'http://localhost:3001';
-
+  const env = { ...loadEnv(mode, process.cwd()) }
+  console.log(env, mode)
   return {
-    envDir: root,
-    define: {
-      'import.meta.env.VITE_WEB_BASE_URL': JSON.stringify(webBaseUrl),
-    },
     plugins: [react(), visualizer({ filename: 'analyze.html', gzipSize: true })],
     assetsInclude: ['**/*.md', '**/*.csv'],
     server: {
-      port: 3000,
       // dev proxy server
       proxy: {
         ...(mode === 'development'
@@ -44,8 +37,7 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, "./src"),
-        'lodash': 'lodash-es'
+        '@': path.resolve(__dirname, "./src")
       },
     }
   } as UserConfig

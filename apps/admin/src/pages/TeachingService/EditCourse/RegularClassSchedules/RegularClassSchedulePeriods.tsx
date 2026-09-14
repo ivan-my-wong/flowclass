@@ -31,10 +31,7 @@ import {
   RepeatFormats,
 } from '@/types/classes'
 import dayjs from '@/utils/dayjs'
-import {
-  buildDefaultRegularV2LessonRepeatFormat,
-  buildDefaultRegularV2Period,
-} from '@/utils/regular-class-schedule.utils'
+import { generateNextHour } from '@/utils/regular-class-schedule.utils'
 
 export const RegularClassSchedulePeriods = (): JSX.Element => {
   const { t } = useTranslation(['teachingService'])
@@ -57,11 +54,19 @@ export const RegularClassSchedulePeriods = (): JSX.Element => {
     name: 'regularScheduleV2.periodsV2',
   })
 
-  const defaultLessonRepeatFormat =
-    buildDefaultRegularV2LessonRepeatFormat() as RepeatFormats
+  const defaultLessonRepeatFormat = {
+    repeat: false,
+    every: 1,
+    times: 1,
+    unit: RepeatUnit.weeks,
+    monthDay: 1,
+  } as RepeatFormats
 
-  const defaultPeriod: Partial<ClassRegularPeriodsV2Form> =
-    buildDefaultRegularV2Period()
+  const defaultPeriod: Partial<ClassRegularPeriodsV2Form> = {
+    startTime: new Date(generateNextHour()),
+    endTime: new Date(dayjs(generateNextHour()).add(1, 'hour').toISOString()),
+    lessonRepeatFormat: defaultLessonRepeatFormat,
+  }
 
   useEffect(() => {
     if (fields.length === 0) {
@@ -185,6 +190,12 @@ export const RegularClassSchedulePeriods = (): JSX.Element => {
                 />
               </div>
             </div>
+
+            {/* 
+             TODO: Implement monthly repeat selection - see ticket #XXX 
+            {unit === RepeatUnit.months && (
+              <SelectMonthlyRepeat form={form} index={index} />
+            )} */}
 
             {/* Time Selection */}
             <div className="box-col-full gap-4">

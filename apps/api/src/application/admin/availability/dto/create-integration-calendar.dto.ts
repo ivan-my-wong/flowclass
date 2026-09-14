@@ -10,5 +10,11 @@ export class CreateIntegrationCalendarDto {
     example: 'xxxxxxxx',
   })
   @IsString()
+  idToken: string
+
+  @ApiProperty({
+    example: 'xxxxxxxx',
+  })
+  @IsString()
   accessToken: string
 }

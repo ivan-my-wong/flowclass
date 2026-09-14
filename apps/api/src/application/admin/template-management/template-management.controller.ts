@@ -230,7 +230,9 @@ export class TemplateManagementController {
       )
       return response
     } catch (error) {
-      throw new Error('Failed to initialize session')
+      throw new InternalServerErrorException(
+        error?.message || 'Failed to get document campaign recipients'
+      )
     }
   }
 

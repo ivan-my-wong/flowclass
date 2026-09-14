@@ -16,8 +16,10 @@ import { ReactQueryDevtools } from 'react-query/devtools'
 import { RecoilRoot } from 'recoil'
 
 import App from './App'
+import SubscriptionDialog from './components/Popups/SubscriptionDialog'
 import { tourProviderConfig } from './constants/config'
 
+import './firebase.config'
 import './i18n'
 import './utils/wakeLock'
 import { Toaster } from './components/ui/Sonner'
@@ -48,17 +50,13 @@ root.render(
     <RecoilRoot>
       <QueryClientProvider client={queryClient}>
         <DndProvider backend={HTML5Backend}>
-          <BrowserRouter
-            future={{
-              v7_startTransition: true,
-              v7_relativeSplatPath: true,
-            }}
-          >
+          <BrowserRouter>
             <TourProvider {...tourProviderConfig}>
               <App />
             </TourProvider>
             <ReactQueryDevtools />
             <Toaster />
+            <SubscriptionDialog />
           </BrowserRouter>
         </DndProvider>
       </QueryClientProvider>

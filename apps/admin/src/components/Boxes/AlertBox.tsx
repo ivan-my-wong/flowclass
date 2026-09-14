@@ -5,9 +5,10 @@ import { DefaultTFuncReturn } from 'i18next'
 import { FaChevronRight } from 'react-icons/fa'
 import { IoIosInformationCircle } from 'react-icons/io'
 
+import { styled } from '@/styles'
 import { cn } from '@/utils/cn'
 
-import Text from '../Texts/Text'
+import Text, { StyledText } from '../Texts/Text'
 import Box from '../ui/Box'
 
 type AlertBoxProps = {
@@ -17,7 +18,22 @@ type AlertBoxProps = {
   actionLink?: React.ReactNode
   useShadow?: boolean
   status?: 'info' | 'warning' | 'success'
-} & ComponentProps<typeof Text>
+} & ComponentProps<typeof StyledText>
+
+const ActionIcon = styled('div', {
+  display: 'flex',
+  marginRight: '$5',
+  alignItems: 'center',
+})
+
+const ActionLink = styled('div', {
+  float: 'right',
+  display: 'flex',
+  alignItems: 'center',
+  fontWeight: 'bold',
+  gap: '$2',
+  cursor: 'pointer',
+})
 
 const STATUS_COLORS = {
   warning: { borderColor: 'border-red-400', textColor: 'text-red-400' },
@@ -52,13 +68,16 @@ const AlertBox: React.FC<AlertBoxProps> = ({
     >
       <div className="flex items-center">
         {icon != null ? (
-          <div className="flex mr-5 items-center">{icon}</div>
+          <ActionIcon>{icon}</ActionIcon>
         ) : (
           <IoIosInformationCircle />
         )}
         <Box
           justify="start"
-          className={cn('flex-1 pl-[0.6rem] w-full', 'md:justify-center')}
+          className={cn(
+            'flex-1 pl-[0.6rem] w-full', // Base styles
+            'md:justify-center' // Responsive styles
+          )}
         >
           <Text align="left" width="100%" {...props}>
             {content}
@@ -66,11 +85,7 @@ const AlertBox: React.FC<AlertBoxProps> = ({
         </Box>
       </div>
       {actionLink !== '' && typeof actionLink === 'string' ? (
-        <div
-          className={cn(
-            'float-right flex items-center font-bold gap-2 cursor-pointer',
-            textColor
-          )}
+        <ActionLink
           onClick={() => {
             if (actionLink.startsWith('http')) {
               window.open(actionLink, '_blank')
@@ -78,25 +93,13 @@ const AlertBox: React.FC<AlertBoxProps> = ({
               navigate(actionLink)
             }
           }}
-          onKeyDown={e => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              if (actionLink.startsWith('http')) {
-                window.open(actionLink, '_blank')
-              } else {
-                navigate(actionLink)
-              }
-            }
-          }}
-          role="button"
-          tabIndex={0}
+          className={textColor}
         >
           <Text {...props}>{actionText}</Text>
           <FaChevronRight />
-        </div>
+        </ActionLink>
       ) : (
-        <div className="float-right flex items-center font-bold gap-2 cursor-pointer">
-          {actionLink}
-        </div>
+        <ActionLink>{actionLink}</ActionLink>
       )}
     </Box>
   )

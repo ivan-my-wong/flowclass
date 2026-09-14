@@ -7,22 +7,6 @@
 
 @layer base {
   :root {
-    /* Theme color variables for API-driven styles (react-select, AG-Grid, etc.) */
-    --color-primary: #467ef7;
-    --color-primary-highlight: #4459cf;
-    --color-text: rgba(0, 0, 0, 0.92);
-    --color-background: white;
-    --color-background-layer-2: #f7f7f7;
-    --color-background-layer-3: #e6e6e6;
-    --color-background-disabled: #999999;
-    --color-border: rgba(0, 0, 0, 0.48);
-    --color-text-subtle: #666666;
-    --color-warn: #e53e3e;
-    --color-success: #38a169;
-    --color-secondary: #f7bf46;
-    --color-tertiary: #f99191;
-    --color-primary-highlight-subtle: #bedcff;
-
     --background: 0 0% 100%;
     --backgroundLayer2: 0 0% 98%;
     --foreground: 0 0% 3.9%;
@@ -53,22 +37,6 @@
   }
 
   .dark {
-    /* Theme color variables for dark mode */
-    --color-primary: #dd6b20;
-    --color-primary-highlight: #ed8936;
-    --color-text: white;
-    --color-background: #1a1a1a;
-    --color-background-layer-2: #333333;
-    --color-background-layer-3: #4d4d4d;
-    --color-background-disabled: #666666;
-    --color-border: #b3b3b3;
-    --color-text-subtle: #feef82;
-    --color-warn: #fc8181;
-    --color-success: #68d391;
-    --color-secondary: #319795;
-    --color-tertiary: #805ad5;
-    --color-primary-highlight-subtle: #fed7a8;
-
     --background: 0 0% 3.9%;
     --backgroundLayer2: 0 0% 14.9%;
     --foreground: 0 0% 98%;
@@ -154,7 +122,7 @@
   }
 
   .dialog-body {
-    @apply px-6 py-4;
+    @apply px-6;
   }
 
   .dialog-btn__close {
@@ -162,7 +130,7 @@
   }
 
   .dialog-header {
-    @apply flex space-y-1.5 text-center sm:text-left !py-4 bg-white dark:bg-dark-background h-14 items-center border-b border-gray-300 px-6;
+    @apply flex space-y-1.5 text-center sm:text-left !py-4 bg-white dark:bg-dark-background h-14 items-center border-b border-gray-300 px-4;
   }
 
   .dialog-content--scrollable .dialog-body {
@@ -170,7 +138,7 @@
   }
 
   .dialog-footer {
-    @apply flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 px-6 pb-6 pt-2;
+    @apply flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 px-4 pb-4 pt-2;
   }
 
   /* Css classes for react-flow */
@@ -238,8 +206,7 @@
   h5,
   h6,
   p,
-  span,
-  label {
+  span {
     @apply font-lato;
   }
 

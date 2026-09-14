@@ -9,6 +9,7 @@ import Box from '../../components/Containers/Box'
 import Spacer from '../../components/Separators/Spacer'
 import Text from '../../components/Texts/Text'
 import useSchoolData from '../../hooks/useSchoolData'
+import { theme } from '../../styles'
 
 // type SchoolTaskProps = {
 //   content?: JSX.Element
@@ -116,7 +117,7 @@ export const SchoolTask = (): JSX.Element => {
     <Box
       direction="column"
       align="flex-start"
-      className="w-full"
+      css={{ width: '100%' }}
       padding="medium"
       id="floating-content"
     >
@@ -155,15 +156,17 @@ export const SchoolTask = (): JSX.Element => {
               transition={{ delay: index * 0.1 }}
             >
               <Spacer space="y2" />
-              <Box align="center" justify="center" className="w-fit">
+              <Box
+                align="center"
+                justify="center"
+                css={{ width: 'fit-content' }}
+              >
                 {task.isDone ? (
-                  <span className="text-success">
-                    <BsFillCheckCircleFill color="currentColor" />
-                  </span>
+                  <BsFillCheckCircleFill
+                    color={theme.colors.success.toString()}
+                  />
                 ) : (
-                  <span className="text-warn">
-                    <RxCross2 color="currentColor" />
-                  </span>
+                  <RxCross2 color={theme.colors.warn.toString()} />
                 )}
                 <div>{task.taskName}</div>
               </Box>

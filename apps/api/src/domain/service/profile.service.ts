@@ -4,7 +4,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common'
-import * as bcrypt from 'bcryptjs'
+import * as bcrypt from 'bcrypt'
 import { plainToInstance } from 'class-transformer'
 import * as dayjs from 'dayjs'
 import { parsePhoneNumber } from 'libphonenumber-js'
@@ -29,7 +29,7 @@ import {
   MAX_TIME_REQUEST_TIME_CHANGE,
   MAX_TIME_SEND_QUESTION,
 } from '@/common/constants/profile.constants'
-import { ObjectStorageProvider } from '@/config/storage/object-storage.provider'
+import { S3ClientFactory } from '@/config/s3/s3-factory.provider'
 import { ClassMediaMaterialsRepository } from '@/models/class-media-materials.repository'
 import { ClassRepository } from '@/models/classes.repository'
 import { CoursesRepository } from '@/models/courses.repository'
@@ -69,7 +69,7 @@ export class ProfileService {
     private authService: AuthService,
     private paymentEvidenceService: PaymentEvidenceService,
     private rescheduleApprovalService: RescheduleApprovalService,
-    private readonly objectStorageProvider: ObjectStorageProvider,
+    private readonly s3ClientFactory: S3ClientFactory,
     private readonly invoiceRepository: InvoiceRepository,
     private readonly mediaMaterialsRepository: ClassMediaMaterialsRepository,
     private readonly teacherFeedbackRepository: TeacherFeedbackRepository,
@@ -403,7 +403,9 @@ export class ProfileService {
             },
           },
         },
-        invoicePromotionsUsed: true,
+        promotionUsed: {
+          coupon: true,
+        },
       },
       order: { createdAt: 'DESC' },
     })
@@ -443,7 +445,7 @@ export class ProfileService {
     const paymentProofs = await Promise.all(
       paymentEvidences.map(async (o) => {
         if (o.image) {
-          o.image = await this.objectStorageProvider.getObjectAccessUrl(o.image)
+          o.image = await this.s3ClientFactory.getS3ObjectPresignedUrl(o.image)
         }
         return { enrollId: o.enrollCourseId, image: o.image }
       })
@@ -506,8 +508,7 @@ export class ProfileService {
             },
           }))
         }),
-        promotion:
-          i.invoicePromotionsUsed?.find((p) => p.promotionType === 'COUPON_DISCOUNT') ?? null,
+        promotion: i.promotionUsed?.coupon,
         paymentDate,
         user: {
           email: i.userAlias?.email,
@@ -616,11 +617,11 @@ export class ProfileService {
             instructorName: classData?.instructor?.firstName,
             locationRoomName: classData?.locationRoom?.name,
           },
-          startTime: l.startTime,
-          endTime: l.endTime,
-          originalStartTime: l.changeStartTime,
-          originalEndTime: l.changeEndTime,
-          hasTimeChange: !!l.changeStartTime,
+          startTime: l.changeStartTime ?? l.startTime,
+          endTime: l.changeEndTime ?? l.endTime,
+          originalStartTime: l.startTime,
+          originalEndTime: l.endTime,
+          hasTimeChange: !!(l.changeStartTime || l.changeEndTime),
           invoice: {
             id: invoice.id,
             payAmount: invoice.payAmount,
@@ -628,7 +629,7 @@ export class ProfileService {
             enrollId: invoice.enrollCourses.at(0)?.id,
             proofToken: invoice.proofToken,
           },
-          isDone: dayjs(l.startTime).isBefore(new Date()),
+          isDone: dayjs(l.changeStartTime || l.startTime).isBefore(new Date()),
           institutionId,
           siteId: invoice.siteId,
           user: {

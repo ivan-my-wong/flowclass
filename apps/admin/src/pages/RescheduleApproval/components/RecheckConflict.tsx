@@ -4,10 +4,10 @@ import { Portal, Root, Title, Trigger } from '@radix-ui/react-dialog'
 import { useTranslation } from 'react-i18next'
 import { CiWarning } from 'react-icons/ci'
 
-import { StyledContent, StyledOverlay } from '@/components/Popups/Modal'
 import ModalCloseButton from '@/components/Popups/ModalCloseButton'
 import Separator from '@/components/Separators/Separator'
 import { useGetDetailRescheduleApproval } from '@/hooks/useRescheduleApproval'
+import { StyledContent, StyledOverlay } from '@/pages/School/CreateSchoolModal'
 import ValidationItem from '@/pages/TeachingService/EditCourse/ValidateSessionModal/ValidationItem'
 import {
   AvailabilityStatus,

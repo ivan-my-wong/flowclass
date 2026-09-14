@@ -2,6 +2,7 @@ import React from 'react'
 
 import { HeaderBackButtonStatus } from '@/components/TabWithListAndButton/HeaderBackButton'
 import useSchoolData from '@/hooks/useSchoolData'
+import { css } from '@/styles'
 import { cn } from '@/utils/cn'
 
 import ContentHeader from './ContentHeader'
@@ -11,8 +12,8 @@ type LayoutProps = {
   leftHeader?: React.ReactNode
   rightHeader?: React.ReactNode
   isCustomStylesApply?: boolean
-  leftHeaderCSS?: string
-  rightHeaderCSS?: string
+  leftHeaderCSS?: any
+  rightHeaderCSS?: any
   mainClassName?: string
   headerClassName?: string
   bordered?: boolean
@@ -39,7 +40,7 @@ const ContentLayout = ({
   useFetchCurrentSchoolNotificationsSetting()
 
   return (
-    <div className={cn('flex flex-col w-full h-full', className)} {...props}>
+    <div className={cn(containerStyles().toString(), className)} {...props}>
       {(headerBackButton || leftHeader || rightHeader) && (
         <ContentHeader
           headerBackButton={headerBackButton}
@@ -52,13 +53,25 @@ const ContentLayout = ({
           className={headerClassName}
         />
       )}
-      <main
-        className={cn('flex flex-col items-center flex-grow', mainClassName)}
-      >
+      <main className={cn(mainStyles().toString(), mainClassName)}>
         {children}
       </main>
     </div>
   )
 }
+
+const containerStyles = css({
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+  height: '100%',
+})
+
+const mainStyles = css({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  flexGrow: 1,
+})
 
 export default ContentLayout

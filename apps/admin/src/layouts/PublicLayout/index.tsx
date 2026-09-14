@@ -1,6 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import clsx from 'clsx'
 import { useTranslation } from 'react-i18next'
 import { FaChevronRight } from 'react-icons/fa'
 import { useRecoilValue } from 'recoil'
@@ -10,7 +11,7 @@ import ImageAspect from '@/components/Images/ImageAspect'
 import Box from '@/components/ui/Box'
 import { Button } from '@/components/ui/Button'
 import { userState } from '@/stores/userData'
-import { cn } from '@/utils/cn'
+import { css, theme } from '@/styles'
 
 import NavMenu from './NavMenu'
 
@@ -30,13 +31,15 @@ const PublicLayoutHeader = ({
   isCustomStylesApply,
 }: HeaderProps) => {
   const navigate = useNavigate()
-  const leftAndCustomStyles = cn(
-    'flex flex-row content-center font-bold gap-2',
-    isCustomStylesApply &&
-      'w-[90%] xl:w-[80%] lg:w-[78%] md:w-[68%] sm:w-[90%]',
-    leftHeaderCSS
-  )
-  const rightAndCustomStyles = cn('ml-auto flex flex-row gap-2', rightHeaderCSS)
+  const leftAndCustomStyles = clsx({
+    [leftStyles()]: true,
+    [customStyles()]: isCustomStylesApply,
+    [leftHeaderCSS]: leftHeaderCSS,
+  })
+  const rightAndCustomStyles = clsx({
+    [rightStyles()]: true,
+    [rightHeaderCSS]: rightHeaderCSS,
+  })
 
   const { t } = useTranslation()
   const userData = useRecoilValue(userState)
@@ -55,7 +58,7 @@ const PublicLayoutHeader = ({
               src={flowclassLogo}
               alt="Flowclass Logo"
             />
-            <div className="flex items-center flex-wrap">{leftHeader}</div>
+            <div className={leftContentStyles()}>{leftHeader}</div>
           </div>
           <Box justify="end">
             <NavMenu
@@ -63,6 +66,10 @@ const PublicLayoutHeader = ({
                 {
                   label: t('component:menubar.aiTools.descriptionGenerator'),
                   url: '/c/ai',
+                },
+                {
+                  label: 'Automation Flow Experiment',
+                  url: '/c/automation-flow-experiment',
                 },
                 {
                   label: 'Pricing',
@@ -109,6 +116,43 @@ const PublicLayoutHeader = ({
     </header>
   )
 }
+
+const leftStyles = css({
+  display: 'flex',
+  flexDirection: 'row',
+  alignContent: 'center',
+  fontWeight: 'bold',
+  gap: '$2',
+})
+
+const customStyles = css({
+  width: '90%',
+  '@xl': {
+    width: '80%',
+  },
+  '@lg': {
+    width: '78%',
+  },
+  '@md': {
+    width: '68%',
+  },
+  '@sm': {
+    width: '90%',
+  },
+})
+
+const leftContentStyles = css({
+  display: 'flex',
+  alignItems: 'center',
+  flexWrap: 'wrap',
+})
+
+const rightStyles = css({
+  marginLeft: 'auto',
+  display: 'flex',
+  flexDirection: 'row',
+  gap: '$2',
+})
 
 const ContentLayout = ({
   homepage,

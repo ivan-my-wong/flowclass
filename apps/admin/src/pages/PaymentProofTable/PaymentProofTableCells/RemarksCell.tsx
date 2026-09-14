@@ -38,7 +38,9 @@ const RemarksCell = (props: RemarksCellProps) => {
         <p>{data?.remark}</p>
         <button
           type="button"
-          className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+          className={`ml-2 transition-opacity cursor-pointer ${
+            data?.remark ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'
+          }`}
           onClick={() => {
             setIsOpen(true)
             setRemark(data?.remark || '')

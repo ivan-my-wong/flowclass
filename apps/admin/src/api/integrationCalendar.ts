@@ -260,7 +260,7 @@ export const getCalendarList = async (
  * Refresh Google token for a specific calendar connection
  * @param institutionId - Institution ID
  * @param connectionId - Calendar connection ID
- * @param idToken - Google ID token
+ * @param idToken - Firebase ID token
  * @returns Promise with refreshed access token
  */
 export const refreshGoogleToken = async ({

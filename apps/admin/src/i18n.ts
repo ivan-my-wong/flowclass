@@ -8,6 +8,7 @@ import { initReactI18next } from 'react-i18next'
 
 import accountEN from './locales/en/account.json'
 import aiToolEN from './locales/en/aiTool.json'
+import automationFlowEn from './locales/en/automationFlow.json'
 import availabilityEN from './locales/en/availability.json'
 import calendarEN from './locales/en/calendar.json'
 import commonEN from './locales/en/common.json'
@@ -37,6 +38,7 @@ import templateManagementEN from './locales/en/templateManagement.json'
 import whatsappTemplateEn from './locales/en/whatsappTemplate.json'
 // Importing translation files
 import accountZH from './locales/zh/account.json'
+import automationFlowZH from './locales/zh/automationFlow.json'
 import availabilityZH from './locales/zh/availability.json'
 import calendarZH from './locales/zh/calendar.json'
 import commonZH from './locales/zh/common.json'
@@ -87,6 +89,7 @@ export const resources: Resource = {
     recordLogs: recordLogsEN,
     aiTool: aiToolEN,
     whatsappTemplate: whatsappTemplateEn,
+    automationFlow: automationFlowEn,
     location: locationEN,
     availability: availabilityEN,
     customMessage: customMessageEn,
@@ -117,6 +120,7 @@ export const resources: Resource = {
     payout: payoutZH,
     lessonDateTime: lessonDateTimeZh,
     whatsappTemplate: whatsappTemplateZH,
+    automationFlow: automationFlowZH,
     location: locationZH,
     availability: availabilityZH,
     integration: integrationZH,

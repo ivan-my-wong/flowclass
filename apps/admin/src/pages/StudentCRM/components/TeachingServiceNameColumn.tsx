@@ -1,8 +1,15 @@
+import { useEffect } from 'react'
+
 import { useTranslation } from 'react-i18next'
 import { GiNewShoot } from 'react-icons/gi'
+import { useRecoilState, useRecoilValue } from 'recoil'
 
+import RemarkIcon from '@/assets/svgs/student/RemarkIcon'
+import ModalRemark from '@/components/Popups/ModalRemark'
 import { Badge } from '@/components/ui/Badge'
 import Text from '@/components/ui/Text'
+import { schoolState } from '@/stores/schoolData'
+import { remarksState } from '@/stores/studentData'
 import { ClassTypeEnum } from '@/types/course'
 import {
   SingleStudentCrmRecordEnrollCourse,
@@ -17,6 +24,9 @@ const TeachingServiceNameColumn = ({
   value: string
 }): JSX.Element => {
   const { t } = useTranslation()
+  const { currentSchool } = useRecoilValue(schoolState)
+  const currentSchoolId = currentSchool?.id || 0
+  const [remarks, setRemarks] = useRecoilState(remarksState)
 
   const filteredRecurrClasses =
     data.enrollCourses?.filter((item: SingleStudentCrmRecordEnrollCourse) => {
@@ -25,36 +35,58 @@ const TeachingServiceNameColumn = ({
       }
       return item.studentSchedule[0].class?.type === ClassTypeEnum.recurring
     }) ?? []
+  const studentId = data.id
+  useEffect(() => {
+    const studentMemoItem = data.studentMemo
+    const isShow =
+      (studentMemoItem !== null && studentMemoItem !== undefined) || false
+    setRemarks(prevRemarks => ({
+      ...prevRemarks,
+      [studentId]: {
+        ...prevRemarks[studentId],
+        isShow,
+      },
+    }))
+    setRemarks(prevRemarks => ({
+      ...prevRemarks,
+      [studentId]: {
+        ...prevRemarks[studentId],
+        memo: studentMemoItem?.memo ?? null,
+      },
+    }))
+  }, [studentId, setRemarks, currentSchoolId, data?.studentMemo])
 
-  const remarks = data.remarks?.trim()
-
-  const nameNode = (
-    <div className="flex flex-col min-w-0">
-      <span>{value}</span>
-      {remarks && (
-        <span className="text-[10px] text-amber-600 leading-tight truncate max-w-[160px]">
-          {remarks}
-        </span>
-      )}
-    </div>
+  const remark = remarks[studentId]?.isShow && (
+    <ModalRemark
+      studentId={studentId}
+      title={t('common:description.remark')}
+      placeholder={t('teachingService:remark.placeholder')}
+      defaultValue={remarks[studentId].memo || ''}
+      trigger={
+        <div data-testid="remark-trigger-button">
+          <RemarkIcon />
+        </div>
+      }
+    />
   )
-
   return (
     <>
       {filteredRecurrClasses.length === 1 ? (
         <div className="box-row-full py-2 justify-start items-start">
+          {remark}
           <Badge variant="success">
             <GiNewShoot size="15" />
             {t('teachingService:firstEnrolStatus.newStudent')}
           </Badge>
-          {nameNode}
+          <Text>{value}</Text>
         </div>
       ) : (
         <div
           className="box-row-full py-2 justify-start"
           data-testid="remark-button"
         >
-          {nameNode}
+          {remark}
+          <span>{value}</span>
         </div>
       )}
     </>

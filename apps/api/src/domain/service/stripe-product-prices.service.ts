@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { plainToInstance } from 'class-transformer'
 import Stripe from 'stripe'
 import { FindOptionsOrder, FindOptionsWhere, In } from 'typeorm'
@@ -9,23 +9,18 @@ import {
   StripeProductPricesPageDto,
   StripeProductPricesPageOptionDto,
 } from '@/application/admin/stripe-product-prices/dto/stripe-product-prices-pagination.dto'
-import { STRIPE_CLIENT } from '@/common/constants/provider-keys'
-import { ensureStripeConfigured } from '@/common/stripe-guard'
 import { StripePlanPriceLookupKey, StripePriceInterval, StripePriceType } from '@/models/enums/'
 import { StripeProductPricesEntity } from '@/models/stripe-product-prices.entity'
 import { StripeProductPricesRepository } from '@/models/stripe-product-prices.repository'
 
 @Injectable()
 export class StripeProductPricesService {
-  constructor(
-    private readonly stripeProductPricesRepository: StripeProductPricesRepository,
-    @Inject(STRIPE_CLIENT)
-    private readonly stripeClient: Stripe | null
-  ) {}
+  private readonly stripe: Stripe
 
-  private get stripe(): Stripe {
-    ensureStripeConfigured(this.stripeClient)
-    return this.stripeClient
+  constructor(private readonly stripeProductPricesRepository: StripeProductPricesRepository) {
+    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2023-10-16',
+    })
   }
 
   async findAll(

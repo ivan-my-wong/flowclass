@@ -25,14 +25,12 @@ import { Field, InputFields, LabelField, Loading } from '.'
 type Props = FormTeachingServiceProps & {
   headerBackButton: HeaderBackButtonStatus
   handleCloseAndClearData: () => void
-  onLessonChanged?: (newClassId: number) => void
 }
 
 const ChangeLesson = (props: Props) => {
   const {
     headerBackButton,
     handleCloseAndClearData,
-    onLessonChanged,
     currentDetail,
     form,
     classOpts,
@@ -100,13 +98,8 @@ const ChangeLesson = (props: Props) => {
         params.lessonDateTime = lessonDateTimeValue
       }
     }
-    if (classType === ClassTypeEnum.regularV2 && data?.classLessonDate) {
-      // For regularV2, classLessonDate from date picker is already "startTime endTime" format
-      params.lessonDateTime = data.classLessonDate
-    }
 
     await mutationChangeLesson.mutateAsync(params)
-    onLessonChanged?.(Number(data.classId))
     handleCloseAndClearData()
     reset()
   }

@@ -2,6 +2,7 @@
 import { AdditionalFeeController } from '@/application/admin/additional-fee/additional-fee.controller'
 import { AuthController } from '@/application/admin/auth/auth.controller'
 import { JwtStrategy } from '@/application/admin/auth/jwt.strategy'
+// import { AutomationFlowController } from '@/application/admin/automation-flow/automation-flow.controller'
 import { ClassLessonController } from '@/application/admin/class-lesson/class-lesson.controller'
 import { CourseActivitiesOrderController } from '@/application/admin/course-activities-order/course-activities-order.controller'
 import { AppointmentController } from '@/application/admin/courses/appointment.controller'
@@ -13,6 +14,7 @@ import { RegularPeriodsController } from '@/application/admin/courses/regular-pe
 import { WorkshopController } from '@/application/admin/courses/workshop.controller'
 import { EnrollCoursesController } from '@/application/admin/enroll-courses/enroll-courses.controller'
 import { EnrollmentFormController } from '@/application/admin/enrollment-form/enrollment-form.controller'
+import { GoogleAnalyticsController } from '@/application/admin/google-analytics/google-analytics.controller'
 import { InstitutionsController } from '@/application/admin/institutions/institutions.controller'
 import { InvoicesController } from '@/application/admin/invoices/invoices.controller'
 import { MasterAdminController } from '@/application/admin/master-admin/master-admin.controller'
@@ -22,7 +24,6 @@ import { OpenAiChatGptController } from '@/application/admin/open-ai/openaiChatS
 import { PasswordResetTokenController } from '@/application/admin/password-reset-token/password-reset-token.controller'
 import { PaymentEvidenceController } from '@/application/admin/payment-evidence/payment-evidence.controller'
 import { BundleDiscountsController } from '@/application/admin/promotions/bundle-discounts.controller'
-import { PackageDiscountsController } from '@/application/admin/promotions/package-discounts.controller'
 import { CouponsController } from '@/application/admin/promotions/coupons.controller'
 import { PromotionsController } from '@/application/admin/promotions/promotions.controller'
 import { RecordLogController } from '@/application/admin/record-log/record-logs.controller'
@@ -31,16 +32,26 @@ import { SeoSettingsController } from '@/application/admin/seo-settings/seo-sett
 import { SetingBlockTimeController } from '@/application/admin/setting-block-time/setting-block-time.controller'
 import { SettingNotificationsController } from '@/application/admin/setting-notifications/setting-notifications.controller'
 import { WhatsappMessagesController } from '@/application/admin/setting-notifications/whatsapp-messages.controller'
+import { EmailTestController } from '@/application/admin/email-test/email-test.controller'
 import { SettingSiteController } from '@/application/admin/setting-site/setting-site.controller'
 import { SettingSocialController } from '@/application/admin/setting-social/setting-social.controller'
 import { SettingWebpageInstitutionController } from '@/application/admin/setting-webpage-institution/setting-webpage-institution.controller'
 import { SiteRegisterController } from '@/application/admin/sites/site-register.controller'
 import { SitesController } from '@/application/admin/sites/sites.controller'
 import { StripeConnectController } from '@/application/admin/stripe-connect/stripe-connect.controller'
+import { StripeProductPricesController } from '@/application/admin/stripe-product-prices/stripe-product-prices.controller'
+import { StripeProductsController } from '@/application/admin/stripe-products/stripe-products.controller'
 import { StudentOnbController } from '@/application/admin/student-onboard/student-onboard.controller'
+import { PlansController } from '@/application/admin/subscription-plans/subscription-plans.controller'
 import { UsersController } from '@/application/admin/users/users.controller'
 import { WhatsappTemplateController } from '@/application/admin/whatsapp-template/whatsapp-template.controller'
 import { HealthModule } from '@/application/health/health.module'
+import {
+  QUEUE_ENROLL_COURSE,
+  QUEUE_NAME_BLOCK_TIME,
+  QUEUE_NAME_IMPORT_CSV,
+  QUEUE_REMIND,
+} from '@/common/constants'
 import { RequireParamsGuard } from '@/common/guards/require-params.guard'
 import { RolesGuard } from '@/common/guards/roles.guard'
 import { AuthMiddleware } from '@/common/middlewares/auth-middleware'
@@ -57,6 +68,8 @@ import { getAllEntities, getAllRepositories, getAllServices } from '@/config/dat
 import { CloudWatchLoggerProvider } from '@/config/loggers/cloudwatch-nestjs.provider'
 import { DatabaseModule } from '@/modules/database.module'
 
+import { CreateNewInvoiceScheduleConsumer, ImportStudentConsumer } from './cron/cron.consumer'
+
 import { AvailabilityController } from '@/application/admin/availability/availability.controller'
 import { ClassMaterialsController } from '@/application/admin/class-materials/class-materials.controller'
 import { ClassRegularSchedulesV2Controller } from '@/application/admin/class-regular-schedules/class-regular-schedules.controller'
@@ -71,9 +84,13 @@ import { TrialLessonsController } from '@/application/admin/promotions/trial-les
 import { RescheduleApprovalController } from '@/application/admin/reschedule-approval/reschedule-approval.controller'
 import { SitesFeatureEnabledController } from '@/application/admin/sites-feature-enabled/sites-feature-enabled.controller'
 import { AdminStudentSubmissionController } from '@/application/admin/student-submission/student-submission.controller'
+import { SubscriptionPlanRecordsController } from '@/application/admin/subscription-plans/subscription-plan-records.controller'
 import { TemplateManagementController } from '@/application/admin/template-management/template-management.controller'
+import { WebHookController } from '@/application/admin/web-hooks/web-hook.controller'
 import { WhatsappWebController } from '@/application/admin/whatsapp-web/whatsapp-web.controller'
+import { PostgresStore } from '@/domain/external/whatsapp/postgres.store'
 import { HttpModule } from '@nestjs/axios'
+import { BullModule } from '@nestjs/bull'
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { RouterModule } from '@nestjs/core'
@@ -86,13 +103,14 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { join } from 'path'
 import { AzureOpenaiModule } from './azure-openai.module'
 import { StripeClientModule } from './stripe-client/stripe-client.module'
-import { DivitModule } from './divit/divit.module'
 import { StatisticsController } from '@/application/admin/statistics/statistics.controller'
+import { MetaController } from '@/application/admin/meta/meta.controller'
+import { MetaWhatsAppProfileController } from '@/application/admin/meta/meta-whatsapp-profile.controller'
+import { InvoiceCampaignWorker } from '@/modules/worker/invoice-campaign.worker'
 
 @Module({
   imports: [
     StripeClientModule,
-    DivitModule,
     ScheduleModule.forRoot(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '@/..', 'exports'),
@@ -108,7 +126,6 @@ import { StatisticsController } from '@/application/admin/statistics/statistics.
       {
         path: 'admin',
         module: AdminModule,
-        children: [DivitModule],
       },
     ]),
     JwtModule.registerAsync({
@@ -125,6 +142,20 @@ import { StatisticsController } from '@/application/admin/statistics/statistics.
     TypeOrmModule.forFeature([...getAllEntities()]),
     HttpModule,
     HealthModule,
+    BullModule.registerQueueAsync(
+      {
+        name: QUEUE_NAME_BLOCK_TIME,
+      },
+      {
+        name: QUEUE_NAME_IMPORT_CSV,
+      },
+      {
+        name: QUEUE_REMIND,
+      },
+      {
+        name: QUEUE_ENROLL_COURSE,
+      }
+    ),
     EventEmitterModule.forRoot(),
   ],
   controllers: [
@@ -152,6 +183,7 @@ import { StatisticsController } from '@/application/admin/statistics/statistics.
     MediaAdminController,
     EnrollCoursesController,
     SeoSettingsController,
+    PlansController,
     PaymentEvidenceController,
     OpenAiController,
     OpenAiChatGptController,
@@ -159,15 +191,19 @@ import { StatisticsController } from '@/application/admin/statistics/statistics.
     ClassLessonController,
     CourseActivitiesOrderController,
     BundleDiscountsController,
-    PackageDiscountsController,
+    StripeProductsController,
+    StripeProductPricesController,
     MasterAdminController,
     EnrollmentFormController,
     SetingBlockTimeController,
+    GoogleAnalyticsController,
     SettingNotificationsController,
     WhatsappMessagesController,
+    EmailTestController,
     StudentOnbController,
     AdditionalFeeController,
     InvoicesController,
+    // AutomationFlowController,
     WhatsappTemplateController,
     TrialLessonsController,
     RescheduleApprovalController,
@@ -175,7 +211,9 @@ import { StatisticsController } from '@/application/admin/statistics/statistics.
     AvailabilityController,
     WhatsappWebController,
     IntegrationGoogleController,
+    WebHookController,
     CustomMessageController,
+    SubscriptionPlanRecordsController,
     TemplateManagementController,
     InstructorsController,
     ClassRegularSchedulesV2Controller,
@@ -185,8 +223,11 @@ import { StatisticsController } from '@/application/admin/statistics/statistics.
     ClassMaterialsController,
     AdminStudentSubmissionController,
     StatisticsController,
+    MetaController,
+    MetaWhatsAppProfileController,
   ],
   providers: [
+    PostgresStore,
     ...getAllRepositories(),
     ...getAllServices(),
     CloudWatchLoggerProvider,
@@ -201,6 +242,11 @@ import { StatisticsController } from '@/application/admin/statistics/statistics.
     RequireParamsGuard,
 
     RolesGuard,
+
+    // These are BULL consumers
+    ImportStudentConsumer,
+    CreateNewInvoiceScheduleConsumer,
+    InvoiceCampaignWorker,
   ],
 })
 export class AdminModule implements NestModule {
@@ -209,6 +255,10 @@ export class AdminModule implements NestModule {
     consumer.apply(AuthMiddleware).exclude(
       {
         path: '/admin/auth/login',
+        method: RequestMethod.ALL,
+      },
+      {
+        path: '/admin/auth/login/social',
         method: RequestMethod.ALL,
       },
       {
@@ -224,38 +274,20 @@ export class AdminModule implements NestModule {
         method: RequestMethod.ALL,
       },
       {
-        path: '/admin/auth/has-users',
-        method: RequestMethod.ALL,
-      },
-      {
         path: '/media/get/(.*)',
-        method: RequestMethod.GET,
-      },
-      {
-        path: '/media/file/(.*)',
         method: RequestMethod.GET,
       },
       {
         path: '/stream/(.*)',
         method: RequestMethod.GET,
-      },
-      {
-        path: '/admin/divit/webhook',
-        method: RequestMethod.POST,
       }
     )
     consumer
       .apply(RawBodyMiddleware)
-      .forRoutes(
-        {
-          path: '/admin/stripe-connects/webhook',
-          method: RequestMethod.POST,
-        },
-        {
-          path: '/admin/divit/webhook',
-          method: RequestMethod.POST,
-        }
-      )
+      .forRoutes({
+        path: '/admin/stripe-connects/webhook',
+        method: RequestMethod.POST,
+      })
       .apply(JsonBodyMiddleware)
       .forRoutes('*')
 

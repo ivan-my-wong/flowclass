@@ -1,5 +1,12 @@
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithCredential,
+} from '@firebase/auth'
+
 import ApiError from '@/api/errors/apiError'
 import { GoogleErrorMessages } from '@/api/errors/errorMessage'
+import { refreshGoogleToken as refreshGoogleTokenApi } from '@/api/integrationCalendar'
 import { IntegrationCalendar } from '@/types/integrationCalendar.type'
 
 /**
@@ -11,10 +18,62 @@ import { IntegrationCalendar } from '@/types/integrationCalendar.type'
  * @returns A promise that resolves to a new token or null
  */
 export const refreshGoogleToken = async (
-  _integrationCalendars: IntegrationCalendar[] = [],
-  _institutionId = 0
+  integrationCalendars: IntegrationCalendar[] = [],
+  institutionId = 0,
+  googleAuthProvider: GoogleAuthProvider
 ): Promise<string | undefined> => {
-  // Google token refresh is disabled in OSS mode.
+  try {
+    const firebaseAuth = getAuth()
+    const { currentUser } = firebaseAuth
+    if (!currentUser) {
+      // eslint-disable-next-line no-console
+      console.error('No user is currently signed in')
+      return undefined
+    }
+
+    // First check if we have a valid integration
+    const hasValidIntegration =
+      integrationCalendars.length > 0 &&
+      integrationCalendars.some(integration => integration.isEnabled)
+
+    if (hasValidIntegration) {
+      const idToken = await currentUser.getIdToken()
+
+      if (!idToken) {
+        throw new Error('Failed to get ID token')
+      }
+
+      const credential = GoogleAuthProvider.credential(idToken)
+      const credential2 = await signInWithCredential(firebaseAuth, credential)
+
+      const accessTokenResult =
+        GoogleAuthProvider.credentialFromResult(credential2)
+
+      if (!accessTokenResult) {
+        throw new Error('Failed to get access token')
+      }
+
+      const { accessToken } = accessTokenResult
+
+      if (!accessToken) {
+        throw new Error('Failed to get access token')
+      }
+
+      // Call the backend API to refresh the Google token
+      await refreshGoogleTokenApi({
+        institutionId,
+        integrationCalendarId: integrationCalendars[0].id,
+        idToken,
+        accessToken,
+      })
+      return accessToken
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error refreshing Google token:', error)
+    return undefined
+  }
+
   return undefined
 }
 

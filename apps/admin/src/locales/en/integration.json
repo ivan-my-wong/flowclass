@@ -1,6 +1,5 @@
 {
   "title": "Integrations",
-  "connectionLogs": "Connection Logs",
   "active": "Active",
   "inactive": "Inactive",
   "needsReconnection": "Needs Reconnection",
@@ -10,9 +9,6 @@
   "disconnect": "Disconnect",
   "setUp": "Set Up",
   "logoAlt": "{{name}} logo",
-  "providers": {
-    "googleCalendar": "Google Calendar"
-  },
   "common": {
     "errorTitle": "Error",
     "next": "Next",
@@ -38,33 +34,25 @@
     "googleCalendar": "Connect your Google Calendar to automatically detect and import available time slots.",
     "googleMeet": "Create and manage Google Meet video conferences for online classes and meetings.",
     "googleSheet": "Sync your Flowclass data with Google Sheets for reporting and analysis.",
-    "googleDrive": "Sync documents and class materials with Google Drive for streamlined file management."
+    "googleDrive": "Sync documents and class materials with Google Drive for streamlined file management.",
+    "xero": "Connect your Xero account to automatically detect and import available time slots."
   },
   "googleCalendar": {
-    "name": "Google Calendar",
     "connectGoogleCalendar": "Connect Google Calendar",
     "refresh": "Refresh",
     "selectCalendar": "Select Calendar",
     "noCalendarsFound": "No calendars found",
     "noIntegrationCalendars": "No calendar connections found. Please connect your Google Calendar first.",
-    "primary": "Primary",
     "selected": "Selected",
-    "saveSelection": "Save Selection",
-    "owner": "Owner",
-    "writer": "Editor",
-    "reader": "Reader"
+    "saveSelection": "Save Selection"
   },
   "googleSheet": {
-    "name": "Google Sheet",
     "step1": {
       "connectTitle": "Connect to Google Drive",
       "connectDescription": "Link your Google account to create a spreadsheet and sync your Flowclass data automatically.",
-      "googleAccountLabel": "Google Account",
-      "chooseAccountDescription": "Choose a Google account to use for creating and syncing your data:",
       "redirectingToGoogle": "Redirecting to Google...",
       "signInWithGoogle": "Sign in with Google",
       "errorAuthUrl": "Could not get Google authentication URL.",
-      "errorSignInFailed": "Failed to initiate Google Sign-In. Please try again.",
       "connectedAccountLabel": "Connected account:",
       "disconnecting": "Disconnecting...",
       "errorDisconnectFailed": "Failed to disconnect Google Account. Please try again."
@@ -79,52 +67,28 @@
   "googleDrive": {
     "title": "Google Drive Integration",
     "description": "Configure your Google Drive connection for seamless file management",
-    "refresh": "Refresh",
     "selectFolder": "Select Folder",
-    "noFoldersFound": "No folders found",
-    "noIntegrationFolders": "No folder connections found. Please connect your Google Drive first.",
     "selected": "Selected",
-    "saveSelection": "Save Selection",
-    "folderPath": "Folder Path",
-    "createFolder": "Create Folder",
-    "newFolderName": "New Folder Name",
-    "createSuccess": "Google Drive folder created/updated successfully.",
-    "updateConfigSuccess": "Google Drive configuration updated successfully.",
     "colorLegend": "Color Legend",
     "permissions": {
       "title": "Required Permissions:",
       "createFolder": "Access to create and manage folders",
       "upload": "Upload and organize files"
     },
-    "errors": {
-      "createFailed": "Failed to create/update Google Drive folder: {{error}}",
-      "updateConfigFailed": "Failed to update Google Drive configuration: {{error}}"
-    },
     "account": {
       "title": "Google Account Authentication",
       "description": "Connect your Google account to enable Drive integration with minimum required permissions",
       "connectSuccess": "Successfully authenticated with Google Drive",
       "button": "Authenticate with Google Drive",
-      "noAccount": "No Account Connected",
-      "disconnectSuccess": "Disconnect Google Drive successfully.",
-      "disconnectFailed": "Disconnect Google Drive failed: {{error}}"
+      "noAccount": "No Account Connected"
     },
     "rootFolder": {
       "title": "Root Folder Selection",
       "description": "Choose the root folder where all education materials will be organized.",
       "warning": "Once a root folder is selected, it cannot be changed. Changing the folder may result in loss of materials and links, or inaccessibility. Please choose carefully as this action is irreversible.",
       "button": "Choose Root Folder From Google Drive",
-      "loading": "Loading folders...",
-      "error": "Failed to load folders: {{error}}",
-      "noFoldersFound": "No folders found",
-      "noIntegrationFolders": "No folder connections found. Please connect your Google Drive first.",
-      "selected": "Selected",
-      "saveSelection": "Save Selection",
-      "settingLoading": "Setting Root Folder...",
-      "settingLoadingDescription": "This may take a moment while we configure your folder structure",
       "noFolderSelected": "No folder selected",
       "noFolderSelectedDescription": "Please select a root folder to continue.",
-      "select": "Select",
       "quotaUnavailable": "Quota unavailable",
       "quotaError": "Your Google Drive quota is not enough to create the root folder. Please try again with a smaller file size or select a different folder.",
       "used": "Used",
@@ -139,17 +103,29 @@
       "description": "This structure will be created within your selected root folder"
     },
     "callback": {
-      "processing": "Processing connection...",
-      "processingDescription": "Finalizing your Google authorization and updating configuration.",
       "success": "Google Drive connected successfully!",
       "successTitle": "Connection Successful",
       "successDescription": "Your account has been connected and integration status updated.",
       "error": "Failed to process Google Drive connection: {{error}}",
-      "errorTitle": "Connection Failed",
-      "redirecting": "You will be redirected shortly...",
-      "loading": "Loading...",
-      "preparing": "Preparing your integration..."
+      "errorTitle": "Connection Failed"
     }
+  },
+  "xero": {
+    "redirectUri": "Redirect to Xero",
+    "redirecting": "You will be redirected automatically to this url in {countdown} seconds.",
+    "connectXero": "Connect Xero",
+    "disconnectXero": "Disconnect Xero",
+    "accountCode": "Account Code",
+    "selectAccount": "Select Account for payments",
+    "accountCodeDescription": "In Flowclass settings, all income from Flowclass will be grouped together under one “Account Code” in Xero. \n\nAn account code is just a number, usually between 100 and 999, that Xero uses to help you organize and track your money. \n\nYou can either use an account code that already exists, or create a new one just for Flowclass income. This makes it easy to see all your Flowclass earnings in one place in your Xero reports.",
+    "invalidCallbackUrl": "Invalid callback url, please try again!",
+    "xeroLinkCopied": "Xero callback url copied to clipboard",
+    "updateConfigSuccess": "Xero configuration updated successfully.",
+    "xeroConnectedToAccount": "Xero already connected to your institution.",
+    "success": "Xero connected successfully!",
+    "disconnectSuccess": "Xero disconnected successfully.",
+    "xeroCallbackUrl": "Xero Callback URL",
+    "xeroCallbackUrlDescription": "This is the URL you need to set in your Xero application settings to enable the integration."
   },
   "availability": {
     "integrationCalendared": "Google Calendar connected successfully!",
@@ -158,9 +134,6 @@
     "eventDeleted": "Calendar event deleted successfully.",
     "errors": {
       "connectCalendar": "Failed to connect Google Calendar",
-      "fetchIntegrationCalendars": "Failed to fetch calendar connections",
-      "fetchCalendarEvents": "Failed to fetch calendar events",
-      "fetchCalendarEvent": "Failed to fetch calendar event",
       "createEventFailed": "Failed to create calendar event: {{error}}",
       "updateEventFailed": "Failed to update calendar event: {{error}}",
       "deleteEventFailed": "Failed to delete calendar event: {{error}}"
@@ -170,16 +143,10 @@
     "name": "Google Meet",
     "connectGoogleMeet": "Connect Google Meet",
     "refresh": "Refresh",
-    "createMeeting": "Create Meeting",
-    "meetingTitle": "Meeting Title",
-    "meetingDescription": "Meeting Description",
     "startTime": "Start Time",
     "endTime": "End Time",
-    "timeZone": "Time Zone",
-    "generateLink": "Generate Link",
     "copyLink": "Copy Link",
     "linkCopied": "Link copied to clipboard",
-    "noMeetingsFound": "No meetings found",
     "noIntegrationMeetings": "No meeting connections found. Please connect your Google Meet first.",
     "integrationConnected": "Google Meet connected successfully!",
     "statusToggled": "Integration status updated successfully",
@@ -188,9 +155,6 @@
     "meetingDeleted": "Meeting deleted successfully",
     "errors": {
       "connectOnlineMeeting": "Failed to connect Google Meet",
-      "fetchIntegrationOnlineMeetings": "Failed to fetch meeting connections",
-      "fetchMeetings": "Failed to fetch meetings",
-      "fetchMeeting": "Failed to fetch meeting details",
       "createMeeting": "Failed to create meeting",
       "updateMeeting": "Failed to update meeting",
       "deleteMeeting": "Failed to delete meeting",

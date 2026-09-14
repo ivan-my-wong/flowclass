@@ -61,6 +61,7 @@ import { RemoveFromParentGroupDto } from './dtos/remove-from-parent-group.dto'
 import { SetParentAccountDto } from './dtos/set-parent-account.dto'
 import {
   CreateAndUpdateStudentContactInfoDto,
+  CreateAndUpdateStudentMemoDto,
   CreateOrUpdateStudentContactInfoV2Dto,
   StudentNotificationSettings,
 } from './dtos/student-memo.dto'
@@ -75,7 +76,6 @@ import {
   GetEnrolledLessonsDto,
   GetStudentDetailResponseDto,
   GetStudentFormFieldsDto,
-  GetTeachingServiceByInvoiceDto,
   GetTeachingServiceOptDto,
   ImportStuDto,
   MergeStudentDto,
@@ -319,7 +319,7 @@ export class StudentOnbController {
   @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER, Role.INSTRUCTOR)
   @UseGuards(RolesGuard)
   @RequireParams(RequireParam.INSTITUTION_ID)
-  async getTeachingService(@Query() params: GetTeachingServiceByInvoiceDto) {
+  async getTeachingService(@Query() params: StudentOnbDetailtByAliasIdDto) {
     const result = await this.studentOnboardService.getTeachingService(params)
     return new ApiResult().success(result)
   }
@@ -596,12 +596,21 @@ export class StudentOnbController {
     return this.studentOnboardService.addExtraLesson(params)
   }
 
-  @Patch('/update-remarks')
-  @ApiOperation({ summary: 'Update remarks for a student alias.' })
-  @ApiOkResponse({ type: ApiResult })
+  @Post('/add-memo')
+  @ApiOperation({
+    summary: 'This api for add student memo.',
+  })
+  @ApiOkResponse({
+    type: ApiResult,
+  })
+  @ApiBadRequestResponse({
+    description: 'This response may be when add student memo',
+  })
   @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER, Role.INSTRUCTOR)
-  async updateRemarks(@Body() params: { userAliasId: number; remarks: string | null }) {
-    return this.studentOnboardService.updateRemarks(params.userAliasId, params.remarks)
+  // @UseGuards(RolesGuard)
+  async addStudentMemo(@Body() params: CreateAndUpdateStudentMemoDto) {
+    const result = await this.studentOnboardService.addStudentMemo(params)
+    return result
   }
 
   @Post('/update-contact-info')
@@ -794,19 +803,6 @@ export class StudentOnbController {
   async updateLessonAttendance(@Body() params: UpdateLessonAttendanceDto) {
     const result = await this.studentOnboardService.updateLessonAttendance(params)
 
-    return new ApiResult().success(result)
-  }
-
-  @Patch('/update-student-lesson-remarks')
-  @ApiOperation({ summary: 'Update remarks for a student lesson.' })
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER, Role.INSTRUCTOR)
-  async updateStudentLessonRemarks(
-    @Body() params: { studentLessonId: number; remarks: string | null }
-  ) {
-    const result = await this.studentOnboardService.updateStudentLessonRemarks(
-      params.studentLessonId,
-      params.remarks
-    )
     return new ApiResult().success(result)
   }
 

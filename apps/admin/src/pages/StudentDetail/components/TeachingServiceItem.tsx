@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { t } from 'i18next'
@@ -109,8 +109,6 @@ const TeachingServiceItem = ({
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
-  const wasDrawerOpen = useRef(false)
-
   // const [open, setOpen] = useState(false)
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [serviceToBeDeleted, setServiceToBeDeleted] =
@@ -125,17 +123,6 @@ const TeachingServiceItem = ({
   >(new Map())
 
   const [studentData, setStudentData] = useRecoilState(studentState)
-
-  useEffect(() => {
-    const isOpen = !!studentData.tableDrawers?.isOpenAssignCourse
-    if (wasDrawerOpen.current && !isOpen) {
-      queryClient.invalidateQueries(QUERY_KEY.student.getStudentDetailKey)
-      queryClient.invalidateQueries(
-        QUERY_KEY.teachingService.getTeachingServiceKey
-      )
-    }
-    wasDrawerOpen.current = isOpen
-  }, [studentData.tableDrawers?.isOpenAssignCourse, queryClient])
 
   const { timeZone, getCurrentSiteTimeZoneDate, siteData } = useSiteData()
   const { schoolData } = useSchoolData()
@@ -291,10 +278,6 @@ const TeachingServiceItem = ({
       text: t('student:statusPaid'),
       color: 'text-success border-success',
     },
-    [PaymentState.PARTIALLY_PAID]: {
-      text: t('student:statusPartiallyPaid'),
-      color: 'text-orange-500 border-orange-500',
-    },
     [PaymentState.PENDING]: {
       text: t('student:statusUnPaid'),
       color: 'text-primary border-primary',
@@ -350,14 +333,6 @@ const TeachingServiceItem = ({
         ...renderMenuItem(paymentStatusMapping[PaymentState.PAID].text, () => {
           handlePaymentStatus(invoice.invoiceId, PaymentState.PAID)
         }),
-      },
-      {
-        ...renderMenuItem(
-          paymentStatusMapping[PaymentState.PARTIALLY_PAID].text,
-          () => {
-            handlePaymentStatus(invoice.invoiceId, PaymentState.PARTIALLY_PAID)
-          }
-        ),
       },
       {
         ...renderMenuItem(
@@ -514,8 +489,6 @@ const TeachingServiceItem = ({
       <div className="space-y-4 w-full">
         {invoiceGroup.enrollCourses.map(service => {
           const sortedServiceLessons = getSortedServiceLessons(service)
-          const currentEnrollStatus =
-            enrollStatuses.get(service.enrollCourseId) || service.confirmState
 
           return (
             <div
@@ -623,8 +596,8 @@ const TeachingServiceItem = ({
                                     {isChangeDate &&
                                       changeStartTime &&
                                       changeEndTime && (
-                                        <div className="text-xs text-gray-400 line-through">
-                                          {t('student:changedFrom')}{' '}
+                                        <div className="text-xs">
+                                          {t('student:changedTo')}{' '}
                                           {getLessonDateTime(
                                             changeStartTime.toString(),
                                             changeEndTime?.toString(),
@@ -658,6 +631,9 @@ const TeachingServiceItem = ({
                                     variant="ghost"
                                     className="flex items-center gap-1 text-blue-500 hover:text-blue-600 p-0 h-auto"
                                     onClick={() => {
+                                      queryClient.invalidateQueries(
+                                        QUERY_KEY.student.getStudentDetailKey
+                                      )
                                       setStudentData(prev => ({
                                         ...prev,
                                         currentEnrol: {
@@ -672,7 +648,7 @@ const TeachingServiceItem = ({
                                         },
                                         currentStudent: student,
                                         tableDrawers: {
-                                          ...prev.tableDrawers,
+                                          ...studentData.tableDrawers,
                                           isOpenAssignCourse: true,
                                           assignCourseMode:
                                             AddTeachingServiceMode.changeLesson,
@@ -729,7 +705,7 @@ const TeachingServiceItem = ({
                         },
                         currentStudentLesson: sortedServiceLessons?.[0],
                         tableDrawers: {
-                          ...prev.tableDrawers,
+                          ...studentData.tableDrawers,
                           assignCourseMode: AddTeachingServiceMode.addLesson,
                           isOpenAssignCourse: true,
                         },

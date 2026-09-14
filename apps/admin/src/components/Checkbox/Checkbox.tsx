@@ -6,8 +6,9 @@ import {
   useRef,
 } from 'react'
 
-import { cn } from '@/utils/cn'
+import type { CSS } from '@stitches/react'
 
+import { styled } from '../../styles'
 import { InputMeta } from '../../types/options'
 
 type CheckboxProps = {
@@ -15,14 +16,61 @@ type CheckboxProps = {
   onChange: (e: boolean) => void
   onBlur?: FocusEventHandler<HTMLInputElement>
   invalid?: boolean
-  className?: string
+  css?: CSS
 } & InputMeta
 
-const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-  (
-    { id, label, isChecked = false, onChange, onBlur, invalid, className },
-    ref
-  ) => {
+const Checkmark = styled('div', {
+  $$size: '30px',
+  flexRowCenter: 'center',
+  borderRadius: '$small',
+  height: '$$size',
+  width: '$$size',
+  fontSize: '$2',
+  border: '2px solid $borderColor',
+  color: '$background',
+  backgroundColor: 'transparent',
+  marginRight: '$4',
+  flex: '0 0 $$size',
+
+  variants: {
+    checked: {
+      true: {
+        color: '$primary',
+        backgroundColor: 'white',
+
+        span: {
+          fontSize: '$4',
+          fontWeight: 900,
+        },
+      },
+    },
+  },
+})
+
+const CheckboxLabel = styled('span', {
+  lineHeight: '1.5',
+})
+
+const CheckboxWrapper = styled('label', {
+  flexRowCenter: 'start',
+  position: 'relative',
+  cursor: 'pointer',
+  // [`&:hover ${Checkmark}`]: {
+  //   borderColor: '$primary',
+  // },
+  variants: {
+    invalid: {
+      true: {
+        [`& > ${Checkmark}`]: {
+          borderColor: '$warn',
+        },
+      },
+    },
+  },
+})
+
+const Checkbox = forwardRef<any, CheckboxProps>(
+  ({ id, label, isChecked = false, onChange, onBlur, invalid, css }, ref) => {
     const checkmarkRef = useRef<HTMLDivElement>(null)
 
     const handleKeyDown: KeyboardEventHandler<HTMLDivElement> = e => {
@@ -32,42 +80,32 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     }
 
     return (
-      <label
-        className={cn(
-          'flex items-center cursor-pointer relative',
-          invalid && '[&>div:first-child]:border-warn'
-        )}
-      >
-        <div
+      <CheckboxWrapper invalid={invalid} css={css}>
+        <Checkmark
           ref={checkmarkRef}
           tabIndex={0}
-          role="checkbox"
-          aria-checked={isChecked}
+          checked={isChecked}
           onKeyDown={handleKeyDown}
           onBlur={onBlur}
-          className={cn(
-            'flex items-center justify-center rounded h-[30px] w-[30px] text-sm border-2 border-border bg-transparent text-background mr-4 shrink-0',
-            isChecked &&
-              'text-primary bg-white [&>span]:text-base [&>span]:font-black',
-            invalid && 'border-warn'
-          )}
         >
           {isChecked && <span>✓</span>}
-        </div>
-        <span className="leading-[1.5]">{label}</span>
+        </Checkmark>
+        <CheckboxLabel onClick={() => checkmarkRef.current?.focus()}>
+          {label}
+        </CheckboxLabel>
         <input
           type="checkbox"
           id={id ?? 'checkbox'}
           checked={isChecked}
-          onChange={e => onChange(e.target.checked)}
+          onChange={e => {
+            onChange(e.target.checked)
+          }}
           hidden
-          ref={ref}
+          ref={ref as any}
         />
-      </label>
+      </CheckboxWrapper>
     )
   }
 )
-
-Checkbox.displayName = 'Checkbox'
 
 export default Checkbox

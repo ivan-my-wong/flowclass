@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next'
 import { useRecoilState } from 'recoil'
 
 import { Spinner } from '@/components/Loaders/Spinner'
+import Separator from '@/components/Separators/Separator'
+import SocialLogin from '@/components/SocialLogin'
 import Link from '@/components/Texts/Link'
 import Text from '@/components/Texts/Text'
 import Box from '@/components/ui/Box'
@@ -14,6 +16,7 @@ import { Input } from '@/components/ui/Inputs/Input'
 import useAuth from '@/hooks/useAuth'
 import BackToHomeLogo from '@/layouts/ContentLayout/BackToHomeLogo'
 import { displayLanguageState } from '@/stores/displayLanguage'
+import { css } from '@/styles'
 
 export type LoginFormProps = {
   firstName: string
@@ -24,7 +27,13 @@ export type LoginFormProps = {
 }
 
 const LoginForm: React.FC = () => {
-  const { isLoading, errorMessages, signInWithEmailAndPassword } = useAuth()
+  const {
+    isLoadingFacebook,
+    isLoadingGoogle,
+    isLoading,
+    errorMessages,
+    signInWithEmailAndPassword,
+  } = useAuth()
   const { t } = useTranslation()
   const { i18n } = useTranslation()
   const [lang] = useRecoilState(displayLanguageState)
@@ -50,9 +59,16 @@ const LoginForm: React.FC = () => {
     })
   }
 
+  const formStyles = css({
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '$3',
+  })
+
   const isLoadingAnyService = useMemo(() => {
-    return isLoading
-  }, [isLoading])
+    return isLoading || isLoadingFacebook || isLoadingGoogle
+  }, [isLoading, isLoadingFacebook, isLoadingGoogle])
 
   const isFormComplete = useMemo(() => {
     return loginForm.email && loginForm.password
@@ -73,7 +89,7 @@ const LoginForm: React.FC = () => {
       >
         {t('login:loginModal.welcomeTitle')}
       </motion.h1>
-      <form className="w-full flex flex-col gap-3">
+      <form className={formStyles()}>
         <Input
           value={loginForm.email}
           onChange={handleChange}
@@ -92,7 +108,11 @@ const LoginForm: React.FC = () => {
           showPasswordToggler
         />
         <Box justify="end">
-          <Link className="w-fit" href="/login/forget-password" align="right">
+          <Link
+            css={{ width: 'fit-content' }}
+            href="/login/forget-password"
+            align="right"
+          >
             {t('login:forgetPassword')}
           </Link>
         </Box>
@@ -113,6 +133,8 @@ const LoginForm: React.FC = () => {
           {t('login:loginModal.registerNow')}
         </Button>
       </form>
+      <Separator margin="large" />
+      <SocialLogin />
     </Box>
   )
 }

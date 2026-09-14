@@ -16,6 +16,7 @@ import { QUERY_KEY } from '@/constants/queryKey'
 import { useSchoolEditSave } from '@/hooks/useSchoolEditSave'
 import useSiteData from '@/hooks/useSiteData'
 import { siteState } from '@/stores/siteData'
+import { styled } from '@/styles'
 import {
   RegionLanguageSettingProps,
   RegionLanguageSettingResponse,
@@ -25,6 +26,19 @@ type RegionLanguageSettingPageProps = {
   tabName: string
   allSaveMethods: any
 }
+
+const LabelForText = styled('div', {
+  marginBottom: 15,
+})
+
+const Hint = styled('div', {
+  fontSize: 10,
+  marginTop: 10,
+})
+const TextField = styled('div', {
+  padding: '10px 0',
+  width: '100%',
+})
 
 export type CountryOption = {
   index: number
@@ -303,14 +317,14 @@ const RegionLanguageSetting = ({
   }, [allSaveMethods, tabName, updateChange])
 
   return (
-    <div className="flex flex-col justify-start items-start">
-      <div className="py-2.5 w-full">
+    <div className="box-col justify-start items-start">
+      <TextField>
         <Box justify="flex-start">
-          <div className="mb-[15px]">
+          <LabelForText>
             {t(`setting:webpageSetting.defaultCountry`)}
-          </div>
+          </LabelForText>
         </Box>
-        <Box className="w-full">
+        <Box css={{ width: '100%' }}>
           <TextSearchSelector
             options={options}
             selectOption={selectedCountryOption}
@@ -320,21 +334,19 @@ const RegionLanguageSetting = ({
         </Box>
         {isCountryChanged &&
           originalCountryOption?.index !== selectedCountryOption?.index && (
-            <Box justify="flex-start" className="text-warn">
-              <div className="text-[10px] mt-2.5">
-                {t(`setting:webpageSetting.changeCountryHint`)}
-              </div>
+            <Box justify="flex-start" css={{ color: '$warn' }}>
+              <Hint>{t(`setting:webpageSetting.changeCountryHint`)}</Hint>
             </Box>
           )}
-      </div>
+      </TextField>
 
-      <div className="py-2.5 w-full">
+      <TextField>
         <Box justify="flex-start">
-          <div className="mb-[15px]">
+          <LabelForText>
             {t(`setting:webpageSetting.defaultLanguage`)}
-          </div>
+          </LabelForText>
         </Box>
-        <Box className="w-full">
+        <Box css={{ width: '100%' }}>
           <TextSearchSelector
             options={languageOptions}
             selectOption={selectedLanguageOption}
@@ -342,13 +354,11 @@ const RegionLanguageSetting = ({
             onChange={(e: any) => handleLanguageChange(e)}
           />
         </Box>
-      </div>
+      </TextField>
 
-      <div className="py-2.5 w-full">
+      <TextField>
         <Box justify="flex-start">
-          <div className="mb-[15px]">
-            {t(`setting:webpageSetting.timezone`)}
-          </div>
+          <LabelForText>{t(`setting:webpageSetting.timezone`)}</LabelForText>
         </Box>
         <Box align="center">
           <TextSearchSelector
@@ -359,17 +369,13 @@ const RegionLanguageSetting = ({
           />
         </Box>
         <Box justify="flex-start">
-          <div className="text-[10px] mt-2.5">
-            {t(`setting:webpageSetting.timezoneHint`)}
-          </div>
+          <Hint>{t(`setting:webpageSetting.timezoneHint`)}</Hint>
         </Box>
-      </div>
+      </TextField>
 
-      <div className="py-2.5 w-full">
+      <TextField>
         <Box justify="flex-start">
-          <div className="mb-[15px]">
-            {t(`setting:webpageSetting.currency`)}
-          </div>
+          <LabelForText>{t(`setting:webpageSetting.currency`)}</LabelForText>
         </Box>
         <Box align="center">
           <TextInput
@@ -380,11 +386,9 @@ const RegionLanguageSetting = ({
           />
         </Box>
         <Box justify="flex-start">
-          <div className="text-[10px] mt-2.5">
-            {t(`setting:webpageSetting.currencyHint`)}
-          </div>
+          <Hint>{t(`setting:webpageSetting.currencyHint`)}</Hint>
         </Box>
-      </div>
+      </TextField>
     </div>
   )
 }

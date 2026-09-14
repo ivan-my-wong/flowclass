@@ -151,16 +151,10 @@ export class SitesService extends BaseService<Site> {
     let sitemapDomain = domain
     if (isFlowclassDomain(domain)) {
       // write a function to get the domain name from a domain with subdomain BUT you don't know how many . the domain has
-      const searchDomains = [domain]
-      if (domain.endsWith('.v2.flowclass.io')) {
-        searchDomains.push(domain.replace('.v2.flowclass.io', '.flowclass.io'))
-      } else if (domain.endsWith('.flowclass.io')) {
-        searchDomains.push(domain.replace('.flowclass.io', '.v2.flowclass.io'))
-      }
 
       sitesAndInstitutionsAndCourses = await this.sitesRepository
         .createQueryBuilder('sites')
-        .where('sites.url IN (:...urls)', { urls: searchDomains })
+        .where('sites.url = :url', { url: domain })
         .leftJoinAndSelect('sites.institutions', 'institutions')
         .leftJoinAndSelect('institutions.courses', 'courses')
         .getMany()
@@ -232,22 +226,7 @@ export class SitesService extends BaseService<Site> {
   }
 
   async findOneByDomain(domain: string): Promise<SiteDetailDto> {
-    let site = await this.sitesRepository.findOneBy({ url: domain })
-
-    if (!site && domain.endsWith('.v2.flowclass.io')) {
-      const legacyDomain = domain.replace('.v2.flowclass.io', '.flowclass.io')
-      site = await this.sitesRepository.findOneBy({ url: legacyDomain })
-    }
-
-    if (!site && domain.endsWith('.flowclass.io')) {
-      const v2Domain = domain.replace('.flowclass.io', '.v2.flowclass.io')
-      site = await this.sitesRepository.findOneBy({ url: v2Domain })
-    }
-
-    if (!site) {
-      site = await this.sitesRepository.findOne({ where: {}, order: { id: 'ASC' } })
-    }
-
+    const site = await this.sitesRepository.findOneBy({ url: domain })
     if (!site) {
       throw new BadRequestException(SiteErrorMessage.SITE_NOT_FOUND)
     }
@@ -255,18 +234,7 @@ export class SitesService extends BaseService<Site> {
   }
 
   async findOneByCustomDomain(domain: string): Promise<SiteDetailDto> {
-    let site = await this.sitesRepository.findOneBy({ customDomain: domain })
-
-    if (!site && domain.endsWith('.v2.flowclass.io')) {
-      const legacyDomain = domain.replace('.v2.flowclass.io', '.flowclass.io')
-      site = await this.sitesRepository.findOneBy({ customDomain: legacyDomain })
-    }
-
-    if (!site && domain.endsWith('.flowclass.io')) {
-      const v2Domain = domain.replace('.flowclass.io', '.v2.flowclass.io')
-      site = await this.sitesRepository.findOneBy({ customDomain: v2Domain })
-    }
-
+    const site = await this.sitesRepository.findOneBy({ customDomain: domain })
     if (!site) {
       throw new BadRequestException(SiteErrorMessage.SITE_NOT_FOUND)
     }
@@ -506,10 +474,7 @@ export class SitesService extends BaseService<Site> {
         const res = await this.createInviteSiteMember(email, name, phone, institution)
         const resWithLink = {
           ...res,
-          inviteLink: `${(process.env.NEXT_PUBLIC_WEB_BASE_URL || '').replace(
-            /\/+$/,
-            ''
-          )}/invite-institution?token=${res.token}`,
+          inviteLink: `https://${process.env.LINK_FLOWCLASS_CMS}/invite-institution?token=${res.token}`,
         }
         inviteList.push(resWithLink)
       })
@@ -545,10 +510,7 @@ export class SitesService extends BaseService<Site> {
         )
         const resWithLink = {
           ...res,
-          inviteLink: `${(process.env.NEXT_PUBLIC_WEB_BASE_URL || '').replace(
-            /\/+$/,
-            ''
-          )}/invite-institution?token=${res.token}`,
+          inviteLink: `https://${process.env.LINK_FLOWCLASS_CMS}/invite-institution?token=${res.token}`,
         }
         institutionInvited.push(resWithLink)
       } else {
@@ -697,12 +659,11 @@ export class SitesService extends BaseService<Site> {
             ? site.name
             : institutionOfSitesWithName[institution.institutionId],
         inviterName,
-        inviteLink: `${(process.env.NEXT_PUBLIC_WEB_BASE_URL || '').replace(
-          /\/+$/,
-          ''
-        )}/invite-institution?token=${institutionWithTokens[institution.institutionId]}`,
+        inviteLink: `https://${process.env.LINK_FLOWCLASS_CMS}/invite-institution?token=${
+          institutionWithTokens[institution.institutionId]
+        }`,
         roleName: RoleName[institution.role],
-        siteBaseUrl: process.env.NEXT_PUBLIC_WEB_BASE_URL || '',
+        siteBaseUrl: `${process.env.LINK_FLOWCLASS_CMS}`,
       })
     })
 
@@ -742,9 +703,21 @@ export class SitesService extends BaseService<Site> {
             : institutionOfSitesWithName[institution.institutionId],
         inviterName,
         newRoleName: RoleName[institution.role],
-        siteBaseUrl: `https://${site.url}/`,
+        siteBaseUrl: `https://${site.url}.flowclass.io/`,
       })
     })
+
+    // if (changeRoleContent.length > 0) {
+    //   this.mailerService.sendMail({
+    //     to: email,
+    //     subject: 'Change Role Of User In Institution',
+    //     template: 'institution-role-changed',
+    //     context: {
+    //       email: email,
+    //       data: changeRoleContent,
+    //     },
+    //   });
+    // }
   }
 
   async findOneBy(where: FindOptionsWhere<Site> | FindOptionsWhere<Site>[]): Promise<Site | null> {

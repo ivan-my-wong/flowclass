@@ -2,6 +2,8 @@ import React from 'react'
 
 import Select, { StylesConfig } from 'react-select'
 
+import { theme } from '@/styles'
+
 export type CountrySelectorProps = {
   options: any[]
   selectOption: any
@@ -16,33 +18,36 @@ const TextSearchSelector: React.FC<CountrySelectorProps> = ({
   width,
 }) => {
   const selectCustomStyles: StylesConfig = {
-    option: styles => ({
-      ...styles,
-      margin: '0.5rem 0',
-      color: 'var(--color-text)',
-      backgroundColor: 'var(--color-background)',
-      '&:hover': {
-        backgroundColor: 'var(--color-background-layer-2)',
-      },
-      '&:active': {
-        backgroundColor: 'var(--color-background-layer-3)',
-      },
-    }),
+    option: styles => {
+      return {
+        ...styles,
+        margin: '0.5rem 0',
+        color: theme.colors.text.toString(),
+        backgroundColor: theme.colors.background.toString(),
+        '&:hover': {
+          backgroundColor: theme.colors.backgroundLayer2.toString(),
+        },
+        '&:active': {
+          backgroundColor: theme.colors.backgroundLayer3.toString(),
+        },
+      }
+    },
     control: styles => ({
       ...styles,
-      backgroundColor: 'var(--color-background)',
-      border: '1px solid var(--color-border)',
+      backgroundColor: theme.colors.background.toString(),
+      border: `1px solid ${theme.colors.borderColor.toString()}`,
       minHeight: '3rem',
-      color: 'var(--color-text)',
+      color: theme.colors.text.toString(),
     }),
     singleValue: styles => ({
       ...styles,
       padding: '0.25rem',
-      color: 'var(--color-text)',
+
+      color: theme.colors.text.toString(),
     }),
     input: styles => ({
       ...styles,
-      color: 'var(--color-text)',
+      color: theme.colors.text.toString(),
     }),
     container: styles => ({
       ...styles,

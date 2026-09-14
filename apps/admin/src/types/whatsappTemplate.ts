@@ -1,3 +1,5 @@
+import { AutomationFunction } from './automationFlow'
+
 export enum WhatsappTemplateStatus {
   PENDING = 'Pending',
   RECEIVED = 'Received',
@@ -16,7 +18,7 @@ export type WhatsappTemplate = {
   id?: number
   name: string
   content: string
-  assignedTo?: Record<string, any> | null
+  assignedTo?: AutomationFunction | null | string
   status?: WhatsappTemplateStatus
   twilioContentId?: string
   language?: string

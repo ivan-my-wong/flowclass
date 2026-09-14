@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import useTranslation from 'next-translate/useTranslation'
 import { FaCalendar, FaCreditCard, FaReceipt, FaTicketAlt, FaUser } from 'react-icons/fa'
 import { IoLocationSharp } from 'react-icons/io5'
@@ -7,6 +6,7 @@ import { Badge } from '@/components/Badge/Badge'
 import Button from '@/components/Buttons/Button'
 import { FEATURE_FLAGS } from '@/constants/common'
 import { PaymentReports, PaymentStatus } from '@/types/profile'
+import dayjs from '@/utils/dayjs'
 import {
   formatDateRange,
   getColorPaymentStatus,
@@ -15,7 +15,6 @@ import {
 } from '@/utils/profile'
 import { getPriceWithCurrency } from '@/utils/string.utils'
 
-import ActionPaymentEmail from './ActionPaymentEmail'
 import ViewApplicationForm from './ViewApplicationForm'
 import ViewUploadedPaymentProof from './ViewUploadedPaymentProof'
 
@@ -117,7 +116,7 @@ const PaymentRecordItem = ({
         {!!data?.paymentDate && (
           <p className="flex items-center gap-2 text-gray-700">
             <FaCalendar size={16} /> <span>{t('profile:paymentDate')}</span>
-            <span className="ml-auto">{dayjs(data?.paymentDate).format('MMM DD, YYYY')}</span>
+            <span className="ml-auto">{dayjs.utc(data?.paymentDate).format('MMM DD, YYYY')}</span>
           </p>
         )}
         {!!data?.payAmount && (
@@ -146,7 +145,6 @@ const PaymentRecordItem = ({
 
       <div className="mt-4 items-center justify-between space-y-1 lg:flex  lg:space-y-0">
         <div className="items-center gap-4 space-y-1 lg:flex lg:space-y-0">
-          <ActionPaymentEmail data={data} />
           <ViewApplicationForm data={data} />
           {data?.paymentMethod === 'PAY_LATER' && data?.paymentState !== PaymentStatus.PAID && (
             <ViewUploadedPaymentProof data={data} refetch={refetch} schoolUrl={schoolUrl} />

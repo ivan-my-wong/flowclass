@@ -18,9 +18,12 @@ import { useResponsive } from '@/hooks/useResponsive'
 import useSchoolData from '@/hooks/useSchoolData'
 import useSiteData from '@/hooks/useSiteData'
 import { useInvoiceMetrics } from '@/hooks/useStudentMetrics'
+import usePlanData from '@/hooks/useSubscriptionPlanData'
+import { styled, theme } from '@/styles'
 import { ChartDate } from '@/types/chartDate.type'
 import { Invoice } from '@/types/enrollCourse'
 import { CalculatedMetrics, ChartDataType } from '@/types/metrics'
+import { PlanTier } from '@/types/schoolSubscriptionPlan'
 import { calculateGrowthRate } from '@/utils/calculate-course'
 import { cn } from '@/utils/cn'
 import { formatCurrency } from '@/utils/currency'
@@ -28,6 +31,32 @@ import { checkDateBetween } from '@/utils/date.utils'
 import { formatDateRelativeToToday } from '@/utils/timeString'
 
 import RevenueWithChart from './components/RevenueWithChart'
+import { SubscriptionStatsCard } from './components/SubscriptionStatsCard'
+
+const Container = styled('div', {
+  width: '100%',
+  padding: '1rem',
+  display: 'flex',
+  flexDirection: 'column',
+  '@sm': {
+    flexDirection: 'column',
+    padding: '1rem',
+    height: 'auto',
+  },
+})
+
+const DataContainer = styled('div', {
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+  maxHeight: '100vh',
+  marginRight: '$2',
+  overflowY: 'auto',
+  paddingBottom: '$2',
+})
+
+Container.displayName = 'Container'
+DataContainer.displayName = 'DataContainer'
 
 // Helper functions for chart building
 const shouldGroupByWeek = (start: string, end: string) => {
@@ -175,7 +204,7 @@ const buildChartOptions = (
         type: 'line',
         data: chartData.data,
         name: title,
-        color: 'var(--color-primary)',
+        color: theme.colors.primary.toString(),
         marker: {
           enabled: false,
           radius: 4,
@@ -273,6 +302,9 @@ const Dashboard = (): JSX.Element => {
     }
   )
 
+  const { schoolSubscription } = usePlanData()
+  const { activePlan, planQuotas } = schoolSubscription
+
   // Filter invoices to parent invoices only (exclude child invoices)
   const parentInvoices = useMemo(() => {
     if (!invoiceData) return []
@@ -321,9 +353,11 @@ const Dashboard = (): JSX.Element => {
         if (invoice.paymentState === PaymentState.PAID) {
           totalRevenueCurrent += invoiceAmount
         } else if (
-          [PaymentState.PENDING, PaymentState.SUBMITTED].includes(
-            invoice.paymentState
-          )
+          [
+            PaymentState.UNPAID,
+            PaymentState.PENDING,
+            PaymentState.SUBMITTED,
+          ].includes(invoice.paymentState)
         ) {
           unpaidRevenueCurrent += invoiceAmount
         } else if (invoice.paymentState === PaymentState.CRITICAL) {
@@ -336,9 +370,11 @@ const Dashboard = (): JSX.Element => {
         if (invoice.paymentState === PaymentState.PAID) {
           totalRevenuePrevious += invoiceAmount
         } else if (
-          [PaymentState.PENDING, PaymentState.SUBMITTED].includes(
-            invoice.paymentState
-          )
+          [
+            PaymentState.UNPAID,
+            PaymentState.PENDING,
+            PaymentState.SUBMITTED,
+          ].includes(invoice.paymentState)
         ) {
           unpaidRevenuePrevious += invoiceAmount
         } else if (invoice.paymentState === PaymentState.CRITICAL) {
@@ -507,6 +543,26 @@ const Dashboard = (): JSX.Element => {
               ) as string
             }
           />
+
+          {/* Notifications and Stats Cards */}
+          <MetricCardContainer
+            isLoading={isAnythingLoading}
+            className="w-full grid grid-cols-1 gap-4 items-start"
+          >
+            <>
+              <SubscriptionStatsCard
+                currentPlan={
+                  activePlan?.isTrial
+                    ? 'TRIAL'
+                    : activePlan?.customerSupportTier ?? PlanTier.FREE
+                }
+                currentStudents={planQuotas?.activeStudents?.used ?? 0}
+                studentQuota={planQuotas?.activeStudents?.quota ?? 0}
+                notificationSent={planQuotas?.reminder?.used ?? 0}
+                notificationQuota={planQuotas?.reminder?.quota ?? 0}
+              />
+            </>
+          </MetricCardContainer>
         </div>
       </div>
     </div>

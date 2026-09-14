@@ -5,7 +5,7 @@ import { IsModeratelyStrongPassword } from '@/common/validators/moderately-stron
 
 export class ResetPasswordDto {
   @ApiProperty({
-    example: 'user@example.com',
+    example: 'flowclass@gmail.com',
   })
   @IsNotEmpty()
   @MaxLength(255)
@@ -15,7 +15,7 @@ export class ResetPasswordDto {
 
 export class ChangeOtherUserPasswordDto {
   @ApiProperty({
-    example: 'user@example.com',
+    example: 'flowclass@gmail.com',
   })
   @IsNotEmpty()
   @IsString()

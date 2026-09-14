@@ -1,7 +1,9 @@
-import { Column, Entity } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm'
 
 import { StripePriceInterval, StripePriceType } from '@/models/enums/'
 import { BaseEntity } from '@/modules/base/base.entity'
+
+import { SubscriptionPlan } from './subscription-plans.entity'
 
 @Entity('stripe_product_prices')
 export class StripeProductPricesEntity extends BaseEntity {
@@ -43,4 +45,8 @@ export class StripeProductPricesEntity extends BaseEntity {
 
   @Column({ name: 'plan_id', nullable: true })
   planId: number
+
+  @ManyToOne(() => SubscriptionPlan, (plan) => plan.stripeProductPrices)
+  @JoinColumn({ name: 'plan_id' })
+  plan: SubscriptionPlan
 }

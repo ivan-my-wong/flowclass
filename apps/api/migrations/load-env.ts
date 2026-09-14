@@ -1,13 +1,17 @@
 import * as dotenv from 'dotenv'
-import * as path from 'path'
-
-// Load from monorepo root (one .env for all apps)
-const rootDir = path.resolve(__dirname, '../../..')
+// Load order: .env.APP_ENV -> .env -> .env.local (last one wins)
+// .env.local should have the highest precedence
+const APP_ENV = process.env.APP_ENV || 'local'
 const loadEnv = () => {
-  const NODE_ENV = process.env.NODE_ENV || 'development'
-  dotenv.config({ path: path.join(rootDir, `.env.${NODE_ENV}`), override: false })
-  dotenv.config({ path: path.join(rootDir, '.env'), override: true })
-  dotenv.config({ path: path.join(rootDir, '.env.local'), override: true })
+  if (APP_ENV) {
+    dotenv.config({ path: `.env.${APP_ENV}`, override: false })
+  }
+
+  // Load .env before .env.local
+  dotenv.config({ path: '.env', override: true })
+
+  // Load .env.local last so it has the highest precedence
+  dotenv.config({ path: '.env.local', override: true })
 }
 
 export default loadEnv

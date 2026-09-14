@@ -1,6 +1,7 @@
 /* eslint-disable import/order */
 /* eslint-disable simple-import-sort/imports */
 import useSiteData from '@/hooks/useSiteData'
+import { styled } from '@/styles'
 import { CalendarOptions } from '@fullcalendar/core'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
@@ -24,10 +25,7 @@ export const minutesToHours = (minutes: number): string[] => {
 const Calendar = forwardRef<FullCalendar, CalendarOptions>((props, ref) => {
   const { useGetCurrentSiteTimeZone } = useSiteData()
   return (
-    <div
-      id="calendar"
-      className="w-full [&_.fc-header-toolbar]:sm:flex-col [&_.fc-header-toolbar]:sm:gap-4 [&_.fc-toolbar-title]:text-xl [&_.fc-button]:bg-transparent [&_.fc-button]:text-text [&_.fc-button-active]:!bg-transparent [&_.fc-button-active]:!border-[3px] [&_.fc-button-active]:!border-border [&_.fc-daygrid-day.fc-day-today]:border-4 [&_.fc-daygrid-day.fc-day-today]:border-primary-highlight [&_.fc-daygrid-day.fc-day-today]:bg-background-layer-2 [&_.fc-daygrid-day_.fc-day-past]:bg-background-layer-2 [&_.fc-daygrid-dot-event]:flex [&_.fc-daygrid-dot-event]:flex-col [&_.fc-daygrid-dot-event]:gap-1.5 [&_.fc-daygrid-event-dot]:h-1 [&_.fc-daygrid-event-dot]:w-1 [&_.fc-daygrid-event-dot]:rounded-full [&_.fc-daygrid-event-dot]:border-primary-highlight [&_.fc-daygrid-event-dot]:bg-primary-highlight"
-    >
+    <FullCalendarWrapper id="calendar">
       <FullCalendar
         ref={ref}
         height="auto"
@@ -48,9 +46,55 @@ const Calendar = forwardRef<FullCalendar, CalendarOptions>((props, ref) => {
         }}
         {...props}
       />
-    </div>
+    </FullCalendarWrapper>
   )
 })
 Calendar.displayName = 'Calendar'
+
+// tried add css or create a styled component but it doesn't work
+// need to add a wrapper to override the css
+const FullCalendarWrapper = styled('div', {
+  width: '100%',
+  '.fc-header-toolbar': {
+    '@sm': {
+      flexDirection: 'column',
+      gap: '$4',
+    },
+
+    '.fc-toolbar-title': {
+      fontSize: '$5',
+    },
+
+    '.fc-button': {
+      backgroundColor: 'transparent',
+      color: '$text',
+    },
+    '.fc-button-active': {
+      backgroundColor: 'transparent!important',
+      border: '3px solid $colors$borderColor!important',
+    },
+  },
+
+  '.fc-daygrid-day': {
+    '&.fc-day-today': {
+      border: '4px solid $colors$primaryHighlight',
+      backgroundColor: '$backgroundLayer2',
+    },
+    '.fc-day-past': {
+      backgroundColor: '$backgroundLayer2',
+    },
+    '.fc-daygrid-dot-event': {
+      flexDirection: 'column',
+      gap: '6px',
+      '.fc-daygrid-event-dot': {
+        height: '$1',
+        width: '$1',
+        borderRadius: '100%',
+        borderColor: '$primaryHighlight',
+        backgroundColor: '$primaryHighlight',
+      },
+    },
+  },
+})
 
 export default Calendar

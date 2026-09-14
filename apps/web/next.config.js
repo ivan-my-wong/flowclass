@@ -1,6 +1,3 @@
-const path = require('path')
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env') })
-
 const nextTranslate = require('next-translate-plugin')
 // eslint-disable-next-line import/no-anonymous-default-export
 module.exports = {
@@ -30,6 +27,28 @@ module.exports = {
         },
       ]
     },
+    async headers() {
+      return [
+        {
+          source: '/_next/static/:path*',
+          headers: [
+            {
+              key: 'Cache-Control',
+              value: 'public, max-age=31536000, immutable',
+            },
+          ],
+        },
+        {
+          source: '/:path*',
+          headers: [
+            {
+              key: 'Cache-Control',
+              value: 'public, max-age=0, must-revalidate',
+            },
+          ],
+        },
+      ]
+    },
   }),
   images: {
     domains: [
@@ -47,11 +66,5 @@ module.exports = {
     // Set reasonable image dimensions
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
   },
 }

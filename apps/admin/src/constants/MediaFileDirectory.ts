@@ -7,7 +7,7 @@ export enum MediaFileDirectory {
   AI_TOOL = 'ai-tool',
 }
 
-export const isPrivateMediaDirectory = {
+export const isS3PrivateBucket = {
   [MediaFileDirectory.SITE]: false,
   [MediaFileDirectory.INSTITUTION]: false,
   [MediaFileDirectory.COURSE]: false,

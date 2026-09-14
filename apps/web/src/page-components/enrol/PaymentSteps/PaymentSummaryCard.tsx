@@ -22,6 +22,7 @@ interface Props {
     amount: number
   }
   usedBalance?: number
+  invoiceId?: number
 }
 
 const PaymentSummaryCard: React.FC<Props> = ({
@@ -35,6 +36,7 @@ const PaymentSummaryCard: React.FC<Props> = ({
   onScrollTo,
   couponDiscount,
   usedBalance,
+  invoiceId,
 }): JSX.Element => {
   const { t } = useTranslation('enrol')
 
@@ -48,6 +50,7 @@ const PaymentSummaryCard: React.FC<Props> = ({
       <div className="mb-2 flex flex-row flex-nowrap items-start justify-between gap-2 md:items-center">
         <div className="text-xl font-bold">
           {t(paid ? 'paymentSummary.titleApplication' : 'paymentSummary.title')}
+          {invoiceId && ` #${invoiceId}`}
         </div>
       </div>
       {/* <div className="box-col-full mt-4 items-start">

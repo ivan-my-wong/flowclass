@@ -23,6 +23,9 @@ export enum NotificationType {
 export enum NotificationStatus {
   SUCCESS = 'SUCCESS',
   SENT = 'SENT',
+  DELIVERED = 'DELIVERED',
+  OPENED = 'OPENED',
+  BOUNCED = 'BOUNCED',
   FAILED = 'FAILED',
   QUEUED = 'QUEUED',
 }
@@ -63,7 +66,9 @@ export const defaultNotificationsSetting: NotificationsSettingUpdateProps = {
 }
 
 export type FilterCriteriaType = {
-  selectedNotificationWhatsappTemplate: MultiValue<SelectItemValuesProps>
+  // selectedUsers: MultiValue<SelectItemValuesProps>
+  selectedNotificationAutomationFlow?: MultiValue<SelectItemValuesProps>
+  selectedNotificationWhatsappTemplate?: MultiValue<SelectItemValuesProps>
   selectedNotificationType: MultiValue<SelectItemValuesProps>
   selectedNotificationStatus: MultiValue<SelectItemValuesProps>
 }

@@ -1,9 +1,7 @@
 import Axios, { AxiosError, AxiosRequestConfig } from 'axios'
 
-import { API_BASE_URL } from '@/lib/config'
-
 const AXIOS_INSTANCE = Axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001',
   headers: {
     'Content-Type': 'application/json',
   },

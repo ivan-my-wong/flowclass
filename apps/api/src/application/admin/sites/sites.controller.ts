@@ -163,7 +163,7 @@ export class SitesController {
 
       example for invite user to become site-manager:
       {
-        "email": "user@example.com",
+        "email": "flowclass@gmail.com",
         "name": "Flowclass",
         "phone": "1234567890",
         "siteId": 1,
@@ -178,7 +178,7 @@ export class SitesController {
 
       example for invite user to become institution-manager of institution 1 and operator of institution 2:
       {
-        "email": "user@example.com",
+        "email": "flowclass@gmail.com",
         "name": "Flowclass",
         "phone": "1234567890",
         "siteId": 1,
@@ -198,7 +198,7 @@ export class SitesController {
 
       example for invite user to become instructor:
       {
-        "email": "user@example.com",
+        "email": "flowclass@gmail.com",
         "name": "Flowclass",
         "phone": "1234567890",
         "siteId": 1,

@@ -233,8 +233,8 @@ const fromExample = {
 
 export class StudentRegAccForm {
   static example = {
-    email: 'student@example.com',
-    password: 'SecurePassword123!',
+    email: 'johndoe@gmail.com',
+    password: 'abcd1234@123',
   }
   @ApiProperty()
   @IsOptional()
@@ -418,7 +418,7 @@ export class StudentCreateEnrollCourseDto {
   registrationForm: any
 
   @ApiProperty({
-    example: 'https://example.com?school=flowclass&course=regular',
+    example: 'https://school.flowclass.io?school=flowclass&course=regular',
   })
   @IsNotEmpty()
   @IsString()
@@ -746,7 +746,7 @@ export class StudentEnrollCoursePricingInfo {
 @Exclude()
 export class StudentMultipleClassInfo {
   @ApiProperty({
-    example: 'https://example.com/confirm-enroll/1',
+    example: 'http://payment.flowclass.io/confirm-enroll/1',
   })
   @Expose()
   paymentLink: Stripe.Response<Stripe.PaymentLink>

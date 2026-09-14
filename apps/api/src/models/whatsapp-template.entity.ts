@@ -9,6 +9,7 @@ import {
   WhatsappTemplateStatus,
 } from './enums/status'
 
+import { AutomationFunction } from '@/common/constants/automationFlow'
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Column, Entity, Index, Repository } from 'typeorm'
@@ -19,11 +20,17 @@ export class WhatsappTemplateEntity extends BaseEntity {
   @Column({ name: 'institution_id' })
   institutionId: number
 
-  @Column({ name: 'content', nullable: true })
+  @Column({ name: 'provider', type: 'varchar', default: 'meta_cloud', nullable: true })
+  provider?: string
+
+  @Column({ name: 'content', nullable: true, type: 'text' })
   content: string
 
   @Column({ name: 'name', type: 'varchar', nullable: true, default: '' })
   name: string
+
+  @Column({ name: 'friendly_name', type: 'varchar', nullable: true, default: '' })
+  friendlyName: string
 
   @Column({ name: 'status', default: WhatsappTemplateStatus.UNSUBMITTED })
   status: string
@@ -34,20 +41,29 @@ export class WhatsappTemplateEntity extends BaseEntity {
   @Column({ name: 'language', default: WhatsappTemplateLanguage.EN })
   language: string
 
+  @Column({ name: 'meta_template_id', type: 'varchar', nullable: true })
+  metaTemplateId?: string
+
   @Column({ name: 'twilio_content_id', type: 'varchar', nullable: true })
-  twilioContentId: string
+  twilioContentId?: string
 
   @Column({ name: 'assigned_to', type: 'jsonb', nullable: true, default: {} })
-  assignedTo: Record<string, any>
+  assignedTo: AutomationFunction
 
-  @Column({ name: 'content_type', type: 'varchar', default: 'twilio/text' })
+  @Column({ name: 'content_type', type: 'varchar', default: 'meta/template' })
   contentType: string
 
   @Column({ name: 'variables', type: 'jsonb', nullable: true })
   variables: Record<string, any>
 
+  @Column({ name: 'types', type: 'jsonb', nullable: true, default: {} })
+  types: Record<string, unknown>
+
+  @Column({ name: 'meta_response', type: 'jsonb', nullable: true })
+  metaResponse?: Record<string, any>
+
   @Column({ name: 'twilio_response', type: 'jsonb', nullable: true })
-  twilioResponse: Record<string, any>
+  twilioResponse?: Record<string, any>
 
   @Column({ name: 'is_default', type: 'boolean', default: false })
   isDefault: boolean

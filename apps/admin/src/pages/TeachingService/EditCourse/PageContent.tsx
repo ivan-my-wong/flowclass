@@ -31,6 +31,7 @@ import { useCourseEditSave } from '@/hooks/useCourseEditSave'
 import useConfirm from '@/hooks/useGlobalConfirm'
 import { useResponsive } from '@/hooks/useResponsive'
 import { AlertTypes, ConfirmOptionsType } from '@/reducers/confirm.reducers'
+import { styled } from '@/styles'
 import { FormCourseDescription, SectionDescription } from '@/types/course'
 import { DropDownMenuType } from '@/types/options'
 import { SectionTag } from '@/types/school'
@@ -328,11 +329,7 @@ const CoursePageContent = ({
 
   return (
     <Form {...form}>
-      <Box
-        id={tabName}
-        direction="column"
-        className="flex w-full flex-col sm:w-full sm:justify-center"
-      >
+      <StyledBox id={tabName} direction="column">
         <BoxWithToggleGroup
           toggleGroupLabels={toggleGroupLabels}
           title={t('school:selectSection')}
@@ -366,7 +363,12 @@ const CoursePageContent = ({
                     <div>
                       <Box>
                         <AiOutlineQuestionCircle />
-                        <Text className="block border-b border-dotted">
+                        <Text
+                          css={{
+                            display: 'block',
+                            borderBottom: '1px dotted',
+                          }}
+                        >
                           {t(`school:hints.needSomeGuidance`)}
                         </Text>
                       </Box>
@@ -380,16 +382,21 @@ const CoursePageContent = ({
                   trigger={
                     // trigger component must be wrapped by div idk why
                     <div>
-                      <Box className="cursor-help">
+                      <Box css={{ cursor: 'help' }}>
                         <AiOutlineQuestionCircle />
-                        <Text className="block underline decoration-dotted">
+                        <Text
+                          css={{
+                            display: 'block',
+                            textDecoration: 'underline dotted',
+                          }}
+                        >
                           {t(`school:hints.needSomeGuidance`)}
                         </Text>
                       </Box>
                     </div>
                   }
                 >
-                  <Text className="block">{hintLabel}</Text>
+                  <Text css={{ display: 'block' }}>{hintLabel}</Text>
                 </Tooltip>
               )}
             </Box>
@@ -424,9 +431,19 @@ const CoursePageContent = ({
           icon
           autoStart={false}
         />
-      </Box>
+      </StyledBox>
     </Form>
   )
 }
 
+const StyledBox = styled(Box, {
+  display: 'flex',
+  width: '100%',
+  '@sm': {
+    width: '100%',
+    justifyContent: 'center',
+  },
+
+  flexDirection: 'column !important',
+})
 export default CoursePageContent

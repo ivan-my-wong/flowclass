@@ -3,7 +3,6 @@ import { StatusPaymentProof } from '@/types/paymentProof'
 export enum PaymentMethodsEnum {
   PAY_LATER = 'PAY_LATER',
   PAY_NOW = 'PAY_NOW',
-  PAY_NOW_DIVIT = 'PAY_NOW_DIVIT',
 }
 
 export enum PaymentEvidenceState {
@@ -15,7 +14,7 @@ export enum PaymentEvidenceState {
 
 export enum PaymentState {
   PAID = 'PAID',
-  PARTIALLY_PAID = 'PARTIALLY_PAID',
+  UNPAID = 'UNPAID',
   PENDING = 'PENDING',
   REFUNDED = 'REFUNDED',
   CRITICAL = 'CRITICAL',
@@ -102,6 +101,7 @@ export const paymentProofCsvHeaders = [
   { label: 'setting:webpageSetting.currency', key: 'currency' },
   { label: 'student:paymentAmount', key: 'paymentAmount' },
   { label: 'student:paymentStatus.status', key: 'paymentState' },
+  { label: 'student:paymentProof.paymentDate', key: 'paymentDate' },
   { label: 'student:paymentMethod.method', key: 'paymentMethod' },
   { label: 'student:exportCSV.payLaterMethod', key: 'payLaterMethod' },
   { label: 'student:enrolledCourse', key: 'courseName' },

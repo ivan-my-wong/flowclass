@@ -238,7 +238,7 @@ export class UpdateInstitutionDto {
 
 export class InviteInstitutionMemberDto {
   @ApiProperty({
-    example: 'user@example.com',
+    example: 'flowclass@gmail.com',
   })
   @MaxLength(255)
   @IsNotEmpty()

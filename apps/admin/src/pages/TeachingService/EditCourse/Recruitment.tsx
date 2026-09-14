@@ -10,6 +10,7 @@ import Spacer from '@/components/Separators/Spacer'
 import Heading from '@/components/Texts/Heading'
 import Text from '@/components/Texts/Text'
 import useSiteData from '@/hooks/useSiteData'
+import { styled } from '@/styles'
 import { Course } from '@/types/course'
 
 interface RecruitmentProps {
@@ -48,8 +49,8 @@ const Recruitment = ({
   }
 
   return (
-    <div className="flex flex-col !important bg-background-layer-2 p-4 !important rounded-md">
-      <Box justify="space-between">
+    <StyledBox>
+      <Box css={{ justifyContent: 'space-between' }}>
         <Heading>{t(`teachingService:tabBar.recruitment`)}</Heading>
         {/* <SaveButton /> */}
       </Box>
@@ -66,7 +67,7 @@ const Recruitment = ({
         direction="row"
         justify="flex-start"
         responsive
-        className="max-w-full gap-8 md:gap-2"
+        css={{ maxWidth: '100%', gap: '$8', '@md': { gap: '$2' } }}
       >
         <LabelInput label={t('teachingService:recruitment.startTime')}>
           <CustomDatePicker
@@ -102,8 +103,16 @@ const Recruitment = ({
         </Button>
       </Box>
       <Spacer space="y1" />
-    </div>
+    </StyledBox>
   )
 }
+
+const StyledBox = styled(Box, {
+  display: 'flex',
+  flexDirection: 'column !important',
+  backgroundColor: '$backgroundLayer2',
+  padding: '$4 !important',
+  borderRadius: '$medium',
+})
 
 export default Recruitment

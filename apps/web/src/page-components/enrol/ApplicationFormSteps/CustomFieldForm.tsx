@@ -3,6 +3,7 @@ import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
 
 import { useRecoilValue } from 'recoil'
 
+import { DevTool } from '@hookform/devtools'
 import _ from 'lodash'
 import useTranslation from 'next-translate/useTranslation'
 import { FieldValues, UseFormReturn } from 'react-hook-form'
@@ -475,6 +476,7 @@ const CustomFieldForm = ({
                 </Button>
               )}
           </form>
+          <DevTool control={control} />
         </div>
       </Form>
       {isOpenAlert && <AlertTrialLesson open={isOpenAlert} setOpen={setIsOpenAlert} />}

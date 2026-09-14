@@ -13,26 +13,21 @@
   "updateProfile": "Update Your Profile",
   "changePassword": "Change Password",
   "changePasswordExplanation": "If you use social media to log in, you can register an account with the same email to change your password. All your data will be linked.",
-
   "support": "Support",
   "documentation": "Documentation",
-
   "introductionFlowclass": "Flowclass is developed by Flowsophic Limited, headquartered in Hong Kong❤️",
-
   "currentPassword": "Current Password",
   "newPassword": "New Password",
   "confirmPassword": "Confirm New Password",
   "saveChanges": "Save Changes",
   "haveUnSavedChanges": "haveUnSavedChanges",
   "pageTitle": "Account Settings",
-
   "profileView": {
     "edit": "Edit Profile",
     "change-password": "Change Password",
     "delete": "Delete Account",
     "profile": "Profile"
   },
-
   "deleteAccount": {
     "deleteAccount": "Delete Account",
     "successDelete": "Your account has been deleted successfully. We welcome you to use Flowclass again at any time",

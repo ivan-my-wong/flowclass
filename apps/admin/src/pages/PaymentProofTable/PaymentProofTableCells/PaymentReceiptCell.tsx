@@ -10,6 +10,7 @@ import {
   PaymentMethodsEnum,
   PaymentState,
 } from '@/constants/payment'
+import { theme } from '@/styles'
 
 import { IPaymentReceiptCellProps } from './types'
 
@@ -38,9 +39,7 @@ export const PaymentReceiptCell = ({
       {uploadedEvidence?.status === PaymentEvidenceState.ACCEPTED && (
         <Box justify="space-between">
           <Box direction="row" fitContent>
-            <span className="text-primary">
-              <HiOutlineHandThumbUp color="currentColor" />
-            </span>
+            <HiOutlineHandThumbUp color={theme.colors.primary.toString()} />
             <div>{t('student:paymentStatus.ACCEPTED')}</div>
           </Box>
         </Box>
@@ -48,16 +47,14 @@ export const PaymentReceiptCell = ({
       {uploadedEvidence?.status === PaymentEvidenceState.REJECTED && (
         <Box justify="space-between">
           <Box direction="row" fitContent>
-            <span className="text-secondary">
-              <AiOutlineStop color="currentColor" />
-            </span>
+            <AiOutlineStop color={theme.colors.secondary.toString()} />
             <div>{t('student:paymentStatus.REJECTED')}</div>
           </Box>
         </Box>
       )}
       {uploadedEvidence?.status === PaymentEvidenceState.PROCESSING && (
-        <Box justify="space-between" className="text-warn">
-          <Box direction="row" fitContent>
+        <Box justify="space-between" css={{ color: '$warn' }}>
+          <Box direction="row" css={{ width: 'fit-content' }}>
             <BiTimeFive />
             <div>{t('student:waitingForReview')}</div>
           </Box>

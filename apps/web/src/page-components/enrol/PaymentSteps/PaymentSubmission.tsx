@@ -31,6 +31,7 @@ import {
 } from '@/types/enrol'
 import { InvoiceResponse, uploadReceiptData } from '@/types/receipt'
 import { templateSectionBgColor } from '@/types/websiteTemplate'
+import dayjs from '@/utils/dayjs'
 import { exportDomain } from '@/utils/domain'
 import { getStudentScheduleSingleMeta } from '@/utils/enroll-course.utils'
 import { validatePhone } from '@/utils/validate'
@@ -48,7 +49,6 @@ const PaymentSubmission = ({
   invoices,
   uploadReceiptSuccess,
   setUploadReceiptSuccess,
-  invoiceToken,
 }: {
   school: School
   course: Course
@@ -56,7 +56,6 @@ const PaymentSubmission = ({
   invoices: InvoiceResponse[]
   uploadReceiptSuccess: boolean
   setUploadReceiptSuccess: (val: boolean) => void
-  invoiceToken?: string
 }): JSX.Element => {
   // enrollmentDetail is the information returned from the API
 
@@ -209,7 +208,9 @@ const PaymentSubmission = ({
       invoiceId: invoice.id,
       file: proofImage,
       payLaterMethod: paymentDetail ?? {},
-      paymentDate: paymentDate ? paymentDate.toISOString() : undefined,
+      paymentDate: paymentDate
+        ? dayjs(paymentDate).format('YYYY-MM-DD') + 'T00:00:00.000Z'
+        : undefined,
     }
 
     return mutateAsync(payload)
@@ -226,7 +227,25 @@ const PaymentSubmission = ({
       toast.success(t('enrol:uploadReceipt.uploadSuccessToast') as string)
     },
     onError: (error: any) => {
-      switch (error.message) {
+      if (error.statusCode === 413 || error.errorCode === 'FILE_SIZE_EXCEEDS_LIMIT') {
+        toast.error(t('errors:PAYLOAD_TOO_LARGE') as string)
+        return
+      }
+
+      const isNetworkError =
+        error.errorCode === 'NETWORK_ERROR' ||
+        error.message === 'Load failed' ||
+        error.message === 'Failed to fetch' ||
+        error.message === 'NetworkError when attempting to fetch resource.' ||
+        error.message?.includes?.('Network request failed') ||
+        error.name === 'TypeError'
+
+      if (isNetworkError) {
+        toast.error(t('errors:NETWORK') as string)
+        return
+      }
+
+      switch (error.errorCode || error.message) {
         case 'ENROLL_COURSE_TOKEN_NOT_MATCH':
           toast.error(t('enrol:uploadReceipt.tokenNotMatch') as string)
           break
@@ -234,13 +253,22 @@ const PaymentSubmission = ({
           toast.error(t('enrol:uploadReceipt.unauthorized') as string)
           break
         case 'INVALID_IMAGE_FORMAT':
+        case 'INVALID_FILE_FORMAT':
           toast.error(t('enrol:uploadReceipt.onlyImage') as string)
           break
         case 'TOKEN_EXPIRED':
           toast.error(t('enrol:uploadReceipt.tokenExpired') as string)
           break
         default:
-          toast.error(t('enrol:uploadReceipt.uploadFailed') as string)
+          if (
+            error.message &&
+            error.message !== 'UNKNOWN_ERROR' &&
+            error.errorCode !== 'UNKNOWN_ERROR'
+          ) {
+            toast.error(error.message)
+          } else {
+            toast.error(t('enrol:uploadReceipt.uploadFailed') as string)
+          }
           break
       }
     },
@@ -285,7 +313,6 @@ const PaymentSubmission = ({
           onChange={setPaymentMethod}
           enrollmentDetail={enrollmentDetail}
           setPayLaterMethod={setPaymentDetail}
-          invoiceToken={invoiceToken}
         />
       )}
       {!uploadReceiptSuccess &&

@@ -482,21 +482,21 @@ const RightTaskGroupSection = ({
             >
               <TaskItem
                 title={t('whatsappSettings.twilioApiKey')}
-                link="/integrations/twilio"
+                link="/integrations/whatsapp"
                 current={tasks.checkWhatsappSetting}
                 target={1}
                 key={t('whatsappSettings.twilioApiKey')}
               />
               <TaskItem
                 title={t('whatsappSettings.testSendWhatsapp')}
-                link="/integrations/twilio"
+                link="/integrations/whatsapp"
                 current={tasks.checkTestSendWhatsapp}
                 target={1}
                 key={t('whatsappSettings.testSendWhatsapp')}
               />
               <TaskItem
                 title={t('whatsappSettings.createTemplate')}
-                link="/whatsapp-templates/add"
+                link="/custom-messages/whatsapp-templates/add?tab=whatsapp-templates"
                 current={tasks.checkWhatsappTemplate}
                 target={1}
                 key={t('whatsappSettings.createTemplate')}

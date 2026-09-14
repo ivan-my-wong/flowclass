@@ -1,6 +1,7 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm'
+import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm'
 
 import { SupportedType } from '@/application/admin/custom-messages/dto/custom-message.dto'
+import { AutomationFlow } from '@/models/automation-flow.entity'
 import { Institution } from '@/models/institutions.entity'
 import { Site } from '@/models/site.entity'
 import { User } from '@/models/user.entity'
@@ -72,6 +73,12 @@ export type AssociatedClassType = {
 }
 
 @Entity('notification_record')
+@Index('idx_notification_record_site_inst_created', ['siteId', 'institutionId', 'createdAt'], {
+  where: '"deleted_at" IS NULL',
+})
+@Index('idx_notification_record_site_created', ['siteId', 'createdAt'], {
+  where: '"deleted_at" IS NULL',
+})
 export class NotificationRecord extends BaseEntity {
   @Column({
     name: 'channel',
@@ -121,6 +128,13 @@ export class NotificationRecord extends BaseEntity {
   notificationStatus: NotificationStatus | SupportedType
 
   @Column({
+    name: 'automation_flow_id',
+    type: 'number',
+    nullable: true,
+  })
+  automationFlowId?: number
+
+  @Column({
     name: 'whatsapp_template_id',
     type: 'number',
     nullable: true,
@@ -139,6 +153,12 @@ export class NotificationRecord extends BaseEntity {
   })
   @JoinColumn({ name: 'whatsapp_template_id' })
   whatsappTemplate?: WhatsappTemplateEntity
+
+  @ManyToOne(() => AutomationFlow, {
+    createForeignKeyConstraints: false,
+  })
+  @JoinColumn({ name: 'automation_flow_id' })
+  automationFlow?: AutomationFlow
 
   @ManyToOne(() => User, (user) => user.notificationRecord, {
     createForeignKeyConstraints: false,

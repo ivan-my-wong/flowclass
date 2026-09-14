@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, IsOptional, MaxLength, MinLength } from 'class-val
 
 export class ChangeProfileDto {
   @ApiPropertyOptional({
-    example: 'user@example.com',
+    example: 'flowclass@gmail.com',
   })
   @IsNotEmpty()
   @MinLength(5)

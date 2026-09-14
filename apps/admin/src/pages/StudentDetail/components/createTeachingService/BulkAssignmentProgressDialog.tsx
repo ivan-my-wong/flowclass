@@ -10,7 +10,6 @@ import {
   DialogTitle,
 } from '@/components/ui/Dialog'
 import { Progress } from '@/components/ui/Progress'
-import { API_BASE_URL } from '@/lib/config'
 
 export type ProgressEvent = {
   status: 'processing' | 'completed' | 'error'
@@ -64,7 +63,8 @@ const BulkAssignmentProgressDialog = ({
       percentage: 0,
     })
 
-    const baseURL = API_BASE_URL
+    // Get base URL from environment or use current origin
+    const baseURL = import.meta.env.VITE_API_BASE_URL || window.location.origin
 
     // For SSE, EventSource doesn't support custom headers
     // The backend should handle authentication via cookies or session

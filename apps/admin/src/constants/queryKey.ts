@@ -58,6 +58,8 @@ export const QUERY_KEY = {
     getSubscriptionDetailSchoolKey: 'getSubscriptionDetailSchoolKey',
     getBillingPortalLinkSchoolKey: 'getBillingPortalLinkSchoolKey',
     getAccountDetailSchoolKey: 'getAccountDetailSchoolKey',
+    getActiveSubscriptionPlanRecordKey: 'getActiveSubscriptionPlanRecordKey',
+    getSubscriptionPlansAndQuotasRecord: 'getSubscriptionPlansAndQuotasRecord',
   },
   paymentEvidence: {
     checkPaymentEvidenceKey: 'checkPaymentEvidenceKey',
@@ -92,9 +94,6 @@ export const QUERY_KEY = {
     getAllAdditionalFeeKey: 'getAllAdditionalFeeKey',
     bundleDiscountDetailKey: 'bundleDiscountDetail',
     bundleDiscountStatsKey: 'bundleDiscountStats',
-    packageDiscountsListKey: 'packageDiscountsListKey',
-    packageDiscountDetailKey: 'packageDiscountDetail',
-    packageDiscountsForClassKey: 'packageDiscountsForClass',
   },
   stripe: {
     connectStripeKey: 'connectStripeKey',
@@ -121,7 +120,22 @@ export const QUERY_KEY = {
     informationFieldListKey: 'informationFieldListKey',
     getCurrentInformationFieldKey: 'getCurrentInformationFieldKey',
   },
+  googleAnalytics: {
+    googleAnalyticsSchoolKey: 'googleAnalyticsSchoolKey',
+    googleAnalyticsCourseKey: 'googleAnalyticsCourseKey',
+    schoolRevenueKey: 'schoolRevenueKey',
+    courseRevenueKey: 'courseRevenueKey',
+  },
+  automationFlow: {
+    automationFunctionsKey: 'automationFunctionsKey',
+    automationFlowsKey: 'automationFlowsKey',
+    automationFlowStepsKey: 'automationFlowStepsKey',
+    detailAutomationFlowStepKey: 'detailAutomationFlowStepKey',
+    detailAutomationFlowKey: 'detailAutomationFlowKey',
+    automationSettingsKey: 'automationSettingsKey',
+  },
   whatsappTemplate: {
+    templateByAutomationFlowStepKey: 'templateByAutomationFlowStepKey',
     whatsappTemplatesKey: 'whatsappTemplatesKey',
     detailWhatsappTemplatesKey: 'detailWhatsappTemplatesKey',
   },
@@ -187,6 +201,12 @@ export const QUERY_KEY = {
     getAuthUrlKey: 'getAuthUrlKey',
     disconnectIntegrationKey: 'disconnectIntegrationKey',
   },
+  whatsappWeb: {
+    initializeWhatsappWebKey: 'initializeWhatsappWebKey',
+    generateQrCodeKey: 'generateQrCodeKey',
+    getSessionStatusKey: 'getSessionStatusKey',
+    getSessionKey: 'getSessionKey',
+  },
   customMessage: {
     customMessageDataKey: 'customMessageDataKey',
     customMessagePreparedDataKey: 'customMessagePreparedDataKey',
@@ -221,6 +241,11 @@ export const QUERY_KEY = {
     lessonList: 'statistics-lesson-list',
     lessonDetail: 'statistics-lesson-detail',
     dropoutStudents: 'statistics-dropout-students',
+  },
+  meta: {
+    embeddedSignupKey: 'metaEmbeddedSignupKey',
+    coexistenceSyncStatusKey: 'metaCoexistenceSyncStatusKey',
+    whatsappProfileKey: 'metaWhatsappProfileKey',
   },
 }
 

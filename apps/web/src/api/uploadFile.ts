@@ -17,8 +17,8 @@ export const uploadImage = async (
   return result
 }
 
-export const getPrivateFileAccessUrl = async (key: string): Promise<string> => {
-  const { data: result } = await customFetch<string>('/admin/media/object-access-url', {
+export const getS3PrivateFileUrl = async (key: string): Promise<string> => {
+  const { data: result } = await customFetch<string>('/admin/media/s3-presigned-url', {
     method: 'GET',
     query: { key },
   })

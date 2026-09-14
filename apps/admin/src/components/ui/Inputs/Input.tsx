@@ -17,15 +17,7 @@ export type InputProps = {
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
-    {
-      className,
-      type,
-      showPasswordToggler,
-      containerClassName,
-      prefixIcon,
-      prefixText,
-      ...props
-    },
+    { className, type, showPasswordToggler, containerClassName, ...props },
     ref
   ) => {
     const {
@@ -54,35 +46,35 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <div
         className={cn([
           'w-full',
-          (prefixIcon || prefixText || showPasswordToggler) && 'relative',
+          (props.prefixIcon || props.prefixText || showPasswordToggler) &&
+            'relative',
           containerClassName,
         ])}
       >
-        {prefixIcon && (
-          <SvgIcon className="absolute left-3 top-1/4">{prefixIcon}</SvgIcon>
+        {props.prefixIcon && (
+          <SvgIcon className="absolute left-3 top-1/4">
+            {props.prefixIcon}
+          </SvgIcon>
         )}
-        {prefixText && (
+        {props.prefixText && (
           <span
             className={cn([
               'absolute text-gray-400 top-1/2 -translate-y-1/2',
-              prefixIcon ? 'left-12' : 'left-2',
+              props.prefixIcon ? 'left-12' : 'left-2',
             ])}
           >
-            {prefixText}
+            {props.prefixText}
           </span>
         )}
         <input
           {...props}
-          // Coalesce null → '' so react-hook-form fields that haven't been
-          // initialized don't flip the input between controlled/uncontrolled.
-          value={props.value === null ? '' : props.value}
           type={type}
           className={cn(
             'flex h-10 w-full rounded-md border border-input bg-background dark:bg-dark-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
             className,
-            prefixIcon && 'pl-12',
-            prefixText && !prefixIcon && 'pl-5',
-            prefixText && prefixIcon && 'pl-16'
+            props.prefixIcon && 'pl-12',
+            props.prefixText && !props.prefixIcon && 'pl-5',
+            props.prefixText && props.prefixIcon && 'pl-16'
           )}
           ref={inputRef}
         />

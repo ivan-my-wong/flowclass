@@ -16,6 +16,13 @@ export class StudentUpdateUserDto {
   @IsOptional()
   lastName: string
 
+  @ApiProperty({
+    example: '',
+  })
+  @MaxLength(255)
+  @IsNotEmpty()
+  firebaseId: string
+
   @ApiPropertyOptional({
     example: '',
   })

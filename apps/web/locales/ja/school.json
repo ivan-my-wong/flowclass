@@ -1,38 +1,16 @@
 {
   "detailPageTitle": "オンライン受講申込・支払いプラットフォーム",
-  "callToAction": "課程を見る",
-
-  "applyNow": "申し込みへ",
-  "introduction": "紹介",
-  "classList": "クラス一覧",
-  "commentList": "コメント一覧",
-  "addComment": "コメントを残す",
   "noClass": "課程がありません",
-  "noGallery": "ギャラリーがありません", 
+  "noGallery": "ギャラリーがありません",
   "noComment": "コメントがありません",
-  "contactCentre": "教育機関にお問い合わせる",
   "scanQrCode": "QRコードを読み取り、アプリで教育機関に問い合わせる",
   "online": "オンライン",
-  "loginPrompt": "コメントする前にログインしてください",
-  "commentPrompt": "受講生のみコメントを残すことができます。お問い合わせは Flowclass 管理者までお願いします",
-  "recommendedCentres": "おすすめの塾",
-
-  "courseCard": {
-    "nPeopleEnrolledAlready": "{{count}}人が受講済み",
-    "perCourse": "課程以上",
-    "details": "詳細資料を見る", 
-    "ratingNumber": "件のコメント",
-    "canUse75Coupon": "クーポン利用可能",
-    "discount": "割引"
-  },
-
   "helperText": {
     "commentNumber": "件のコメント"
   },
-
   "heading": {
     "basicInfo": "紹介",
-    "searchTitle": "関連する学校", 
+    "searchTitle": "関連する学校",
     "searchTitleAll": "すべてのクラス",
     "searchSubtitle": "検索結果件数",
     "providedCourse": "提供課程",
@@ -44,26 +22,8 @@
     "allCourses": "全課程",
     "allImages": "全画像",
     "": "ホーム",
-    "home": "ホーム", 
+    "home": "ホーム",
     "calendar": "カレンダー"
-  },
-
-  "gallery": {
-    "all": "全て",
-    "environment": "環境",
-    "student": "生徒", 
-    "course": "課程詳細",
-    "qualification": "資格",
-    "exit": "終了"
-  },
-  "description": {
-    "SCHOOL_ABOUT_US": "について",
-    "SCHOOL_FACILITIES": "施設", 
-    "SCHOOL_STUDENT_ACHIEVEMENT": "生徒の成果",
-    "SCHOOL_QUALIFICATION": "資格",
-    "SCHOOL_STUDENT_LIFE": "学校の文化",
-    "SCHOOL_AWARDS": "受賞歴",
-    "SCHOOL_SUCCESS_STORIES": "成功ストーリ"
   },
   "imageTag": {
     "all": "全て",
@@ -79,7 +39,6 @@
   "noContent": "コンテンツがありません",
   "profile": {
     "login": "Log In",
-    "logout": "Logout",
     "save": "Save",
     "modalTitle": "Access your student profile at {{institutionName}}",
     "findMyProfile": "Find My Profile",
@@ -100,10 +59,7 @@
       "email": "E-mail",
       "whatsapp": "WhatsApp"
     },
-    "updateProfile": "Profile updated successfully",
     "updateNotification": "Notification updated successfully",
-    "paid": "Paid",
-    "unpaid": "Unpaid",
     "resendPaymentRecord": "Re-send Payment Record",
     "viewUploadedPaymentProof": "View Uploaded Payment Proof",
     "successResend": "Payment record has been re-sent",

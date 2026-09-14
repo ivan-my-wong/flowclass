@@ -1,6 +1,6 @@
 import Stripe from 'stripe'
 
-import { StripeConnectDetail } from '../types/stripe-connect'
+import { StripeConnectDetail } from '../types/schoolSubscriptionPlan'
 
 import apiClient from './index'
 

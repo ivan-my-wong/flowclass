@@ -1,21 +1,18 @@
 {
   "whatsappTemplate": "WhatsApp Template",
   "addWhatsappTemplate": "Add WhatsApp Template",
-  "notYetReady": "We will be releasing a feature to let you automate sending out reminder WhatsApp messages to your students. You can create your message templates first.",
   "filter": {
-    "searchPlaceholder": "Search template by name",
     "allStatusesPlaceholder": "All statuses",
     "assignedToPlaceholder": "None"
   },
   "form": {
-    "add": "Add new a WhatsApp Template",
+    "add": "Add WhatsApp Template",
     "edit": "Update WhatsApp Template",
     "name": "Template Name",
     "nameRequirements": "Lowercase alphanumeric characters and underscores only",
     "namePlaceholder": "Enter template name",
     "content": "Template Content",
     "contentPlaceholder": "Enter template content",
-    "tags": "Tags",
     "language": "Language",
     "languagePlaceholder": "Select language",
     "category": "Category",
@@ -33,8 +30,8 @@
     "alertUnsubmittedTemplateDescription": "This template is unsubmitted. Cannot be used for sending messages.",
     "alertRejectedTemplate": "Rejected Template",
     "alertRejectedTemplateDescription": "This template is rejected. Cannot be used for sending messages.",
-    "twilioIntegration": "Twilio Integration",
-    "twilioIntegrationDescription": "Configure your Twilio credentials to send WhatsApp messages."
+    "twilioIntegration": "Meta WhatsApp Integration",
+    "twilioIntegrationDescription": "Connect your Meta WhatsApp Business Cloud API account to send WhatsApp messages."
   },
   "action": {
     "checkApprovalStatus": "Check the approval request status"
@@ -46,9 +43,7 @@
   "message": {
     "createSuccess": "Create WhatsApp Template successfully",
     "updateSuccess": "Update WhatsApp Template successfully",
-    "deleteSuccess": "Delete WhatsApp Template successfully",
-    "submitApprovalSuccess": "Submit for approval successfully",
-    "alreadyApproved": "Template: {{name}} already approved!!"
+    "deleteSuccess": "Delete WhatsApp Template successfully"
   },
   "category": {
     "all": "All Categories",
@@ -57,9 +52,7 @@
     "marketing": "Marketing"
   },
   "language": {
-    "all": "All Languages",
-    "english": "English",
-    "chinese": "Chinese"
+    "all": "All Languages"
   },
   "status": {
     "all": "All Status",

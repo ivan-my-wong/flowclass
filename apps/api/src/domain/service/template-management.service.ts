@@ -1,7 +1,7 @@
 /* eslint-disable simple-import-sort/imports */
 import { CreateDocumentCampaignDto } from '@/application/admin/template-management/dto/create-campaign.dto'
 import { CreateDocumentTemplateDto } from '@/application/admin/template-management/dto/create-template.dto'
-import { ObjectStorageProvider } from '@/config/storage/object-storage.provider'
+import { S3ClientFactory } from '@/config/s3/s3-factory.provider'
 import { ClassRepository } from '@/models/classes.repository'
 import { CoursesRepository } from '@/models/courses.repository'
 import { DocumentCampaignRecipientsStatus } from '@/models/document-campaign-recipients.entity'
@@ -15,26 +15,19 @@ import {
   TemplateFieldData,
 } from '@/models/document-template.entity'
 import { DocumentTemplateRepository } from '@/models/document-template.repository'
-import { Institution } from '@/models/institutions.entity'
-import { InstitutionsRepository } from '@/models/institutions.repository'
 import { UserAlias } from '@/models/user-aliases.entity'
 import { UserAliasesRepository } from '@/models/user-aliases.repository'
 import { User } from '@/models/user.entity'
 import { Injectable, Logger } from '@nestjs/common'
-import { createCanvas, loadImage } from '@napi-rs/canvas'
+import { createCanvas, loadImage } from 'canvas'
 import * as dayjs from 'dayjs'
-import {
-  EmailParams,
-  NodemailerEmailTransport,
-  Recipient,
-  Sender,
-} from '@/domain/external/email-transport.provider'
+import { EmailParams, Recipient, Sender } from 'mailersend'
+import { EmailService } from '../external/email.service'
 
 @Injectable()
 export class TemplateManagementService {
   private readonly logger = new Logger(TemplateManagementService.name)
-  private readonly emailTransport: NodemailerEmailTransport
-  private readonly defaultSentFrom = new Sender('info@flowclass.ai', 'Flowclass')
+  private defaultSentFrom = new Sender('no-reply@flowclass.io', 'Flowclass')
 
   constructor(
     private readonly documentTemplatetRepository: DocumentTemplateRepository,
@@ -43,11 +36,9 @@ export class TemplateManagementService {
     private readonly coursesRepository: CoursesRepository,
     private readonly classRepository: ClassRepository,
     private readonly userAliasesRepository: UserAliasesRepository,
-    private readonly institutionsRepository: InstitutionsRepository,
-    private readonly objectStorageProvider: ObjectStorageProvider
-  ) {
-    this.emailTransport = new NodemailerEmailTransport()
-  }
+    private readonly s3ClientFactory: S3ClientFactory,
+    private readonly emailService: EmailService
+  ) {}
 
   async getAllDocumentTemplate(institutionId: number, type?: DocumentTemplateType) {
     return this.documentTemplatetRepository.find({
@@ -240,11 +231,6 @@ export class TemplateManagementService {
     })
   }
 
-  private getSenderFromInstitution(institution: Institution | null): Sender {
-    if (!institution?.email) return this.defaultSentFrom
-    return new Sender(institution.email, institution.name ?? 'Institution')
-  }
-
   private async getBufferFromUrl(url: string): Promise<Buffer> {
     const response = await fetch(url)
 
@@ -264,15 +250,10 @@ export class TemplateManagementService {
   ) {
     const result = { student, error: null }
 
-    const institution = await this.institutionsRepository.findOne({
-      where: { id: campaign.institutionId },
-    })
-    const sender = this.getSenderFromInstitution(institution)
-
     const emailParams = new EmailParams()
-      .setFrom(sender)
+      .setFrom(this.defaultSentFrom)
       .setTo([new Recipient(student.user.email, student.name)])
-      .setReplyTo(sender)
+      .setReplyTo(this.defaultSentFrom)
       .setSubject(campaign.emailSubject)
       .setHtml(campaign.emailBody)
       .setAttachments([
@@ -283,8 +264,8 @@ export class TemplateManagementService {
         },
       ])
 
-    await this.emailTransport.email
-      .send(emailParams)
+    await this.emailService
+      .sendMailerSendEmail(emailParams)
       .then(async () => {
         this.logger.log(`Email sent successfully to ${student.name} (${student.user.email})`)
         await this.documentCampaignRecipientsRepository.update(
@@ -349,7 +330,7 @@ export class TemplateManagementService {
       fieldValues
     )
 
-    const uploadedUrl = await this.objectStorageProvider.uploadObject('certificates', buffer, {
+    const uploadedUrl = await this.s3ClientFactory.uploadObject('certificates', buffer, {
       isPrivateBucket: false,
       contentType: 'image/png',
     })

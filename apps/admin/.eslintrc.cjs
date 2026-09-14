@@ -18,6 +18,7 @@ module.exports = {
     '.eslintrc.js',
     '*.config.js',
     '*.config.ts',
+    'playwright.config.ts',
   ],
   extends: [
     'plugin:react/recommended',

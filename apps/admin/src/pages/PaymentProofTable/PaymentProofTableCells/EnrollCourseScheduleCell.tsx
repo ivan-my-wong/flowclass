@@ -1,10 +1,15 @@
-import { t } from 'i18next'
-import { RiArrowDropDownLine } from 'react-icons/ri'
+import { useState } from 'react'
 
-import OldButton from '@/components/Buttons/Button'
-import Box from '@/components/Containers/Box'
-import Text from '@/components/Texts/Text'
-import Popover from '@/components/Tooltips/Popover'
+import { t } from 'i18next'
+import { TiEye } from 'react-icons/ti'
+
+import { Button } from '@/components/ui/Button'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+} from '@/components/ui/Dialog'
 import {
   Table,
   TableBody,
@@ -32,34 +37,44 @@ const EnrollCourseScheduleCell = ({
   enroll,
   studentSchedules,
 }: EnrollCourseScheduleCellProps): JSX.Element => {
-  const sortedLessons = (() => {
-    const allLessons = [...studentSchedules]
-      .sort((a, b) => {
-        const earliest = (s: PaymentProofStudentSchedule) =>
-          Math.min(
-            ...(s.studentLessons ?? []).map(l =>
-              new Date(l.startTime).getTime()
-            ),
-            Infinity
-          )
-        return earliest(a) - earliest(b)
-      })
-      .flatMap(s =>
-        (s.studentLessons ?? []).map(l => ({ ...l, scheduleId: s.id }))
-      )
-    return [...allLessons].sort(
-      (a, b) =>
-        new Date(a.changeStartTime || a.startTime).getTime() -
-        new Date(b.changeStartTime || b.startTime).getTime()
-    )
-  })()
+  const [isOpen, setIsOpen] = useState(false)
 
-  const scheduleContent = (
-    <Box
-      gap="none"
-      direction="column"
-      css={{ width: '300px', maxHeight: '320px', overflow: 'auto' }}
-    >
+  const renderTable = (schedules: PaymentProofStudentSchedule[]) => {
+    // Sort schedules by the earliest lesson start time
+    const sortedSchedules = [...schedules].sort((a, b) => {
+      const getEarliestStartTime = (schedule: PaymentProofStudentSchedule) => {
+        if (!schedule.studentLessons || schedule.studentLessons.length === 0) {
+          return new Date(0).getTime()
+        }
+        const startTimes = schedule.studentLessons.map(lesson => {
+          const startTime = lesson.changeStartTime || lesson.startTime
+          return new Date(startTime).getTime()
+        })
+        return Math.min(...startTimes)
+      }
+
+      return getEarliestStartTime(a) - getEarliestStartTime(b)
+    })
+
+    // Flatten and sort all lessons by start time
+    const allLessons = sortedSchedules.flatMap(schedule => {
+      if (!schedule.studentLessons || schedule.studentLessons.length === 0) {
+        return []
+      }
+      return schedule.studentLessons.map(lesson => ({
+        ...lesson,
+        scheduleId: schedule.id,
+      }))
+    })
+
+    // Sort lessons by start time (using changeStartTime if available, otherwise startTime)
+    const sortedLessons = [...allLessons].sort((a, b) => {
+      const aStartTime = new Date(a.changeStartTime || a.startTime).getTime()
+      const bStartTime = new Date(b.changeStartTime || b.startTime).getTime()
+      return aStartTime - bStartTime
+    })
+
+    return (
       <Table>
         <TableHeader>
           <TableRow>
@@ -86,41 +101,51 @@ const EnrollCourseScheduleCell = ({
           )}
         </TableBody>
       </Table>
-    </Box>
-  )
+    )
+  }
 
   return (
-    <div className="flex items-center gap-1 overflow-hidden min-w-0 w-full">
-      <div className="flex-shrink-0">{getCourseIcon(enroll.type)}</div>
-      <Popover
-        trigger={
-          <div>
-            <OldButton
-              variants="subtle"
-              size="small"
-              iconAfter={<RiArrowDropDownLine />}
-            >
-              <Text
-                css={{
-                  display: 'block',
-                  color: '$text',
-                  maxWidth: 160,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {enroll.courseName}
-              </Text>
-            </OldButton>
-          </div>
-        }
+    <div className="flex items-center gap-2 overflow-hidden min-w-0 w-full">
+      <Button
+        variant="ghost"
+        size="sm"
+        className="flex-shrink-0"
+        iconAfter={<TiEye />}
+        onClick={() => setIsOpen(true)}
       >
-        {scheduleContent}
-      </Popover>
-      <span className="text-xs text-text-sub whitespace-nowrap overflow-hidden text-ellipsis min-w-0">
+        {t('student:dropdown.clickToViewTimeSlots')}
+      </Button>
+      <div className="flex-shrink-0">{getCourseIcon(enroll.type)}</div>
+      <span className="font-semibold whitespace-nowrap overflow-hidden text-ellipsis min-w-0">
+        {enroll.courseName}
+      </span>
+      <span className="whitespace-nowrap overflow-hidden text-ellipsis min-w-0">
         {enroll.secondLevelName}
       </span>
+
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="w-full p-8">
+          <DialogTitle>
+            {enroll.courseName} - {enroll.secondLevelName}
+          </DialogTitle>
+          <DialogClose asChild>
+            <Button
+              variant="ghost"
+              className="absolute top-4 right-4"
+              aria-label="Close"
+            >
+              ×
+            </Button>
+          </DialogClose>
+          {studentSchedules.length > 0 ? (
+            renderTable(studentSchedules)
+          ) : (
+            <div className="py-4 text-center text-muted-foreground">
+              {t('student:noLessonsScheduled')}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -1,72 +1,34 @@
 {
   "action": {
-    "logout": "Sign out",
     "back": "Back",
-    "next": "Next",
-    "delete": "Delete",
-    "finish": "Finish",
     "cancel": "Cancel",
-    "update": "Update",
-    "create": "Create",
-    "upgrade": "Plans & Subscriptions",
-    "modify": "Modify",
     "confirm": "Confirm",
     "enquiry": "Enquiry",
-    "leave": "Leave",
-    "join": "Join",
-    "add": "Add",
     "share": "Share",
     "submit": "Submit",
-    "upload": "Upload",
     "contact": "Contact",
     "confirmDelete": "Confirm deletion?",
     "nextStep": "Next Step",
     "confirmLeave": "Confirm leaving?",
-    "pay": "Pay",
     "close": "Close",
-    "review": "Review",
     "tryAgain": "Try again",
     "continueToTheApplication": "Continue to the application",
-    "viewDetails": "View details",
     "applyHere": "Apply here",
     "addToWishlist": "Add to Wishlist",
-    "viewWishlist": "View Wishlist",
-    "reject": "Reject",
     "yesSend": "Yes, Send"
   },
   "navigation": {
-    "goToHome": "Go to home",
     "backToPreviousPage": "Back to previous page"
   },
   "section": {
-    "title": "Title",
-    "type": "Category",
-    "label": "Label",
-    "comment": "Comment",
-    "cover": "Cover",
-    "basicInfo": "Basic Info"
-  },
-  "price": {
-    "free": "Free"
+    "type": "Category"
   },
   "description": {
-    "no": "No",
-    "info": "Description",
-    "brief": "Brief Introduction",
-    "noName": "Unnamed",
     "status": "Status",
-    "tag": "Tag",
-    "to": "to",
-    "or": "or",
-    "remark": "Remarks",
     "free": "Free"
   },
   "entity": {
-    "student": "Student",
-    "class": "Class",
-    "session": "Session",
-    "user": "User",
-    "school": "School"
+    "class": "Class"
   },
   "roles": {
     "operations": "Operations",
@@ -81,18 +43,10 @@
     "minute": "minute"
   },
   "fields": {
-    "locality": "Area",
-    "address": "Address",
     "email": "Email",
-    "website": "Website",
     "phone": "Phone",
     "name": "Name",
-    "remarks": "Remarks",
-    "basicInfo": "Basic Information",
-    "price": "Price",
-    "quota": "Quota",
-    "discountedPrice": "Discounted Price",
-    "grade": "Student Level"
+    "price": "Price"
   },
   "notFound": {
     "back": "Back",
@@ -132,7 +86,6 @@
     "Sun": "Sunday"
   },
   "wishlist": {
-    "title": "Add to Wishlist",
-    "selectedCourses": "Selected Courses"
+    "title": "Add to Wishlist"
   }
 }

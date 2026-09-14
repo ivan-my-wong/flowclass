@@ -7,6 +7,8 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
+import * as admin from 'firebase-admin'
+import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier'
 import { Auth, calendar_v3, drive_v3, google, meet_v2, sheets_v4 } from 'googleapis'
 import { Readable } from 'stream'
 
@@ -978,24 +980,29 @@ export class IntegrationGoogleService {
     return this.getIntegrationById(id, GoogleServiceType.CALENDAR)
   }
 
-  // Create a Calendar Integration (needs careful review)
+  // Create a Calendar Integration (uses Firebase token - needs careful review)
+  // This assumes the DTO contains a Firebase token to verify the Google User.
   // A standard OAuth flow (handleGoogleOAuthCallback) is generally preferred.
   async createCalendarIntegration(
     createDto: CreateIntegrationCalendarDto
   ): Promise<IntegrationGoogleEntity> {
-    const syntheticGoogleUserId = `institution-${createDto.institutionId}`
-    const syntheticGoogleEmail = `institution-${createDto.institutionId}@local.flowclass`
-
+    let decodedToken: DecodedIdToken
+    try {
+      decodedToken = await admin.auth().verifyIdToken(createDto.idToken)
+    } catch (error) {
+      throw new BadRequestException('Invalid Firebase ID token')
+    }
     // Use consolidated save method - passing necessary details
+    // Note: This uses accessToken *from the DTO*, which might differ from a standard OAuth flow.
     return this.saveGoogleCredentials(
       createDto.institutionId,
       createDto.institutionId,
-      syntheticGoogleUserId,
-      syntheticGoogleEmail,
-      createDto.accessToken,
-      undefined,
-      new Date(Date.now() + 60 * 60 * 1000),
-      undefined,
+      decodedToken.uid,
+      decodedToken.email!,
+      createDto.accessToken, // Token from DTO
+      undefined, // No refresh token in this DTO flow
+      new Date(Date.now() + decodedToken.exp * 1000), // Expiry from Firebase token
+      undefined, // Scopes not in DTO
       GoogleServiceType.CALENDAR
     )
   }
@@ -1149,7 +1156,7 @@ export class IntegrationGoogleService {
 
   // Refresh Calendar Token (specific DTO variant)
   async refreshCalendarToken(dto: RefreshCalendarTokenDto): Promise<IntegrationGoogleEntity> {
-    // This flow seems specific to ID token refresh for Google OAuth.
+    // This flow seems specific to using Firebase ID tokens for refresh, which is unusual for Google OAuth.
     // A standard refresh uses the Google Refresh Token. Re-implementing using standard refresh token logic.
     const integration = await this.getIntegrationById(dto.integrationId, GoogleServiceType.CALENDAR)
     if (integration.userId !== dto.institutionId) {
@@ -1186,21 +1193,24 @@ export class IntegrationGoogleService {
     return this.getIntegrationById(id, GoogleServiceType.MEET)
   }
 
-  // Create Meet Integration
+  // Create Meet Integration (also uses Firebase token)
   async createMeetIntegration(
     createDto: CreateIntegrationOnlineMeetingDto
   ): Promise<IntegrationGoogleEntity> {
-    const syntheticGoogleUserId = `institution-${createDto.institutionId}`
-    const syntheticGoogleEmail = `institution-${createDto.institutionId}@local.flowclass`
-
+    let decodedToken: DecodedIdToken
+    try {
+      decodedToken = await admin.auth().verifyIdToken(createDto.idToken)
+    } catch (error) {
+      throw new BadRequestException('Invalid Firebase ID token')
+    }
     return this.saveGoogleCredentials(
       createDto.institutionId,
       createDto.institutionId,
-      syntheticGoogleUserId,
-      syntheticGoogleEmail,
-      createDto.accessToken,
+      decodedToken.uid,
+      decodedToken.email!,
+      createDto.accessToken, // Token from DTO
       undefined,
-      new Date(Date.now() + 60 * 60 * 1000),
+      new Date(Date.now() + decodedToken.exp * 1000),
       undefined,
       GoogleServiceType.MEET
     )

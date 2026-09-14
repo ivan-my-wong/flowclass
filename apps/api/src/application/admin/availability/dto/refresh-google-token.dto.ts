@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
-import { IsNotEmpty, IsNumber } from 'class-validator'
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator'
 
 export class RefreshGoogleTokenDto {
   @ApiProperty({
@@ -29,4 +29,21 @@ export class RefreshGoogleTokenDto {
   @IsNotEmpty()
   @Type(() => Number)
   institutionId: number
+
+  @ApiProperty({
+    description: 'Firebase ID token',
+    example: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjFlOWdkazcifQ...',
+    format: 'jwt',
+  })
+  @IsString()
+  @IsNotEmpty()
+  idToken: string
+
+  @ApiProperty({
+    description: 'Google Calendar access token',
+    example: 'ya29.a0AR...',
+  })
+  @IsString()
+  @IsNotEmpty()
+  accessToken: string
 }

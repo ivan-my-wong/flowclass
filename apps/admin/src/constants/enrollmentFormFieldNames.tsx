@@ -26,7 +26,7 @@ export enum FieldTypes {
 }
 
 export const studentLinksBaseUrl = {
-  // Example: https://example.com/enrol/upload-receipt?school=&schoolId=356&course=recurring&enrolId=1203&token=<JWT>
+  // Example: https://onefivezero.staging.flowclass.io/enrol/upload-receipt?school=&schoolId=356&course=recurring&enrolId=1203&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Iml2YW5AZmxvd2NsYXNzLmlvIiwiaWF0IjoxNzA0MDgwODEwLCJleHAiOjE3MDY2NzI4MTB9.ei90YqExXrvYBTV-uxUH660CBXftHQBPaL3zZ1pYqxM
   uploadReceipt: '/enrol/upload-receipt',
 }
 

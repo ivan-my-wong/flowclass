@@ -32,7 +32,7 @@ import {
   StaffUserType,
 } from '@/types/user'
 import { getSinglePermissionFromUserRole } from '@/utils/convert'
-import { getMediaFileUrl } from '@/utils/generate-link.utils'
+import { getS3FileUrl } from '@/utils/generate-link.utils'
 import {
   generateFirstNameAndLastName,
   roleParserMap,
@@ -148,7 +148,7 @@ const EditProfileView = (): JSX.Element => {
                         <DraggableFileInput
                           directory={MediaFileDirectory.SITE}
                           imageUrl={
-                            field.value ? getMediaFileUrl(field.value) : ''
+                            field.value ? getS3FileUrl(field.value) : ''
                           }
                           onFileUpload={field.onChange}
                           classDropZone="rounded-full h-32 w-32"

@@ -1,5 +1,4 @@
 {
-  "perInterval": "per {{interval}}",
   "stepNames": {
     "Students": "Students",
     "Schools": "Schools",
@@ -30,7 +29,6 @@
     "prioritySupport": "Priority customer support"
   },
   "alertBox": {
-    "heading": "Upgrade your plan now and experience more features for marketing your courses automatically",
     "button": "Manage your subscription",
     "currently": "You are currently subscribed to the following plan:",
     "currentPlan": "You are currently on Flowclass Growth Plan",
@@ -44,25 +42,16 @@
     "PRO_TIER": "Pro"
   },
   "visitDashboard": {
-    "title": "Visit payment dashboard",
-    "description": "You can view your payment history and manage your plans through the Stripe dashboard."
+    "title": "Visit payment dashboard"
   },
-  "bill": "Billing",
   "mySubscription": "My Active Subscription",
   "checkOutWithLink": "Your upgrade link is created. After you finish the payment, your account will be automatically upgraded",
-  "currentlySubscribed": "View other plans that can boost your teaching business growth:",
-  "paymentRecord": "Payment Record",
   "nextBillDay": "Next billing day",
-  "billSetting": "Bill Setting",
-  "allFeatures": "All Features",
   "upgrade": "Upgrade",
-  "detail": "Detail",
-  "install": "Install",
   "currentPlan": "Current Plan",
   "activeSubscription": "Active Subscription",
   "yourCurrentPlan": "Your current plan",
   "customPlanLabel": "You are on a custom plan",
-  "manageAllSubscription": "Manage All",
   "approachingLimits": "Approaching Limits",
   "approachingLimitsLabel": "You are using 100% of your user and school limits. Consider upgrading to avoid service interruptions.",
   "perMonth": "per month",
@@ -76,7 +65,6 @@
   "totalPrice": "Total Price",
   "subscribed": "Subscribed",
   "cancelled": "Cancelled",
-  "schoolLowerCase": "school",
   "btnModify": "Modify",
   "usage": "Usage",
   "manage": "Manage",
@@ -95,68 +83,15 @@
   "createSubscriptionPlanSuccess": "Your subscription plan was successfully created, and you'll be redirected to the payment page",
   "headerBtnViewSubscription": "View Subscription",
   "subscriptionDetail": {
-    "fetchError": "You do not have a subscription yet.",
-    "startSubscription": "You started your subscription since {{date}}",
-    "cancelSubscription": "You cancelled your subscription since {{date}}",
-    "cancelSubscriptionTips": "You will still have access to the premium features until the end of your current subscription period on {{date}}",
-    "nextBilling": "Your next billing date is {{date}}",
-    "resubscribe": "Resubscribe",
-    "currentPlan": "Current Plan",
-    "upgrade": "Upgrade",
-    "downgrade": "Downgrade"
+    "currentPlan": "Current Plan"
   },
   "subscriptionPopup": {
-    "title": "Update subscription",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "description": "You are about to change your subscription to {{plan}} {{period}} plan.\nYour next subscription fee will be {{price}} per {{interval}}.\nPlease confirm your action.",
-    "annual": "annual",
     "monthly": "monthly"
-  },
-  "plan": {
-    "flowclassPlan": "Flowclass plan",
-    "seoPlan": "SEO plan",
-    "addOns": "Add-ons"
-  },
-  "flowclass": {
-    "free": "Free",
-    "plus": "Plus",
-    "premium": "Premium"
-  },
-  "seo": {
-    "basic": "Basic",
-    "advance": "Advanced",
-    "supreme": "Supreme"
-  },
-  "limit": {
-    "maxOfActiveStudents": "Max No. of Active Students",
-    "maxOfNotificationReminders": "Max No. of Notifications Sent Each Month"
-  },
-  "channel": {
-    "whatsapp": "Reminders on WhatsApp",
-    "assistedWhatsappOnboarding": "Assisted WhatsApp Onboarding"
-  },
-  "user": {
-    "additional": "Additional Users",
-    "limit": "Users (By institution)"
-  },
-  "branding": {
-    "premiumDomain": "Premium Domain",
-    "personalBranding": "Use personal email & name in email communications",
-    "noPlatformBranding": "No Flowclass branding on payment page"
-  },
-  "promotion": {
-    "coupon": "Coupon Code",
-    "additionalFee": "Additional Fee"
   },
   "noSubscriptionLabel": "You don't have any active subscriptions. Please create a new one to enjoy advanced features",
   "createSubscriptionBtnLabel": "Create New Subscription",
   "payment": {
-    "integratedWithStripe": "Integrated with Stripe",
     "customFields": "Custom Fields",
-    "successTitle": "Payment Completed",
-    "successDesc": "Your payment was successful. Click the button below to return to the Subscription Management page",
-    "redirectBtnLabel": "Go To Subscription Management",
     "upgradeSuccessTitle": "🎉 Upgrade Successful!",
     "upgradeSuccessDesc": "Congratulations! Your platform has been upgraded successfully. All your new features will be ready soon.",
     "featuresReadySoon": "Your enhanced features are being activated and will be available shortly.",
@@ -168,22 +103,6 @@
       "enhancedTools": "Enhanced Tools"
     }
   },
-  "unused": {
-    "maxOfTotalStudents": "Max No. of Total Students",
-    "maxOfTotalClasses": "Max No. of Classes"
-  },
-  "addOns": {
-    "classroomManagement": "Classroom management",
-    "teacherManagement": "Teacher management"
-  },
-  "features": {
-    "seeAll": "Compare all features",
-    "essential": "Essential features",
-    "advanced": "Advanced features",
-    "premium": "Premium features"
-  },
-  "customerSupport": "Full Customer support",
-  "emailAutomation": "Email automation",
   "checkout": {
     "failCheckout": "Failed to create checkout session. Please try again later",
     "noPermission": "You do not have the permission to upgrade the plan. Please contact the admin of the site.",
@@ -192,17 +111,11 @@
   "comingSoon": "Coming Soon",
   "paymentMethod": "Payment Method",
   "subscriptionDialog": {
-    "dialogTitle": "You have exceeded your plan limit",
     "upgradePlan": "You can upgrade your existing plan to create more course pages and enjoy advanced recruitment system builder features.",
     "upgradePlan2": "Please upgrade your plan to unlock this function.",
     "upgradePlan3": "You can upgrade your existing plan to invite more users and enjoy advanced recruitment system builder features.",
     "upgradePlan4": "You can upgrade your existing plan to connect Stripe and enjoy advanced recruitment system builder features.",
-    "upgrade": "Plan and Subscription Pricing",
-    "upgradeCreate": "You must upgrade your plan to create more course items.",
-    "contactSales": "contact our sales team",
     "messages": {
-      "starterPlanCourse": "Upgrade to starter plan to create 3 course pages and set custom path",
-      "premiumPlanCourse": "Upgrade to premium plan to create 10 course pages",
       "discountCode": "Upgrade to starter plan to create discount codes"
     }
   },
@@ -256,15 +169,6 @@
     "customPlanTitle": "Need a customized plan?",
     "customPlanDescription": "Create your own subscription."
   },
-  "manageSubscription": {
-    "title": "Manage Subscription",
-    "currentPlanSummary": "Current Subscription Plan Summary",
-    "noActivePlan": "No active subscription plan found",
-    "planDetails": {
-      "title": "Current Plan Details",
-      "noData": "No plan data available"
-    }
-  },
   "billingHistory": {
     "column": {
       "date": "Date",
@@ -310,12 +214,8 @@
     "reviewPlanSelections": "Review your Selections",
     "billDetail": "Billing details",
     "creditBalance": "Available credits",
-    "amountDueToday": "Amount due today",
-    "newPlanCost": "New Plan Cost",
-    "currentPlanCost": "Current Plan Cost",
-    "totalCost": "Total Cost"
+    "amountDueToday": "Amount due today"
   },
-  "modifyPlan": {},
   "trialUpgrade": {
     "title": "Trial Plan Limitation",
     "description": "Because you are on a trial plan, you cannot upgrade each plan individually. To modify each plan individually, please create an active subscription.",
@@ -394,6 +294,7 @@
     "MULTIPLE_SCHOOL": "Schools",
     "MULTIPLE_ADMIN": "Admins",
     "MULTIPLE_TUTOR": "Tutors",
+    "INTEGRATION_XERO": "Xero",
     "INTEGRATION_GOOGLE_DRIVE": "Google drive",
     "SETUP_FEE_SCHOOL_1": "Setup Fee (School 1)",
     "SETUP_FEE_INSTITUTION_2": "Setup Fee (Institution 2)",
@@ -423,7 +324,6 @@
     "CUSTOMER_SUPPORT_BASIC": "Customer Support (Basic)",
     "CUSTOMER_SUPPORT_EXPERT": "Customer Support (Expert)"
   },
-
   "stripeProductDescription": {
     "CLASS_TYPE_REGULAR": "Fixed-term courses with a set schedule and start/end date. Ideal for cohorts or semester-based classes where all students begin and end together. Perfect for traditional academic programs, certification courses, and structured learning paths.",
     "CLASS_TYPE_RECURRING": "Ongoing classes where students can join at any time, continuing indefinitely without a set end date. Perfect for memberships, continuous enrollment programs, and drop-in style classes where students progress at their own pace.",
@@ -450,6 +350,7 @@
     "MULTIPLE_SCHOOL": "Manage multiple schools or centres under one account. Pay only for the number of locations you need. Centralized administration with location-specific customization and reporting.",
     "MULTIPLE_ADMIN": "Add extra admin staff who can manage bookings, payments, and school operations. Distribute administrative responsibilities across your team while maintaining security and access control.",
     "MULTIPLE_TUTOR": "Add extra tutors who can access their schedules, manage classes, and take attendance. Empower your teaching staff with the tools they need to deliver excellent student experiences.",
+    "INTEGRATION_XERO": "Integrate with Xero for easy accounting and bookkeeping. Automatically sync financial data between Flowclass and your accounting system for streamlined financial management.",
     "INTEGRATION_GOOGLE_DRIVE": "Sync documents and class materials with Google Drive for streamlined file management. Keep all your educational resources organized and accessible across your team.",
     "SETUP_FEE_SCHOOL_1": "One-time setup and data migration fee for your first school or centre. Our team will import your data and configure your system for a smooth start. Includes data migration from Excel or other systems.",
     "SETUP_FEE_INSTITUTION_2": "One-time setup fee for your second school or institution. Includes data migration and configuration. Our experts ensure seamless integration with your existing operations.",
@@ -504,8 +405,7 @@
       "school": {
         "question": "How many schools or centers will you manage?",
         "description": "Select the number of schools or centers you wish to manage.",
-        "inputLabel": "Number of schools",
-        "schoolLabel": "schools"
+        "inputLabel": "Number of schools"
       },
       "setup": {
         "question": "Would you like our team to help set up your classes and migrate data?",

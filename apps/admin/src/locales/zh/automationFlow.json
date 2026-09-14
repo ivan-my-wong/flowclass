@@ -1,0 +1,42 @@
+{
+  "automationFlow": "自動化流程",
+  "setting": {
+    "sendInvoiceReminder": "發送帳單提醒",
+    "automaticallyGenerateInvoice": "自動生成帳單",
+    "sendWhatsappMessageAfterGeneration": "生成帳單後發送 WhatsApp 訊息",
+    "updateSuccess": "自動化流程設定更新成功",
+    "sendLessonReminder": "發送課堂提醒",
+    "sendWhatsappMessageForLessonComing": "發送 WhatsApp 課堂提醒"
+  },
+  "form": {
+    "name": "自動化流程名稱",
+    "fieldRequired": "此欄位為必填",
+    "namePlaceholder": "請輸入自動化流程名稱",
+    "editPeriod": "編輯提醒週期",
+    "labelUnpaidFor": "如果未付款",
+    "labelBeforeLesson": "在課堂前",
+    "enabled": "啟用",
+    "disabled": "停用",
+    "activateThisFlow": "啟動此流程",
+    "startEvery": "每",
+    "frequencyCron": "週期",
+    "frequencyUnit": "頻率單位",
+    "frequencyPlaceholder": "請輸入頻率數量",
+    "frequencyUnitPlaceholder": "請選擇頻率單位",
+    "pickCourses": "選擇課程",
+    "pickClassesDescription": "保持課程空白將通過所有流程",
+    "selectCourses": "選擇課程",
+    "selectCourseDescription": "請選擇您的課程，此流程將在此課程中啟用。",
+    "selectClasses": "選擇班級",
+    "selectClassesDescription": "請選擇要啟用此流程的班級。",
+    "afterRegistered": "註冊後",
+    "afterApproved": "核准後",
+    "editMessage": "編輯訊息"
+  },
+  "alertOnlyTypeAutomationFlow": "此處只能選擇類型為「{automationFlowName}」的 WhatsApp 範本。",
+  "coursesSelected": "{countCourses} 課程",
+  "message": {
+    "updateAutomationFlowSuccess": "您已成功更新自動化流程。",
+    "updateAutomationFlowStepSuccess": "您已成功更新自動化流程步驟。"
+  }
+}

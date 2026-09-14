@@ -1,28 +1,170 @@
-import React, { useCallback, useMemo } from 'react'
-
-import { v4 as uuidv4 } from 'uuid'
+import { ComponentProps, forwardRef, useMemo } from 'react'
 
 import {
-  Select as UiSelect,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectSeparator,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/Select'
-import { cn } from '@/utils/cn'
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+} from '@radix-ui/react-icons'
+// eslint-disable-next-line no-restricted-syntax
+import * as SelectPrimitive from '@radix-ui/react-select'
+import { styled } from '@stitches/react'
+import { v4 as uuidv4 } from 'uuid'
 
 import { DraggableCard, DraggableContainer } from '../Containers/Draggable'
 import Text from '../Texts/Text'
 
-const triggerVariantClasses = {
-  compact:
-    'h-7 text-[0.9rem] shadow-none border-2 border-background-layer-3 focus:shadow-none',
-  disabled:
-    'bg-background-disabled text-text-subtle shadow-none hover:bg-background-disabled hover:text-text-subtle hover:cursor-not-allowed hover:shadow-none',
+const SelectTrigger = styled(SelectPrimitive.SelectTrigger, {
+  all: 'unset',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: 4,
+  padding: '0 $4',
+  fontSize: '1rem',
+  lineHeight: 1,
+  height: '$12',
+  gap: 5,
+  backgroundColor: '$background',
+  border: '2px solid $backgroundLayer3',
+  color: '$text',
+  boxShadow: '$1',
+  whiteSpace: 'normal',
+  '&:hover': { backgroundColor: '$backgroundLayer3', cursor: 'pointer' },
+  '&:focus': { boxShadow: `0 0 0 2px $colors$borderColor` },
+  '&[data-placeholder]': { color: '$text' },
+
+  variants: {
+    variant: {
+      compact: {
+        height: '$7',
+        fontSize: '0.9rem',
+        boxShadow: 'none',
+        border: '2px solid $backgroundLayer3',
+        '&:focus': { boxShadow: 'none' },
+      },
+      disabled: {
+        backgroundColor: '$textDisabled',
+        color: '$textSubtle',
+        boxShadow: 'none',
+        '&:hover': {
+          backgroundColor: '$textDisabled',
+          color: '$textSubtle',
+          cursor: 'not-allowed!important',
+          boxShadow: 'none',
+        },
+      },
+    },
+    fullWidth: {
+      true: {
+        width: '100%',
+        padding: 'unset',
+      },
+    },
+  },
+})
+
+const SelectIcon = styled(SelectPrimitive.SelectIcon, {
+  color: '$text',
+})
+
+const SelectContent = styled(SelectPrimitive.Content, {
+  overflow: 'hidden',
+  backgroundColor: '$background',
+  borderRadius: 6,
+  zIndex: '$selectPopup',
+})
+
+const SelectViewport = styled(SelectPrimitive.Viewport, {
+  padding: 5,
+})
+
+type SelectSingleProps = {} & ComponentProps<typeof StyledItem>
+
+const SelectItem = forwardRef<HTMLDivElement, SelectSingleProps>(
+  ({ children, ...props }, forwardedRef) => {
+    return (
+      <StyledItem {...props} ref={forwardedRef}>
+        <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+        <StyledItemIndicator>
+          <CheckIcon />
+        </StyledItemIndicator>
+      </StyledItem>
+    )
+  }
+)
+
+const StyledItem = styled(SelectPrimitive.Item, {
+  fontSize: '1rem',
+  lineHeight: 1,
+  color: '$text',
+  borderRadius: 3,
+  display: 'flex',
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  height: 'auto',
+  minHeight: '2rem',
+  padding: '$2 $4',
+  position: 'relative',
+  userSelect: 'none',
+  cursor: 'pointer',
+  '&[data-disabled]': {
+    color: '$textSubtle',
+    pointerEvents: 'none',
+  },
+
+  '&[data-highlighted]': {
+    outline: 'none',
+    color: '$primarySubtle',
+  },
+})
+
+const SelectLabel = styled(SelectPrimitive.Label, {
+  padding: '0 25px',
+  fontSize: 12,
+  lineHeight: '25px',
+  color: '$text',
+})
+
+const SelectSeparator = styled(SelectPrimitive.Separator, {
+  height: 1,
+  backgroundColor: '$backgroundDisabled',
+  margin: 5,
+})
+
+const StyledItemIndicator = styled(SelectPrimitive.ItemIndicator, {
+  position: 'absolute',
+  left: 0,
+  width: '$4',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+})
+
+const scrollButtonStyles = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: 25,
+  backgroundColor: '$background',
+  color: '$primary',
+  cursor: 'default',
 }
+
+const SelectScrollUpButton = styled(
+  SelectPrimitive.ScrollUpButton,
+  scrollButtonStyles
+)
+
+const SelectScrollDownButton = styled(
+  SelectPrimitive.ScrollDownButton,
+  scrollButtonStyles
+)
+
+const StyledPortal = styled(SelectPrimitive.Portal, {
+  zIndex: '$selectPopup',
+  borderRadius: '$medium',
+  border: `1px solid $colors$borderColor`,
+})
 
 // selectItems format: [{label: string, values: [number | string]}]
 export type SelectItemValuesProps = {
@@ -55,17 +197,10 @@ export type SelectInputProps = {
   triggerVariant?: 'compact'
   currentSelect: string | number
   fullWidth?: boolean
-  onValueChange: (value: string) => void
-  handleDragEnd?: (newData: unknown[]) => void
+  onValueChange: (value: any) => void
+  handleDragEnd?: (newData: any[]) => void
   draggable?: boolean
   disabled?: boolean
-}
-
-const touchHandler = {
-  onTouchStart: (e: React.TouchEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-  },
 }
 
 const SelectDefault: React.FC<SelectInputProps> = ({
@@ -80,90 +215,87 @@ const SelectDefault: React.FC<SelectInputProps> = ({
   draggable,
   disabled,
 }) => {
-  const getTextColor = useCallback((label: string, status?: string) => {
+  const getTextColor = (label: string, status?: string) => {
     if (status === 'error') {
-      return <Text className="text-warn">{label}</Text>
+      return <Text css={{ color: '$warn' }}>{label}</Text>
     }
     if (status === 'highlight') {
       return <Text type="primary">{label}</Text>
     }
+
     return label
-  }, [])
+  }
 
   const DraggableSelectItems = (): JSX.Element => {
     const draggableItems = useMemo(() => {
-      return selectItems.map(item => ({
-        ...item,
-        itemValues: item.itemValues.map(itemValue => ({
-          ...itemValue,
-          id: uuidv4(),
-        })),
-      }))
-    }, [selectItems])
+      return selectItems.map(item => {
+        return {
+          ...item,
+          itemValues: item.itemValues.map(itemValue => {
+            return {
+              ...itemValue,
+              // this is only for dnd kit
+              id: uuidv4(),
+            }
+          }),
+        }
+      })
+    }, [])
 
     return (
       <>
-        {draggableItems.map((item, index) => {
+        {draggableItems.map(item => {
           if (item?.group) {
             return (
-              <SelectGroup key={item.group}>
-                <SelectLabel className="py-0 px-6 text-xs leading-[25px] text-text">
-                  {item.group}
-                </SelectLabel>
+              <SelectPrimitive.Group key={item.group}>
+                <SelectLabel>{item.group}</SelectLabel>
                 <DraggableContainer
                   items={item.itemValues}
                   handleDragEnd={handleDragEnd!}
                 >
-                  {item.itemValues.map(itemValue => (
-                    <DraggableCard
-                      id={(
-                        itemValue as SelectItemValuesProps & { id: string }
-                      ).id.toString()}
-                      key={itemValue.value}
-                      cardClassName="p-1"
-                    >
-                      <SelectItem
-                        {...touchHandler}
-                        value={itemValue.value.toString()}
-                        disabled={itemValue.disabled}
-                        className={cn(
-                          'text-base leading-none text-text min-h-8 py-2 px-4',
-                          'data-[disabled]:text-text-subtle',
-                          'data-[highlighted]:text-primary-subtle'
-                        )}
+                  {item.itemValues.map(itemValue => {
+                    return (
+                      <DraggableCard
+                        id={itemValue.id.toString()}
+                        key={itemValue.value}
+                        cardStyle={{
+                          padding: '$1',
+                        }}
                       >
-                        {typeof itemValue.label === 'string'
-                          ? getTextColor(itemValue.label, itemValue.status)
-                          : itemValue.label}
-                      </SelectItem>
-                    </DraggableCard>
-                  ))}
+                        <SelectItem
+                          key={itemValue.value}
+                          value={itemValue.value.toString()}
+                          disabled={itemValue.disabled}
+                        >
+                          {typeof itemValue.label === 'string'
+                            ? getTextColor(itemValue.label, itemValue.status)
+                            : itemValue.label}
+                        </SelectItem>
+                      </DraggableCard>
+                    )
+                  })}
                 </DraggableContainer>
-                <SelectSeparator className="h-px bg-background-disabled my-1.5" />
-              </SelectGroup>
+                <SelectSeparator />
+              </SelectPrimitive.Group>
             )
           }
           return (
             <DraggableContainer
-              key={`draggable-no-group-${index}`}
+              key={uuidv4()}
               items={item.itemValues}
               handleDragEnd={handleDragEnd!}
             >
               {item.itemValues.map(itemValue => (
                 <DraggableCard
-                  id={(
-                    itemValue as SelectItemValuesProps & { id: string }
-                  ).id.toString()}
+                  id={itemValue.id.toString()}
                   key={itemValue.value}
-                  cardClassName="p-1"
+                  cardStyle={{
+                    padding: '$1',
+                  }}
                 >
                   <SelectItem
-                    {...touchHandler}
+                    key={itemValue.value}
                     value={itemValue.value.toString()}
-                    className={cn(
-                      'text-base leading-none text-text min-h-8 py-2 px-4',
-                      'data-[highlighted]:text-primary-subtle'
-                    )}
                   >
                     {typeof itemValue.label === 'string'
                       ? getTextColor(itemValue.label, itemValue.status)
@@ -171,7 +303,7 @@ const SelectDefault: React.FC<SelectInputProps> = ({
                   </SelectItem>
                 </DraggableCard>
               ))}
-              <SelectSeparator className="h-px bg-background-disabled my-1.5" />
+              <SelectSeparator />
             </DraggableContainer>
           )
         })}
@@ -183,87 +315,94 @@ const SelectDefault: React.FC<SelectInputProps> = ({
     return (
       <>
         {selectItems.map((item, index) => {
-          if (item.group !== null && item.group !== undefined) {
+          if (item.group !== null) {
             return (
-              <SelectGroup key={`${item.group}${index}`}>
-                <SelectLabel className="py-0 px-6 text-xs leading-[25px] text-text">
-                  {item.group}
-                </SelectLabel>
-                {item.itemValues.map((itemValue, idx) => (
+              <SelectPrimitive.Group key={`${item.group}${index - 1}`}>
+                <SelectLabel>{item.group}</SelectLabel>
+                {item.itemValues.map((itemValue, index) => (
                   <SelectItem
-                    key={`${itemValue.value}${idx}`}
+                    key={`${itemValue.value}${index - 1}`}
                     value={itemValue.value.toString()}
                     disabled={itemValue.disabled}
-                    {...touchHandler}
-                    className={cn(
-                      'text-base leading-none text-text min-h-8 py-2 px-4',
-                      'data-[disabled]:text-text-subtle',
-                      'data-[highlighted]:text-primary-subtle'
-                    )}
                   >
                     {typeof itemValue.label === 'string'
                       ? getTextColor(itemValue.label, itemValue.status)
                       : itemValue.label}
                   </SelectItem>
                 ))}
-                <SelectSeparator className="h-px bg-background-disabled my-1.5" />
-              </SelectGroup>
+                <SelectSeparator />
+              </SelectPrimitive.Group>
             )
           }
 
           return (
-            <React.Fragment key={`no-group-${index}`}>
-              {item.itemValues.map((itemValue, idx) => (
+            <>
+              {item.itemValues.map((itemValue, index) => (
                 <SelectItem
-                  key={`${itemValue.value}${idx}`}
+                  key={`${itemValue.value}${index - 1}`}
                   value={itemValue.value.toString()}
-                  {...touchHandler}
-                  className={cn(
-                    'text-base leading-none text-text min-h-8 py-2 px-4',
-                    'data-[highlighted]:text-primary-subtle'
-                  )}
                 >
                   {typeof itemValue.label === 'string'
                     ? getTextColor(itemValue.label, itemValue.status)
                     : itemValue.label}
                 </SelectItem>
               ))}
-              <SelectSeparator className="h-px bg-background-disabled my-1.5" />
-            </React.Fragment>
+              <SelectSeparator />
+            </>
           )
         })}
       </>
     )
   }
 
-  const triggerVariantKey = disabled ? 'disabled' : triggerVariant
+  const handleValueChange = (value: string) => {
+    document.body.style.pointerEvents = 'auto'
+    if (onValueChange) {
+      onValueChange(value)
+    }
+  }
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      document.body.style.pointerEvents = 'auto'
+    }
+  }
 
   return (
-    <UiSelect value={currentSelect.toString()} onValueChange={onValueChange}>
+    <SelectPrimitive.Root
+      onValueChange={handleValueChange}
+      onOpenChange={handleOpenChange}
+      value={currentSelect.toString()}
+    >
       <SelectTrigger
         id={id ?? 'select-trigger'}
+        variant={disabled ? 'disabled' : triggerVariant}
+        fullWidth={fullWidth}
         disabled={disabled}
-        className={cn(
-          'inline-flex items-center justify-center rounded px-4 text-base leading-none h-12 gap-1.5 bg-background border-2 border-background-layer-3 text-text shadow-sm whitespace-normal hover:bg-background-layer-3 hover:cursor-pointer focus:outline-none focus:shadow-[0_0_0_2px_hsl(var(--border))] data-[placeholder]:text-text disabled:cursor-not-allowed disabled:opacity-50',
-          triggerVariantKey && triggerVariantClasses[triggerVariantKey],
-          fullWidth && 'w-full'
-        )}
       >
-        <SelectValue placeholder={placeholder} />
+        <SelectPrimitive.Value placeholder={placeholder} />
+        <SelectIcon>
+          <ChevronDownIcon />
+        </SelectIcon>
       </SelectTrigger>
-      <SelectContent
-        className={cn(
-          'overflow-hidden bg-background z-[1100]',
-          'border border-border'
-        )}
-      >
-        {draggable && handleDragEnd ? (
-          <DraggableSelectItems />
-        ) : (
-          <NonDraggableSelectItems />
-        )}
-      </SelectContent>
-    </UiSelect>
+      <StyledPortal>
+        <SelectContent>
+          <SelectScrollUpButton>
+            <ChevronUpIcon />
+          </SelectScrollUpButton>
+          <SelectViewport>
+            {draggable && handleDragEnd ? (
+              <DraggableSelectItems />
+            ) : (
+              <NonDraggableSelectItems />
+            )}
+          </SelectViewport>
+          <SelectScrollDownButton>
+            <ChevronDownIcon />
+          </SelectScrollDownButton>
+        </SelectContent>
+      </StyledPortal>
+    </SelectPrimitive.Root>
   )
 }
 

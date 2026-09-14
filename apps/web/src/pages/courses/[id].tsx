@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 
 import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
+import TagManager, { DataLayerArgs } from 'react-gtm-module'
 
 import DynamicCourseTemplate from '@/page-components/DynamicCourseTemplate'
 import { useSchoolContext } from '@/stores/schoolContext'
@@ -46,6 +47,14 @@ const CourseDetail = ({ course, school }: CourseDetailProps): JSX.Element => {
   }
 
   useEffect(() => {
+    const tagManagerArgs: DataLayerArgs = {
+      dataLayer: {
+        schoolId: school.id,
+        courseId: course.id,
+      },
+      dataLayerName: 'PageDataLayer',
+    }
+    TagManager.dataLayer(tagManagerArgs)
     setSchoolContext({
       school,
       webpageSettings,

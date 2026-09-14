@@ -14,6 +14,7 @@ export type BaseUser = {
   userNameLower: string
   displayId: number | null
   isEmailVerified: boolean
+  firebaseId: string
   phone: string | null
   lastActiveTime: string | null
   avatar: string | null

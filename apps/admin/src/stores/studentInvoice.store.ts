@@ -145,14 +145,6 @@ export const invoiceSessionState = atom<InvoiceSessionType[]>({
   default: [],
 })
 
-// Maps classId → all available lessons for that class (used for package discount auto-apply)
-export const availableLessonsByClassState = atom<
-  Record<number, { id: number; date: string; period?: number }[]>
->({
-  key: ATOM_KEY.AvailableLessonsByClassState,
-  default: {},
-})
-
 export const invoiceSessionsSelector = selectorFamily({
   key: ATOM_KEY.InvoiceSessionsSelector,
   get:
@@ -277,13 +269,8 @@ export const getInvoiceOfStudentSelector = selectorFamily({
       const appliedPromotions = student?.appliedPromotions ?? []
       const total = calculateTotalDiscount(
         invoice.total ?? 0,
-        appliedPromotions
-      )
-      // Final price = price after all discounts - credits used
-      const usedBalance = student?.usedBalance ?? invoice?.usedBalance ?? 0
-      const finalTotal = Math.max(
-        0,
-        calculatedDiscount.priceAfterDiscount - usedBalance
+        appliedPromotions,
+        currentSite?.currency || DEFAULT_CURRENCY
       )
       return {
         ...invoice,

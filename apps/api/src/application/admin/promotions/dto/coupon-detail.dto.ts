@@ -26,6 +26,14 @@ export class CouponDetailDto {
 
   @ApiPropertyOptional()
   @Expose()
+  userAliasIds: number[]
+
+  @ApiPropertyOptional()
+  @Expose()
+  userIds: number[]
+
+  @ApiPropertyOptional()
+  @Expose()
   code: string
 
   @ApiPropertyOptional()
@@ -87,7 +95,11 @@ export class IStudentAssigned {
   lastName: string
   firstName: string
   id: number
-  avatarUrl: string
+  userAliasId?: number
+  userId?: number
+  phone?: string
+  name?: string
+  avatarUrl?: string
 }
 
 export class ICourseAssigned {

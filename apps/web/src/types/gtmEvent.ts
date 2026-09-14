@@ -1,3 +1,5 @@
+import TagManager, { DataLayerArgs } from 'react-gtm-module'
+
 export enum GtmEvent {
   pageView = 'page_view',
   addShippingInfo = 'add_shipping_info',
@@ -15,9 +17,16 @@ export type GtmItem = {
   quantity?: number
 }
 
-/** No-op: GTM/analytics disabled in OSS mode */
 export const setGtmEvent = (
-  _data: {
+  data: {
     event?: GtmEvent
-  } & Record<string, unknown>
-): void => {}
+  } & Record<string, any>
+): void => {
+  const tagManagerArgs: DataLayerArgs = {
+    dataLayer: {
+      ...data,
+    },
+    dataLayerName: 'PageDataLayer',
+  }
+  TagManager.dataLayer(tagManagerArgs)
+}

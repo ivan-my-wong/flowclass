@@ -3,14 +3,14 @@ import { GoogleServiceType } from '@/models/integration-google.entity'
 export const INTEGRATION_ERROR = {
   // Calendar integration errors
   CALENDAR_CONNECTION_NOT_FOUND: 'Calendar connection not found',
-  NO_GOOGLE_USER_ID: 'No Google user ID available for this calendar connection',
+  NO_FIREBASE_USER_ID: 'No Firebase user ID available for this calendar connection',
   AUTHENTICATION_FAILED: 'Authentication failed',
   TOKEN_EXPIRED: 'Authentication token has expired',
   FAILED_TO_REFRESH_TOKEN: 'Failed to refresh token',
 
   // Online meeting integration errors
   MEETING_CONNECTION_NOT_FOUND: 'Online meeting connection not found',
-  NO_MEETING_GOOGLE_USER_ID: 'No Google user ID available for this meeting connection',
+  NO_MEETING_FIREBASE_USER_ID: 'No Firebase user ID available for this meeting connection',
   MEETING_AUTHENTICATION_FAILED: 'Meeting authentication failed',
   MEETING_TOKEN_EXPIRED: 'Meeting authentication token has expired',
   FAILED_TO_REFRESH_MEETING_TOKEN: 'Failed to refresh meeting token',

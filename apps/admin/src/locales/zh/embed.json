@@ -10,14 +10,10 @@
     "customDevelopment": "自訂開發",
     "others": "其他"
   },
-
   "configuration": {
     "title": "設定",
     "setWidthHeightCourse": "請設定顯示的寬度、高度和課程：",
-    "width": "寬度：",
     "height": "高度：",
-    "course": "課程：",
-    "apply": "應用",
     "negative": "請輸入正數。",
     "entireSchool": "整個學校",
     "element": "元素"

@@ -12,6 +12,16 @@ export class PromotionDetailDto {
 export class CheckPossiblePromotionsDto {
   @ApiPropertyOptional({
     type: Number,
+    description: 'The ID of user alias to check possible promotions for',
+  })
+  @Expose()
+  @Type(() => Number)
+  @IsInt()
+  @IsOptional()
+  userAliasId?: number
+
+  @ApiPropertyOptional({
+    type: Number,
     description: 'The ID of user to check possible promotions for',
   })
   @Expose()

@@ -81,7 +81,7 @@ export class StudentResponsePaymentRecordsDTO {
   classes: { id: number; name: string }[]
 
   @Expose()
-  course: { id: number; name: string }
+  course: { id: number; name: string; path: string }
 
   @Expose()
   createdAt: string
@@ -103,6 +103,33 @@ export class StudentResponsePaymentRecordsDTO {
 
   @Expose()
   paymentProof: string
+
+  @Expose()
+  paymentState: string
+
+  @Expose()
+  enrollId?: number
+
+  @Expose()
+  paymentDate?: Date
+
+  @Expose()
+  institutionId?: number
+
+  @Expose()
+  siteId?: number
+
+  @Expose()
+  lessons?: any[]
+
+  @Expose()
+  promotion?: any
+
+  @Expose()
+  transaction?: any
+
+  @Expose()
+  user?: any
 }
 export class MediaMaterialsDTO {
   @Expose()

@@ -3,7 +3,6 @@
 import { useState } from 'react'
 
 import { CalendarIcon } from '@radix-ui/react-icons'
-import dayjs from 'dayjs'
 import { useTranslation } from 'react-i18next'
 import { HiOutlinePencilSquare } from 'react-icons/hi2'
 import { MdSave } from 'react-icons/md'
@@ -23,6 +22,7 @@ import useSiteData from '@/hooks/useSiteData'
 import { AlertTypes } from '@/reducers/confirm.reducers'
 import { Invoice, PaymentProofTableItem } from '@/types/enrollCourse'
 import { cn } from '@/utils/cn'
+import dayjs from '@/utils/dayjs'
 
 type PaymentDateCellProps = {
   data: PaymentProofTableItem
@@ -48,7 +48,7 @@ const PaymentDateCell = (props: PaymentDateCellProps) => {
   const openModal = () => {
     setIsOpen(true)
     if (data?.paymentDate) {
-      const parsed = dayjs(data.paymentDate).toDate()
+      const parsed = dayjs.utc(data.paymentDate).toDate()
       setSelectedDate(Number.isNaN(parsed.getTime()) ? null : parsed)
     } else {
       setSelectedDate(null)
@@ -61,7 +61,7 @@ const PaymentDateCell = (props: PaymentDateCellProps) => {
   }
 
   const displayDate = data?.paymentDate
-    ? dayjs(data.paymentDate).format('DD MMM YYYY')
+    ? dayjs.utc(data.paymentDate).format('DD MMM YYYY')
     : t('common:notSet')
 
   return (
@@ -110,7 +110,9 @@ const PaymentDateCell = (props: PaymentDateCellProps) => {
                 mode="single"
                 selected={selectedDate || undefined}
                 onSelect={handleDateSelect}
-                disabled={date => date < new Date()}
+                captionLayout="dropdown"
+                fromYear={2015}
+                toYear={new Date().getFullYear() + 5}
                 initialFocus
               />
             </PopoverContent>
@@ -120,7 +122,7 @@ const PaymentDateCell = (props: PaymentDateCellProps) => {
             <div className="mt-3 text-xs text-gray-600 p-3 bg-gray-50 rounded-md border border-gray-200">
               <strong>{t('student:paymentProof.currentPaymentDate')}:</strong>
               <br />
-              {dayjs(data.paymentDate).format('DD MMMM YYYY')}
+              {dayjs.utc(data.paymentDate).format('DD MMMM YYYY')}
             </div>
           )}
 
@@ -130,7 +132,7 @@ const PaymentDateCell = (props: PaymentDateCellProps) => {
             onClick={() => {
               setIsOpen(false)
               const formattedDate = selectedDate
-                ? dayjs(selectedDate).format('YYYY-MM-DD')
+                ? `${dayjs(selectedDate).format('YYYY-MM-DD')}T00:00:00.000Z`
                 : ''
 
               setConfirm({

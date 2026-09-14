@@ -1,14 +1,12 @@
 {
   "notificationLogs": {
     "title": "Notification Logs",
-    "description": "This page shows the logs of all the notifications sent to the users.",
     "tableHeaders": {
       "action": "Action",
       "notificationType": "Notification Type",
       "automationFlow": "Automation Flow",
       "whatsappTemplate": "Whatsapp Template",
       "associatedClass": "Associated Class",
-      "notificationMessage": "Notification Message",
       "recipientUserEmail": "Recipient User Email",
       "recipientUserPhone": "Recipient User Phone",
       "messageSent": "Message Sent",
@@ -44,28 +42,23 @@
       "timeSaved": "Estimated Time Saved",
       "SinceLastMonth": "Since Previous Period"
     },
-    "notificationChannels": {
-      "EMAIL": "Email",
-      "WHATSAPP": "WhatsApp"
-    },
     "notificationStatuses": {
-      "null": "",
-      "SENT": "Success",
-      "SUCCESS": "Success",
+      "null": "Pending",
+      "SENT": "Sent",
+      "SUCCESS": "Sent",
+      "DELIVERED": "Delivered",
+      "OPENED": "Opened",
+      "BOUNCED": "Bounced",
       "QUEUED": "In Queue",
-      "FAILED": "Failed"
+      "FAILED": "Failed",
+      "PENDING": "Pending"
     },
     "selectLabels": {
-      "selectStudent": "All Student",
-      "selectNotificationChannel": "All channel",
       "selectNotificationType": "All Notification Type",
       "selectNotificationStatus": "All status",
       "selectWhatsappTemplateOptions": "All Whatsapp Templates",
       "selectAutomationFlowOptions": "All Automation Flows",
       "reset": "Reset"
-    },
-    "growthRate": {
-      "NA": "N/A"
     },
     "cell": {
       "view": "View"

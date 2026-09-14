@@ -14,10 +14,7 @@
   "editExpiry": {
     "currentExpiry": "Current expiry",
     "expiryDate": "Expiry Date",
-    "expiryTime": "Expiry Time",
-    "studentName": "Student",
     "materialName": "Material",
-    "removeExpiry": "Remove Expiry",
     "selectDate": "Select expiry date",
     "title": "Edit Expiry Date",
     "student": {
@@ -27,13 +24,9 @@
   },
   "filter": {
     "searchByName": "Search by name",
-    "selectLessons": "Select Lessons",
     "sortBy": "Sort by"
   },
-  "items": "items",
   "materialItem": {
-    "deleteMaterial": "Delete material",
-    "editExpiry": "Edit expiry date",
     "expiresAt": "Expires at {{date}}",
     "materials": "Materials",
     "notifyStudentsBtn": "Notify Students",
@@ -48,8 +41,7 @@
     "phone": "Phone",
     "send": "Send",
     "student": "Student",
-    "title": "Send Reminder for Lesson Materials",
-    "whatsappNotification": "WhatsApp Notification"
+    "title": "Send Reminder for Lesson Materials"
   },
   "notifyStudentSuccess": "Notify student successfully",
   "updateExpirySuccess": "Expiry date updated successfully",
@@ -65,7 +57,6 @@
       "lessonLabel": "Lesson",
       "lessonPlaceholder": "Select Lesson",
       "linkUrlLabel": "Link URL",
-      "linkUrlRequired": "Link URL is required",
       "materialDescLabel": "Material Description",
       "materialDescPlaceholder": "Enter material description (shows to students)",
       "materialNameLabel": "Material Name",
@@ -83,7 +74,6 @@
       "uploadingCompleted": "Uploading completed",
       "uploadingFailed": "Uploading failed",
       "uploadingMaterials": "Uploading materials",
-      "uploadingPending": "Uploading pending",
       "uploadingToGoogleDrive": "Uploading to google drive",
       "uploadMaterialsSuccess": "Upload materials successfully"
     },

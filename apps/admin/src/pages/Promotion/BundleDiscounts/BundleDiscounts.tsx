@@ -13,10 +13,13 @@ import { HeaderBackButtonStatus } from '@/components/TabWithListAndButton/Header
 import { Button } from '@/components/ui/Button'
 import usePromotionData from '@/hooks/usePromotionData'
 import useSiteData from '@/hooks/useSiteData'
+import usePlanData from '@/hooks/useSubscriptionPlanData'
 import ContentLayout from '@/layouts/ContentLayout'
 import { AlertTypes } from '@/reducers/confirm.reducers'
 import { promotionState } from '@/stores/promotionData'
+import { subscriptionDialogOpenState } from '@/stores/schoolSubscriptionData'
 import { BundleDiscount } from '@/types/bundleDiscounts'
+import { PromotionType } from '@/types/coupon'
 
 import BundleCardComponent from '../components/BundleCard'
 
@@ -90,14 +93,21 @@ const BundleDiscountsPage = (): JSX.Element => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [promotionData] = useRecoilState(promotionState)
+  const { checkSubscriptionAccess } = usePlanData()
   const { useFetchAllBundleDiscountsData } = usePromotionData()
   const fetchBundleDiscountsDataResult = useFetchAllBundleDiscountsData()
+  const [, setShowSubscriptionPopup] = useRecoilState(
+    subscriptionDialogOpenState
+  )
   const { siteData } = useSiteData()
 
   const { isLoading, isError, isSuccess, isIdle, data, refetch } =
     fetchBundleDiscountsDataResult
 
-  const hasBundleDiscount = true
+  const hasBundleDiscount = checkSubscriptionAccess(
+    'promotionTier',
+    PromotionType.BUNDLE_DISCOUNT
+  )
 
   const currency = siteData.currentSite?.currency
 
@@ -107,7 +117,18 @@ const BundleDiscountsPage = (): JSX.Element => {
   }
 
   const rightHeaderContent = (
-    <Button onClick={() => navigate('/promotion/bundle-discounts/add')}>
+    <Button
+      onClick={() => {
+        if (hasBundleDiscount) {
+          navigate('/promotion/bundle-discounts/add')
+        } else {
+          setShowSubscriptionPopup({
+            open: true,
+            message: t(`subscription:subscriptionDialog.upgradePlan`),
+          })
+        }
+      }}
+    >
       {t('common:action.create')}
     </Button>
   )

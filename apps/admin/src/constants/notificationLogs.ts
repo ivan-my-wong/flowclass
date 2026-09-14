@@ -6,6 +6,11 @@ export interface IUserFieldsType {
   phone: boolean
 }
 
+export interface IAutomationFlowFieldsType {
+  id: boolean
+  name: boolean
+}
+
 export interface IWhatsappTemplateFieldsType {
   id: boolean
   name: boolean
@@ -14,8 +19,12 @@ export interface INotificationLogFieldsType {
   id: boolean
   createdAt: boolean
   updatedAt: boolean
+  sentAt: boolean
   notificationStatus: boolean
   message: boolean
+  subject: boolean
+  channel: boolean
+  associatedClass: boolean
   recipientUserEmail: boolean
   recipientUserPhone: boolean
   user: IUserFieldsType
@@ -32,10 +41,14 @@ export const SELECT_FIELDS_NOTIFICATION_LOGS: Partial<INotificationLogFieldsType
     id: true,
     createdAt: true,
     updatedAt: true,
+    sentAt: true,
     notificationStatus: true,
     recipientUserEmail: true,
     recipientUserPhone: true,
     message: true,
+    subject: true,
+    channel: true,
+    associatedClass: true,
     notificationType: true,
     user: {
       id: true,
@@ -44,7 +57,7 @@ export const SELECT_FIELDS_NOTIFICATION_LOGS: Partial<INotificationLogFieldsType
       email: true,
       phone: true,
     },
-    whatsappTemplate: {
+    automationFlow: {
       id: true,
       name: true,
     },

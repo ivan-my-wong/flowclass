@@ -24,7 +24,6 @@ import {
   getStudentsByCustomFieldFilter,
   getStudentsByPhone,
   mergeStudent,
-  mergeStudent,
   removeFromParentGroup,
   setParentAccount,
   submitStudentNotification,

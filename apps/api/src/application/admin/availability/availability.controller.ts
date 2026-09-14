@@ -51,7 +51,13 @@ export class AvailabilityController {
   constructor(private readonly availabilityService: AvailabilityService) {}
 
   @Get()
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR
+  )
   @UseGuards(RolesGuard)
   @RequireParams(RequireParam.INSTITUTION_ID)
   @UseGuards(RequireParamsGuard)
@@ -101,7 +107,13 @@ export class AvailabilityController {
   }
 
   @Get(':id')
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER, Role.INSTRUCTOR)
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR
+  )
   @UseGuards(RolesGuard)
   @ApiOperation({
     summary: 'Get an availability by ID',
@@ -116,7 +128,13 @@ export class AvailabilityController {
   }
 
   @Post()
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR
+  )
   @UseGuards(RolesGuard)
   @RequireParams(RequireParam.INSTITUTION_ID)
   @UseGuards(RequireParamsGuard)
@@ -129,7 +147,13 @@ export class AvailabilityController {
   }
 
   @Patch(':id')
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER, Role.INSTRUCTOR)
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR
+  )
   @UseGuards(RolesGuard)
   @ApiOperation({
     summary: 'Update an availability',
@@ -144,7 +168,13 @@ export class AvailabilityController {
   }
 
   @Delete(':id')
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR
+  )
   @UseGuards(RolesGuard)
   @ApiOperation({
     summary: 'Delete an availability',
@@ -156,7 +186,13 @@ export class AvailabilityController {
 
   // Update assigned user of the calendar
   @Patch(':id/user')
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR
+  )
   @UseGuards(RolesGuard)
   @ApiOperation({
     summary: 'Update assigned user of the calendar',
@@ -171,7 +207,13 @@ export class AvailabilityController {
   }
 
   @Patch(':id/schedules')
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR
+  )
   @UseGuards(RolesGuard)
   @ApiOperation({
     summary: 'Update available schedules for an availability',
@@ -185,7 +227,13 @@ export class AvailabilityController {
   }
 
   @Patch(':id/overrides')
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR
+  )
   @UseGuards(RolesGuard)
   @ApiOperation({
     summary: 'Update date overrides for an availability',

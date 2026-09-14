@@ -5,6 +5,7 @@ import Select, { StylesConfig } from 'react-select'
 import { SocialIcon } from 'react-social-icons'
 
 import { useResponsive } from '@/hooks/useResponsive'
+import { theme } from '@/styles'
 
 import Box from '../ui/Box'
 
@@ -17,23 +18,31 @@ export type SocialMediaSelectorProps = {
 }
 
 const selectCustomStyles = (width?: string): StylesConfig => ({
-  option: styles => ({
-    ...styles,
-    backgroundColor: 'var(--color-background)',
-    color: 'var(--color-text)',
-  }),
+  option: styles => {
+    return {
+      ...styles,
+      backgroundColor: theme.colors.background.toString(),
+      color: theme.colors.text.toString(),
+      // justifyContent: 'center',
+      // justifyItems: 'flex-start',
+      // alignItems: 'center',
+    }
+  },
   control: styles => ({
     ...styles,
-    backgroundColor: 'var(--color-background)',
-    color: 'var(--color-text)',
+    backgroundColor: theme.colors.background.toString(),
+    color: theme.colors.text.toString(),
+    // ...(!autoHeight && { height: '6rem' }),
   }),
   singleValue: styles => ({
     ...styles,
-    color: 'var(--color-text)',
+    // padding: '0.25rem',
+    color: theme.colors.text.toString(),
+    // ...(!autoHeight && { height: '6rem' }),
   }),
   input: styles => ({
     ...styles,
-    color: 'var(--color-text)',
+    color: theme.colors.text.toString(),
   }),
   menu: styles => ({
     ...styles,

@@ -10,7 +10,6 @@ import Button from '@/components/Buttons/Button'
 import LabelInput from '@/components/Inputs/LabelInput'
 import { TextInput } from '@/components/Inputs/TextInput'
 import { Spinner } from '@/components/Loaders/Spinner'
-import { StyledContent, StyledOverlay } from '@/components/Popups/Modal'
 import ModalCloseButton from '@/components/Popups/ModalCloseButton'
 import Separator from '@/components/Separators/Separator'
 import Text from '@/components/Texts/Text'
@@ -26,6 +25,8 @@ import useSchoolData from '@/hooks/useSchoolData'
 import { userState } from '@/stores/userData'
 import { CopySchool, School } from '@/types/school'
 import { validateEmail } from '@/utils/validate'
+
+import { StyledContent, StyledOverlay } from './CreateSchoolModal'
 
 type DuplicateSchoolModalProps = {
   hidden?: boolean

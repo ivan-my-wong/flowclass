@@ -22,6 +22,14 @@
   "SITE": {
     "NOT_FOUND": "サイトが見つかりません。"
   },
+  "COUPON": {
+    "EXPIRED": "クーポンの有効期限が切れているか無効です",
+    "USED_UP": "クーポンは上限に達しました",
+    "NOT_FOUND": "クーポンが見つかりません",
+    "NOT_APPLY_FOR_THIS_COURSE": "このクーポンはこのコースまたはクラスには適用できません",
+    "NOT_APPLY_FOR_USER": "このクーポンはお客様のアカウントには適用できません",
+    "IS_NOT_ACTIVE": "このクーポンは現在無効です"
+  },
   "ENROL": {
     "PLEASE_PICK_CLASS": "先にクラスを選んでください。",
     "PLEASE_PICK__STARTING_LESSON": "先に初めのレッスンを選んでください。",

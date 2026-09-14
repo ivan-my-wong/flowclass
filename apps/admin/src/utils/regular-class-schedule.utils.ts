@@ -8,17 +8,7 @@ import dayjs from '@/utils/dayjs'
 
 import { deepCopy } from './shallow'
 
-const PREVIEW_MONTHS = 24
-
-const getDefaultPeriodCount = (unit: string, every: number): number => {
-  const daysPerUnit: Record<string, number> = {
-    [RepeatUnit.days]: 1,
-    [RepeatUnit.weeks]: 7,
-    [RepeatUnit.months]: 30,
-  }
-  const daysPerPeriod = (daysPerUnit[unit] ?? 7) * every
-  return Math.ceil((PREVIEW_MONTHS * 30) / daysPerPeriod)
-}
+const PREVIEW_PERIOD_COUNT = 5
 
 export type PeriodDateArray = {
   startDate: string
@@ -76,11 +66,11 @@ export const getRegularClassSchedules = (
     }
   }
 
-  // Use periodRepeatCount if available, otherwise generate enough periods to cover 24 months
+  // Use periodRepeatCount if available, otherwise fall back to PREVIEW_PERIOD_COUNT
   const maxPeriods =
     periodRepeatCount && periodRepeatCount > 0
       ? periodRepeatCount
-      : getDefaultPeriodCount(scheduleUnit, scheduleEvery)
+      : PREVIEW_PERIOD_COUNT
 
   for (let i = 0; i < maxPeriods; i++) {
     periodDates.push({
@@ -414,29 +404,4 @@ export const parseDateOverride = (override: DateOverride) => {
 // Write a function to generate a time round to the next hour and return ISO string from today's time
 export const generateNextHour = (): string => {
   return dayjs().add(1, 'hour').startOf('hour').toISOString()
-}
-
-/**
- * Default lesson repeat format used to seed an empty `regularScheduleV2.periodsV2`
- * entry. Shared by `RegularClassSchedulePeriods` (which auto-seeds on mount when
- * the array is empty) and `Class/index.tsx`'s `setFormData` (which pre-seeds the
- * same value so the form's `defaultValues` matches the post-seed values — this
- * stops react-hook-form's `isDirty` from being `true` on mount, which would
- * otherwise show the "*Unsaved changes" banner without any user input).
- */
-export const buildDefaultRegularV2LessonRepeatFormat = () => ({
-  repeat: false,
-  every: 1,
-  times: 1,
-  unit: RepeatUnit.weeks,
-  monthDay: 1,
-})
-
-export const buildDefaultRegularV2Period = () => {
-  const startIso = generateNextHour()
-  return {
-    startTime: new Date(startIso),
-    endTime: new Date(dayjs(startIso).add(1, 'hour').toISOString()),
-    lessonRepeatFormat: buildDefaultRegularV2LessonRepeatFormat(),
-  }
 }

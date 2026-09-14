@@ -60,10 +60,6 @@ export class StudentCreateInvoiceDTO {
   @IsPositive()
   payAmount: number
 
-  @IsOptional()
-  @IsNumber()
-  amountPaid?: number
-
   @ApiPropertyOptional({ example: 'HKD' })
   @IsNotEmpty()
   @IsOptional()

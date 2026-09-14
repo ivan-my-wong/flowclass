@@ -10,7 +10,6 @@ import { useRecoilState } from 'recoil'
 import { toast } from 'sonner'
 
 import {
-  bulkUpdateSharedVideo,
   CreateLesson,
   delayFollowingLessons,
   DeleteLesson,
@@ -24,12 +23,7 @@ import {
   updateLessonLocationRoom,
   updateTimeLesson,
 } from '@/api/lessonDateTime'
-import {
-  deleteSingleStudentLesson,
-  updateAttendance,
-  updateStudentLessonRemarks,
-} from '@/api/student'
-import { SharedVideoStatus } from '@/constants/course'
+import { deleteSingleStudentLesson, updateAttendance } from '@/api/student'
 import { QUERY_KEY } from '@/constants/queryKey'
 import { lessonDateTimeState } from '@/stores/lessonDateTimeData'
 import {
@@ -306,33 +300,14 @@ const useLessonDateTimeData = () => {
       mutationFn: (data: any) => updateAttendance(data),
       onSuccess: async data => {
         if (data) {
-          // Only invalidate non-matrix queries. The matrix useEffect rebuilds
-          // the entire students state from server data, which would overwrite
-          // locally-set attendances for other lessons. Local state is kept
-          // correct via the onChange -> setStatus callback in the cell.
-          await Promise.all([
-            queryClient.invalidateQueries([
-              QUERY_KEY.course.getLessonDateTimeKey,
-            ]),
-            queryClient.invalidateQueries([
-              QUERY_KEY.studentLesson.getListStudentLessonKey,
-            ]),
+          await queryClient.invalidateQueries([
+            QUERY_KEY.course.getLessonDateTimeKey,
           ])
           toast.success(t('student:attendanceStatus.attendanceUpdated'))
         } else {
           toast.success(t('student:attendanceStatus.attendanceNotUpdated'))
         }
       },
-      onError: (error: ApiError) => {
-        handleApiError({ error, t })
-      },
-    })
-  }
-
-  const useUpdateStudentLessonRemarks = () => {
-    return useMutation({
-      mutationFn: (data: { studentLessonId: number; remarks: string | null }) =>
-        updateStudentLessonRemarks(data),
       onError: (error: ApiError) => {
         handleApiError({ error, t })
       },
@@ -466,34 +441,12 @@ const useLessonDateTimeData = () => {
     useDelayFollowingLessons,
     useDeleteStudentLesson,
     useUpdateAttendanceLesson,
-    useUpdateStudentLessonRemarks,
     useFetchAvailableNextRecurring,
     useGetListStudentLesson,
     useUpdateLocationRoom,
     useUpdateInstructor,
     useCheckConflict,
     useGetLessonMatrix,
-    useBulkUpdateSharedVideo,
-  }
-
-  function useBulkUpdateSharedVideo(
-    onSuccess?: () => void
-  ): UseMutationResult<
-    void,
-    ApiError,
-    { classLessonIds: number[]; hasSharedVideo: SharedVideoStatus; studentLessonIds?: number[] }
-  > {
-    return useMutation({
-      mutationFn: ({ classLessonIds, hasSharedVideo, studentLessonIds }) =>
-        bulkUpdateSharedVideo(classLessonIds, hasSharedVideo, studentLessonIds),
-      onSuccess: () => {
-        toast.success(t('lessonList:videoStatusUpdated'))
-        onSuccess?.()
-      },
-      onError: (error: ApiError) => {
-        handleApiError({ error, t })
-      },
-    })
   }
 }
 

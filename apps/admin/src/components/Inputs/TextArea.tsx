@@ -1,14 +1,52 @@
 import { forwardRef } from 'react'
 
+import { CSS } from '@stitches/react'
 import { DefaultTFuncReturn } from 'i18next'
 import { ComponentPropsWithRef } from 'react-spring'
 
-import { cn } from '@/utils/cn'
+import { styled } from '@/styles'
 
 import Text from '../Texts/Text'
 import Box from '../ui/Box'
 
 import { TextInputLabel } from './TextInput'
+
+export const StyledTextArea = styled('textarea', {
+  padding: '$small',
+  width: '100%',
+  // minWidth: '100%',
+  borderRadius: '$medium',
+  outline: 'none',
+  backgroundColor: '$background',
+  border: '1px solid $borderColor',
+  color: '$text',
+  caretColor: '$text',
+  '&:hover:enabled, &:focus:enabled': {
+    borderColor: '$borderColor',
+  },
+  '&:focus:enabled': {
+    focusOutline: '$borderColorPrimary',
+  },
+  '&::placeholder': {
+    color: '$textSubtle',
+  },
+  '&:disabled': {
+    backgroundColor: '$backgroundDisabled',
+  },
+  variants: {
+    invalid: {
+      true: {
+        borderColor: '$secondary',
+        '&:hover:enabled, &:focus:enabled': {
+          borderColor: '$secondary',
+        },
+      },
+    },
+    resize: {
+      false: { resize: 'none' },
+    },
+  },
+})
 
 type TextAreaProps = {
   rows?: number
@@ -17,14 +55,13 @@ type TextAreaProps = {
   defaultValue?: string
   readOnly?: boolean
   resize?: boolean
+  css?: CSS
   label?: DefaultTFuncReturn | string
   required?: boolean
   isError?: boolean
   helperText?: DefaultTFuncReturn | string
   vertical?: boolean
-  className?: string
 } & ComponentPropsWithRef<'textarea'>
-
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
   (
     {
@@ -37,8 +74,6 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
       isError = false,
       helperText,
       vertical,
-      resize = true,
-      className,
       ...props
     },
     ref
@@ -49,39 +84,27 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
         align={vertical ? 'start' : 'center'}
       >
         {label && (
-          <TextInputLabel
-            fullWidth={!!vertical}
-            className="w-[30%] max-w-[40%]"
-          >
+          <TextInputLabel css={{ width: '30%' }}>
             <>
               <span className="whitespace-nowrap"> {label}</span>
-              {required && <Text type="error">*</Text>}
+              {required && <Text css={{ color: '$warn' }}>*</Text>}
             </>
           </TextInputLabel>
         )}
-        <Box direction="col" align="start">
-          <textarea
+        <Box direction="col">
+          <StyledTextArea
             rows={rows ?? 10}
             disabled={disabled ?? false}
+            {...props}
             ref={ref}
             value={value}
             defaultValue={defaultValue}
-            className={cn(
-              'p-2 w-full rounded-md outline-none bg-background border border-border text-text caret-text',
-              'hover:enabled:border-border focus:enabled:border-border focus:enabled:ring-2 focus:enabled:ring-border-primary focus:enabled:ring-offset-0',
-              'placeholder:text-text-subtle disabled:bg-background-disabled',
-              isError &&
-                'border-warn hover:enabled:border-warn focus:enabled:border-warn',
-              !resize && 'resize-none',
-              className
-            )}
-            {...props}
           />
           {helperText && (
             <Text
               size="small"
               type={isError ? 'error' : undefined}
-              className={isError ? 'text-warn' : 'text-text'}
+              css={{ color: isError ? '$warn' : '$text' }}
             >
               {helperText}
             </Text>
@@ -91,7 +114,5 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     )
   }
 )
-
-TextArea.displayName = 'TextArea'
 
 export default TextArea

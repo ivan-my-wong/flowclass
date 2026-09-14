@@ -1,21 +1,75 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { forwardRef, HTMLAttributes } from 'react'
 
-import { cn } from '@/utils/cn'
+import type { CSS } from '@stitches/react'
+import { ComponentProps } from '@stitches/react'
 
-const gapClasses = {
-  none: 'gap-0',
-  small: 'gap-2',
-  medium: 'gap-4',
-  large: 'gap-8',
-}
+import { styled } from '../../styles'
 
-const paddingClasses = {
-  none: 'p-0',
-  small: 'p-2',
-  medium: 'p-4',
-  large: 'p-8',
-}
+const StyledBox = styled('div', {
+  display: 'flex',
+  width: '100%',
+  gap: '$2',
+
+  variants: {
+    responsive: {
+      true: {
+        '@md': {
+          flexDirection: 'column!important',
+        },
+      },
+    },
+    fitContent: {
+      true: {
+        width: 'fit-content',
+      },
+    },
+
+    rounded: {
+      true: {
+        borderRadius: '$1',
+      },
+    },
+
+    wrap: {
+      true: {
+        flexWrap: 'wrap',
+      },
+    },
+
+    gap: {
+      none: {
+        gap: '0',
+      },
+      small: {
+        gap: '$2',
+      },
+      medium: {
+        gap: '$4',
+      },
+      large: {
+        gap: '$8',
+      },
+    },
+    padding: {
+      none: {
+        padding: '0',
+      },
+      small: {
+        padding: '$2',
+      },
+      medium: {
+        padding: '$4',
+      },
+      large: {
+        padding: '$8',
+      },
+    },
+  },
+  defaultVariants: {
+    padding: 'none',
+  },
+})
 
 type BoxProps = {
   justify?:
@@ -32,37 +86,9 @@ type BoxProps = {
     | 'flex-start'
     | 'flex-end'
   children: React.ReactNode
-  responsive?: boolean
-  fitContent?: boolean
-  rounded?: boolean
-  wrap?: boolean
-  gap?: keyof typeof gapClasses
-  padding?: keyof typeof paddingClasses
-  className?: string
-} & HTMLAttributes<HTMLDivElement>
-
-const justifyClasses: Record<string, string> = {
-  center: 'justify-center',
-  'space-between': 'justify-between',
-  'space-around': 'justify-around',
-  'flex-start': 'justify-start',
-  'flex-end': 'justify-end',
-}
-
-const directionClasses: Record<string, string> = {
-  row: 'flex-row',
-  column: 'flex-col',
-  'row-reverse': 'flex-row-reverse',
-  'column-reverse': 'flex-col-reverse',
-}
-
-const alignClasses: Record<string, string> = {
-  center: 'items-center',
-  'space-between': 'items-between',
-  'space-around': 'items-around',
-  'flex-start': 'items-start',
-  'flex-end': 'items-end',
-}
+  css?: CSS
+} & HTMLAttributes<HTMLDivElement> &
+  ComponentProps<typeof StyledBox>
 
 const Box = forwardRef<HTMLDivElement, BoxProps>(
   (
@@ -70,42 +96,29 @@ const Box = forwardRef<HTMLDivElement, BoxProps>(
       justify = 'center',
       direction = 'row',
       align = 'center',
+      css,
+
       children,
-      responsive,
-      fitContent,
-      rounded,
-      wrap,
-      gap = 'small',
-      padding = 'none',
-      className,
       ...props
     },
     ref
   ) => {
     return (
-      <div
-        ref={ref}
-        className={cn(
-          'flex w-full',
-          justifyClasses[justify] || 'justify-center',
-          directionClasses[direction] || 'flex-row',
-          alignClasses[align] || 'items-center',
-          gapClasses[gap],
-          paddingClasses[padding],
-          responsive && 'flex-col md:flex-row',
-          fitContent && 'w-fit',
-          rounded && 'rounded-lg',
-          wrap && 'flex-wrap',
-          className
-        )}
+      <StyledBox
+        css={{
+          justifyContent: justify,
+          flexDirection: direction,
+          alignItems: align,
+
+          ...css,
+        }}
         {...props}
+        ref={ref}
       >
         {children}
-      </div>
+      </StyledBox>
     )
   }
 )
-
-Box.displayName = 'Box'
 
 export default Box

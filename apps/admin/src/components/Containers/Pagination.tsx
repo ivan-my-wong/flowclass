@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 
 import ReactPaginate from 'react-paginate'
 
+import { styled } from '../../styles'
 import Text from '../Texts/Text'
 
 import Box from './Box'
@@ -24,6 +25,27 @@ interface PaginatedItemsProps {
   currentPage?: number
 }
 
+const PaginationWrapper = styled('div', {
+  width: '100%',
+
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: '0.5rem 0',
+  ul: {
+    listStyleType: 'none' /* Remove bullets */,
+    padding: 0 /* Remove padding */,
+    margin: 0 /* Remove margins */,
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '$4',
+    alignItems: 'center',
+    '.selected': {
+      fontWeight: 'bold',
+    },
+  },
+})
+
 const PaginatedItems = ({
   children = [],
   title,
@@ -35,13 +57,6 @@ const PaginatedItems = ({
 }: PaginatedItemsProps): JSX.Element => {
   const [itemOffset, setItemOffset] = useState(currentOffset ?? 0)
   const pageCount = Math.ceil(children.length / (itemsPerPage || 1))
-  // react-paginate logs a warning when `forcePage` is out of [0, pageCount-1].
-  // Clamp it so we never feed it a stale page index (e.g. when the list shrinks
-  // or there are 0 items).
-  const safeForcePage =
-    typeof currentPage === 'number' && pageCount > 0
-      ? Math.min(Math.max(currentPage, 0), pageCount - 1)
-      : undefined
 
   const handlePageClick = (event: { selected: number }): void => {
     const newOffset = (event.selected * itemsPerPage) % children.length
@@ -58,9 +73,9 @@ const PaginatedItems = ({
       <Box>
         {actionButton}
         {title && <Text className="shrink-0">{title}</Text>}
-        <div className="w-full flex justify-center items-center py-2 [&_ul]:list-none [&_ul]:p-0 [&_ul]:m-0 [&_ul]:flex [&_ul]:justify-center [&_ul]:gap-4 [&_ul]:items-center [&_.selected]:font-bold">
+        <PaginationWrapper>
           <ReactPaginate
-            forcePage={safeForcePage}
+            forcePage={currentPage}
             breakLabel="..."
             nextLabel={
               <PaginationButton
@@ -83,7 +98,7 @@ const PaginatedItems = ({
             }
             renderOnZeroPageCount={null}
           />
-        </div>
+        </PaginationWrapper>
       </Box>
 
       {currentItems}

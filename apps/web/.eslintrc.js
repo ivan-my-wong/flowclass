@@ -146,7 +146,7 @@ module.exports = {
               // Import React first
 
               ['^next(/.*|$)', '^react$', 'react-router-dom'],
-              ['recoil'],
+              ['@playwright/test', 'recoil'],
               ['^@?\\w'],
               // Internal imports using @ alias (all directories inside src)
               ['^@(/.*|$)'],

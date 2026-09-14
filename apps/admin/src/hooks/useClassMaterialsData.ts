@@ -13,7 +13,6 @@ import {
 } from '@/api/class-materials'
 import ApiError, { handleApiError } from '@/api/errors/apiError'
 import { QUERY_KEY } from '@/constants/queryKey'
-import { API_BASE_URL } from '@/lib/config'
 import {
   currentUploadProgressState,
   uploadProgressState,
@@ -41,7 +40,7 @@ export const useClassMaterialsData = () => {
   )
   const startEvent = (uploadProgress: UploadProgress): void => {
     const eventSource = new EventSource(
-      `${API_BASE_URL}/stream/${uploadProgress.uploadId}`
+      `${import.meta.env.VITE_API_BASE_URL}/stream/${uploadProgress.uploadId}`
     )
     eventSource.onerror = () => {
       eventSource.close()

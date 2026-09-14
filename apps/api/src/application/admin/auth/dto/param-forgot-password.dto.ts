@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, MaxLength } from 'class-validator'
 
 export class ParamForgotPasswordDto {
   @ApiProperty({
-    example: 'user@example.com',
+    example: 'flowclass@gmail.com',
   })
   @IsNotEmpty()
   @MaxLength(255)

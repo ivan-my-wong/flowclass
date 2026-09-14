@@ -21,11 +21,10 @@ import useInstructors from '@/hooks/useInstructors'
 import useSchoolData from '@/hooks/useSchoolData'
 import useStudentData from '@/hooks/useStudentData'
 import { IFormInput } from '@/pages/Setting/CustomDataField/CreateNewFieldComponent'
+import { styled } from '@/styles'
 import { StudentPrimaryIdentifier } from '@/types/school'
 import { UserAlias } from '@/types/studentMemo'
 import { formatPhoneNumber } from '@/utils/misc'
-
-import { ErrorField } from './createTeachingService'
 
 type PersonalInformationFormProps = {
   register: UseFormRegister<any>
@@ -174,9 +173,7 @@ const PersonalInformationForm = ({
         )}
 
         {errors.phone?.type === 'required' && (
-          <div className="absolute text-[#ff4d4f] -bottom-6 left-0 text-sm">
-            {t('student:create.phoneRequired')}
-          </div>
+          <ErrorField>{t('student:create.phoneRequired')}</ErrorField>
         )}
       </Box>
       {!!student && isCreateStudent && (
@@ -208,9 +205,7 @@ const PersonalInformationForm = ({
         />
       </Box>
       {errors.name?.type === 'required' && (
-        <div className="absolute text-[#ff4d4f] -bottom-6 left-0 text-sm">
-          {t('student:create.nameRequired')}
-        </div>
+        <ErrorField> {t('student:create.nameRequired')}</ErrorField>
       )}
       <Box direction="col" padding="0">
         <div className="flex items-center justify-start w-full gap-2">
@@ -232,34 +227,18 @@ const PersonalInformationForm = ({
           })}
         />
 
-        {errors.email && (
-          <div className="absolute text-[#ff4d4f] -bottom-6 left-0 text-sm">
-            {errors.email.message}
-          </div>
-        )}
-      </Box>
-      <Box direction="col" padding="0">
-        <div className="flex items-center justify-start w-full gap-2">
-          <Text bold>{t('student:create.secondaryEmail')}</Text>
-        </div>
-        <TextInput
-          id="secondaryEmail"
-          vertical
-          disabled={disabled}
-          {...register('secondaryEmail', {
-            pattern: {
-              value: /\S+@\S+\.\S+/,
-              message: t('student:create.emailFormat'),
-            },
-            maxLength: 200,
-          })}
-        />
-        {errors.secondaryEmail && (
-          <ErrorField>{(errors.secondaryEmail as any).message}</ErrorField>
-        )}
+        {errors.email && <ErrorField>{errors.email.message}</ErrorField>}
       </Box>
     </Box>
   )
 }
+
+const ErrorField = styled('div', {
+  position: 'absolute',
+  color: '#ff4d4f',
+  bottom: '-22px',
+  left: 0,
+  fontSize: 14,
+})
 
 export default PersonalInformationForm

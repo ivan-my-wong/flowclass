@@ -1,7 +1,15 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common'
 import { JwtService, JwtSignOptions } from '@nestjs/jwt'
-import * as bcrypt from 'bcryptjs'
+import * as bcrypt from 'bcrypt'
 import { plainToInstance } from 'class-transformer'
+import * as admin from 'firebase-admin'
+import { DecodedIdToken } from 'firebase-admin/lib/auth/token-verifier'
 import { ILike } from 'typeorm'
 
 import { BaseRegisterDto } from '@/application/admin/auth/dto/base-register.dto'
@@ -10,6 +18,7 @@ import {
   CreateLoginTokenDto,
   LoginDto,
   LoginResponse,
+  LoginSocialDto,
   LoginWithTokenDto,
   ValidateTokenDto,
 } from '@/application/admin/auth/dto/login.dto'
@@ -24,6 +33,7 @@ import { UserDetailDto } from '@/application/admin/users/dto/user-detail.dto'
 import { CloudWatchLoggerProvider } from '@/config/loggers/cloudwatch-nestjs.provider'
 import { EmailService } from '@/domain/external/email.service'
 import { AuthorizationException } from '@/exceptions/authorization.exception'
+import { AuthErrorMessage } from '@/exceptions/error-message/auth'
 import { UserErrorMessage } from '@/exceptions/error-message/user'
 import { InviteSiteMemberStatus } from '@/models/enums/status'
 import { InstructorProfileRepository } from '@/models/instructor-profile.entity'
@@ -35,6 +45,8 @@ import { shallow } from '@/utils/shallow.utils'
 import { sitesOfUser } from '@/utils/sites.utils'
 import { transformPhone } from '@/utils/string.utils'
 import { permissionsOfUser } from '@/utils/user-roles.utils'
+
+import { GaMeasurementService } from '../external/gaMeasurement.service'
 
 import { PasswordResetTokenService } from './password-reset-token.service'
 import { UsersService } from './users.service'
@@ -50,13 +62,14 @@ export class AuthService {
     private readonly passwordResetTokenService: PasswordResetTokenService,
     private readonly emailService: EmailService,
     private readonly logger: CloudWatchLoggerProvider,
+    private readonly gaMeasurementService: GaMeasurementService,
     private readonly inviteMembersRepository: InviteMembersRepository,
     private readonly userRolesRepository: UserRolesRepository,
     private readonly instructorProfileRepository: InstructorProfileRepository
   ) {
     this.jwtOption = {
-      secret: process.env.JWT_SECRET,
-      expiresIn: '1d',
+      secret: process.env.JWT_TOKEN_FORGOT_PASSWORD_SECRET_KEY,
+      expiresIn: process.env.JWT_TOKEN_FORGOT_PASSWORD_EXPRIED,
     }
   }
 
@@ -65,11 +78,6 @@ export class AuthService {
       secret: process.env.JWT_SECRET,
       expiresIn: process.env.JWT_EXPIRES_IN,
     }
-  }
-
-  async hasUsers(): Promise<{ hasUsers: boolean }> {
-    const count = await this.usersRepository.count()
-    return { hasUsers: count > 0 }
   }
 
   async registerAdminAccount(
@@ -99,10 +107,111 @@ export class AuthService {
 
     const data = await this.getResponseUserDto(user)
 
+    // try {
+    //   await this.linkFirebaseAccount({ user, isStudent })
+    // } catch (err) {
+    //   if (err.status === 422) {
+    //     await this.usersRepository.delete({ id: user.id })
+    //     throw err
+    //   }
+    // }
+
     return {
       user: data,
       accessToken,
       refreshToken,
+    }
+  }
+
+  async linkFirebaseAccount({
+    user,
+    providerData,
+    isStudent,
+  }: {
+    user: User
+    providerData?: { uid: string; providerId: string }
+    isStudent?: boolean
+  }): Promise<void> {
+    // Sending the user to firebase
+    const firebaseUser = {
+      password: user.password, // Assuming `id` is the user's unique identifier
+      email: user.email,
+      emailVerified: false,
+      // Include any other relevant user data you want to send to Firebase
+    }
+
+    let existingUser
+
+    try {
+      existingUser = await admin.auth().getUserByEmail(user.email)
+    } catch (err) {
+      // Nothing should happen
+      this.logger.log(err)
+    }
+
+    try {
+      let firebaseUid
+
+      if (existingUser) {
+        // User already exists in Firebase, link the accounts
+        firebaseUid = existingUser.uid
+
+        const dataToBeUpdated: Record<string, any> = {
+          email: firebaseUser.email,
+          password: firebaseUser.password,
+          // Update any other relevant user data in Firebase
+        }
+
+        if (providerData) {
+          dataToBeUpdated.providerData = providerData
+          dataToBeUpdated.emailVerified = true
+        }
+
+        await admin.auth().updateUser(firebaseUid, dataToBeUpdated)
+
+        this.logger.log(firebaseUid + ': User account linked in Firebase')
+      } else {
+        // User doesn't exist in Firebase, create a new account
+        const createdUser = await admin.auth().createUser(firebaseUser)
+        firebaseUid = createdUser.uid
+        this.logger.log(firebaseUid + ': User data sent to Firebase successfully')
+      }
+
+      if (user.email && firebaseUid !== '') {
+        await this.usersService.updateFirebaseId(user.id, firebaseUid)
+      }
+    } catch (error) {
+      this.logger.error(AuthErrorMessage.FAIL_TO_CREATE_FIREBASE_USER, error)
+      // Handle the error accordingly
+      throw new HttpException(
+        AuthErrorMessage.FAIL_TO_CREATE_FIREBASE_USER + ': ' + error.message,
+        HttpStatus.UNPROCESSABLE_ENTITY
+      )
+    }
+
+    if (!isStudent) {
+      try {
+        // Sending a verification email after a user has registered
+
+        const verificationLink = await admin
+          .auth()
+          .generateEmailVerificationLink(firebaseUser.email)
+          .then((link) => link)
+          .catch((err) => {
+            throw err
+          })
+
+        await this.emailService.sendVerificationEmail({
+          userId: user.id,
+          emailAddress: user.email,
+          verificationLink,
+          firstName: user.firstName,
+          phoneNumber: user.phone,
+        })
+      } catch (err) {
+        this.logger.error(AuthErrorMessage.CANNOT_SEND_VERIFICATION_EMAIL, err.stack)
+        // Handle the error accordingly
+      }
     }
   }
 
@@ -186,12 +295,93 @@ export class AuthService {
     }
   }
 
+  async loginSocial({ idToken }: LoginSocialDto): Promise<LoginResponse> {
+    let decodedToken: DecodedIdToken = null
+    try {
+      decodedToken = await admin.auth().verifyIdToken(idToken)
+    } catch (error) {
+      this.logger.error(AuthErrorMessage.ID_TOKEN_NOT_VALID, error.stack)
+      throw AuthorizationException.unauthorizedException()
+    }
+
+    if (!decodedToken?.email) {
+      this.logger.warn('Social login: ID token missing email')
+      throw AuthorizationException.unauthorizedException()
+    }
+
+    const users = await this.findSuitableUserFromEmail(decodedToken.email)
+
+    const user = users[0]
+
+    // if (!user) {
+    //   const userInstance = plainToInstance(
+    //     User,
+    //     {
+    //       email: decodedToken.email,
+    //       password: bcrypt.hashSync(decodedToken.user_id + decodedToken.auth_time, 12),
+    //       avatarUrl: decodedToken.picture,
+    //       firebaseId: decodedToken.uid,
+    //       firstName: decodedToken.name,
+    //       isEmailVerified: decodedToken.email_verified,
+    //     },
+    //     { ignoreDecorators: true }
+    //   )
+
+    //   user = await this.usersService.createUser(userInstance)
+    //   await this.linkFirebaseAccount({
+    //     user,
+    //     providerData: {
+    //       providerId: decodedToken.provider_id,
+    //       uid: decodedToken.uid,
+    //     },
+    //   })
+
+    //   try {
+    //     this.gaMeasurementService.sendToGa({
+    //       userId: user.id,
+    //       clientId: decodedToken.uid,
+    //       events: [
+    //         {
+    //           name: GaMeasurementEventName.SIGN_UP,
+    //           params: {
+    //             login_method: decodedToken.firebase?.sign_in_provider,
+    //             email: decodedToken.email,
+    //           },
+    //         },
+    //       ],
+    //       userProperties: {
+    //         email: decodedToken.email,
+    //         firebaseId: user.firebaseId,
+    //       },
+    //     })
+    //   } catch (err) {
+    //     this.logger.error(UserErrorMessage.ANALYTICS_CANNOT_BE_SENT, err.stack)
+    //   }
+    // }
+
+    if (!user) {
+      throw new UnauthorizedException(UserErrorMessage.USER_NOT_FOUND)
+    }
+
+    const { accessToken, refreshToken } = await this.generateToken(user)
+
+    await this.usersService.saveLastLogin(user)
+
+    const data = await this.getResponseUserDto(user)
+
+    return {
+      user: data,
+      accessToken,
+      refreshToken,
+    }
+  }
+
   async refreshAccessToken({ refreshToken }: { refreshToken: string }) {
     let payload
 
     try {
       payload = this.jwtService.verify(refreshToken, {
-        secret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET || 'local-dev-jwt-secret',
+        secret: process.env.JWT_REFRESH_SECRET,
       })
     } catch (e) {
       if ((e.message as string).includes('expired')) {
@@ -245,7 +435,7 @@ export class AuthService {
     })
 
     const resetLink = encodeURI(
-      process.env.NEXT_PUBLIC_WEB_BASE_URL +
+      process.env.FRONTEND_URL +
         '/login/reset-password?email=' +
         user.email +
         '&token=' +
@@ -322,11 +512,20 @@ export class AuthService {
       throw AuthorizationException.unauthorizedException()
     }
 
+    const userRoles = await user.userRoles
+    user.permissions = permissionsOfUser(userRoles)
+
     return user
   }
 
-  async createLoginToken({ email }: CreateLoginTokenDto): Promise<string> {
-    const user = await this.usersService.findOneByEmail(email)
+  async createLoginToken({ email, phone }: CreateLoginTokenDto): Promise<string> {
+    let user: User | null = null
+
+    if (email) {
+      user = await this.usersService.findOneByEmail(email)
+    } else if (phone) {
+      user = await this.usersService.findOneBy({ phone })
+    }
 
     if (!user) {
       throw AuthorizationException.unauthorizedException()
@@ -423,8 +622,8 @@ export class AuthService {
     }
 
     return this.jwtService.signAsync(jwtPayload, {
-      secret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET || 'local-dev-jwt-secret', // unique refresh secret from environment vars
-      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d', // unique refresh expiration from environment vars
+      secret: process.env.JWT_REFRESH_SECRET, // unique refresh secret from environment vars
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN, // unique refresh expiration from environment vars
     })
   }
 

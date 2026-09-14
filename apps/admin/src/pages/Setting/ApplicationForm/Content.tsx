@@ -12,6 +12,7 @@ import Heading from '@/components/Texts/Heading'
 import Text from '@/components/Texts/Text'
 import { Button } from '@/components/ui/Button'
 import useSchoolData from '@/hooks/useSchoolData'
+import { styled } from '@/styles'
 import {
   FlagInformationFieldTypes,
   InformationFieldTypes,
@@ -113,13 +114,12 @@ const Content = ({
         </div>
         <Text className="mb-4">
           {t('setting:applicationForm.descriptionApplicatFields')}{' '}
-          <button
-            type="button"
-            className="text-primary cursor-pointer bg-transparent border-0 p-0 font-inherit"
+          <Span
             onClick={() => navigate('/settings/student-information-field')}
+            style={{ cursor: 'pointer' }}
           >
             {t('setting:applicationForm.settingInformationFields')}
-          </button>
+          </Span>
         </Text>
       </>
     ),
@@ -132,13 +132,12 @@ const Content = ({
         </div>
         <Text className="mb-4">
           {t('setting:applicationForm.descriptionCommonFields')}{' '}
-          <button
-            type="button"
-            className="text-primary cursor-pointer bg-transparent border-0 p-0 font-inherit"
+          <Span
             onClick={() => navigate('/settings/student-information-field')}
+            style={{ cursor: 'pointer' }}
           >
             {t('setting:applicationForm.settingInformationFields')}
-          </button>
+          </Span>
         </Text>
         {!(items[FlagInformationFieldTypes.common].length > 1) && (
           <div className="border-dashed border-2 p-4 rounded-md border-gray-400 flex flex-col items-center mt-4">
@@ -207,4 +206,7 @@ const Content = ({
     </div>
   )
 }
+const Span = styled('span', {
+  color: '$primary',
+})
 export default Content

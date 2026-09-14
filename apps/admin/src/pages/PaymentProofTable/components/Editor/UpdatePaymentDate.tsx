@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { CalendarIcon } from '@radix-ui/react-icons'
-import dayjs from 'dayjs'
 import { useTranslation } from 'react-i18next'
 import { LuPencil } from 'react-icons/lu'
 
@@ -22,6 +21,7 @@ import useSiteData from '@/hooks/useSiteData'
 import { AlertTypes } from '@/reducers/confirm.reducers'
 import { PaymentProofTableItem } from '@/types/enrollCourse'
 import { cn } from '@/utils/cn'
+import dayjs from '@/utils/dayjs'
 
 interface UpdatePaymentDateProps {
   data: PaymentProofTableItem
@@ -42,7 +42,7 @@ const UpdatePaymentDate = ({ data, refetch }: UpdatePaymentDateProps) => {
 
   useEffect(() => {
     if (isOpen && data?.paymentDate) {
-      const parsed = dayjs(data.paymentDate).toDate()
+      const parsed = dayjs.utc(data.paymentDate).toDate()
       setSelectedDate(Number.isNaN(parsed.getTime()) ? null : parsed)
     } else if (isOpen) {
       setSelectedDate(null)
@@ -58,7 +58,7 @@ const UpdatePaymentDate = ({ data, refetch }: UpdatePaymentDateProps) => {
     if (!data?.id) return
 
     const formattedDate = selectedDate
-      ? dayjs(selectedDate).format('YYYY-MM-DD')
+      ? `${dayjs(selectedDate).format('YYYY-MM-DD')}T00:00:00.000Z`
       : null
 
     setConfirm({
@@ -99,7 +99,7 @@ const UpdatePaymentDate = ({ data, refetch }: UpdatePaymentDateProps) => {
   }, [])
 
   const displayDate = data?.paymentDate
-    ? dayjs(data.paymentDate).format('DD MMM YYYY')
+    ? dayjs.utc(data.paymentDate).format('DD MMM YYYY')
     : t('common:notSet')
 
   return (
@@ -169,6 +169,9 @@ const UpdatePaymentDate = ({ data, refetch }: UpdatePaymentDateProps) => {
                   selected={selectedDate || undefined}
                   onSelect={handleDateSelect}
                   initialFocus
+                  captionLayout="dropdown"
+                  fromYear={2015}
+                  toYear={new Date().getFullYear() + 5}
                 />
               </PopoverContent>
             </Popover>
@@ -178,7 +181,7 @@ const UpdatePaymentDate = ({ data, refetch }: UpdatePaymentDateProps) => {
             <div className="text-xs text-gray-600 p-3 bg-gray-50 rounded-md border border-gray-200">
               <strong>{t('student:paymentProof.currentPaymentDate')}:</strong>
               <br />
-              {dayjs(data.paymentDate).format('DD MMMM YYYY')}
+              {dayjs.utc(data.paymentDate).format('DD MMMM YYYY')}
             </div>
           )}
         </div>

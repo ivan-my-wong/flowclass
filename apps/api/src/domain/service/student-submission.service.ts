@@ -21,6 +21,7 @@ import {
 } from '@/application/admin/class-materials/dto/search-params.dto'
 import { BulkUploadTeacherFeedbackDto } from '@/application/admin/student-submission/dto/student-submission.dto'
 import { StudentMaterialsDto } from '@/application/student/student-submission/dto/student-submission.dto'
+import { MetaWhatsappService } from '@/domain/external/meta-whatsapp.service'
 import { ErrorCode } from '@/exceptions/error-message/errors'
 import { ClassLessonRepository } from '@/models/class-lesson.repository'
 import { ClassLesson } from '@/models/class-lessons.entity'
@@ -49,7 +50,6 @@ import { GoogleDriveFile, IntegrationGoogleService } from '../external/integrati
 import { UploadProgressService } from '../external/upload-progress'
 
 import { UserRolesService } from './user-roles.service'
-import { WhatsappWebService } from './whatsapp-web.service'
 
 @Injectable()
 export class StudentSubmissionService {
@@ -65,7 +65,7 @@ export class StudentSubmissionService {
     private readonly userAliasRepository: UserAliasesRepository,
     private readonly classLessonRepository: ClassLessonRepository,
     private readonly emailService: EmailService,
-    private readonly whatsappWebService: WhatsappWebService,
+    private readonly whatsappService: MetaWhatsappService,
     private readonly enrollCourseRepository: EnrollCourseRepository,
     private readonly classRepository: ClassRepository
   ) {}
@@ -810,16 +810,17 @@ export class StudentSubmissionService {
     studentLesson: StudentLesson
   ) {
     try {
-      await this.whatsappWebService.sendMessage(
-        institution.id,
-        userAlias.user?.phone,
-        this.buildContentWithVariable(
-          whatsappContent,
-          userAlias,
-          studentLesson.class,
-          institution.name
-        )
+      if (!userAlias.user?.phone) return
+      const body = this.buildContentWithVariable(
+        whatsappContent,
+        userAlias,
+        studentLesson.class,
+        institution.name
       )
+      await this.whatsappService.sendDirectWhatsappMessage({
+        toPhone: userAlias.user.phone,
+        body,
+      })
     } catch (error) {
       console.error('Whatsapp send failed', error)
     }

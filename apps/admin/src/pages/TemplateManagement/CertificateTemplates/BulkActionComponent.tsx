@@ -9,6 +9,7 @@ import Text from '@/components/ui/Text'
 import useGlobalConfirm from '@/hooks/useGlobalConfirm'
 import useTemplateManagement from '@/hooks/useTemplateManagement'
 import { AlertTypes } from '@/reducers/confirm.reducers'
+import { theme } from '@/styles'
 import { DocumentTemplate } from '@/types/templateManagement'
 
 type BulkActionComponentProps = {
@@ -78,9 +79,7 @@ const BulkActionComponent = ({
                   variant="ghost"
                   className="rounded-full h-8 w-8 hover:bg-background-disabled hover:text-text-sub justify-center text-center p-0"
                 >
-                  <span className="text-primary">
-                    <LuX fill="currentColor" />
-                  </span>
+                  <LuX fill={theme.colors.primary.toString()} />
                 </Button>
 
                 <Text className="text-sm mr-auto text-text-subtle">

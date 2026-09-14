@@ -11,7 +11,7 @@ export const getSchools = async (siteId: number): Promise<School[]> => {
     },
   })
 
-  return res?.data?.data?.content ?? []
+  return res.data.data.content
 }
 
 export const getCurrentSchool = async (id: number): Promise<School> => {

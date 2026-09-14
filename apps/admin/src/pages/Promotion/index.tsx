@@ -2,31 +2,36 @@ import { useMemo } from 'react'
 
 import { useTranslation } from 'react-i18next'
 
-import BundleDiscountIcon from '@/assets/promotion/bundlediscount.png'
+import BundleDiscount from '@/assets/promotion/bundlediscount.png'
 import CouponIcon from '@/assets/promotion/couponIcon.png'
 import Heading from '@/components/Texts/Heading'
 import usePromotionData from '@/hooks/usePromotionData'
 import useSiteData from '@/hooks/useSiteData'
 import useSitesFeatureEnabled from '@/hooks/useSiteFeatureEnableData'
+import usePlanData from '@/hooks/useSubscriptionPlanData'
+import useTrialLessonData from '@/hooks/useTrialLessonData'
 import ContentLayout from '@/layouts/ContentLayout'
+import { PromotionType } from '@/types/coupon'
 import { SiteFeature } from '@/types/site-feature'
 
 import PromotionCard from './components/PromotionCard'
 
 const Promotion = (): JSX.Element => {
   const { t } = useTranslation()
-  const {
-    useFetchAllCouponData,
-    useFetchAllBundleDiscountsData,
-    useFetchAllPackageDiscountsData,
-  } = usePromotionData()
+  const { useFetchAllCouponData, useFetchAllBundleDiscountsData } =
+    usePromotionData()
   const fetchCouponDataResult = useFetchAllCouponData()
   const { data } = fetchCouponDataResult
+  const { checkSubscriptionAccess } = usePlanData()
+
   const hasAdditionalFeeAccess = true
-  const hasBundleDiscountAccess = true
+
+  const hasBundleDiscountAccess = checkSubscriptionAccess(
+    'promotionTier',
+    PromotionType.BUNDLE_DISCOUNT
+  )
 
   const { data: bundleDiscountData } = useFetchAllBundleDiscountsData()
-  const { data: packageDiscountData } = useFetchAllPackageDiscountsData()
 
   const { siteData } = useSiteData()
   const { useFetchSitesFeatureEnabled } = useSitesFeatureEnabled()
@@ -45,19 +50,6 @@ const Promotion = (): JSX.Element => {
     )
   }, [sitesFeatureEnabled, siteData?.currentSite?.id])
 
-  const enabledPackageDiscounts = useMemo(() => {
-    if (!siteData?.currentSite?.id) return false
-    if (!sitesFeatureEnabled) return true
-    const packageDiscounts = sitesFeatureEnabled.find(
-      o => o.feature === SiteFeature.PackageDiscounts
-    )
-    return (
-      !packageDiscounts ||
-      packageDiscounts.siteIds.length === 0 ||
-      packageDiscounts.siteIds.includes(siteData.currentSite.id)
-    )
-  }, [sitesFeatureEnabled, siteData?.currentSite?.id])
-
   return (
     <ContentLayout
       leftHeader={<Heading>{t('component:menubar.promotion')}</Heading>}
@@ -71,22 +63,28 @@ const Promotion = (): JSX.Element => {
           url="/promotion/coupon-code"
         />
 
+        {/* <PromotionCard
+          icon={TrialIcon}
+          title={t('promotion:titles.trial')}
+          numOfPromotion={summaryTrialLessond || 0}
+          haveAccess={hasTrialLessonAccess}
+          url="/promotion/trial-lesson"
+        /> */}
+        {/* <PromotionCard
+          icon={BundleDiscount}
+          title={t('setting:additionalFee.title')}
+          numOfPromotion={additionalFeeData?.length || 0}
+          haveAccess={hasAdditionalFeeAccess}
+          disabled
+          url="/settings/additional-fee"
+        /> */}
         {enabledBundleDiscounts && (
           <PromotionCard
-            icon={BundleDiscountIcon}
+            icon={BundleDiscount}
             title={t('promotion:titles.bundleDiscount')}
             numOfPromotion={bundleDiscountData?.length || 0}
             haveAccess={hasBundleDiscountAccess}
             url="/promotion/bundle-discounts"
-          />
-        )}
-        {enabledPackageDiscounts && (
-          <PromotionCard
-            icon={BundleDiscountIcon}
-            title={t('promotion:titles.packageDiscount')}
-            numOfPromotion={packageDiscountData?.length || 0}
-            haveAccess
-            url="/promotion/package-discounts"
           />
         )}
         {/* <PromotionCard

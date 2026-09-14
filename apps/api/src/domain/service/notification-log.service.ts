@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { isArray } from 'class-validator'
 import * as dayjs from 'dayjs'
-import { And, FindOptionsWhere, ILike, LessThanOrEqual, Like, MoreThanOrEqual, Raw } from 'typeorm'
+import { And, FindOptionsWhere, ILike, In, LessThanOrEqual, Like, MoreThanOrEqual, Raw } from 'typeorm'
 
 import {
   GetNotificationLogDto,
@@ -14,7 +14,9 @@ import {
   ChangeLessonWtsDTO,
 } from '@/application/admin/setting-notifications/setting-notifications.dto'
 import { CloudWatchLoggerProvider } from '@/config/loggers/cloudwatch-nestjs.provider'
-import { RemindPaymentWts } from '@/domain/external/whatsapp.service'
+import { EmailService } from '@/domain/external/email.service'
+import { RemindPaymentWts } from '@/domain/external/meta-whatsapp.service'
+import { AutomationFlow } from '@/models/automation-flow.entity'
 import {
   AssociatedClassType,
   NotificationChannel,
@@ -25,15 +27,10 @@ import { NotificationRecordRepository } from '@/models/notification-record.repos
 import { WhatsappTemplateEntity } from '@/models/whatsapp-template.entity'
 import { shallow } from '@/utils/shallow.utils'
 
-type WhatsappDeliveryMessage = {
-  sid?: string
-  body?: string
-  errorCode?: string | number | null
-}
-
 export type WriteWANotificationRecordParams = {
   msgData: RemindPaymentWts | ChangeLessonWtsDTO | AddLessonEmailDTO
-  message: WhatsappDeliveryMessage
+  message: any
+  automationFlow?: AutomationFlow
   whatsappTemplate?: WhatsappTemplateEntity
   notificationRecord?: NotificationRecord
 }
@@ -41,6 +38,7 @@ export type WriteWANotificationRecordParams = {
 export type PutNotifAtQueueParams = {
   msgData: RemindPaymentWts | ChangeLessonWtsDTO | AddLessonEmailDTO
   messageContent: string
+  automationFlow?: AutomationFlow
   whatsappTemplate?: WhatsappTemplateEntity
   invoiceMetadata?: Record<string, any>
   sentAt?: Date
@@ -61,7 +59,8 @@ export type SaveNotificationLogParams = {
 export class NotificationRecordService {
   constructor(
     private readonly logger: CloudWatchLoggerProvider,
-    private readonly notificationRecordRepository: NotificationRecordRepository
+    private readonly notificationRecordRepository: NotificationRecordRepository,
+    private readonly emailService: EmailService
   ) {}
 
   async getNotificationLogBySiteSchool(
@@ -77,11 +76,13 @@ export class NotificationRecordService {
     }
 
     if (payload.startDate && payload.endDate) {
+      const startDate = dayjs(payload.startDate).startOf('day').toDate()
       const endDate = dayjs(payload.endDate).endOf('day').toDate()
 
-      whereClause.createdAt = And(MoreThanOrEqual(payload.startDate), LessThanOrEqual(endDate))
+      whereClause.createdAt = And(MoreThanOrEqual(startDate), LessThanOrEqual(endDate))
     } else if (payload.startDate && !payload.endDate) {
-      whereClause.createdAt = MoreThanOrEqual(payload.startDate)
+      const startDate = dayjs(payload.startDate).startOf('day').toDate()
+      whereClause.createdAt = MoreThanOrEqual(startDate)
     } else if (payload.endDate && !payload.startDate) {
       const endDate = dayjs(payload.endDate).endOf('day').toDate()
 
@@ -105,10 +106,14 @@ export class NotificationRecordService {
     return await this.notificationRecordRepository.find({
       where: whereClause,
       relations: {
+        automationFlow: true,
         whatsappTemplate: true,
         user: true,
       },
       select: payload?.select,
+      order: {
+        createdAt: 'DESC',
+      },
     })
   }
 
@@ -123,6 +128,7 @@ export class NotificationRecordService {
   async writeWhatsappNotificationRecord({
     msgData,
     message,
+    automationFlow,
     whatsappTemplate,
     notificationRecord,
   }: WriteWANotificationRecordParams) {
@@ -137,6 +143,7 @@ export class NotificationRecordService {
           siteId: msgData.siteId,
           message: message.body,
           whatsappTemplateId: whatsappTemplate?.id,
+          automationFlowId: automationFlow?.id,
           associatedClass: associatedClass.map((d) =>
             shallow({
               source: d,
@@ -170,6 +177,7 @@ export class NotificationRecordService {
     messageContent,
     invoiceMetadata,
     sentAt,
+    automationFlow,
     whatsappTemplate,
   }: PutNotifAtQueueParams) {
     const associatedClass = this.serializeAssociatedClass(msgData.associatedClass)
@@ -182,6 +190,7 @@ export class NotificationRecordService {
       message: messageContent,
       notificationStatus: NotificationStatus.QUEUED,
       whatsappTemplateId: whatsappTemplate?.id,
+      automationFlowId: automationFlow?.id,
       invoiceMetadata,
       sentAt,
       associatedClass: associatedClass.map((d) =>
@@ -237,5 +246,84 @@ export class NotificationRecordService {
       invoiceMetadata,
     })
     return this.notificationRecordRepository.save(notificationLog)
+  }
+
+  async resendNotificationLogs(
+    recordIds: number[],
+    scope: { siteId: number; institutionId?: number }
+  ) {
+    if (!recordIds || recordIds.length === 0) {
+      throw new BadRequestException('No record IDs provided to resend')
+    }
+
+    const whereClause: FindOptionsWhere<NotificationRecord> = {
+      id: In(recordIds),
+      siteId: scope.siteId,
+    }
+
+    if (scope.institutionId) {
+      whereClause.institutionId = scope.institutionId
+    }
+
+    const records = await this.notificationRecordRepository.find({
+      where: whereClause,
+      relations: {
+        user: true,
+        institution: true,
+        site: true,
+      },
+    })
+
+    const results: {
+      id: number
+      success: boolean
+      status: NotificationStatus
+      error?: string
+    }[] = []
+
+    for (const record of records) {
+      try {
+        if (record.channel === NotificationChannel.EMAIL || !record.channel) {
+          await this.emailService.resendNotificationRecord(record)
+          results.push({
+            id: record.id,
+            success: record.notificationStatus === NotificationStatus.SENT,
+            status: record.notificationStatus as NotificationStatus,
+            error:
+              record.notificationStatus === NotificationStatus.FAILED
+                ? record.message
+                : undefined,
+          })
+        } else {
+          results.push({
+            id: record.id,
+            success: false,
+            status: record.notificationStatus as NotificationStatus,
+            error: 'Channel not supported for resend',
+          })
+        }
+      } catch (err: any) {
+        this.logger.error(
+          `Failed to resend notification record ${record.id}:`,
+          err?.message || err
+        )
+        record.notificationStatus = NotificationStatus.FAILED
+        record.message = err?.message || JSON.stringify(err)
+        await this.notificationRecordRepository.save(record)
+        results.push({
+          id: record.id,
+          success: false,
+          status: NotificationStatus.FAILED,
+          error: err?.message || 'Failed to resend notification',
+        })
+      }
+    }
+
+    return {
+      total: records.length,
+      succeeded: results.filter((r) => r.success).length,
+      failed: results.filter((r) => !r.success).length,
+      results,
+    }
   }
 }

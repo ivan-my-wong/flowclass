@@ -8,7 +8,12 @@ export class AssignCouponDto {
   @ApiProperty()
   @Expose()
   @IsArray()
-  userIds: number[]
+  userAliasIds: number[]
+
+  @ApiProperty()
+  @Expose()
+  @IsArray()
+  userIds?: number[]
 
   @ApiProperty()
   @Expose()

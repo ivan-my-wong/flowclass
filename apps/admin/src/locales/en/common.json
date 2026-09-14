@@ -15,7 +15,6 @@
     "confirmSort": "Confirm sorting",
     "contact": "Contact",
     "copy": "Copy",
-    "copied": "Copied!",
     "create": "Create",
     "decideLater": "Decide Later",
     "delete": "Delete",
@@ -63,28 +62,11 @@
   },
   "and": "and",
   "description": {
-    "brief": "Brief Introduction",
     "comingSoon": "Coming Soon!",
-    "createdBy": "© Flowsophic Limited",
     "hasPermission": "Not Allowed",
     "ifApplicable": "If applicable",
-    "info": "Description",
-    "no": "No",
-    "noName": "Unnamed",
-    "or": "or",
     "remark": "Remarks",
-    "status": "Status",
-    "tag": "Tag",
-    "to": "to"
-  },
-  "entity": {
-    "class": "Class",
-    "classes": "Classes",
-    "school": "School",
-    "session": "Session",
-    "sessions": "Sessions",
-    "student": "Student",
-    "user": "User"
+    "status": "Status"
   },
   "errorPage": {
     "forbiddenDescription": "Sorry, you do not have permission to access this page. Please contact support or go back.",
@@ -114,6 +96,7 @@
     "INVALID_DATA": "The data you have entered is invalid. Please check again.",
     "INVALID_EXPRIRE_DATE": "Error: Please select a valid date.",
     "INVALID_FILE_CSV": "The file you uploaded is invalid. Please check again.",
+    "INVALID_IMAGE_FORMAT": "Invalid image format. Supported formats are: JPG, JPEG, PNG, WEBP, SVG, HEIC, HEIF.",
     "INVALID_PHONE_NUMBER": "Invalid phone number.",
     "INVALID_PHONE_NUMBER_FOR_USER": "The user's phone number is invalid. Please check if you have entered a valid phone number for the user",
     "invalidLink": "The provided URL is not valid. Please ensure it is correctly formatted and includes the necessary components such as the protocol (e.g., 'http://', 'https://').",
@@ -149,19 +132,10 @@
     "VALIDATION_ERROR": "Incorrect input"
   },
   "fields": {
-    "address": "Address",
-    "basicInfo": "Basic Information",
-    "discountedPrice": "Discounted Price",
     "email": "Email",
-    "grade": "Student Level",
-    "locality": "Area",
     "name": "Name",
     "options": "Options",
     "phone": "Phone",
-    "price": "Price",
-    "quota": "Quota",
-    "remarks": "Remarks",
-    "website": "Website",
     "whatsapp": "Whatsapp"
   },
   "noData": "No data",
@@ -175,20 +149,13 @@
   "notSet": "Not set",
   "pagination": {
     "aria": {
-      "goToFirst": "Go to first page",
-      "goToLast": "Go to last page",
       "next": "Go to next page",
       "previous": "Go to previous page"
     },
-    "first": "First",
-    "last": "Last",
     "more": "More pages",
     "next": "Next",
-    "of": "of",
-    "page": "Page",
     "pageSize": "Page size",
-    "previous": "Previous",
-    "rows": "rows"
+    "previous": "Previous"
   },
   "roles": {
     "instructor": "Course Instructor",
@@ -197,11 +164,6 @@
     "siteAdmin": "Site Manager"
   },
   "section": {
-    "basicInfo": "Basic Info",
-    "comment": "Comment",
-    "cover": "Cover",
-    "label": "Label",
-    "title": "Title",
     "type": "Category"
   },
   "status": {

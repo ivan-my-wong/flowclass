@@ -6,6 +6,8 @@ import ImageAspect from '@/components/Images/ImageAspect'
 import SkeletonLoader from '@/components/Loaders/SkeletonLoader'
 import Text from '@/components/Texts/Text'
 import useSchoolData from '@/hooks/useSchoolData'
+import useSiteData from '@/hooks/useSiteData'
+import { siteDomainIfCustom } from '@/utils/string'
 
 import { SetDomainStepPreview } from '../steps/SetDomainStep'
 
@@ -28,24 +30,34 @@ const OnboardingPreview: React.FC<OnboardingPreviewProps> = ({
   payoutPreview,
   classUrl,
 }) => {
+  const { siteData } = useSiteData()
   const { schoolData } = useSchoolData()
 
-  const webBaseUrl =
-    import.meta.env.VITE_WEB_BASE_URL || 'http://localhost:3001'
-
-  // Mobile frame component for site preview - loads web app from NEXT_PUBLIC_WEB_BASE_URL
+  // Mobile frame component for site preview
   const MobileSitePreview = () => {
     const [isLoading, setIsLoading] = useState(true)
     const [hasError, setHasError] = useState(false)
 
+    const domain = siteDomainIfCustom(
+      siteData?.currentSite?.customDomain,
+      siteData?.currentSite?.url
+    )
     const schoolUrl = schoolData?.currentSchool?.url
 
-    // Use web app URL from NEXT_PUBLIC_WEB_BASE_URL; append school path when available
+    if (!domain) {
+      return (
+        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+          <Text className="text-gray-500 text-sm">No site available</Text>
+        </div>
+      )
+    }
+
+    // For step 4 and after, use classUrl if available, otherwise use school URL
     const siteUrl =
       classUrl ||
       (schoolUrl
-        ? `${webBaseUrl.replace(/\/$/, '')}/@${encodeURI(schoolUrl)}`
-        : webBaseUrl)
+        ? `https://${domain}/@${encodeURI(schoolUrl)}`
+        : `https://${domain}`)
 
     const handleLoad = () => {
       setIsLoading(false)
@@ -92,11 +104,11 @@ const OnboardingPreview: React.FC<OnboardingPreviewProps> = ({
     )
   }
 
-  // Don't show preview for step 0, student enrollment, or last step
+  // Don't show preview for step 0 or last step
   if (
     currentSectionIndex === 0 ||
-    currentSectionIndex === 5 ||
-    currentSectionIndex === 6
+    currentSectionIndex === 6 ||
+    currentSectionIndex === 8
   ) {
     return <></>
   }

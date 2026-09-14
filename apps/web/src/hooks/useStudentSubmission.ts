@@ -9,7 +9,6 @@ import {
   uploadStudentSubmission,
   UploadStudentSubmissionDto,
 } from '@/api/student-submission'
-import { API_BASE_URL } from '@/lib/config'
 import { currentUploadProgressState, uploadProgressState } from '@/stores/student-submission'
 
 const useStudentSubmission = () => {
@@ -19,7 +18,9 @@ const useStudentSubmission = () => {
   )
 
   const startEvent = (uploadProgress: UploadProgressResponse): void => {
-    const eventSource = new EventSource(`${API_BASE_URL}/stream/${uploadProgress.uploadId}`)
+    const eventSource = new EventSource(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/stream/${uploadProgress.uploadId}`
+    )
     eventSource.onerror = () => {
       eventSource.close()
     }

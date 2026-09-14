@@ -9,22 +9,13 @@
   "viewQrCode": "查看二維碼",
   "downloadQrCode": "下載二維碼",
   "action": {
-    "cancel": "取消",
-    "save": "保存",
     "reset": "重置",
     "viewDetail": "查看詳情",
-    "sendWhatsapp": "發送WhatsApp",
-    "sendEmail": "發送電子郵件",
-    "addRemarks": "添加備註",
-    "changeLesson": "更改課程",
-    "deleteLesson": "刪除課程",
     "deleteClass": "刪除班級",
     "changeEntireLesson": "更改整個課程",
     "delayAllFollowingLesson": "延後所有後續課程",
     "changeStudentsLesson": "更改學生的課程"
   },
-  "selectCourse": "選擇課程",
-  "selectClass": "選擇班級",
   "start": "開始時間",
   "end": "結束時間",
   "description": "此課程僅分配給所選班級和課程下當前課程時段內已註冊的學生",
@@ -34,24 +25,17 @@
   "searchPlaceholder": "通過輸入電郵、姓名或電話搜索學生",
   "edit": "編輯",
   "studentList": "學生名單",
-
   "lessonStats": {
     "attendance": "已標記為出席",
     "quota": "名額",
     "quota1": "(從班級繼承)"
   },
-
   "promotion": {
     "trialLesson": "試堂"
   },
-
   "dialog": {
-    "titleDeleteDialog": "您確定要刪除課程嗎",
-    "descriptionDeleteLesson": "此操作不可逆轉"
+    "titleDeleteDialog": "您確定要刪除課程嗎"
   },
-  "changedFrom": "改為自",
-  "new": "新",
-  "choosePeriod": "選擇時段",
   "postpone": {
     "postponed": "已延後",
     "postpone": "您已選擇延後此課程 !",
@@ -72,13 +56,11 @@
     "tooltip": "過去的課程不能更改"
   },
   "updateLocationRoom": {
-    "success": "成功更新地點房間",
-    "error": "更新地點房間失敗"
+    "success": "成功更新地點房間"
   },
   "delayFollowingLessons": {
     "title": "延後所有後續課程",
     "description": "當前課程將被取消，並且將在下一個可用時段為當前課程中的所有學生分配一個額外課程。",
-    "featureForRecurring": "此功能僅適用於循環課程",
-    "delayFollowingLessonsSuccess": "成功保存延後所有後續課程數據"
+    "featureForRecurring": "此功能僅適用於循環課程"
   }
 }

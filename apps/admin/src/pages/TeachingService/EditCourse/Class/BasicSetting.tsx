@@ -182,18 +182,12 @@ const BasicSetting = ({ fieldIndex }: BasicSettingProps): JSX.Element => {
   }, [tuitionLabel, currency])
 
   useEffect(() => {
-    const subscription = localForm.watch((values, info) => {
-      // `info.type` is `undefined` for programmatic `setValue` calls and
-      // `'change'` for user-driven input. We only propagate dirtiness to
-      // the parent form on real user input — otherwise mount-time
-      // programmatic writes (e.g. price-options syncing) would falsely
-      // flag the form as having unsaved changes.
-      const isUserChange = info?.type === 'change'
+    const subscription = localForm.watch(values => {
       form.setValue(
         `classes.${fieldIndex}`,
         convertToClassFormData({ classData: values as ClassesForm }),
         {
-          shouldDirty: isUserChange,
+          shouldDirty: true,
         }
       )
     })

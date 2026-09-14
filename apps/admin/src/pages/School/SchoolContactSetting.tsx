@@ -149,6 +149,7 @@ const SchoolContactSetting = ({
       ...updatedFields,
       description: currentSchool.description ?? [],
     }
+    delete updatedFields.studentMemo
     updateSchoolResult.mutateAsync(updatedFields).then(() => {
       setOriginalSchool(currentSchool)
       setIsRegionLanguageUnsavedChanges(false)

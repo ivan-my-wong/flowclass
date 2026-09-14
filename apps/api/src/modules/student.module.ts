@@ -1,4 +1,5 @@
 import { HttpModule } from '@nestjs/axios'
+import { BullModule } from '@nestjs/bull'
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { RouterModule } from '@nestjs/core'
@@ -17,6 +18,7 @@ import { StudentRegularSchedulesController } from '@/application/student/course/
 import { EnrollCoursesController } from '@/application/student/enroll-courses/enroll-courses.controller'
 import { MediaStudentController } from '@/application/student/media/media-student.controller'
 import { PaymentEvidenceController } from '@/application/student/payment-evidence/payment-evidence.controller'
+import { PricingPageController } from '@/application/student/pricing-page/pricing-page.controller'
 import { ProfileStudentController } from '@/application/student/profile/profile.controller'
 import { BundleDiscountsController } from '@/application/student/promotions/bundle-discounts.controller'
 import { CouponsController } from '@/application/student/promotions/coupons.controller'
@@ -26,6 +28,12 @@ import { SchoolsStudentController } from '@/application/student/school/schools-s
 import { SitesStudentController } from '@/application/student/site/sites-student.controller'
 import { StudentSubmissionController } from '@/application/student/student-submission/student-submission.controller'
 import { UsersController } from '@/application/student/users/users.controller'
+import {
+  QUEUE_ENROLL_COURSE,
+  QUEUE_NAME_BLOCK_TIME,
+  QUEUE_NAME_IMPORT_CSV,
+  QUEUE_REMIND,
+} from '@/common/constants'
 import { RequireParamsGuard } from '@/common/guards/require-params.guard'
 import { InstitutionExistsRule } from '@/common/validators/institution-exists.validator'
 import { IsModeratelyStrongPassword } from '@/common/validators/moderately-strong-password'
@@ -34,18 +42,18 @@ import { UserExistsRule } from '@/common/validators/user-exists.validator'
 import { TAppConfig } from '@/config/config.schema'
 import { getAllEntities, getAllRepositories, getAllServices } from '@/config/database'
 import { CloudWatchLoggerProvider } from '@/config/loggers/cloudwatch-nestjs.provider'
-import { ObjectStorageProvider } from '@/config/storage/object-storage.provider'
+import { S3ClientFactory } from '@/config/s3/s3-factory.provider'
+import { PostgresStore } from '@/domain/external/whatsapp/postgres.store'
 import { SitesService } from '@/domain/service/sites.service'
+import { EnrollCourseProcessConsumer } from '@/modules/cron/cron.consumer'
 
 import { StripeClientModule } from './stripe-client/stripe-client.module'
-import { DivitStudentModule } from './divit/divit-student.module'
 import { AzureOpenaiModule } from './azure-openai.module'
 import { DatabaseModule } from './database.module'
 
 @Module({
   imports: [
     StripeClientModule,
-    DivitStudentModule,
     ScheduleModule.forRoot(),
     PassportModule.register({
       defaultStrategy: 'jwt',
@@ -67,10 +75,24 @@ import { DatabaseModule } from './database.module'
       {
         path: 'student',
         module: StudentModule,
-        children: [DivitStudentModule],
+        children: [],
       },
     ]),
     HttpModule,
+    BullModule.registerQueueAsync(
+      {
+        name: QUEUE_NAME_BLOCK_TIME,
+      },
+      {
+        name: QUEUE_NAME_IMPORT_CSV,
+      },
+      {
+        name: QUEUE_REMIND,
+      },
+      {
+        name: QUEUE_ENROLL_COURSE,
+      }
+    ),
   ],
   controllers: [
     AuthController,
@@ -80,6 +102,7 @@ import { DatabaseModule } from './database.module'
     UsersController,
     MediaStudentController,
     PaymentEvidenceController,
+    PricingPageController,
     SitesStudentController,
     SchoolsStudentController,
     RequestPayoutController,
@@ -93,6 +116,7 @@ import { DatabaseModule } from './database.module'
     StudentSubmissionController,
   ],
   providers: [
+    PostgresStore,
     ...getAllRepositories(),
     ...getAllServices(),
     CloudWatchLoggerProvider,
@@ -108,7 +132,8 @@ import { DatabaseModule } from './database.module'
     UserExistsRule,
     IsModeratelyStrongPassword,
 
-    ObjectStorageProvider,
+    S3ClientFactory,
+    EnrollCourseProcessConsumer,
   ],
 })
 export class StudentModule implements NestModule {

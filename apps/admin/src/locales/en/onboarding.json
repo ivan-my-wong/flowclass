@@ -13,9 +13,7 @@
     "step3": "Finalizing platform setup"
   },
   "taskTitle": {
-    "site": "Get your site up and running",
     "centre": "Personalize your school page",
-    "tuitionTask": "Set up tuition receiving",
     "course": "Create your course page to recruit students",
     "payment": "Start accepting payments online",
     "calendar": "Use class schedule for planning",
@@ -29,23 +27,10 @@
     "upgrade": "Upgrade to connect online payment gateways and accept payments automatically",
     "linkStripe": "Create or connect your credit card (with Stripe)"
   },
-  "progressBar": {
-    "title": "New to Flowclass? Follow these steps to build your platform",
-    "description": "Better application flow for students. Increase conversion rate. Automate collection of tuition... Your education business grows with us.",
-    "orderReminder": "Below is the order we recommend you to follow."
-  },
-  "siteSettings": {
-    "domain": "Choose a domain for your entire site (which groups all your schools)",
-    "country": "Confirm your country where you will be teaching and the currency to be used",
-    "timezone": "Confirm the timezone which students will use for booking."
-  },
   "schoolSettings": {
-    "domain": "Choose a link for your school (which students will use to access your page)",
-    "name": "Choose a name for your school",
     "logo": "Upload a logo for your school",
     "banner": "Upload a banner for your school",
     "description": "Write a landing page description with at least 200 characters for your school",
-    "location": "Fill in the location of your school",
     "contact": "Fill in the contact information of your school",
     "gallery": "Upload photos to the Galley",
     "contactInfo": "Set basic contact information",
@@ -56,21 +41,13 @@
   "courseSettings": {
     "createCourse": "Create your first course page",
     "setPath": "Set a link for your course enrollment page",
-    "setPrice": "Set a price for your course",
     "setSchedule": "Set the schedule of the coming month for your course",
     "publishCourse": "Publish your course to make it available to the world",
     "description": "Write a landing page description with at least 200 characters for your course",
     "seo": "Add SEO settings",
     "createClass": "Create your first class page",
     "addTag": "Add a tag to your course (optional)",
-    "setRegistrationMessage": "Set a message after registration",
-    "addPrerequisite": "Add an application prerequisite. (Optional)",
-    "course-description": "Write course description",
-    "course-upload-banner": "Upload a banner for the course",
-    "course-lesson-time": "Set up lesson time and tuition",
-    "course-fill-sections": "Fill in at least 2 sections of the course detail description",
-    "class-description": "Fill in the class description & price",
-    "class-timeslots": "Fill in at least 2 timeslots of the class"
+    "setRegistrationMessage": "Set a message after registration"
   },
   "calendarSettings": {
     "checkAttendanceModifications": "Check attendance modifications",
@@ -102,22 +79,12 @@
     "useCustomDomain": "Use your own domain (Optional)"
   },
   "task": {
-    "centre-upload-logo": "Upload a logo & banner for the site",
-    "centre-upload-info": "Fill in the site location & contact info",
-    "centre-write-description": "Write the site's description",
-    "centre-upload-gallery": "Upload a gallery image",
-    "promotion-discount-code": "Create the first discount code",
-    "payment-connect-stripe": "Connect to Stripe",
-    "payment-withdrawal-info": "Fill in payment account for withdrawal"
+    "promotion-discount-code": "Create the first discount code"
   },
   "welcome": {
-    "title": "You do not own a site yet.",
-    "secondTitle": "Create a site to start building your course landing page!",
-    "textInput": "Choose your site domain",
     "schoolName": "School Name",
     "schoolNamePlaceholder": "Enter your school name",
     "siteDomain": "Site Domain",
-    "phone": "Phone",
     "country": "Country",
     "schoolLogo": "Upload your Logo",
     "themeColor": "Choose your theme color",
@@ -138,25 +105,16 @@
     "tuitionPerClass": "Per class",
     "tuitionPerLesson": "Per lesson",
     "classTimeSlots": "Enter available time slots",
-    "connectDomain": "Or connect with your own domain (Coming soon)",
-    "colleagues": "Did your colleagues invite you to their site?",
-    "joinSite": "Join their site and create with them!",
-    "enterTheirDomain": "Enter the token you received",
-    "linkTheirDomain": "Or their own domain (Coming soon)",
-    "domainHelper": "Your site name should be simple, and only contain letters and '-'",
     "siteCreated": "Your site is successfully created!",
     "classCreated": "Class created successfully!",
     "courseCreated": "Course created successfully!",
     "courseFound": "Course found and will be used!",
-    "availabilityCreated": "Availability created successfully!",
     "availabilityCreationFailed": "Class created but availability setup failed",
-    "siteJoined": "You have successfully joined their site!",
     "setupComplete": "Your site is ready! Let's get started.",
     "themeSettingComplete": "You have successfully set website theme!"
   },
   "dashboard": {
     "gettingStarted": "Getting Started",
-    "quotas": "Quotas",
     "statistics": "Advanced Statistics",
     "analytics": "Basic Analytics",
     "advanced": "Advanced",
@@ -171,8 +129,7 @@
       "overview": "Overview",
       "byCourse": "By Course",
       "byClass": "By Class",
-      "byInstructor": "By Instructor",
-      "byStudent": "By Student"
+      "byInstructor": "By Instructor"
     },
     "student": {
       "title": "Student",
@@ -184,7 +141,6 @@
   "errors": {
     "tooShort": "The site domain must be at least 3 characters long",
     "invalidDomain": "Your site domain can only contain lowercase letters, numbers, and dashes",
-    "tokenDoesNotExist": "The token you entered does not exist. Please check the email you received again.",
     "domainAlreadyExist": "The domain you chose is already taken. Please choose another one. If you are stuck at the initial screen, please try to log out and login again.",
     "setSiteError": "There exists an error when setting site. Please try again later.",
     "siteCreationFailed": "Failed to create your platform. Please try again.",
@@ -194,11 +150,8 @@
   "newUserSetup": {
     "welcome": "Get ready to handle 3x more students",
     "welcomeDesc": "Learn how Flowclass automates your teaching business — more students, less hassle.",
-    "setWebsite": "Set up your Flowclass website",
-    "whatWillYouBe": "What will you be using Flowclass for?",
     "createCourse": "Create Your First Course",
     "createCourseDesc": "Setup First Course for Students",
-    "recommendOnboarding": "We will use this to recommend the most suitable features for you.",
     "countrySettings": "Country & Regional Settings",
     "countrySettingsDesc": "Set your country of operations and we'll configure currency, timezone, and local settings automatically",
     "schoolDetails": "School Profile",
@@ -230,7 +183,6 @@
       "welcome": "Welcome",
       "domainSettings": "Launch your site",
       "countrySettings": "Region Settings",
-      "basicInfo": "Basic Info",
       "schoolDetails": "School Details",
       "createCourse": "Create Course",
       "classSetup": "Class Setup",
@@ -241,7 +193,6 @@
       "connectWhatsApp": "Connect WhatsApp",
       "tryStudentEnrollment": "Try Student Enrollment",
       "trialLimitation": "Trial Information",
-      "platformLive": "Your Platform is Live!",
       "success": "Success"
     },
     "appointmentClassPreview": {
@@ -304,44 +255,24 @@
         "saturday": "Saturday"
       }
     },
-    "alwaysChange": "You can always change your domain and site name afterwards.",
     "registerPaymentMethod": "Register New Payment Method",
     "fillInPaymentInfo": "Fill in all the necessary information required to start collecting tuition fees from students",
-    "emailPaymentNoti": "Payment notification will be sent to your students through Email based on your selected schedule",
     "addPaymentMethod": "You can choose to add a payment method later",
-    "step": "Step",
-    "getStarted": "Let's get started.",
     "teachingDescribe": "Which of these best describe your teaching business?",
     "starting": "I'm just starting",
     "individual": "I'm an individual tutor or trainer",
     "teacher": "I am a teacher in an education institution",
     "owner": "I am the owner of an education institution",
-    "teachingLocation": "Where will your teaching business be located?",
-    "teachingBusinessLocation": "Location of Teaching Business",
-    "countryRegion": "Country / Region",
     "others": "Others",
     "numOfStudent": {
       "title": "How many students are you teaching or managing in total?",
-      "subtitle": "Just give us a rough approximation",
-      "choice1": "I haven't started",
-      "choice2": "1 - 10 students",
-      "choice3": "11 - 100 students",
-      "choice4": "101 - 1,000 students",
-      "choice5": "1,000 - 10,000 students",
-      "choice6": "10,000 students and more",
-      "choice7": "I'm not sure"
+      "subtitle": "Just give us a rough approximation"
     },
     "finishSetup": {
-      "title": "You are ready!",
-      "content": "Please wait while we set up your site...",
       "success": "Success!",
       "successDesc": "Your system is now live, start managing your courses and students effortlessly!",
       "visitDashboard": "Visit Dashboard",
       "learnMore": "Learn more about advanced features of Flowclass"
-    },
-    "setSiteDomain": {
-      "question1": "What do you want your site domain to be?",
-      "question2": "What's the name of your school?"
     },
     "teachingService": {
       "title": "Where do you provide your teaching service?",
@@ -360,7 +291,6 @@
       "step3": "Step 3: Information required to be uploaded: name, email, item/ course name, payment amount and billing date",
       "step4": "Step 4: Remove columns from the .CSV that you do not wish to import",
       "step5": "Step 5: If there are some information missing, you will be able to input them in the Student CRM",
-      "downloadTemplate": "Download Template CSV",
       "uploadCSVBtn": "Upload CSV",
       "manuallyUploadLater": "Manually Create Student Later"
     },
@@ -368,8 +298,7 @@
     "promoteMethod": {
       "title": "Are you current promoting with these channels?",
       "personalWebsite": "Personal Website",
-      "companyWebsite": "Company Website",
-      "others": "Others"
+      "companyWebsite": "Company Website"
     },
     "teachTarget": {
       "title": "Who you teach?",
@@ -408,23 +337,9 @@
       "personalInfo": "Personal Information Fields",
       "personalInfoDesc": "These fields collect specific details for each individual applicant, such as name, date of birth, and contact information. If the application involves multiple people, these fields will be replicated for each person."
     },
-    "connectWhatsAppDescription": "Set up WhatsApp notifications to automatically send payment reminders, class updates, and important announcements to your students.",
     "skipForNow": "Skip for now",
     "skipWhatsAppDescription": "You can set up WhatsApp notifications later from your dashboard. Students will still receive email notifications for important updates.",
-    "mobilePreview": {
-      "title": "Your Platform is Live!",
-      "description": "This is how your students will see and interact with your enrollment process on their mobile devices.",
-      "openInNewTab": "Open in New Tab",
-      "copyLink": "Copy Link",
-      "unableToGenerateUrl": "Unable to generate enrollment URL",
-      "preparingPreview": "Preparing your mobile preview...",
-      "studentEnrollmentPreview": "Student Enrollment Preview"
-    },
     "waitingForUploadReceipt": "Complete the enrollment process to continue",
-    "skipMobilePreview": {
-      "title": "Skip Mobile Preview?",
-      "description": "Are you sure you want to skip the mobile preview? You can always test the enrollment process later from your dashboard."
-    },
     "classSetup": {
       "title": "What class types do you need?",
       "subtitle": "Enabling the right class types ensures your scheduling, enrollment, and payment workflows match how your organization actually runs its classes.",
@@ -520,36 +435,9 @@
       "title": "Try Enrolling as a Student",
       "subtitle": "Experience the enrollment process from your students' perspective. Click through the mobile preview to see how easy it is to apply for your class."
     },
-    "platformLive": {
-      "title": "Your Platform is Live!",
-      "subtitle": "Try enrolling as a student to experience your complete enrollment flow. This is exactly how your students will interact with your platform."
-    },
     "subscription": {
       "title": "Upgrade Your Platform",
-      "subtitle": "Unlock advanced features, increase student capacity, and access premium tools to grow your educational business.",
-      "timer": {
-        "limitedTime": "Limited Time Offer",
-        "expired": "Offer Expired",
-        "description": "Special onboarding pricing - this offer expires soon!"
-      },
-      "whyUpgrade": {
-        "title": "Why Upgrade Now?",
-        "subtitle": "Get access to advanced features and higher student limits to scale your educational platform",
-        "unlimitedClasses": {
-          "title": "Unlimited Classes & Students",
-          "description": "Create unlimited courses and enroll as many students as you need"
-        },
-        "advancedFeatures": {
-          "title": "Advanced Features",
-          "description": "Access premium tools like advanced analytics, custom branding, and integrations"
-        },
-        "prioritySupport": {
-          "title": "Priority Support",
-          "description": "Get priority customer support and faster response times"
-        }
-      },
-      "skipMessage": "You can always upgrade later from your dashboard",
-      "skipButton": "Skip for Now"
+      "subtitle": "Unlock advanced features, increase student capacity, and access premium tools to grow your educational business."
     },
     "creating": "Creating..."
   },
@@ -590,16 +478,8 @@
     "schoolName": "School name will be displayed on the website header, in the search results, and all emails sent to students. It should be the official name of your education brand."
   },
   "acceptInvite": {
-    "title": "You have been invited to collaborate on the Flowclass site!",
-    "subTitle": "Create an account to start collaborating the site with the owner",
-    "invitedEmail": "This email address will be used for login",
-    "enterPwContinue": "Enter new password",
     "errorToken": "Oops! Your invitation token is no longer valid.",
     "backToLogin": "Back to login page"
-  },
-  "notHavePaymentMethod": {
-    "description": "You do not have any enabled payment method. Students will not be able to complete the application process.",
-    "action": "Go to the payment method page"
   },
   "skipDialog": {
     "skip": "Skip",
@@ -608,17 +488,15 @@
     "resumeOnboarding": "Resume Onboarding"
   },
   "pricingCalculator": {
-    "title": "Find Your Perfect Plan",
-    "subtitle": "Answer a few questions to get personalized pricing recommendations",
-    "step": "Step",
-    "of": "of",
-    "next": "Next",
-    "previous": "Previous",
-    "getStarted": "Get Started",
     "questions": {
       "studentCount": {
         "title": "How many students do you have?",
-        "options": ["0–100", "101–500", "501–1,500", "1,501 or more"]
+        "options": [
+          "0–100",
+          "101–500",
+          "501–1,500",
+          "1,501 or more"
+        ]
       },
       "workload": {
         "title": "How would you describe your team's workload managing day-to-day operations?",
@@ -730,14 +608,9 @@
       }
     },
     "results": {
-      "title": "Your Personalized Plan",
-      "subtitle": "Based on your answers, here's what we recommend",
       "monthlyPrice": "per month",
       "yearlyPrice": "per year",
-      "saveWithYearly": "Save with yearly billing",
-      "features": "Included Features",
-      "startTrial": "Start Free Trial",
-      "contactSales": "Contact Sales"
+      "saveWithYearly": "Save with yearly billing"
     }
   },
   "pricingPublic": {
@@ -745,7 +618,6 @@
       "title": "Revolutionary Pricing Model for Every Educator",
       "subtitle": "From solo tutors to multi-location education businesses, Flowclass adapts to your needs.",
       "startingPrice": "Starting from $9.9 USD per month",
-      "description": "Choose only the features you need now. Upgrade anytime as you grow.",
       "cta": {
         "bookDemo": "Start Automating",
         "viewPlans": "View Plans"
@@ -760,12 +632,6 @@
           "description": "Enjoy complete freedom—no long-term contracts, cancel your subscription at any time."
         }
       }
-    },
-    "trustedBy": {
-      "title": "Trusted by Leading Education Providers",
-      "subtitle": "Join 100+ organizations who have scaled up with Flowclass.",
-      "cta": "Book a Demo",
-      "logoAlt": "Trusted institution logo"
     },
     "featureBreakdown": {
       "title": "Complete Feature & Pricing Breakdown",
@@ -875,7 +741,6 @@
         "multipleSchools": "Multiple Schools",
         "multipleAdmins": "Multiple Admins",
         "multipleTutors": "Multiple Tutors",
-        "multipleStaff": "Multiple Staff",
         "classTypes": "Class Types",
         "studentPortal": "Feature: Student Portal",
         "qrAttendance": "Feature: QR Attendance",
@@ -889,15 +754,12 @@
         "multipleTutors": "3 additional tutors",
         "classTypes": "All types"
       },
-      "free": "Free",
       "total": "Total",
       "additionalInfo": {
         "title": "Why such flexible pricing?",
         "description": "Our modular approach means you only pay for the features and capacity you actually need."
       },
-      "contactForDetails": "Contact for details",
-      "unlimited": "Unlimited",
-      "all": "All"
+      "contactForDetails": "Contact for details"
     },
     "moneyBackGuarantee": {
       "title": "14-Day Money-Back Guarantee",
@@ -916,14 +778,9 @@
           "title": "Messaging Support",
           "description": "Get help when you need it through our messaging system"
         }
-      },
-      "cta": "Start Free Trial"
+      }
     },
     "testimonials": {
-      "title": "What Our Customers Say",
-      "subtitle": "Join thousands of education providers who trust Flowclass to manage their institutions",
-      "rating": "out of 5",
-      "cta": "Book a Demo",
       "testimonialList": [
         {
           "id": 1,
@@ -1054,8 +911,6 @@
       }
     },
     "presetPlans": {
-      "title": "Not sure where to start?",
-      "subtitle": "Choose from our most popular packages—each designed for a specific stage of your educational business.",
       "not_sure_where_to_start": "Not sure where to start?",
       "choose_from_popular_packages": "Choose from our most popular packages—each designed for a specific stage of your educational business.",
       "currency": "Currency:",
@@ -1084,122 +939,26 @@
       "try_pricing_calculator": "Try our pricing calculator",
       "plans": {
         "individual": {
-          "name": "Individual Trainers & Tutors",
-          "basePrice": "$800",
-          "maxStudents": "100",
-          "schoolsIncluded": "1",
-          "adminsIncluded": "3",
-          "tutorsIncluded": "2",
           "classTypes": "1",
-          "promotions": "Basic",
-          "studentPortal": "✔️",
-          "rescheduleRequest": "",
-          "tutorCentral": "",
-          "qrCodeAttendance": "",
-          "creditSystem": "",
-          "notificationChannel": "Email Only",
-          "totalPlanValue": "$2,400"
+          "qrCodeAttendance": ""
         },
         "startup": {
-          "name": "Startup Education Centres",
-          "basePrice": "$3,800",
-          "maxStudents": "500",
-          "schoolsIncluded": "1",
-          "adminsIncluded": "3",
-          "tutorsIncluded": "5",
           "classTypes": "1",
-          "promotions": "Advanced",
-          "studentPortal": "✔️",
-          "rescheduleRequest": "✔️",
-          "tutorCentral": "✔️",
-          "qrCodeAttendance": "",
-          "creditSystem": "",
-          "notificationChannel": "WhatsApp (Unofficial)",
-          "totalPlanValue": "$8,200"
+          "qrCodeAttendance": ""
         },
         "small": {
-          "name": "Small-scale Education Centres",
-          "basePrice": "$6,800",
-          "maxStudents": "1,500",
-          "schoolsIncluded": "4",
-          "adminsIncluded": "3",
-          "tutorsIncluded": "10",
           "classTypes": "1",
-          "promotions": "Advanced",
-          "studentPortal": "✔️",
-          "rescheduleRequest": "✔️",
-          "tutorCentral": "✔️",
-          "qrCodeAttendance": "✔️",
-          "creditSystem": "✔️",
-          "notificationChannel": "WhatsApp (Unofficial)",
-          "totalPlanValue": "$14,500"
+          "qrCodeAttendance": "✔️"
         },
         "medium": {
-          "name": "Medium-size Education Centres",
-          "basePrice": "$12,800",
-          "maxStudents": "5,000",
-          "schoolsIncluded": "10",
-          "adminsIncluded": "10",
-          "tutorsIncluded": "20",
           "classTypes": "2",
-          "promotions": "Advanced",
-          "studentPortal": "✔️",
-          "rescheduleRequest": "✔️",
-          "tutorCentral": "✔️",
-          "qrCodeAttendance": "✔️",
-          "creditSystem": "✔️",
-          "notificationChannel": "WhatsApp (Unofficial)",
-          "totalPlanValue": "$26,220"
+          "qrCodeAttendance": "✔️"
         },
         "large": {
-          "name": "Large-size Education Centres",
-          "basePrice": "$19,800",
-          "maxStudents": "Unlimited",
-          "schoolsIncluded": "20",
-          "adminsIncluded": "30",
-          "tutorsIncluded": "40",
           "classTypes": "3",
-          "promotions": "Advanced",
-          "studentPortal": "✔️",
-          "rescheduleRequest": "✔️",
-          "tutorCentral": "✔️",
-          "qrCodeAttendance": "✔️",
-          "creditSystem": "✔️",
-          "notificationChannel": "WhatsApp (Unofficial)",
-          "totalPlanValue": "$47,700"
+          "qrCodeAttendance": "✔️"
         }
-      },
-      "note": "Each preset plan will have a CTA button that goes to the check out page. Only small-scale or higher, will have the 'contact sales' button",
-      "customization": {
-        "title": "Every plan can be customized and upgraded at any time.",
-        "subtitle": "Want to customize your own plan?",
-        "description": "Try our Plan Calculator to build a package that's just right for you.",
-        "cta": "Book a Demo"
       }
-    },
-    "calculator": {
-      "title": "Pricing Calculator",
-      "subtitle": "Estimate your subscription in seconds. Select your number of students, campuses, admins, and features. See your price instantly!",
-      "cta": "Start Using"
-    },
-    "completePlans": {
-      "title": "Full Pricing Breakdown",
-      "description": "Full Pricing Table Placeholder: Show base users, schools, setup fee, admin, tutor, class type, features, notifications, promo, integrations, and support tiers",
-      "features": [
-        "Transparent pricing for every feature",
-        "No lock-ins or forced bundles—add or remove features anytime",
-        "All prices clearly displayed with no surprises"
-      ],
-      "cta": "Book a Demo"
-    },
-    "finalCta": {
-      "title": "Ready to Simplify and Scale Your Education Business?",
-      "subtitle": "Start streamlining student bookings and automating payment processes today with Flowclass!",
-      "cta": {
-        "bookDemo": "Book a Demo",
-        "viewPlans": "View Plans"
-      },
-      "contact": "Or contact us: info@flowclass.io | +852 5722 5763"
     }
   },
   "contactSalesModal": {
@@ -1394,344 +1153,75 @@
   "featureData": {
     "homeDescription": {
       "title": "Create Home Page Description",
-      "description": "A compelling school description helps potential students understand what makes your institution unique. This is often the first thing visitors see on your website, so it's crucial to make a great first impression.",
-      "steps": [
-        "Navigate to the School Settings page",
-        "Click on the \"Description\" tab",
-        "Write a detailed description of your school (at least 50 words)",
-        "Include information about your teaching philosophy, specialties, and what makes you unique",
-        "Add any relevant details about your experience and qualifications",
-        "Save your changes"
-      ],
-      "tips": [
-        "Use clear, engaging language that speaks to your target audience",
-        "Include specific details about your teaching methods",
-        "Mention any specializations or unique features of your school",
-        "Keep it professional but approachable"
-      ]
+      "description": "A compelling school description helps potential students understand what makes your institution unique. This is often the first thing visitors see on your website, so it's crucial to make a great first impression."
     },
     "moreClasses": {
       "title": "Create More Classes",
-      "description": "Offering multiple class types allows you to serve different student needs and increase your revenue potential. This shows your school's versatility and professionalism.",
-      "steps": [
-        "Go to Teaching Service > Create Course",
-        "Choose a different class type from your existing one",
-        "Fill in the basic course information",
-        "Set up the class schedule and pricing",
-        "Configure any special requirements or prerequisites",
-        "Publish the new course"
-      ],
-      "tips": [
-        "Consider offering different skill levels (beginner, intermediate, advanced)",
-        "Think about different formats (group classes, private lessons, workshops)",
-        "Ensure each class has a clear value proposition",
-        "Set appropriate pricing for each class type"
-      ]
+      "description": "Offering multiple class types allows you to serve different student needs and increase your revenue potential. This shows your school's versatility and professionalism."
     },
     "courseSettings": {
       "title": "Customize your Course Settings",
-      "description": "Detailed course descriptions help students understand exactly what they'll learn and what to expect. This reduces confusion and improves student satisfaction.",
-      "steps": [
-        "Navigate to Teaching Service > Edit Course",
-        "Click on the \"Description\" tab",
-        "Write a comprehensive description (at least 50 words)",
-        "Include learning objectives and outcomes",
-        "Describe the teaching methodology",
-        "Add any prerequisites or requirements",
-        "Save your changes"
-      ],
-      "tips": [
-        "Be specific about what students will learn",
-        "Include the duration and format of the course",
-        "Mention any materials or equipment needed",
-        "Set clear expectations for student participation"
-      ]
+      "description": "Detailed course descriptions help students understand exactly what they'll learn and what to expect. This reduces confusion and improves student satisfaction."
     },
     "customFields": {
       "title": "Custom Fields",
-      "description": "Custom information fields allow you to collect specific data from students during registration. This helps you better understand your students and tailor your services.",
-      "steps": [
-        "Go to Settings > Student Information Field",
-        "Click \"Add New Field\"",
-        "Choose the field type (text, dropdown, checkbox, etc.)",
-        "Enter the field label and description",
-        "Set whether the field is required or optional",
-        "Configure any validation rules",
-        "Save the field"
-      ],
-      "tips": [
-        "Think about what information would be most useful for your teaching",
-        "Keep forms concise to avoid overwhelming students",
-        "Use clear, simple language for field labels",
-        "Test the form from a student's perspective"
-      ]
+      "description": "Custom information fields allow you to collect specific data from students during registration. This helps you better understand your students and tailor your services."
     },
     "customForms": {
       "title": "Custom Forms",
-      "description": "Application forms help you gather important information from potential students and streamline your enrollment process. A well-designed form improves the student experience.",
-      "steps": [
-        "Navigate to Settings > Application Form",
-        "Click \"Create New Form\"",
-        "Add the necessary fields for your application",
-        "Set up conditional logic if needed",
-        "Configure form settings and notifications",
-        "Test the form to ensure it works correctly",
-        "Publish the form"
-      ],
-      "tips": [
-        "Include only essential information to keep forms short",
-        "Use clear instructions and helpful placeholder text",
-        "Consider the order of fields logically",
-        "Test the form thoroughly before going live"
-      ]
+      "description": "Application forms help you gather important information from potential students and streamline your enrollment process. A well-designed form improves the student experience."
     },
     "coupons": {
       "title": "Coupons",
-      "description": "Coupon codes are a powerful marketing tool that can help attract new students and encourage repeat business. They're especially effective for promotions and special offers.",
-      "steps": [
-        "Go to Promotion > Coupon Code",
-        "Click \"Create New Coupon\"",
-        "Choose between percentage or fixed amount discount",
-        "Set the discount value and any minimum purchase requirements",
-        "Set an expiration date and usage limits",
-        "Create a memorable coupon code",
-        "Save and activate the coupon"
-      ],
-      "tips": [
-        "Use clear, memorable coupon codes",
-        "Set reasonable expiration dates to create urgency",
-        "Consider offering different discounts for different occasions",
-        "Track coupon usage to measure effectiveness"
-      ]
+      "description": "Coupon codes are a powerful marketing tool that can help attract new students and encourage repeat business. They're especially effective for promotions and special offers."
     },
     "onlinePayment": {
       "title": "Online Payment",
-      "description": "Setting up online payments makes it easier for students to pay for classes and reduces administrative work. Stripe Connect provides secure, reliable payment processing.",
-      "steps": [
-        "Navigate to Settings > Payments",
-        "Click \"Set up Stripe Connect\"",
-        "Follow the Stripe onboarding process",
-        "Provide your business information and bank details",
-        "Complete identity verification",
-        "Test the payment system with a small transaction",
-        "Activate payment processing"
-      ],
-      "tips": [
-        "Ensure all business information is accurate for faster approval",
-        "Test payments thoroughly before going live",
-        "Keep your Stripe dashboard updated with current information",
-        "Consider offering multiple payment methods"
-      ]
+      "description": "Setting up online payments makes it easier for students to pay for classes and reduces administrative work. Stripe Connect provides secure, reliable payment processing."
     },
     "trackingAttendance": {
       "title": "Tracking Attendance",
-      "description": "Attendance tracking helps you monitor student progress and identify patterns. It's essential for maintaining accurate records and ensuring students are getting value from their classes.",
-      "steps": [
-        "Go to Full Calendar view",
-        "Find the lesson you want to mark attendance for",
-        "Click on the lesson to open details",
-        "Look for the attendance section",
-        "Mark students as \"Present\", \"Absent\", or \"Late\"",
-        "Add any notes about the lesson if needed",
-        "Save the attendance record"
-      ],
-      "tips": [
-        "Mark attendance promptly after each lesson",
-        "Use notes to track any special circumstances",
-        "Review attendance patterns regularly",
-        "Follow up with students who have frequent absences"
-      ]
+      "description": "Attendance tracking helps you monitor student progress and identify patterns. It's essential for maintaining accurate records and ensuring students are getting value from their classes."
     },
     "addingClassToStudents": {
       "title": "Adding Class to Students",
-      "description": "Enrolling students in courses is a fundamental part of managing your school. This process ensures students are properly registered and can access their classes.",
-      "steps": [
-        "Navigate to Student Record",
-        "Find the student you want to enroll",
-        "Click on their name to open their profile",
-        "Look for the \"Assign Course\" button",
-        "Select the appropriate course and class",
-        "Set the enrollment date and any special notes",
-        "Confirm the enrollment"
-      ],
-      "tips": [
-        "Double-check course and class selection before confirming",
-        "Set appropriate enrollment dates",
-        "Add notes for any special arrangements",
-        "Ensure students are aware of their enrollment"
-      ]
+      "description": "Enrolling students in courses is a fundamental part of managing your school. This process ensures students are properly registered and can access their classes."
     },
     "importStudents": {
       "title": "Import Students",
-      "description": "If you have existing student data in spreadsheets or other systems, importing can save you significant time. This feature helps you migrate data efficiently.",
-      "steps": [
-        "Go to Student Record page",
-        "Click on \"Import Student\" button",
-        "Download the template file to see the required format",
-        "Prepare your student data in the correct format",
-        "Upload the completed file",
-        "Review the import preview for any errors",
-        "Confirm the import to add students to your system"
-      ],
-      "tips": [
-        "Use the provided template to ensure correct formatting",
-        "Check all data for accuracy before importing",
-        "Start with a small batch to test the process",
-        "Keep a backup of your original data"
-      ]
+      "description": "If you have existing student data in spreadsheets or other systems, importing can save you significant time. This feature helps you migrate data efficiently."
     },
     "invoiceCampaign": {
       "title": "Invoice Campaign",
-      "description": "Invoice campaigns help you send professional invoices to multiple students at once. This streamlines your billing process and ensures timely payments.",
-      "steps": [
-        "Navigate to Invoice Templates",
-        "Click \"Create New Campaign\"",
-        "Select the students you want to invoice",
-        "Choose the appropriate invoice template",
-        "Customize the invoice content if needed",
-        "Set the due date and payment terms",
-        "Send the invoices to students"
-      ],
-      "tips": [
-        "Use clear, professional invoice templates",
-        "Set reasonable due dates for payments",
-        "Include all necessary payment information",
-        "Follow up on overdue invoices promptly"
-      ]
+      "description": "Invoice campaigns help you send professional invoices to multiple students at once. This streamlines your billing process and ensures timely payments."
     },
     "enterAddress": {
       "title": "Enter Address",
-      "description": "Adding your school's address helps students find you and provides important contact information. This is especially important for in-person classes.",
-      "steps": [
-        "Go to Contact page",
-        "Click \"Edit Contact Information\"",
-        "Enter your complete school address",
-        "Include any relevant landmarks or directions",
-        "Add parking information if applicable",
-        "Verify the address is correct on a map",
-        "Save your contact information"
-      ],
-      "tips": [
-        "Include clear directions for students",
-        "Mention any parking restrictions or options",
-        "Update the address if you move locations",
-        "Consider adding a map or directions link"
-      ]
+      "description": "Adding your school's address helps students find you and provides important contact information. This is especially important for in-person classes."
     },
     "invitingInstructors": {
       "title": "Inviting Other Instructors",
-      "description": "As your school grows, you may want to add other instructors to help teach classes. This feature allows you to manage multiple teachers efficiently.",
-      "steps": [
-        "Navigate to Settings > Users",
-        "Click \"Invite New User\"",
-        "Enter the instructor's email address",
-        "Select \"Instructor\" as their role",
-        "Set their permissions and access levels",
-        "Add a personal message if desired",
-        "Send the invitation"
-      ],
-      "tips": [
-        "Clearly communicate expectations to new instructors",
-        "Set appropriate permission levels for each instructor",
-        "Provide training on your school's systems",
-        "Establish clear communication channels"
-      ]
+      "description": "As your school grows, you may want to add other instructors to help teach classes. This feature allows you to manage multiple teachers efficiently."
     },
     "studentCredits": {
       "title": "Student Credits",
-      "description": "A credit system allows students to purchase lessons in advance and use them flexibly. This can improve cash flow and student commitment.",
-      "steps": [
-        "Go to Feature Enable page",
-        "Find \"Student Credit System\" and enable it",
-        "Navigate to Student Record",
-        "Select a student to manage credits for",
-        "Click \"Manage Credits\"",
-        "Add or deduct credits as needed",
-        "Add notes explaining the credit transaction",
-        "Save the changes"
-      ],
-      "tips": [
-        "Set clear policies for credit usage and expiration",
-        "Keep detailed records of all credit transactions",
-        "Communicate credit policies clearly to students",
-        "Consider offering credit purchase incentives"
-      ]
+      "description": "A credit system allows students to purchase lessons in advance and use them flexibly. This can improve cash flow and student commitment."
     },
     "addLocations": {
       "title": "Add Locations",
-      "description": "Multiple locations allow you to expand your school's reach and serve students in different areas. This is essential for growing your business.",
-      "steps": [
-        "Navigate to Locations page",
-        "Click \"Add New Location\"",
-        "Enter the location name and address",
-        "Add contact information for the location",
-        "Set up any location-specific settings",
-        "Configure room or space details",
-        "Save the new location"
-      ],
-      "tips": [
-        "Choose locations that are easily accessible to students",
-        "Ensure each location has adequate facilities",
-        "Consider the local market and competition",
-        "Plan for location-specific marketing"
-      ]
+      "description": "Multiple locations allow you to expand your school's reach and serve students in different areas. This is essential for growing your business."
     },
     "approvalRequests": {
       "title": "Approval Requests",
-      "description": "Managing reschedule requests helps maintain class schedules while accommodating student needs. This feature streamlines the approval process.",
-      "steps": [
-        "Go to Reschedule Approval page",
-        "Review pending reschedule requests",
-        "Check the reason for the request and new timing",
-        "Consider the impact on other students",
-        "Approve or reject the request",
-        "Add comments explaining your decision",
-        "Notify the student of your decision"
-      ],
-      "tips": [
-        "Set clear policies for reschedule requests",
-        "Consider the impact on other students before approving",
-        "Communicate decisions promptly to students",
-        "Keep records of all reschedule decisions"
-      ]
+      "description": "Managing reschedule requests helps maintain class schedules while accommodating student needs. This feature streamlines the approval process."
     },
     "automationFlows": {
       "title": "Automation Flows",
-      "description": "Automation flows help you streamline repetitive tasks and improve efficiency. They can handle everything from student communications to payment reminders.",
-      "steps": [
-        "Navigate to Automation Flows",
-        "Click \"Create New Flow\"",
-        "Choose the trigger for your automation",
-        "Set up the conditions and actions",
-        "Test the flow to ensure it works correctly",
-        "Activate the automation flow",
-        "Monitor the flow's performance"
-      ],
-      "tips": [
-        "Start with simple automations and build complexity gradually",
-        "Test thoroughly before activating flows",
-        "Monitor automation performance regularly",
-        "Keep automations updated as your processes change"
-      ]
+      "description": "Automation flows help you streamline repetitive tasks and improve efficiency. They can handle everything from student communications to payment reminders."
     },
     "assignHourlyRate": {
       "title": "Assign Hourly Rate to Instructor",
-      "description": "Setting hourly rates for instructors helps you track costs and manage payroll efficiently. This is essential for multi-instructor schools to ensure fair compensation.",
-      "steps": [
-        "Navigate to Settings > Users",
-        "Find the instructor you want to set rates for",
-        "Click on their profile to open details",
-        "Look for the \"Hourly Rate\" or \"Payroll\" section",
-        "Enter the appropriate hourly rate",
-        "Set any overtime or special rate rules if needed",
-        "Save the instructor's rate settings"
-      ],
-      "tips": [
-        "Set rates based on experience and qualifications",
-        "Consider market rates for similar positions",
-        "Document rate changes for payroll tracking",
-        "Review and update rates regularly"
-      ]
+      "description": "Setting hourly rates for instructors helps you track costs and manage payroll efficiently. This is essential for multi-instructor schools to ensure fair compensation."
     }
   },
   "featureModal": {

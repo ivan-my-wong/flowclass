@@ -5,6 +5,7 @@ import Select, { StylesConfig } from 'react-select'
 
 import { OptionType } from '@/types/options'
 
+import { styled, theme } from '../../styles'
 import ImageAspect from '../Images/ImageAspect'
 
 import { DynamicTypeSelectorItemProps } from './Select'
@@ -30,24 +31,28 @@ const selectCustomStyles = (
 
   autoHeight?: boolean
 ): StylesConfig => ({
-  option: styles => ({
-    ...styles,
-    backgroundColor: 'var(--color-background)',
-    color: 'var(--color-text)',
-  }),
+  option: styles => {
+    return {
+      ...styles,
+      backgroundColor: theme.colors.background.toString(),
+      color: theme.colors.text.toString(),
+    }
+  },
   control: styles => ({
     ...styles,
-    backgroundColor: 'var(--color-background)',
-    color: 'var(--color-text)',
+    backgroundColor: theme.colors.background.toString(),
+    color: theme.colors.text.toString(),
+    // ...(!autoHeight && { height: '6rem' }),
   }),
   singleValue: styles => ({
     ...styles,
     padding: '0.25rem',
-    color: 'var(--color-text)',
+    color: theme.colors.text.toString(),
+    // ...(!autoHeight && { height: '6rem' }),
   }),
   input: styles => ({
     ...styles,
-    color: 'var(--color-text)',
+    color: theme.colors.text.toString(),
   }),
   menu: styles => ({
     ...styles,
@@ -65,6 +70,15 @@ const selectCustomStyles = (
   }),
 })
 
+const Wrapper = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: '100%',
+  height: '100%',
+  color: '$text',
+})
+
 const CourseSelector: React.FC<
   SelectorProps & {
     autoHeight?: boolean
@@ -78,7 +92,7 @@ const CourseSelector: React.FC<
       placeholder={t('component:select.selectCourse')}
       options={options}
       formatOptionLabel={data => (
-        <div className="flex items-center justify-between w-full h-full text-text">
+        <Wrapper>
           {data.image && (
             <ImageAspect
               s3="public"
@@ -91,8 +105,8 @@ const CourseSelector: React.FC<
 
           <span>{data.label}</span>
 
-          {data.icon && <span className="mx-2">{data.icon}</span>}
-        </div>
+          {data.icon && <span style={{ margin: '0 0.5rem' }}>{data.icon}</span>}
+        </Wrapper>
       )}
       styles={selectCustomStyles(width, autoHeight)}
       onChange={onChange}

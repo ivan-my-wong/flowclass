@@ -19,7 +19,6 @@ import { EnrolledClassProvider } from '../Enrolled/EnrolledClassContext'
 import EnrolledDialog from '../Enrolled/EnrolledDialog'
 
 import CourseItem from './CourseItem'
-import { FEATURE_FLAG } from '@/constants/featureFlags'
 
 const MAX_VISIBLE_COURSES = 5
 
@@ -42,12 +41,9 @@ const CourseContainer = (): JSX.Element => {
     })
   )
   const assignedClassIdsSet = useMemo(() => {
-    if (!currentActiveStudent) return new Set<number>()
-    return new Set(
-      activeClasses
-        .filter(item => item.studentItem.id === currentActiveStudent.id)
-        .map(item => item.classId)
-    )
+    return currentActiveStudent
+      ? new Set(activeClasses.map(item => item.classId) ?? [])
+      : new Set<number>()
   }, [currentActiveStudent, activeClasses])
 
   // Filter classes based on search query (name, course name, or ID)
@@ -135,15 +131,14 @@ const CourseContainer = (): JSX.Element => {
             <div className="text-lg font-semibold">
               {t('courseAssignment.title')}
             </div>
-            {FEATURE_FLAG.ADD_ENROLLED_CLASS_IN_INVOICE_CAMPAIGN &&
-              currentActiveStudent && (
-                <Button
-                  iconBefore={<IoMdAdd aria-hidden="true" focusable="false" />}
-                  onClick={() => setOpenEnrolledDialog(true)}
-                >
-                  {t('enrolledClass.addEnrolledClass')}
-                </Button>
-              )}
+            {currentActiveStudent && !isInvoiceExist && (
+              <Button
+                iconBefore={<IoMdAdd aria-hidden="true" focusable="false" />}
+                onClick={() => setOpenEnrolledDialog(true)}
+              >
+                {t('enrolledClass.addEnrolledClass')}
+              </Button>
+            )}
           </div>
           <div className="relative">
             <Input

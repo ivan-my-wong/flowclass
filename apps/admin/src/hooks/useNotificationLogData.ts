@@ -1,6 +1,10 @@
-import { useQuery } from 'react-query'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 
-import { getNotificationLogs, RecordLogPayload } from '@/api/recordLogs'
+import {
+  getNotificationLogs,
+  RecordLogPayload,
+  resendNotificationLogs,
+} from '@/api/recordLogs'
 import { CACHE_TIME } from '@/constants/common'
 import { SELECT_FIELDS_NOTIFICATION_LOGS } from '@/constants/notificationLogs'
 import { QUERY_KEY } from '@/constants/queryKey'
@@ -13,12 +17,15 @@ const useNotificationLogData = () => {
   const { currentSite } = useSiteData()
   const institutionId = currentSchool?.id || 0
   const siteId = currentSite?.id || 0
+  const queryClient = useQueryClient()
+
   const useFetchNotificationLogs = (params?: RecordLogPayload) => {
     return useQuery({
       queryKey: [
         QUERY_KEY.notificationLog.notificationLogsKey,
         siteId,
         institutionId,
+        params,
       ],
       queryFn: () =>
         getNotificationLogs({
@@ -33,8 +40,26 @@ const useNotificationLogData = () => {
       cacheTime: CACHE_TIME,
     })
   }
+
+  const useResendNotificationLogs = () => {
+    return useMutation({
+      mutationFn: (recordIds: number[]) =>
+        resendNotificationLogs({
+          siteId,
+          institutionId,
+          recordIds,
+        }),
+      onSuccess: () => {
+        queryClient.invalidateQueries(
+          QUERY_KEY.notificationLog.notificationLogsKey
+        )
+      },
+    })
+  }
+
   return {
     useFetchNotificationLogs,
+    useResendNotificationLogs,
   }
 }
 export default useNotificationLogData

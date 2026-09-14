@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   ClassSerializerInterceptor,
   Controller,
@@ -46,10 +45,6 @@ import { SiteFeatureEnabledDto } from './dto/sites-feature-enabled.dto'
 export class SitesFeatureEnabledController {
   constructor(private readonly sitesFeatureEnabledService: SitesFeatureEnabledService) {}
 
-  private isOpenSourceMode(): boolean {
-    return process.env.OPEN_SOURCE_DISABLE_SUBSCRIPTIONS !== 'false'
-  }
-
   @Get()
   @ApiResponse({
     status: HttpStatusCode.Ok,
@@ -63,10 +58,6 @@ export class SitesFeatureEnabledController {
     isArray: true,
   })
   async getAllSitesFeatureEnabled(): Promise<SitesFeatureEnabled[]> {
-    if (this.isOpenSourceMode()) {
-      return []
-    }
-
     return this.sitesFeatureEnabledService.getAll()
   }
 
@@ -85,10 +76,6 @@ export class SitesFeatureEnabledController {
     type: SitesFeatureEnabled,
   })
   async updateSiteFeatures(@Body() body: SiteFeatureEnabledDto): Promise<SitesFeatureEnabled> {
-    if (this.isOpenSourceMode()) {
-      throw new BadRequestException('Site feature gating is disabled in open-source mode')
-    }
-
     return this.sitesFeatureEnabledService.createOrUpdate(body)
   }
 }

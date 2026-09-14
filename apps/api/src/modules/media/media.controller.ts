@@ -2,7 +2,7 @@ import { Controller, Get, Param, Res } from '@nestjs/common'
 import { ApiNotFoundResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Response } from 'express'
 import { existsSync } from 'fs'
-import * as path from 'path'
+import path from 'path'
 
 import { FileNotFoundException } from '@/exceptions/media.exception'
 
@@ -34,23 +34,5 @@ export class MediaController {
     } else {
       throw new FileNotFoundException('Error: File not found')
     }
-  }
-
-  @Get('file/:key(*)')
-  public async getFileByKey(@Param('key') key: string, @Res() res: Response) {
-    const decodedKey = decodeURIComponent(key || '')
-    const uploadRoot = process.env.FILE_UPLOAD_LOCATION || path.resolve(process.cwd(), '__uploads')
-    const resolvedPath = path.resolve(uploadRoot, decodedKey)
-    const resolvedRoot = path.resolve(uploadRoot)
-    if (!resolvedPath.startsWith(resolvedRoot)) {
-      throw new FileNotFoundException('Error: File not found')
-    }
-
-    const exists = existsSync(resolvedPath)
-    if (exists) {
-      return res.sendFile(resolvedPath)
-    }
-
-    throw new FileNotFoundException('Error: File not found')
   }
 }

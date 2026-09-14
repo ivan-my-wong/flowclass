@@ -15,14 +15,12 @@ import {
   fetchBundleDiscountAvailability,
   fetchPossiblePromotions,
   getAllBundleDiscounts,
-  getAllPackageDiscounts,
 } from '@/api/promotion'
 import { getAllStudentsOfInstitutionNew } from '@/api/student'
 import { QUERY_KEY } from '@/constants/queryKey'
 import { schoolState } from '@/stores/schoolData'
 import { siteState } from '@/stores/siteData'
 import { BundleDiscount, CheckEligibleDto } from '@/types/bundleDiscounts'
-import { PackageDiscount } from '@/types/packageDiscounts'
 import { StudentEnrolmentRecord } from '@/types/student'
 import {
   BundleDiscountAvailabilityResponse,
@@ -37,11 +35,7 @@ interface HookResult {
   useGetAllStudents: () => UseQueryResult<StudentEnrolmentRecord[]>
 
   useGetAllPromotions: () => UseQueryResult<
-    (
-      | PossiblePromotionsType
-      | BundleDiscount
-      | (PackageDiscount & { promotionType: PromotionTypeItem })
-    )[],
+    (PossiblePromotionsType | BundleDiscount)[],
     ApiError
   >
 
@@ -96,13 +90,9 @@ const useStudentInvoice = (): HookResult => {
     const result = useQuery(
       [QUERY_KEY.studentInvoice.getCouponAndBundle],
       async () => {
-        const [coupon, bundle, packageDiscount] = await Promise.all([
+        const [coupon, bundle] = await Promise.all([
           fetchPossiblePromotions(currentSchoolId),
           getAllBundleDiscounts(
-            currentSiteId.toString(),
-            currentSchoolId.toString()
-          ),
-          getAllPackageDiscounts(
             currentSiteId.toString(),
             currentSchoolId.toString()
           ),
@@ -115,10 +105,6 @@ const useStudentInvoice = (): HookResult => {
           ...(bundle ?? []).map(d => ({
             ...d,
             promotionType: PromotionTypeItem.BUNDLE,
-          })),
-          ...(packageDiscount ?? []).map(p => ({
-            ...p,
-            promotionType: PromotionTypeItem.PACKAGE,
           })),
         ]
       },

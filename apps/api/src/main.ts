@@ -9,8 +9,8 @@ import { ConfigService } from '@nestjs/config'
 import { NestFactory, Reflector } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { useContainer } from 'class-validator'
-import * as dotenv from 'dotenv'
-import * as path from 'path'
+import * as admin from 'firebase-admin'
+import { initializeApp } from 'firebase-admin/app'
 import { initializeTransactionalContext } from 'typeorm-transactional'
 
 import { BadRequestExceptionFilter } from './common/filters/bad-request.filter'
@@ -19,6 +19,21 @@ import { TransformInterceptor } from './common/middlewares/transform.interceptor
 import { TAppConfig } from './config/config.schema'
 import { AppModule } from './modules/app.module'
 import { initExtensions } from './exts'
+
+async function initFirebase(config: ConfigService<TAppConfig>) {
+  const firebasePrivateKey = config.get('FIREBASE_PRIVATE_KEY')
+
+  initializeApp({
+    // credential: applicationDefault(),
+    credential: admin.credential.cert({
+      projectId: config.get('FIREBASE_PROJECT_ID'),
+      privateKey: JSON.parse(firebasePrivateKey.replace(/\n/g, '\\n')).replace(/\\n/g, '\n'),
+      clientEmail: config.get('FIREBASE_CLIENT_EMAIL'),
+    } as admin.ServiceAccount),
+
+    projectId: config.get('FIREBASE_PROJECT_ID'),
+  })
+}
 
 async function initSwagger(app: INestApplication) {
   const config = new DocumentBuilder()
@@ -44,11 +59,6 @@ async function initSwagger(app: INestApplication) {
 }
 
 async function bootstrap() {
-  // Load .env from monorepo root (for local dev: API connects to Docker postgres at localhost:5432)
-  const rootDir = path.resolve(__dirname, '../../../..')
-  dotenv.config({ path: path.join(rootDir, '.env'), override: false })
-  dotenv.config({ path: path.join(rootDir, '.env.local'), override: true })
-
   initExtensions()
   initializeTransactionalContext()
 
@@ -98,6 +108,8 @@ async function bootstrap() {
     await initSwagger(app)
   }
 
-  await app.listen(parseInt(config.get('APP_PORT'), 10) || 3100)
+  await initFirebase(config)
+
+  await app.listen(parseInt(config.get('APP_PORT'), 10) || 5000)
 }
 bootstrap()

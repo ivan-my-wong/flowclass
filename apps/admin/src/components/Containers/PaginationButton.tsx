@@ -1,7 +1,5 @@
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 
-import { cn } from '@/utils/cn'
-
 import Button from '../Buttons/Button'
 
 type PaginationButtonProps = {
@@ -21,10 +19,14 @@ const PaginationButton = ({
     <Button
       disabled={disabled}
       onClick={onClick}
-      className={cn(
-        '!bg-transparent text-text',
-        'disabled:!bg-transparent disabled:text-text-disabled'
-      )}
+      css={{
+        backgroundColor: 'transparent!important',
+        color: '$text',
+        '&:disabled': {
+          backgroundColor: 'transparent!important',
+          color: '$textDisabled',
+        },
+      }}
       iconAfter={type === 'next' && <FaChevronRight />}
       iconBefore={type === 'back' && <FaChevronLeft />}
     >

@@ -1,12 +1,17 @@
 import { config } from 'dotenv'
-import * as path from 'path'
 
-// Load from monorepo root (one .env for all apps)
-const rootDir = process.cwd()
+const APP_ENV = process.env.APP_ENV || 'local'
 
 export const initEnv = () => {
-  const NODE_ENV = process.env.NODE_ENV || 'development'
-  config({ path: path.join(rootDir, `.env.${NODE_ENV}`), override: false })
-  config({ path: path.join(rootDir, '.env'), override: true })
-  config({ path: path.join(rootDir, '.env.local'), override: true })
+  // Load order: .env.APP_ENV.local -> .env.APP_ENV -> .env -> .env.local (last one wins)
+  // .env.local should have the highest precedence and override all previous values
+  if (APP_ENV) {
+    config({ path: `.env.${APP_ENV}`, override: false })
+  }
+
+  // Load .env before .env.local (will be overridden by .env.local)
+  config({ path: '.env', override: true })
+
+  // Load .env.local last so it has the highest precedence and overrides all previous values
+  config({ path: '.env.local', override: true })
 }

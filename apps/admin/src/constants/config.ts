@@ -1,6 +1,8 @@
 import { ProviderProps } from '@reactour/tour'
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock'
 
+import { theme } from '../styles'
+
 export const config = {
   // time related formats are following: https://day.js.org/docs/en/display/format
   dateFormat: 'YYYY-MM-DD', // zero-padded displayed
@@ -32,17 +34,17 @@ export const tourProviderConfig: Omit<ProviderProps, 'children'> = {
     }),
     arrow: base => ({
       ...base,
-      color: 'var(--color-text)',
+      color: theme.colors.text.toString(),
     }),
     close: base => ({
       ...base,
-      color: 'var(--color-text)',
+      color: theme.colors.text.toString(),
     }),
     popover: base => ({
       ...base,
       borderRadius: '1rem',
-      backgroundColor: 'var(--color-background)',
-      color: 'var(--color-text)',
+      backgroundColor: theme.colors.background.toString(),
+      color: theme.colors.text.toString(),
       padding: '1rem',
     }),
   },

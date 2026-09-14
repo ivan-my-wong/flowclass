@@ -1,5 +1,7 @@
+import { InjectQueue } from '@nestjs/bull'
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
+import { Queue } from 'bull'
 import { randomUUID } from 'crypto'
 import * as dayjs from 'dayjs'
 import * as _ from 'lodash'
@@ -37,6 +39,7 @@ import {
 } from '@/application/admin/class-lesson/dto/list-class-lesson.dto'
 import { ChangeLessonEmailDTO } from '@/application/admin/setting-notifications/setting-notifications.dto'
 import { ApiError } from '@/common/api-formats/api-error'
+import { QUEUE_NAME_BLOCK_TIME } from '@/common/constants'
 import { EmailService } from '@/domain/external/email.service'
 import { SettingSiteService } from '@/domain/service/setting-site.service'
 import { ErrorCode } from '@/exceptions/error-message/errors'
@@ -50,7 +53,7 @@ import { CoursesRepository } from '@/models/courses.repository'
 import { LessonString } from '@/models/custom-types/lesson-string'
 import { StudentLessonWithUserMemo } from '@/models/custom-types/student-lessons'
 import { ClassTypeEnum } from '@/models/enums'
-import { PaymentStatus, SharedVideoStatus } from '@/models/enums/status'
+import { PaymentStatus } from '@/models/enums/status'
 import { Institution } from '@/models/institutions.entity'
 import { InstitutionsRepository } from '@/models/institutions.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
@@ -62,6 +65,7 @@ import { StudentLessonRepository } from '@/models/student-lesson.repository'
 import { User } from '@/models/user.entity'
 import { UsersRepository } from '@/models/users.repository'
 import { paginateArrays } from '@/utils/pagination.utils'
+import { toCamelCase } from '@/utils/response.utils'
 import { shallow } from '@/utils/shallow.utils'
 import { studentLessonToUtc } from '@/utils/time.utils'
 
@@ -73,6 +77,8 @@ export class ClassLessonService {
     private readonly classLessonRepository: ClassLessonRepository,
     private readonly studentLessonRepository: StudentLessonRepository,
     private readonly invoiceRepository: InvoiceRepository,
+    @InjectQueue(QUEUE_NAME_BLOCK_TIME)
+    private readonly classLessonQueue: Queue,
     @InjectRepository(SettingBlockTime)
     private readonly settingBlockTimeRepository: Repository<SettingBlockTime>,
     private readonly userRepository: UsersRepository,
@@ -141,14 +147,8 @@ export class ClassLessonService {
 
     // Update student lesson
     for (const studentLesson of studentLessons) {
-      // Preserve original reference on first reschedule
-      if (!studentLesson.changeStartTime) {
-        studentLesson.changeClassLessonId = studentLesson.classLessonId
-        studentLesson.changeStartTime = studentLesson.startTime
-        studentLesson.changeEndTime = studentLesson.endTime
-      }
-      studentLesson.startTime = data.changeStartTime
-      studentLesson.endTime = data.changeEndTime
+      studentLesson.changeStartTime = data.changeStartTime
+      studentLesson.changeEndTime = data.changeEndTime
       await this.studentLessonRepository.save(studentLesson)
     }
     // Update class lesson
@@ -633,7 +633,6 @@ export class ClassLessonService {
           enrollCourse: true,
           studentSchedule: { invoice: true },
           user: { aliases: true },
-          changeClassLesson: { locationRoom: true },
         },
         order: { userId: 'ASC' },
       }
@@ -643,19 +642,15 @@ export class ClassLessonService {
     const studentLessons = studentLessonsByLesson
       .filter((student: StudentLesson) => !!student?.user?.aliases)
       .map((student: StudentLesson) => {
-        // Match by the enrollCourse's canonical userAliasId — name matching
-        // collapses multiple aliases of the same user onto one bucket when
-        // their preferredName resolves to the same alias.
-        const aliases =
-          student.user.aliases.find((d) => d.id === student.enrollCourse?.userAliasId) ??
-          student.user.aliases.find((d) => d.name === student.enrollCourse?.preferredName)
+        const aliases = student.user.aliases.find((d) => {
+          return d.name === student.enrollCourse?.preferredName
+        })
 
         const payments = student.studentSchedule?.invoice
         const result = {
           aliases,
           id: student.id,
           classLessonId: student.classLessonId,
-          changeClassLessonId: student.changeClassLessonId,
           changeStartTime: student.changeStartTime,
           changeEndTime: student.changeEndTime,
           attendance: student.attendance,
@@ -669,10 +664,6 @@ export class ClassLessonService {
             createdAt: payments?.createdAt,
             paymentState: payments?.paymentState,
           },
-          hasSharedVideo: student.hasSharedVideo,
-          changeLocationName: student.changeClassLesson?.locationRoom?.name ?? null,
-          changeLocationColorCode: null,
-          changeLessonType: null,
         }
 
         const check = listStudents.some((o) => {
@@ -902,6 +893,26 @@ export class ClassLessonService {
       userId: d.userId,
     }))
     return _.groupBy(classLessons, 'userId')
+  }
+
+  async pushClassLessonToQueue(data) {
+    const listClassLesson = await this.classLessonRepository
+      .createQueryBuilder('cl')
+      .where({
+        changeStartTime: IsNull(),
+        startTime: LessThanOrEqual(data.endTime),
+        endTime: MoreThanOrEqual(data.startTime),
+      })
+      .orWhere({
+        changeStartTime: LessThanOrEqual(data.endTime),
+        changeEndTime: MoreThanOrEqual(data.startTime),
+      })
+      .getRawMany()
+    if (listClassLesson.length > 0) {
+      for (const item of listClassLesson) {
+        await this.classLessonQueue.add(toCamelCase(item, ['cl_']))
+      }
+    }
   }
 
   async handleUpdateTeacherLesson(data) {
@@ -1543,24 +1554,5 @@ export class ClassLessonService {
     return {
       timeSlotQuota: groupedByTime,
     }
-  }
-
-  async bulkUpdateSharedVideo(
-    classLessonIds: number[],
-    hasSharedVideo: SharedVideoStatus,
-    studentLessonIds?: number[]
-  ): Promise<void> {
-    if (studentLessonIds?.length) {
-      await this.studentLessonRepository.update(
-        { id: In(studentLessonIds) },
-        { hasSharedVideo }
-      )
-      return
-    }
-    if (!classLessonIds.length) return
-    await this.studentLessonRepository.update(
-      { classLessonId: In(classLessonIds) },
-      { hasSharedVideo }
-    )
   }
 }

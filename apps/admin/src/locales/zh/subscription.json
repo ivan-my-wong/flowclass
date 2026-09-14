@@ -29,7 +29,6 @@
     "prioritySupport": "優先客戶支持"
   },
   "alertBox": {
-    "heading": "立即升級您的計劃，體驗更多自動營銷課程的功能",
     "button": "管理您的訂閱",
     "currently": "您目前訂閱的計劃：",
     "currentPlan": "您目前使用的是 Flowclass 成長計劃",
@@ -43,25 +42,16 @@
     "PRO_TIER": "專業"
   },
   "visitDashboard": {
-    "title": "前往付款主頁",
-    "description": "您可以通過 Stripe 主頁查看付款記錄並管理您的計劃。"
+    "title": "前往付款主頁"
   },
-  "bill": "帳單",
   "mySubscription": "我的活躍訂閱",
   "checkOutWithLink": "您的升級連結已創建。完成付款後，您的帳戶將自動升級",
-  "currentlySubscribed": "查看其他可以促進您教學業務增長的計劃：",
-  "paymentRecord": "付款記錄",
   "nextBillDay": "下次計費日",
-  "billSetting": "帳單設置",
-  "allFeatures": "所有功能",
   "upgrade": "升級",
-  "detail": "詳情",
-  "install": "安裝",
   "currentPlan": "當前計劃",
   "activeSubscription": "活躍訂閱",
   "yourCurrentPlan": "您目前的方案",
   "customPlanLabel": "您正在使用自訂方案",
-  "manageAllSubscription": "管理全部",
   "approachingLimits": "接近限制",
   "approachingLimitsLabel": "您正在使用 100% 的用戶和學校限制。考慮升級以避免服務中斷。",
   "perMonth": "每月",
@@ -75,7 +65,6 @@
   "totalPrice": "總價格",
   "subscribed": "已訂閱",
   "cancelled": "已取消",
-  "schoolLowerCase": "學校",
   "btnModify": "修改",
   "usage": "使用量",
   "manage": "管理",
@@ -94,68 +83,15 @@
   "createSubscriptionPlanSuccess": "您的訂閱計劃已成功創建，您將被重定向到付款頁面",
   "headerBtnViewSubscription": "查看訂閱",
   "subscriptionDetail": {
-    "fetchError": "您尚未擁有訂閱。",
-    "startSubscription": "您從 {{date}} 開始訂閱",
-    "cancelSubscription": "您從 {{date}} 取消了訂閱",
-    "cancelSubscriptionTips": "您仍然可以前往高級功能，直到您當前的訂閱期結束於 {{date}}",
-    "nextBilling": "您的下一個計費日期是 {{date}}",
-    "resubscribe": "重新訂閱",
-    "currentPlan": "當前計劃",
-    "upgrade": "升級",
-    "downgrade": "降級"
+    "currentPlan": "當前計劃"
   },
   "subscriptionPopup": {
-    "title": "更新訂閱",
-    "cancel": "取消",
-    "confirm": "確認",
-    "description": "您即將將訂閱更改為 {{plan}} {{period}} 計劃。\n您的下一筆訂閱費用將為每{{interval}} {{price}}。\n請確認您的操作。",
-    "annual": "年度",
     "monthly": "月度"
-  },
-  "plan": {
-    "flowclassPlan": "Flowclass 計劃",
-    "seoPlan": "SEO 計劃",
-    "addOns": "附加功能"
-  },
-  "flowclass": {
-    "free": "免費",
-    "plus": "進階",
-    "premium": "高級"
-  },
-  "seo": {
-    "basic": "基礎",
-    "advance": "進階",
-    "supreme": "最高級"
-  },
-  "limit": {
-    "maxOfActiveStudents": "最大活躍學生數",
-    "maxOfNotificationReminders": "每月發送的最大通知數"
-  },
-  "channel": {
-    "whatsapp": "WhatsApp 提醒",
-    "assistedWhatsappOnboarding": "WhatsApp 輔助入職"
-  },
-  "user": {
-    "additional": "額外用戶",
-    "limit": "用戶（按機構）"
-  },
-  "branding": {
-    "premiumDomain": "高級域名",
-    "personalBranding": "在電子郵件通訊中使用個人電子郵件和名稱",
-    "noPlatformBranding": "付款頁面上沒有 Flowclass 品牌標識"
-  },
-  "promotion": {
-    "coupon": "優惠券代碼",
-    "additionalFee": "額外費用"
   },
   "noSubscriptionLabel": "您沒有任何活躍訂閱。請創建新訂閱以享受高級功能",
   "createSubscriptionBtnLabel": "創建新訂閱",
   "payment": {
-    "integratedWithStripe": "與 Stripe 集成",
     "customFields": "自定義欄位",
-    "successTitle": "付款完成",
-    "successDesc": "您的付款成功。點擊下方按鈕返回訂閱管理頁面",
-    "redirectBtnLabel": "前往訂閱管理",
     "upgradeSuccessTitle": "🎉 升級成功！",
     "upgradeSuccessDesc": "恭喜！您的平台已成功升級。所有新功能即將準備就緒。",
     "featuresReadySoon": "您的高級功能正在激活中，很快就會可用。",
@@ -167,22 +103,6 @@
       "enhancedTools": "增強工具"
     }
   },
-  "unused": {
-    "maxOfTotalStudents": "最大總學生數",
-    "maxOfTotalClasses": "最大班級數"
-  },
-  "addOns": {
-    "classroomManagement": "教室管理",
-    "teacherManagement": "教師管理"
-  },
-  "features": {
-    "seeAll": "比較所有功能",
-    "essential": "基本功能",
-    "advanced": "進階功能",
-    "premium": "高級功能"
-  },
-  "customerSupport": "全面客戶支持",
-  "emailAutomation": "電子郵件自動化",
   "checkout": {
     "failCheckout": "創建結賬會話失敗。請稍後再試",
     "noPermission": "您沒有升級計劃的權限。請聯繫網站管理員。",
@@ -191,17 +111,11 @@
   "comingSoon": "即將推出",
   "paymentMethod": "付款方式",
   "subscriptionDialog": {
-    "dialogTitle": "您已超出計劃限制",
     "upgradePlan": "您可以升級現有計劃，創建更多課程頁面，並享受高級招生系統構建器功能。",
     "upgradePlan2": "請升級您的計劃以解鎖此功能。",
     "upgradePlan3": "您可以升級現有計劃，邀請更多用戶，並享受高級招生系統構建器功能。",
     "upgradePlan4": "您可以升級現有計劃，連接 Stripe，並享受高級招生系統構建器功能。",
-    "upgrade": "計劃和訂閱價格",
-    "upgradeCreate": "您必須升級計劃才能創建更多課程項目。",
-    "contactSales": "聯繫我們的銷售團隊",
     "messages": {
-      "starterPlanCourse": "升級到入門計劃，創建 3 個課程頁面並設置自定義路徑",
-      "premiumPlanCourse": "升級到高級計劃，創建 10 個課程頁面",
       "discountCode": "升級到入門計劃，創建折扣碼"
     }
   },
@@ -255,15 +169,6 @@
     "customPlanTitle": "需要自訂方案？",
     "customPlanDescription": "建立自己的訂閱。"
   },
-  "manageSubscription": {
-    "title": "訂閱管理",
-    "currentPlanSummary": "當前訂閱計劃記錄",
-    "noActivePlan": "未找到活躍的訂閱計劃",
-    "planDetails": {
-      "title": "當前計劃詳情",
-      "noData": "無計劃數據可用"
-    }
-  },
   "billingHistory": {
     "column": {
       "date": "日期",
@@ -309,12 +214,8 @@
     "reviewPlanSelections": "審查您的選擇",
     "billDetail": "帳單詳情",
     "creditBalance": "可用積分",
-    "amountDueToday": "今日應付金額",
-    "newPlanCost": "新計劃費用",
-    "currentPlanCost": "當前計劃費用",
-    "totalCost": "總費用"
+    "amountDueToday": "今日應付金額"
   },
-  "modifyPlan": {},
   "trialUpgrade": {
     "title": "試用計劃限制",
     "description": "由於您正在使用試用計劃，您無法單獨升級每個計劃。要單獨修改每個計劃，請創建一個活躍的訂閱。",
@@ -389,6 +290,7 @@
     "MULTIPLE_SCHOOL": "學校",
     "MULTIPLE_ADMIN": "管理員",
     "MULTIPLE_TUTOR": "導師",
+    "INTEGRATION_XERO": "Xero",
     "INTEGRATION_GOOGLE_DRIVE": "Google 雲端硬碟"
   },
   "stripeProductDescription": {
@@ -417,6 +319,7 @@
     "MULTIPLE_SCHOOL": "可於一個帳戶內管理多間學校或分校，按實際校數收費。",
     "MULTIPLE_ADMIN": "增加額外管理員，用於處理預約、收費及校務管理。",
     "MULTIPLE_TUTOR": "增加額外導師帳號，供導師查閱課表及進行課堂管理及點名。",
+    "INTEGRATION_XERO": "與 Xero 無縫整合，簡化帳務及會計處理。",
     "INTEGRATION_GOOGLE_DRIVE": "連接 Google Drive，方便管理教材和文件。",
     "SETUP_FEE_SCHOOL_1": "首間學校或中心的一次性設定及數據遷移費用，由專業團隊協助導入資料及設置帳戶。",
     "SETUP_FEE_INSTITUTION_2": "第二間學校或分校的一次性設定及數據遷移費用，包含資料匯入及系統配置。",
@@ -435,7 +338,6 @@
     "MULTIPLE_ADMIN_50": "第 50 位及之後每位管理員的年費。包含持續存取與管理服務。大型營運的簡化管理。",
     "MULTIPLE_ADMIN_UNLIMITED": "無上限方案：每位管理員的年費。包含持續存取與管理服務。無限行政擴展的全面管理。",
     "MULTIPLE_ADMIN_1": "第 1 位及之後每位管理員的年費。包含持續存取與管理服務。成長中行政團隊的專業管理。",
-
     "MULTIPLE_TUTOR_2": "第 2 位及之後每位導師的年費。包含持續存取與管理服務。擴展教學團隊的高效管理。",
     "MULTIPLE_TUTOR_4": "第 4 位及之後每位導師的年費。包含持續存取與管理服務。成長中教育營運的簡化管理。",
     "MULTIPLE_TUTOR_10": "第 10 位及之後每位導師的年費。包含持續存取與管理服務。中型教學營運的專業管理。",
@@ -443,7 +345,6 @@
     "MULTIPLE_TUTOR_50": "第 50 位及之後每位導師的年費。包含持續存取與管理服務。主要教育機構的簡化管理。",
     "MULTIPLE_TUTOR_UNLIMITED": "無上限方案：每位導師的年費。包含持續存取與管理服務。無限教學擴展的全面管理。",
     "MULTIPLE_TUTOR_1": "第 1 位及之後每位導師的年費。包含持續存取與管理服務。成長中教學營運的專業管理。",
-
     "CUSTOMER_SUPPORT_ADVANCED": "進階客戶支援，享有更快回應速度及專屬帳戶經理。包括優先處理支援票、延長服務時間，以及針對複雜實施需求的個人化協助。",
     "CUSTOMER_SUPPORT_BASIC": "基本客戶支援，提供標準回應時間。包含於辦公時間內的電郵及即時聊天支援、完整教學文件及自助社群資源。",
     "CUSTOMER_SUPPORT_EXPERT": "專家級客戶支援，享有即時回應及專屬帳戶經理。包括 24/7 優先支援、自訂培訓課程，以及為企業級實施提供策略諮詢。"
@@ -473,8 +374,7 @@
       "school": {
         "question": "您將管理多少所學校或中心？",
         "description": "選擇您希望管理的學校或中心數量。",
-        "inputLabel": "學校數量",
-        "schoolLabel": "所學校"
+        "inputLabel": "學校數量"
       },
       "setup": {
         "question": "您希望我們的團隊幫助設置您的課程並遷移數據嗎？",

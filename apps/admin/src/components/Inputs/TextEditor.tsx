@@ -9,10 +9,11 @@ import ReactQuill, { ReactQuillProps } from 'react-quill'
 import { MediaFileDirectory } from '@/constants/MediaFileDirectory'
 import { formats, getQuillModules } from '@/constants/reactQuillModules'
 import useFileUpload from '@/hooks/useFileUpload'
+import { styled } from '@/styles'
 import { MediaUploadResponse } from '@/types/apiResponse'
 import { SectionDescription } from '@/types/course'
 import { SectionTag } from '@/types/school'
-import { getMediaFileUrl } from '@/utils/generate-link.utils'
+import { getS3FileUrl } from '@/utils/generate-link.utils'
 
 import Box from '../ui/Box'
 
@@ -73,7 +74,7 @@ const TextEditor = forwardRef<ReactQuill, TextEditorProps>(
       if (range) {
         quillRef.current
           ?.getEditor()
-          .insertEmbed(range.index, 'image', getMediaFileUrl(data.url))
+          .insertEmbed(range.index, 'image', getS3FileUrl(data.url))
       }
     }
     const uploadImageResult = useImageUpload(
@@ -223,8 +224,7 @@ const TextEditor = forwardRef<ReactQuill, TextEditorProps>(
         {isSimpleEditor ? (
           <>
             {content !== undefined && (
-              <ReactQuill
-                className="flex flex-col h-full [&_.ql-snow.ql-toolbar]:bg-background [&_.ql-snow.ql-toolbar]:shrink-0 [&_.ql-container]:flex-1 [&_.ql-container]:h-auto [&_.ql-container]:flex [&_.ql-container]:flex-col [&_.ql-editor]:flex-1 [&_.ql-editor]:overflow-wrap-anywhere [&_.ql-editor]:resize-y [&_.ql-editor]:h-auto [&_.ql-editor]:bg-background"
+              <StyledTextEditor
                 id="textEditor"
                 ref={quillRef}
                 modules={getQuillModules(quillRef)}
@@ -241,8 +241,7 @@ const TextEditor = forwardRef<ReactQuill, TextEditorProps>(
         ) : (
           <>
             {content && (
-              <ReactQuill
-                className="flex flex-col h-full [&_.ql-snow.ql-toolbar]:bg-background [&_.ql-snow.ql-toolbar]:shrink-0 [&_.ql-container]:flex-1 [&_.ql-container]:h-auto [&_.ql-container]:flex [&_.ql-container]:flex-col [&_.ql-editor]:flex-1 [&_.ql-editor]:overflow-wrap-anywhere [&_.ql-editor]:resize-y [&_.ql-editor]:h-auto [&_.ql-editor]:bg-background"
+              <StyledTextEditor
                 id="textEditor"
                 ref={quillRef}
                 modules={getQuillModules(quillRef)}
@@ -266,5 +265,120 @@ const TextEditor = forwardRef<ReactQuill, TextEditorProps>(
     )
   }
 )
+
+const StyledTextEditor = styled(ReactQuill, {
+  display: 'flex',
+  flexDirection: 'column',
+  height: '100%',
+  '.ql-snow.ql-toolbar': {
+    backgroundColor: '$background',
+    flexShrink: 0,
+  },
+  '.ql-container': {
+    flex: '1 1 auto',
+    height: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  '.ql-stroke': {
+    stroke: '$text',
+  },
+  '.ql-picker-label': {
+    color: '$primary',
+  },
+  '.ql-picker-label:hover': {
+    color: '$primary',
+    stroke: '$primary',
+  },
+  '.ql-snow.ql-toolbar .ql-picker-label:hover': {
+    color: '$primary',
+    stroke: '$primary',
+  },
+  '.ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke': {
+    stroke: '$primary',
+  },
+  '.ql-snow.ql-toolbar .ql-picker-label.ql-active': {
+    color: '$primary',
+  },
+  '.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke': {
+    stroke: '$primary',
+  },
+  // button
+  '.ql-snow .ql-fill': {
+    fill: '$text',
+  },
+  '.ql-snow.ql-toolbar button.ql-active .ql-stroke': {
+    stroke: '$primary',
+  },
+  '.ql-snow.ql-toolbar button.ql-active .ql-fill': {
+    stroke: '$primary',
+  },
+  'button:hover .ql-fill': {
+    stroke: '$primary !important',
+  },
+  'button:hover .ql-stroke': {
+    stroke: '$primary !important',
+  },
+  'button.ql-active': {
+    stroke: '$primary',
+  },
+  '.ql-editor': {
+    flex: '1 1 auto',
+    overflowWrap: 'anywhere',
+    resize: 'vertical',
+    height: 'auto',
+    backgroundColor: '$background',
+  },
+  '.ql-size': {
+    width: '65px',
+    fontSize: '14px',
+    '.ql-picker-item:before': {
+      content: 'attr(data-value) !important',
+    },
+    '.ql-picker-label:before': {
+      content: 'attr(data-value) !important ',
+    },
+  },
+  // for fontsize
+  '.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="8px"]::before': {
+    fontSize: '8px',
+  },
+  '.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="10px"]::before': {
+    fontSize: '10px',
+  },
+  '.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="12px"]::before': {
+    fontSize: '12px',
+  },
+  '.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="14px"]::before': {
+    fontSize: '14px',
+  },
+  '.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="16px"]::before': {
+    fontSize: '16px',
+  },
+  '.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="18px"]::before': {
+    fontSize: '18px',
+  },
+  '.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="20px"]::before': {
+    fontSize: '20px',
+  },
+  '.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="22px"]::before': {
+    fontSize: '22px',
+  },
+  '.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="24px"]::before': {
+    fontSize: '24px',
+  },
+  '.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="26px"]::before': {
+    fontSize: '26px',
+  },
+  '.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="28px"]::before': {
+    fontSize: '28px',
+  },
+  '.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="30px"]::before': {
+    fontSize: '30px',
+  },
+  '.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="32px"]::before': {
+    fontSize: '32px',
+  },
+})
 
 export default TextEditor

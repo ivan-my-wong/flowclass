@@ -22,28 +22,17 @@ import {
   ChevronRightIcon,
   DotFilledIcon,
 } from '@radix-ui/react-icons'
+import { CSS } from '@stitches/react'
 import { useTranslation } from 'react-i18next'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import { IoMdNotifications } from 'react-icons/io'
 
-import { cn } from '@/utils/cn'
-
+import { keyframes, styled } from '../../styles'
 import Box from '../Containers/Box'
 import SvgIcon from '../Images/SvgIcon'
 import Text from '../Texts/Text'
 import LanguageToggle from '../Toggle/LanguageToggle'
 import Tooltip from '../Tooltips/Tooltip'
-
-const contentClassName = cn(
-  'min-w-40 bg-background rounded-lg border border-border shadow-lg z-[1070]',
-  'data-[state=open]:data-[side=top]:animate-slide-down-fade',
-  'data-[state=open]:data-[side=right]:animate-slide-left-fade',
-  'data-[state=open]:data-[side=bottom]:animate-slide-up-fade',
-  'data-[state=open]:data-[side=left]:animate-slide-right-fade'
-)
-
-const itemClassName =
-  'group outline-none text-sm text-text flex items-center h-12 relative justify-start pl-5 select-none cursor-pointer gap-3 data-[disabled]:text-text-disabled data-[disabled]:pointer-events-none data-[highlighted]:bg-background-layer-3'
 
 type MenuItemProps = {
   id?: string
@@ -96,8 +85,8 @@ export type DropDownMenuItemType =
 type DropdownMenuProps = {
   menuItems: DropDownMenuItemType[]
   trigger?: JSX.Element
-  contentProps?: { className?: string }
-  triggerProps?: { className?: string }
+  contentProps?: CSS
+  triggerProps?: CSS
   dataTestId?: string
   triggerType?: 'click' | 'hover'
   sideOffset?: number
@@ -116,7 +105,7 @@ const MenuItem = ({
   if (!isHidden) {
     const component = (
       <div>
-        <Item
+        <StyledItem
           id={id ?? ''}
           disabled={disabled}
           data-testid={dataTestId}
@@ -124,15 +113,11 @@ const MenuItem = ({
             e.stopPropagation()
             onClick?.()
           }}
-          className={cn(itemClassName, 'gap-0')}
+          className="gap-0"
         >
           {content}
-          {rightContent && (
-            <div className="ml-auto pl-8 text-text-subtle group-data-[highlighted]:text-text-contrast group-data-[disabled]:text-text-disabled">
-              {rightContent}
-            </div>
-          )}
-        </Item>
+          {rightContent && <RightSlot>{rightContent}</RightSlot>}
+        </StyledItem>
       </div>
     )
     return (
@@ -150,85 +135,74 @@ const MenuItem = ({
   return <></>
 }
 
-const MenuLabel = ({ label }: LabelMenuItemProps): JSX.Element => (
-  <Label className="pl-6 text-xs leading-6 text-text">{label}</Label>
-)
+const MenuLabel = ({ label }: LabelMenuItemProps): JSX.Element => {
+  return <StyledLabel>{label}</StyledLabel>
+}
 
-const MenuSeparator = (): JSX.Element => (
-  <Separator className="h-px bg-text-subtle my-1.5" />
-)
+const MenuSeparator = (): JSX.Element => {
+  return <StyledSeparator />
+}
 
-const MenuSubMenu = ({ content, items }: SubMenuItemProps): JSX.Element => (
-  <Sub>
-    <SubTrigger
-      className={cn(
-        itemClassName,
-        'data-[state=open]:bg-primary data-[state=open]:text-text-contrast'
-      )}
-    >
-      {content}
-      <div className="ml-auto pl-8 text-text-subtle group-data-[highlighted]:text-text-contrast">
-        <ChevronRightIcon />
-      </div>
-    </SubTrigger>
-    <Portal>
-      <SubContent sideOffset={2} alignOffset={-5} className={contentClassName}>
-        {items.map((item, index) => (
-          <MenuItem key={index.toString()} {...item} />
-        ))}
-      </SubContent>
-    </Portal>
-  </Sub>
-)
+const MenuSubMenu = ({ content, items }: SubMenuItemProps): JSX.Element => {
+  return (
+    <Sub>
+      <StyledSubTrigger>
+        {content}
+        <RightSlot>
+          <ChevronRightIcon />
+        </RightSlot>
+      </StyledSubTrigger>
+      <Portal>
+        <StyledSubContent sideOffset={2} alignOffset={-5}>
+          {items.map((item, index) => {
+            const id = index.toString()
+            return <MenuItem key={id} {...item} />
+          })}
+        </StyledSubContent>
+      </Portal>
+    </Sub>
+  )
+}
 
 const MenuCheckBoxItem = ({
   content,
   rightContent,
   checked,
   onCheckedChange,
-}: CheckboxMenuItemProps): JSX.Element => (
-  <CheckboxItem
-    checked={checked}
-    onCheckedChange={onCheckedChange}
-    className={itemClassName}
-  >
-    <ItemIndicator className="absolute left-0 w-6 inline-flex items-center justify-center">
-      <CheckIcon />
-    </ItemIndicator>
-    {content}
-    {rightContent && (
-      <div className="ml-auto pl-8 text-text-subtle group-data-[highlighted]:text-text-contrast">
-        {rightContent}
-      </div>
-    )}
-  </CheckboxItem>
-)
+}: CheckboxMenuItemProps): JSX.Element => {
+  return (
+    <StyledCheckboxItem checked={checked} onCheckedChange={onCheckedChange}>
+      <StyledItemIndicator>
+        <CheckIcon />
+      </StyledItemIndicator>
+      {content}
+      {rightContent && <RightSlot>{rightContent}</RightSlot>}
+    </StyledCheckboxItem>
+  )
+}
 
 const MenuRadioGroup = ({
   value,
   onSelectChange,
   items,
-}: RadioMenuItemProps): JSX.Element => (
-  <RadioGroup value={value} onValueChange={onSelectChange}>
-    {items.map((item, index) => (
-      <RadioItem
-        value={item.value}
-        key={item.value ?? index.toString()}
-        className={itemClassName}
-      >
-        <ItemIndicator className="absolute left-0 w-6 inline-flex items-center justify-center">
-          <DotFilledIcon />
-        </ItemIndicator>
-        {item.content}
-        {item.rightContent && (
-          <div className="ml-auto pl-8 text-text-subtle group-data-[highlighted]:text-text-contrast">
-            {item.rightContent}
-          </div>
-        )}
-      </RadioItem>
-    ))}
-  </RadioGroup>
-)
+}: RadioMenuItemProps): JSX.Element => {
+  return (
+    <RadioGroup value={value} onValueChange={onSelectChange}>
+      {items.map((item, index) => {
+        const id = item.value ?? index.toString()
+        return (
+          <StyledRadioItem value={item.value} key={id}>
+            <StyledItemIndicator>
+              <DotFilledIcon />
+            </StyledItemIndicator>
+            {item.content}
+            {item.rightContent && <RightSlot>{item.rightContent}</RightSlot>}
+          </StyledRadioItem>
+        )
+      })}
+    </RadioGroup>
+  )
+}
 
 const DropdownMenu = ({
   trigger,
@@ -244,11 +218,15 @@ const DropdownMenu = ({
   const [open, setOpen] = React.useState(false)
 
   const handleOnMouseOver = () => {
-    if (triggerType === 'hover') setOpen(true)
+    if (triggerType === 'hover') {
+      setOpen(true)
+    }
   }
 
   const handleOnMouseLeave = () => {
-    if (triggerType === 'hover') setOpen(false)
+    if (triggerType === 'hover') {
+      setOpen(false)
+    }
   }
 
   return (
@@ -261,38 +239,29 @@ const DropdownMenu = ({
           {trigger}
         </Trigger>
       ) : (
-        <Trigger
+        <StyledTrigger
           asChild
           onMouseOver={handleOnMouseOver}
           aria-label="Open Menu"
           title="Open Menu"
-          className="flex items-center justify-center cursor-pointer"
         >
           <div
             id="dropdownMenu"
             data-testid={dataTestId ?? 'toggle-dropdown'}
-            className={cn(className, triggerProps?.className)}
+            className={className}
           >
             <GiHamburgerMenu className="h-5 w-5" />
           </div>
-        </Trigger>
+        </StyledTrigger>
       )}
 
       <Portal>
-        <Content
-          className={cn(
-            contentClassName,
-            '!border-gray-50 !shadow-xl divide-y divide-gray-300',
-            contentProps?.className
-          )}
+        <StyledContent
+          className="!border-gray-50 !shadow-xl divide-y divide-gray-300"
           sideOffset={sideOffset || 5}
+          css={contentProps}
           onMouseEnter={handleOnMouseOver}
           onMouseLeave={handleOnMouseLeave}
-          style={{
-            animationDuration: '400ms',
-            animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
-            willChange: 'transform, opacity',
-          }}
         >
           {menuItems.map((menuItem, index) => {
             const id = `option-${index}`
@@ -332,9 +301,9 @@ const DropdownMenu = ({
                 return <MenuSeparator key={id} />
               case 'language':
                 return (
-                  <Item key={id} className={cn(itemClassName, 'pr-4')}>
+                  <StyledItem key={id} css={{ paddingRight: '1rem' }}>
                     <LanguageToggle variant="compact" />
-                  </Item>
+                  </StyledItem>
                 )
               case 'checkbox':
                 return (
@@ -357,24 +326,161 @@ const DropdownMenu = ({
                 )
               case 'beamer':
                 return (
-                  <Item key={id} className={cn(itemClassName, 'pr-4')}>
-                    <div className="beamerButton w-full flex flex-row">
-                      <SvgIcon className="mr-4">
+                  <StyledItem key={id} css={{ paddingRight: '1rem' }}>
+                    <div
+                      className="beamerButton"
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        flexDirection: 'row',
+                      }}
+                    >
+                      <SvgIcon
+                        css={{
+                          marginRight: '1rem',
+                        }}
+                      >
                         <IoMdNotifications />
                       </SvgIcon>
                       <Text>{t('component:menubar.updates')}</Text>
                     </div>
-                  </Item>
+                  </StyledItem>
                 )
               default:
                 return null
             }
           })}
-          <Arrow className="fill-text-subtle" />
-        </Content>
+          <StyledArrow />
+        </StyledContent>
       </Portal>
     </Root>
   )
 }
 
 export default DropdownMenu
+
+const StyledTrigger = styled(Trigger, {
+  // width: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+})
+
+const UnsetTrigger = styled(Trigger, {
+  backgroundColor: 'unset',
+  border: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+})
+
+const slideUpAndFade = keyframes({
+  '0%': { opacity: 0, transform: 'translateY(2px)' },
+  '100%': { opacity: 1, transform: 'translateY(0)' },
+})
+
+const slideRightAndFade = keyframes({
+  '0%': { opacity: 0, transform: 'translateX(-2px)' },
+  '100%': { opacity: 1, transform: 'translateX(0)' },
+})
+
+const slideDownAndFade = keyframes({
+  '0%': { opacity: 0, transform: 'translateY(-2px)' },
+  '100%': { opacity: 1, transform: 'translateY(0)' },
+})
+
+const slideLeftAndFade = keyframes({
+  '0%': { opacity: 0, transform: 'translateX(2px)' },
+  '100%': { opacity: 1, transform: 'translateX(0)' },
+})
+
+const contentStyles = {
+  minWidth: '10rem',
+  backgroundColor: '$background',
+  borderRadius: '$1',
+
+  border: '1px solid $colors$borderColor',
+  boxShadow: `0px 10px 20px -20px $colors$shadowColor, 0px 10px 20px -20px $colors$shadowColor`,
+  animationDuration: '400ms',
+  animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+  willChange: 'transform, opacity',
+  zIndex: 1,
+  '&[data-state="open"]': {
+    '&[data-side="top"]': { animationName: slideDownAndFade },
+    '&[data-side="right"]': { animationName: slideLeftAndFade },
+    '&[data-side="bottom"]': { animationName: slideUpAndFade },
+    '&[data-side="left"]': { animationName: slideRightAndFade },
+  },
+}
+
+const StyledContent = styled(Content, contentStyles)
+const StyledSubContent = styled(SubContent, contentStyles)
+
+const StyledArrow = styled(Arrow, { fill: '$textSubtle' })
+
+export const itemStyles = {
+  all: 'unset',
+  fontSize: '$3',
+  color: '$text',
+  // borderRadius: '$1',
+  display: 'flex',
+  alignItems: 'center',
+  height: '3rem',
+  cursor: 'pointer',
+  position: 'relative',
+  justifyContent: 'flex-start',
+  paddingLeft: '1.2rem',
+  userSelect: 'none',
+  zIndex: '$tooltip',
+  gap: '$3',
+
+  '&[data-disabled]': {
+    color: '$textDisabled',
+    pointerEvents: 'none',
+  },
+
+  '&[data-highlighted]': {
+    backgroundColor: '$backgroundLayer3',
+  },
+}
+
+const StyledItem = styled(Item, itemStyles)
+const StyledCheckboxItem = styled(CheckboxItem, itemStyles)
+const StyledRadioItem = styled(RadioItem, itemStyles)
+const StyledSubTrigger = styled(SubTrigger, {
+  '&[data-state="open"]': {
+    backgroundColor: '$primary',
+    color: '$textContrast',
+  },
+  ...itemStyles,
+})
+
+const StyledLabel = styled(Label, {
+  paddingLeft: '1.5rem',
+  fontSize: '0.5rem',
+  lineHeight: '1.5rem',
+  color: '$text',
+})
+
+const StyledSeparator = styled(Separator, {
+  height: 1,
+  backgroundColor: '$textSubtle',
+})
+
+const StyledItemIndicator = styled(ItemIndicator, {
+  position: 'absolute',
+  left: 0,
+  width: '1.5rem',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+})
+
+const RightSlot = styled('div', {
+  marginLeft: 'auto',
+  paddingLeft: '$8',
+  color: '$textSubtle',
+  '[data-highlighted] > &': { color: '$textContrast' },
+  '[data-disabled] &': { color: '$textDisabled' },
+})

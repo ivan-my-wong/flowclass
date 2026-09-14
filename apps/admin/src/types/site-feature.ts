@@ -7,7 +7,6 @@ export enum SiteFeature {
   LessonMatrix = 'lessonMatrix',
   BundleDiscounts = 'bundleDiscounts',
   ClassMaterials = 'classMaterials',
-  PackageDiscounts = 'packageDiscounts',
 }
 
 export interface SiteFeatureRecord {

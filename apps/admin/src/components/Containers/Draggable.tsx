@@ -16,66 +16,63 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { CSS as SiitchesCSS } from '@stitches/react'
 import { MdOutlineDragIndicator } from 'react-icons/md'
 
-import { cn } from '@/utils/cn'
+import { styled } from '../../styles'
 
 type DraggableCardProps = {
   id: string | number
   children: React.ReactNode
-  cardStyle?: React.CSSProperties
-  cardClassName?: string
+  cardStyle?: SiitchesCSS
 } & ComponentPropsWithoutRef<'div'>
 
 const DraggableCard = ({
   id,
   children,
   cardStyle,
-  cardClassName,
-  className,
-  style,
   ...props
 }: DraggableCardProps): JSX.Element => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id })
 
-  const transformStyle = {
+  const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   }
 
   const [isHovering, setIsHovering] = useState(false)
 
-  const handleMouseEnter = () => setIsHovering(true)
-  const handleMouseLeave = () => setIsHovering(false)
+  const handleMouseEnter = () => {
+    setIsHovering(true)
+  }
+
+  const handleMouseLeave = () => {
+    setIsHovering(false)
+  }
 
   return (
-    <div
+    <DraggableCardBox
+      css={{ ...cardStyle }}
       key={id}
       ref={setNodeRef}
-      style={{ ...transformStyle, ...style, ...cardStyle }}
-      className={cn(
-        'w-full min-w-36 gap-1 h-fit flex flex-row items-center bg-background-layer-2 p-4 rounded-md',
-        cardClassName,
-        className
-      )}
+      style={{ ...style }}
       {...props}
     >
-      <div
+      <DraggableBoxHandler
         {...attributes}
         {...listeners}
-        className={cn(
-          'w-fit rounded-[20%] cursor-grab text-text-subtle',
-          isHovering && 'bg-text-disabled'
-        )}
+        css={{
+          backgroundColor: isHovering ? '$textDisabled' : 'transparent',
+        }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <MdOutlineDragIndicator size="2rem" />
-      </div>
+      </DraggableBoxHandler>
 
       {children}
-    </div>
+    </DraggableCardBox>
   )
 }
 
@@ -128,5 +125,27 @@ const DraggableContainer = ({
     </DndContext>
   )
 }
+
+const DraggableBoxHandler = styled('div', {
+  width: 'fit-content',
+  borderRadius: '20%',
+  cursor: 'grab',
+  color: '$textSubtle',
+})
+
+const DraggableCardBox = styled('div', {
+  width: '100%',
+  minWidth: '9rem',
+  gap: '$1',
+  height: 'fit-content',
+  display: 'flex',
+  flexDirection: 'row',
+  alignContent: 'center',
+  // justifyContent: 'space-between',
+  alignItems: 'center',
+  backgroundColor: '$backgroundLayer2',
+  padding: '$4',
+  borderRadius: '$medium',
+})
 
 export { DraggableCard, DraggableContainer }

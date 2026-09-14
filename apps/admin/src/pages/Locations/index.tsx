@@ -121,10 +121,6 @@ const LocationsPage = () => {
         headerName: t('location:locations.address').toString(),
         field: 'address',
         cellClass: 'justify-start',
-        // address is an object (Coordinate/Address shape); cellRenderer handles
-        // display, so silence AG Grid's "object cell data type needs a value
-        // formatter" warning with a no-op valueFormatter.
-        valueFormatter: () => '',
         cellRenderer: ({ data }: ICellRendererParams<LocationRoom>) => {
           if (!data) return null
           return (
@@ -253,7 +249,7 @@ const LocationsPage = () => {
               'location:locations.searchByLocationName'
             ).toString()}
             handleReset={handleReset}
-            filterSelector={({ handleReset: reset }) => (
+            filterSelector={
               <div className="box-responsive-full">
                 <div className="box-row-full">
                   <LabelSelector
@@ -292,12 +288,16 @@ const LocationsPage = () => {
                     selectStyles={selectorStyles()}
                   />
 
-                  <Button className="w-[20%]" variant="outline" onClick={reset}>
+                  <Button
+                    className="w-[20%]"
+                    variant="outline"
+                    onClick={handleReset}
+                  >
                     {t('recordLogs:notificationLogs.selectLabels.reset')}
                   </Button>
                 </div>
               </div>
-            )}
+            }
           />
         </div>
       </div>

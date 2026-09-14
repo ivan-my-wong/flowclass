@@ -88,7 +88,7 @@ const FilterForm = ({ courses, setCurrentFilter, showPaymentState }: FilterFormP
         data-testid="course-select"
         options={courses?.map(course => ({ label: course.name, value: course.id })) || []}
         placeholder={t('profile:course')}
-        onChange={val => handleChange('courseId', val?.value)}
+        onChange={(val: any) => handleChange('courseId', val?.value)}
         isClearable
         isSearchable
         name="course"
@@ -99,7 +99,7 @@ const FilterForm = ({ courses, setCurrentFilter, showPaymentState }: FilterFormP
           data-testid="payment-status-select"
           options={optionsPaymentState}
           placeholder={t('profile:paymentStatus')}
-          onChange={val => handleChange('paymentState', val?.value)}
+          onChange={(val: any) => handleChange('paymentState', val?.value)}
           isClearable
           isSearchable
           name="payment-status"
@@ -110,7 +110,7 @@ const FilterForm = ({ courses, setCurrentFilter, showPaymentState }: FilterFormP
         data-testid="payment-method-select"
         options={optionsPaymentMethod}
         placeholder={t('profile:paymentMethod')}
-        onChange={val => handleChange('paymentMethod', val?.value)}
+        onChange={(val: any) => handleChange('paymentMethod', val?.value)}
         isClearable
         isSearchable
         name="payment-method"
@@ -121,7 +121,7 @@ const FilterForm = ({ courses, setCurrentFilter, showPaymentState }: FilterFormP
           data-testid="children-select"
           options={optionsChildren}
           placeholder={t('profile:children')}
-          onChange={val => handleChange('childrenId', val?.value)}
+          onChange={(val: any) => handleChange('childrenId', val?.value)}
           isClearable
           isSearchable
           name="childrenId"

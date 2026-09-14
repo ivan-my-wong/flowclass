@@ -137,10 +137,10 @@ export const deleteInstitutionGalleryImage = async ({
   return res.data.data
 }
 
-export const getPrivateFileAccessUrl = async (key: string): Promise<string> => {
+export const getS3PrivateFileUrl = async (key: string): Promise<string> => {
   const res = await apiClient.get({
     needAuth: true,
-    url: '/admin/media/object-access-url',
+    url: '/admin/media/s3-presigned-url',
     params: {
       key,
     },

@@ -2,23 +2,59 @@ import { useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
+import { useRecoilState } from 'recoil'
 
 import useSchoolData from '@/hooks/useSchoolData'
+import usePlanData from '@/hooks/useSubscriptionPlanData'
 import AddSchoolModal, {
   AddSchoolModalHandle,
 } from '@/pages/School/CreateSchoolModal'
+import { subscriptionDialogOpenState } from '@/stores/schoolSubscriptionData'
 import { School } from '@/types/school'
 
 import SelectDefault from './Select'
 
-const SchoolSelector = () => {
+const SchoolSelector = ({
+  triggerVariant,
+}: {
+  triggerVariant: 'compact' | 'fullWidth'
+}) => {
   const { schoolData, setCurrentSchool } = useSchoolData()
   const { t } = useTranslation()
   const addSchoolModalHandle = useRef<AddSchoolModalHandle>(null)
+  const { checkSubscriptionAccess } = usePlanData()
+  const [, setShowSubscriptionPopup] = useRecoilState(
+    subscriptionDialogOpenState
+  )
+
   const navigate = useNavigate()
   const openModal = () => {
     addSchoolModalHandle.current?.handleOpenChange?.()
   }
+
+  const shouldCheckCreateNewSchool = checkSubscriptionAccess(
+    'schoolQuantity',
+    schoolData.schools.length + 1
+  )
+
+  // To be added later hen e support multiple schools. Currently only one schools on release.
+
+  // if (!schoolData.schools.length) {
+  //   return (
+  //     <>
+  //       <Text
+  //         css={{ width: '100%' }}
+  //         onClick={(event: React.FormEvent) => {
+  //           openModal()
+  //           event.stopPropagation()
+  //         }}
+  //       >
+  //         {t(`school:addSchoolModalTitle`)}
+  //       </Text>
+  //       <AddSchoolModal ref={addSchoolModalHandle} hidden />
+  //     </>
+  //   )
+  // }
 
   const tabSelectProps = {
     placeholder: t('component:select.placeholder'),
@@ -44,6 +80,13 @@ const SchoolSelector = () => {
     ],
     currentSelect: schoolData.currentSchool?.id.toString() || '',
     onValueChange: (value: string) => {
+      if (value === 'addNewSchool' && !shouldCheckCreateNewSchool) {
+        setShowSubscriptionPopup({
+          open: true,
+          message: t('subscription:subscriptionDialog.upgradePlan'),
+        })
+        return
+      }
       if (value === 'addNewSchool') {
         openModal()
       } else {
@@ -51,6 +94,21 @@ const SchoolSelector = () => {
         navigate('/dashboard')
       }
     },
+  }
+
+  if (triggerVariant === 'fullWidth') {
+    return (
+      <>
+        <SelectDefault
+          fullWidth
+          placeholder={tabSelectProps.placeholder}
+          selectItems={tabSelectProps.selectItems}
+          currentSelect={tabSelectProps.currentSelect}
+          onValueChange={tabSelectProps.onValueChange}
+        />
+        <AddSchoolModal ref={addSchoolModalHandle} hidden />
+      </>
+    )
   }
 
   return (

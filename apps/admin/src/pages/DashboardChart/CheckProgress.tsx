@@ -35,7 +35,7 @@ import { DiscountType } from '@/types/coupon'
 import { ClassTypeEnum, Course } from '@/types/course'
 import { RequestTimeChangeStatus } from '@/types/rescheduleApproval'
 import { School } from '@/types/school'
-import { StripeConnectDetail } from '@/types/stripe-connect'
+import { StripeConnectDetail } from '@/types/schoolSubscriptionPlan'
 
 const defaultSectionValue = '<p><br></p>'
 
@@ -227,7 +227,11 @@ const CheckProgress = (): {
   )
 
   const checkDomain = (): number => {
-    if (!currentSite?.url || currentSite.url === '') {
+    if (
+      !currentSite?.url ||
+      currentSite.url === '' ||
+      currentSite.url === '.flowclass.io'
+    ) {
       return 0
     }
 
@@ -765,7 +769,9 @@ const CheckProgress = (): {
     return hasProcessedRequests ? 1 : 0
   }
 
-  const checkAutomationFlowCreated = (): number => 0
+  const checkAutomationFlowCreated = (): number => {
+    return 0
+  }
 
   const checkInstructorHourlyRates = (): number => {
     // Check if there are more than one instructor

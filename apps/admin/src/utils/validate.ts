@@ -1,6 +1,6 @@
 import { Convert } from 'easy-currencies'
 
-import { StripeCurrency } from '../types/stripe-connect'
+import { StripeCurrency } from '../types/schoolSubscriptionPlan'
 
 export const validatePhone = (phone: string): boolean => {
   if (!phone || phone === '') {
@@ -63,6 +63,10 @@ export const validateDomain = (str: string): boolean => {
   if (!str) {
     return false
   }
+  // check for all lowercase and no special characters
+  // return /^(?=.{1,63}$)[a-z0-9]+(-[a-z0-9]+)*(\.[a-z0-9]+(-[a-z0-9]+)*)*$/.test(
+  //   str
+  // )
   return /^[a-zA-Z0-9\-_/]*(%[0-9a-fA-F]{2}[a-zA-Z0-9\-_/]*)*$/.test(str)
 }
 
@@ -71,19 +75,6 @@ export const validateCustomDomain = (str: string): boolean => {
   // have at least one dot, special character is not placed at beginning or end
   return /^(?:[a-z0-9]+(?:[-.][a-z0-9]+)*\.[a-z0-9]+(?:[-.][a-z0-9]+)*|)$/.test(
     str
-  )
-}
-
-/**
- * Validates free-form domain input (no preset suffix).
- * Accepts: localhost, example.com, my-school.local, sub.domain.co.uk
- */
-export const validateFreeFormDomain = (str: string): boolean => {
-  if (!str?.trim()) return false
-  const s = str.trim().toLowerCase()
-  if (s === 'localhost') return true
-  return /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/.test(
-    s
   )
 }
 

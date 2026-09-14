@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common'
+import { Body, Controller, Post, Query, UseGuards } from '@nestjs/common'
 import {
   ApiBadRequestResponse,
   ApiExtraModels,
@@ -25,6 +25,7 @@ import {
   CreateLoginTokenDto,
   LoginDto,
   LoginResponse,
+  LoginSocialDto,
   LoginWithTokenDto,
   RefreshTokenDto,
   ValidateTokenDto,
@@ -45,25 +46,6 @@ import { ChangeOtherUserPasswordDto, ResetPasswordDto } from './dto/reset-passwo
 @UseGuards(AdminAuthGuard)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
-  @Get('has-users')
-  @Public()
-  @ApiOperation({
-    summary:
-      'Check if any users exist in the database. Used to redirect new installations to register.',
-  })
-  @ApiOkResponse({
-    description: 'Returns whether at least one user exists',
-    schema: {
-      properties: {
-        hasUsers: { type: 'boolean', description: 'True if any users exist' },
-      },
-    },
-  })
-  async hasUsers(): Promise<{ hasUsers: boolean }> {
-    return this.authService.hasUsers()
-  }
-
   @ApiExtraModels(LoginResponse)
   @Post('register')
   @Public()
@@ -110,6 +92,22 @@ export class AuthController {
   })
   async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
     return this.authService.refreshAccessToken(refreshTokenDto)
+  }
+
+  @Post('login/social')
+  @Public()
+  @ApiOperation({
+    summary:
+      'This api for master admin, site manager, institution manager, instructor, operator to log into out system.',
+  })
+  @ApiOkResponse({
+    schema: loginSchema,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'This response when user not available in your system.',
+  })
+  async loginSocial(@Body() loginSocialDto: LoginSocialDto): Promise<LoginResponse> {
+    return this.authService.loginSocial(loginSocialDto)
   }
 
   @Post('reset-password')

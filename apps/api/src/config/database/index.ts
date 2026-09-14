@@ -1,16 +1,17 @@
 /* eslint-disable simple-import-sort/imports */
-import { ObjectStorageProvider } from '@/config/storage/object-storage.provider'
+import { S3ClientFactory } from '@/config/s3/s3-factory.provider'
 import { EmailService } from '@/domain/external/email.service'
+import { GaMeasurementService } from '@/domain/external/gaMeasurement.service'
+import { GoogleAnalyticsService } from '@/domain/external/google-analytics.service'
 import { ChatGPTService } from '@/domain/external/openAi.service'
 import { StripeConnectService } from '@/domain/external/stripe-connect.service'
-import { StripeProductPricesService } from '@/domain/service/stripe-product-prices.service'
-import { WhatsappService } from '@/domain/external/whatsapp.service'
+import { WebHookService } from '@/domain/external/web-hook.service'
+import { MetaWhatsappService } from '@/domain/external/meta-whatsapp.service'
 import { AdditionalFeeService } from '@/domain/service/additional-fee.service'
 import { AppointmentService } from '@/domain/service/appointment.service'
 import { AuthService } from '@/domain/service/auth.service'
 import { AvailabilityService } from '@/domain/service/availability.service'
 import { BundleDiscountsService } from '@/domain/service/bundle-discounts.service'
-import { PackageDiscountsService } from '@/domain/service/package-discounts.service'
 import { ClassLessonService } from '@/domain/service/class-lesson.service'
 import { ClassService } from '@/domain/service/class.service'
 import { CommentService } from '@/domain/service/comment.service'
@@ -44,6 +45,7 @@ import { SettingSiteService } from '@/domain/service/setting-site.service'
 import { SettingSocialService } from '@/domain/service/setting-social.service'
 import { SettingWebpageInstitutionService } from '@/domain/service/setting-webpage-institution.service'
 import { SitesService } from '@/domain/service/sites.service'
+import { StripeProductPricesService } from '@/domain/service/stripe-product-prices.service'
 import { StudentOnbService } from '@/domain/service/student-onboard.service'
 import { StudentScheduleService } from '@/domain/service/student-schedule.service'
 import { TrialLessonService } from '@/domain/service/trial-lesson.service'
@@ -54,11 +56,16 @@ import { WorkshopService } from '@/domain/service/workshop.service'
 import { AdditionalFee, AdditionalFeeRepository } from '@/models/additional-fee.entity'
 import { AiRunsRecord, AiRunsRecordRepository } from '@/models/ai-runs-record.entity'
 import { Appointment, AppointmentRepository } from '@/models/appointment.entity'
+import { AutomationFlowStep } from '@/models/automation-flow-steps.entity'
+import { AutomationFlow } from '@/models/automation-flow.entity'
+import {
+  AutomationFlowRepository,
+  AutomationFlowStepRepository,
+  InstitutionAutomationFlowRepository,
+} from '@/models/automation-flow.repository'
 import { Availability, AvailabilityRepository } from '@/models/availability.entity'
 import { BundleDiscount } from '@/models/bundle-discounts.entity'
 import { BundleDiscountsRepository } from '@/models/bundle-discounts.repository'
-import { PackageDiscount } from '@/models/package-discounts.entity'
-import { PackageDiscountsRepository } from '@/models/package-discounts.repository'
 import { ClassLessonRepository } from '@/models/class-lesson.repository'
 import { ClassLesson } from '@/models/class-lessons.entity'
 import { ClassEntity } from '@/models/classes.entity'
@@ -71,14 +78,16 @@ import { CommonFormRepository } from '@/models/common-form.repository'
 import { Coupon } from '@/models/coupons.entity'
 import { CouponsRepository } from '@/models/coupons.repository'
 import {
+  CourseActivitiesOrderEntity,
+  CourseActivitiesOrderRepository,
+} from '@/models/course-activities-order.entity'
+import { CoursePromotionUsed } from '@/models/course-promotion-used.entity'
+import { CoursePromotionUsedRepository } from '@/models/course-promotion-used.repository'
+import {
   RecurringSchedules,
   RecurringSchedulesRepository,
 } from '@/models/course-recurring-schedules.entity'
 import { RegularPeriods, RegularPeriodsRepository } from '@/models/course-regular-periods.entity'
-import {
-  CourseActivitiesOrderEntity,
-  CourseActivitiesOrderRepository,
-} from '@/models/course-activities-order.entity'
 import { Course } from '@/models/courses.entity'
 import { CoursesRepository } from '@/models/courses.repository'
 import { CustomMessageEntity, CustomMessageRepository } from '@/models/custom-message.entity'
@@ -87,6 +96,7 @@ import {
   EnrollClassMappingRepository,
   EnrollCourseRepository,
 } from '@/models/enroll-courses.repository'
+import { InstitutionAutomationFlow } from '@/models/institution-automation-flow.entity'
 import { InstitutionGallery } from '@/models/institution-gallery.entity'
 import { InstitutionGalleryRepository } from '@/models/institution-gallery.repository'
 import { Institution } from '@/models/institutions.entity'
@@ -94,7 +104,17 @@ import { InstitutionsRepository } from '@/models/institutions.repository'
 
 import { IntegrationGoogleService } from '@/domain/external/integration-google.service'
 import { StudentNotifSettingService } from '@/domain/service/student-notif-setting.service'
+import { SubscriptionPlanRecordsService } from '@/domain/service/subscription-service/subscription-plan-records.service'
 import { WhatsappWebService } from '@/domain/service/whatsapp-web.service'
+import { MetaCoexistenceSyncService } from '@/domain/external/meta/meta-coexistence-sync.service'
+import { MetaGraphApiService } from '@/domain/external/meta/meta-graph-api.service'
+import { MetaService } from '@/domain/external/meta/meta.service'
+import { MetaTemplateService } from '@/domain/external/meta/meta-template.service'
+import { MetaWhatsAppProfileService } from '@/domain/external/meta/meta-whatsapp-profile.service'
+import { WhatsAppProviderConnectionService } from '@/domain/external/meta/whatsapp-provider-connection.service'
+import { WhatsAppProviderCredentialService } from '@/domain/external/meta/whatsapp-provider-credential.service'
+import { AutomationSettings } from '@/models/automation-settings.entity'
+import { AutomationSettingsRepository } from '@/models/automation-settings.repository'
 import {
   IntegrationGoogleEntity,
   IntegrationGoogleRepository,
@@ -102,8 +122,6 @@ import {
 import { InviteMember } from '@/models/invite-member.entity'
 import { InviteMembersRepository } from '@/models/invite-members.repository'
 import { Invoice } from '@/models/invoice.entity'
-import { InvoicePromotionUsed } from '@/models/invoice-promotion-used.entity'
-import { InvoicePromotionUsedRepository } from '@/models/invoice-promotion-used.repository'
 import { InvoiceRepository } from '@/models/invoice.repository'
 import { LessonQuestion } from '@/models/lesson-question.entity'
 import { LessonQuestionRepository } from '@/models/lesson-question.repository'
@@ -146,12 +164,20 @@ import { StripeProductPricesRepository } from '@/models/stripe-product-prices.re
 import { StudentForm } from '@/models/student-form.entity'
 import { StudentLesson } from '@/models/student-lesson.entity'
 import { StudentLessonRepository } from '@/models/student-lesson.repository'
+import { StudentMemo } from '@/models/student-memo.entity'
+import { StudentMemoRepository } from '@/models/student-memo.repository'
 import {
   StudentNotificationSetting,
   StudentNotificationSettingRepository,
 } from '@/models/student-notification-setting.entity'
 import { StudentSchedule } from '@/models/student-schedule.entity'
 import { StudentScheduleRepository } from '@/models/student-schedule.repository'
+import {
+  SubscriptionPlanRecordsEntity,
+  SubscriptionPlanRecordsRepository,
+} from '@/models/subscription-plan-records.entity'
+import { SubscriptionPlan } from '@/models/subscription-plans.entity'
+import { SubscriptionPlansRepository } from '@/models/subscription-plans.repository'
 import { Transaction } from '@/models/transaction.entity'
 import { TransactionRepository } from '@/models/transaction.repository'
 import { ClassTrialLesson, TrialLesson } from '@/models/trial-lesson.entity'
@@ -167,6 +193,22 @@ import {
   WhatsappTemplateEntity,
   WhatsappTemplateRepository,
 } from '@/models/whatsapp-template.entity'
+import {
+  MetaEmbeddedSignup,
+  MetaEmbeddedSignupRepository,
+} from '@/models/meta-embedded-signup.entity'
+import {
+  WhatsAppProviderConnection,
+  WhatsAppProviderConnectionRepository,
+} from '@/models/whatsapp-provider-connection.entity'
+import {
+  MetaProviderCredential,
+  MetaProviderCredentialRepository,
+} from '@/models/meta-provider-credential.entity'
+import {
+  MetaCoexistenceSyncCheckpoint,
+  MetaCoexistenceSyncCheckpointRepository,
+} from '@/models/meta-coexistence-sync-checkpoint.entity'
 import { WKSession, WorkshopSessionRepository } from '@/models/workshop-sessions.entity'
 import { MediaService } from '@/modules/media/media.service'
 import InvoiceWorker from '@/modules/worker/invoice.worker'
@@ -183,8 +225,20 @@ import { InvoiceCampaignService } from '@/domain/service/invoice-campaign.servic
 import { InvoiceStatisticsService } from '@/domain/service/invoice-statistics.service'
 import { SitesFeatureEnabledService } from '@/domain/service/sites-feature-enabled.service'
 import { StudentSubmissionService } from '@/domain/service/student-submission.service'
+import { AddSubscriptionPlanService } from '@/domain/service/subscription-service/add-subscription.service'
+import { CancelSubscriptionService } from '@/domain/service/subscription-service/cancel-subscription.service'
+import { DowngradeSubscriptionService } from '@/domain/service/subscription-service/downgrade-subscription.service'
+import { SubscriptionPresetPlansService } from '@/domain/service/subscription-service/preset-plans.service'
+import { PricingPageService } from '@/domain/service/subscription-service/pricing-page.service'
+import { SubmitSubscriptionService } from '@/domain/service/subscription-service/submit-subscription.service'
+import { PlansService } from '@/domain/service/subscription-service/subscription-plans.service'
+import { SubscriptionSummaryService } from '@/domain/service/subscription-service/subscription-summary.service'
+import { SubstituteSubscriptionService } from '@/domain/service/subscription-service/substitute-subscription.service'
+import { UpgradeSubscriptionService } from '@/domain/service/subscription-service/upgrade-subscription.service'
 import { TemplateManagementService } from '@/domain/service/template-management.service'
 
+import { AutomationFlowCondition } from '@/models/automation-flow-condition.entity'
+import { AutomationFlowConditionRepository } from '@/models/automation-flow-condition.repository'
 import { ClassMaterials } from '@/models/class-materials.entity'
 import { ClassMaterialsRepository } from '@/models/class-materials.repository'
 import { MediaMaterials } from '@/models/class-media-materials.entity'
@@ -219,6 +273,8 @@ import {
 } from '@/models/sites-feature-enabled.entity'
 import { StudentSubmissions } from '@/models/student-submission.entity'
 import { StudentSubmissionRepository } from '@/models/student-submission.repository'
+import { SubscriptionPresetPlanEntity } from '@/models/subscription-preset-plans.entity'
+import { SubscriptionPresetPlansRepository } from '@/models/subscription-preset-plans.repository'
 import { TeacherFeedback } from '@/models/teacher-feedback.entity'
 import { TeacherFeedbackRepository } from '@/models/teacher-feedback.repository'
 
@@ -228,6 +284,7 @@ export const getAllEntities = () => [
   ClassPriceOption,
   CommentEntity,
   Coupon,
+  CoursePromotionUsed,
   Course,
   EnrollClassMapping,
   EnrollCourse,
@@ -235,10 +292,10 @@ export const getAllEntities = () => [
   Institution,
   InviteMember,
   Invoice,
-  InvoicePromotionUsed,
   RegularPeriods,
   PasswordResetToken,
   PaymentEvidence,
+  SubscriptionPlan,
   PayoutMethod,
   SeoSetting,
   PeriodLessons,
@@ -251,7 +308,6 @@ export const getAllEntities = () => [
   SiteGallery,
   Site,
   StripeConnect,
-  StripeProductPricesEntity,
   StudentSchedule,
   Transaction,
   UserRole,
@@ -262,7 +318,7 @@ export const getAllEntities = () => [
   StudentLesson,
   CourseActivitiesOrderEntity,
   BundleDiscount,
-  PackageDiscount,
+  StripeProductPricesEntity,
   CommonForm,
   CommonField,
   SettingBlockTime,
@@ -270,10 +326,18 @@ export const getAllEntities = () => [
   RecurringSchedules,
   SettingNotifications,
   AdditionalFee,
+  StudentMemo,
   AiRunsRecord,
   RepeatFormats,
   NotificationRecord,
+  AutomationFlow,
+  AutomationFlowStep,
+  InstitutionAutomationFlow,
   WhatsappTemplateEntity,
+  MetaEmbeddedSignup,
+  WhatsAppProviderConnection,
+  MetaProviderCredential,
+  MetaCoexistenceSyncCheckpoint,
   TrialLesson,
   ClassTrialLesson,
   LessonQuestion,
@@ -284,9 +348,13 @@ export const getAllEntities = () => [
   IntegrationGoogleEntity,
   CustomMessageEntity,
   StudentNotificationSetting,
+  SubscriptionPlanRecordsEntity,
+  SubscriptionPresetPlanEntity,
+  AutomationSettings,
   DocumentTemplate,
   DocumentCampaign,
   DocumentCampaignRecipients,
+  AutomationFlowCondition,
   InstructorRate,
   InstructorProfile,
   ClassRegularSchedulesV2,
@@ -309,13 +377,10 @@ export const getAllRepositories = () => [
   UserRolesRepository,
   SitesRepository,
   InstitutionsRepository,
-  InstitutionGalleryRepository,
   StripeConnectRepository,
-  StripeProductPricesRepository,
   ClassRepository,
   ClassLessonRepository,
   ClassPriceOptionRepository,
-  CourseActivitiesOrderRepository,
   TrialLessonRepository,
   ClassTrialLessonRepository,
   CouponsRepository,
@@ -335,20 +400,31 @@ export const getAllRepositories = () => [
   EnrollClassMappingRepository,
   SeoSettingsRepository,
   TransactionRepository,
+  SubscriptionPlansRepository,
   PaymentEvidenceRepository,
   InvoiceRepository,
-  InvoicePromotionUsedRepository,
+  CoursePromotionUsedRepository,
+  InstitutionGalleryRepository,
+  CourseActivitiesOrderRepository,
   BundleDiscountsRepository,
-  PackageDiscountsRepository,
+  StripeProductPricesRepository,
   RecurringSchedulesRepository,
   SettingNotificationsRepository,
   StudentScheduleRepository,
   AdditionalFeeRepository,
+  StudentMemoRepository,
   RepeatFormatsRepository,
   StudentLessonRepository,
   AiRunsRecordRepository,
   NotificationRecordRepository,
+  AutomationFlowStepRepository,
+  InstitutionAutomationFlowRepository,
+  AutomationFlowRepository,
   WhatsappTemplateRepository,
+  MetaEmbeddedSignupRepository,
+  WhatsAppProviderConnectionRepository,
+  MetaProviderCredentialRepository,
+  MetaCoexistenceSyncCheckpointRepository,
   CommonFormRepository,
   CommonFieldRepository,
   LessonQuestionRepository,
@@ -359,9 +435,13 @@ export const getAllRepositories = () => [
   CustomMessageRepository,
   WhatsappSessionRepository,
   StudentNotificationSettingRepository,
+  SubscriptionPlanRecordsRepository,
+  SubscriptionPresetPlansRepository,
+  AutomationSettingsRepository,
   DocumentTemplateRepository,
   DocumentCampaignRepository,
   DocumentCampaignRecipientsRepository,
+  AutomationFlowConditionRepository,
   InstructorRatesRepository,
   InstructorProfileRepository,
   ClassRegularSchedulesV2Repository,
@@ -384,7 +464,6 @@ export const getAllServices = () => [
   SitesService,
   InstitutionsService,
   StripeConnectService,
-  StripeProductPricesService,
   ClassService,
   ClassPriceOptionService,
   CouponsService,
@@ -407,22 +486,25 @@ export const getAllServices = () => [
   EmailService,
   PaymentService,
   PaymentEvidenceService,
+  WebHookService,
   InvoiceService,
   ChatGPTService,
-  ObjectStorageProvider,
+  GaMeasurementService,
+  S3ClientFactory,
   RecordLogService,
   StudentOnbService,
   ClassLessonService,
   CourseActivitiesOrderService,
   BundleDiscountsService,
-  PackageDiscountsService,
+  StripeProductPricesService,
   ManagementService,
   EnrollmentFormService,
   SetingBlockTimeService,
+  GoogleAnalyticsService,
   RecurringSchedulesService,
   SettingNotificationsService,
   SetingBlockTimeService,
-  WhatsappService,
+  MetaWhatsappService,
   StudentScheduleService,
   AdditionalFeeService,
   SettingBlockTime,
@@ -440,12 +522,22 @@ export const getAllServices = () => [
   LessonWorker,
   WhatsappWebService,
   CustomMessageService,
-  WhatsappWebService,
   StudentNotifSettingService,
+  SubscriptionPlanRecordsService,
+  SubscriptionSummaryService,
+  UpgradeSubscriptionService,
+  AddSubscriptionPlanService,
+  SubmitSubscriptionService,
+  DowngradeSubscriptionService,
+  CancelSubscriptionService,
+  SubscriptionPresetPlansService,
+  SubstituteSubscriptionService,
+  PricingPageService,
   TemplateManagementService,
   InstructorProfilesService,
   ClassRegularSchedulesV2Service,
   InvoiceCampaignService,
+  PlansService,
   CreditManagementService,
   ClassRegularSchedulesV2Service,
   SitesFeatureEnabledService,
@@ -453,4 +545,11 @@ export const getAllServices = () => [
   StudentSubmissionService,
   UploadProgressService,
   InvoiceStatisticsService,
+  MetaGraphApiService,
+  WhatsAppProviderConnectionService,
+  WhatsAppProviderCredentialService,
+  MetaService,
+  MetaTemplateService,
+  MetaWhatsAppProfileService,
+  MetaCoexistenceSyncService,
 ]

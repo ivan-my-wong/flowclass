@@ -383,7 +383,7 @@ export class Course extends BaseEntity {
   @Column({ name: 'is_archived', type: 'boolean', default: false })
   isArchived: boolean
 
-  @Column('jsonb', { name: 'email_settings', nullable: true })
+  @Column('jsonb', { name: 'email_settings', nullable: true, default: () => "'{}'::jsonb" })
   emailSettings?: EmailSettings
 
   @Column({ name: 'course_code', nullable: true })

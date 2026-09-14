@@ -15,7 +15,9 @@ import { Button } from '@/components/ui/Button'
 import ContentLayout from '@/layouts/ContentLayout'
 import { AlertTypes } from '@/reducers/confirm.reducers'
 import { userState } from '@/stores/userData'
-import { cn } from '@/utils/cn'
+import { styled } from '@/styles'
+
+const ShortText = styled(Text, { width: '60%', '@sm': { width: '100%' } })
 
 const DeleteAccount = () => {
   const [showConfirmPopup, setShowConfirmPopup] = useState(false)
@@ -50,15 +52,9 @@ const DeleteAccount = () => {
     <ContentLayout headerBackButton={headerBackButton}>
       <Box padding="base" direction="col" align="start" gap="lg">
         <Heading>{t('account:deleteAccount.deleteAccount')}</Heading>
-        <Text className={cn('w-[60%] sm:w-full')}>
-          {t('account:deleteAccount.notice1')}
-        </Text>
-        <Text className={cn('w-[60%] sm:w-full')}>
-          {t('account:deleteAccount.notice2')}
-        </Text>
-        <Text className={cn('w-[60%] sm:w-full')}>
-          {t('account:deleteAccount.notice3')}
-        </Text>
+        <ShortText>{t('account:deleteAccount.notice1')}</ShortText>
+        <ShortText>{t('account:deleteAccount.notice2')}</ShortText>
+        <ShortText>{t('account:deleteAccount.notice3')}</ShortText>
         <Spacer space="y2" />
         <Button
           color="warn"

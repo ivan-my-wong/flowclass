@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 
 import { motion } from 'framer-motion'
 import { useRecoilValue } from 'recoil'
 
-import { hasUsers } from '@/api/auth'
+import LeftLoginScreen from '@/components/Animations/LeftLoginScreen'
 import useAuth from '@/hooks/useAuth'
 import { userState } from '@/stores/userData'
 import { userPermissionState, UserRole } from '@/stores/userPermissionData'
@@ -19,25 +19,8 @@ const LoginLayout: React.FC<LoginLayoutProps> = ({ children }) => {
   const { mutateAsync } = useLoginTokenWithEmail()
   const userPermission = useRecoilValue(userPermissionState)
   const currentUser = useRecoilValue(userState)
-  const [hasUsersCheckDone, setHasUsersCheckDone] = useState(false)
 
   const navigate = useNavigate()
-
-  useEffect(() => {
-    const checkHasUsers = async () => {
-      try {
-        const usersExist = await hasUsers()
-        if (!usersExist) {
-          navigate('/register', { replace: true })
-        }
-      } catch {
-        // On API error, allow login (e.g. API not reachable)
-      } finally {
-        setHasUsersCheckDone(true)
-      }
-    }
-    checkHasUsers()
-  }, [navigate])
 
   useEffect(() => {
     if (!isLogin || !currentUser) {
@@ -60,7 +43,7 @@ const LoginLayout: React.FC<LoginLayoutProps> = ({ children }) => {
         }
       )
     }
-  }, [userPermission, isLogin, currentUser, navigate])
+  }, [userPermission, isLogin, currentUser])
 
   const urlParams = new URLSearchParams(location.search)
   const token = urlParams.get('token')
@@ -80,23 +63,35 @@ const LoginLayout: React.FC<LoginLayoutProps> = ({ children }) => {
     return <Navigate to="/home" replace />
   }
 
-  if (!hasUsersCheckDone) {
-    return (
-      <div className="flex md:flex-row flex-col-reverse md:h-dvh overflow-hidden items-center justify-center bg-white">
-        <div className="text-gray-500">Loading...</div>
-      </div>
-    )
-  }
-
   return (
-    <div className="flex md:h-dvh overflow-hidden items-center justify-center bg-white">
+    <div className="flex md:flex-row flex-col-reverse md:h-dvh overflow-hidden">
+      {/* Left side with floating phone image */}
       <motion.div
-        className="w-full max-w-md p-8"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+        className="md:w-1/2 w-full h-full flex items-center justify-center bg-white"
       >
-        {children}
+        <LeftLoginScreen />
+      </motion.div>
+
+      {/* Right side with auth form */}
+      <motion.div
+        className="md:p-0 p-8 md:w-1/2 w-full h-full flex items-center justify-center bg-white"
+        initial={{ x: 30, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+      >
+        <div className="w-full max-w-md">
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="w-full h-full flex items-center justify-center"
+          >
+            {children}
+          </motion.div>
+        </div>
       </motion.div>
     </div>
   )

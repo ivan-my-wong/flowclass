@@ -28,6 +28,7 @@ export type InvoiceResponse = {
   siteId: number
   institutionId: number
   userId: number
+  userAliasId?: number
 
   // There will be a list of user Ids if there are multiple applicants
   applicants?: PartialUser[]

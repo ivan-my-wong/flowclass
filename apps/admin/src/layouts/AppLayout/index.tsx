@@ -1,25 +1,77 @@
 import { Outlet } from 'react-router-dom'
 
+import ImpersonationBanner from '@/components/ImpersonationBanner'
 import MenuBar from '@/components/MenuBar'
+import { styled } from '@/styles'
 
 import AppHeader from './AppHeader'
 
+const Container = styled('div', {
+  display: 'flex',
+  flexDirection: 'column',
+  height: '100vh',
+})
+
+const HeaderWrapper = styled('div', {
+  backgroundColor: '$background',
+  borderBottom: `2px solid $colors$backgroundLayer3`,
+  height: '3rem',
+  '@sm': {
+    display: 'block',
+    position: 'sticky',
+    top: 0,
+  },
+})
+
+const ContentWrapper = styled('div', {
+  display: 'flex',
+
+  maxHeight: 'calc(100vh - 3rem)',
+  flex: 1,
+
+  '@sm': {
+    maxHeight: 'none',
+  },
+
+  variants: {
+    isImpersonating: {
+      true: {
+        maxHeight: 'calc(100vh - 5.5rem)',
+      },
+    },
+  },
+})
+
+const Sidebar = styled('aside', {
+  '@sm': {
+    display: 'none',
+  },
+})
+
+const MainContent = styled('main', {
+  flex: 1,
+  overflowY: 'auto',
+})
+
 const AppLayout = ({ children }: { children?: React.ReactNode }) => {
+  const isImpersonating = !!localStorage.getItem('impersonator-access-token')
+
   return (
-    <div className="flex flex-col h-screen">
-      <div className="bg-background border-b-2 border-background-layer-3 h-12 z-default sm:block sm:sticky sm:top-0">
+    <Container>
+      <ImpersonationBanner />
+      <HeaderWrapper className="z-default">
         <AppHeader />
-      </div>
-      <div className="flex flex-1 min-h-0">
-        <aside className="hidden sm:block shrink-0 h-full">
+      </HeaderWrapper>
+      <ContentWrapper isImpersonating={isImpersonating}>
+        <Sidebar>
           <MenuBar />
-        </aside>
-        <main className="flex-1 overflow-y-auto min-h-0">
+        </Sidebar>
+        <MainContent>
           <Outlet />
           {children}
-        </main>
-      </div>
-    </div>
+        </MainContent>
+      </ContentWrapper>
+    </Container>
   )
 }
 

@@ -27,6 +27,7 @@ import { RequireParam } from '@/models/enums'
 import {
   SendWhatsAppMessageDto,
   WhatsAppMessageResponseDto,
+  WhatsAppStatusResponse,
 } from './dtos/send-whatsapp-message.dto'
 
 @ApiTags('WhatsApp Web')
@@ -78,7 +79,9 @@ export class WhatsappWebController {
   @RequireParams(RequireParam.INSTITUTION_ID)
   @UseGuards(RequireParamsGuard)
   @Get('status')
-  async getStatus(@Query('institutionId', ParseIntPipe) institutionId: number) {
+  async getStatus(
+    @Query('institutionId', ParseIntPipe) institutionId: number
+  ): Promise<Promise<WhatsAppStatusResponse>> {
     const { data } = await this.whatsappWebService.getStatus(institutionId)
     return data
   }

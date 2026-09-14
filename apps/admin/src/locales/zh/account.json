@@ -12,26 +12,21 @@
   "updateProfile": "更新您的個人檔案",
   "changePassword": "修改密碼",
   "changePasswordExplanation": "如果您使用社交媒體帳號登入，您可以使用相同的電子郵件註冊一個帳號以修改您的密碼。所有您的資料將會連結起來。",
-
   "support": "支援",
   "documentation": "文件",
-
   "introductionFlowclass": "Flowclass 由總部位於香港的 Flowsophic Limited 開發❤️",
-
   "currentPassword": "目前密碼",
   "newPassword": "新密碼",
   "confirmPassword": "確認新密碼",
   "saveChanges": "儲存變更",
   "haveUnSavedChanges": "有未儲存的變更",
   "pageTitle": "帳號設定",
-
   "profileView": {
     "edit": "編輯個人檔案",
     "change-password": "修改密碼",
     "delete": "刪除帳號",
     "profile": "個人檔案"
   },
-
   "deleteAccount": {
     "deleteAccount": "刪除帳號",
     "successDelete": "您的帳號已成功刪除。隨時歡迎您再次使用 Flowclass。",

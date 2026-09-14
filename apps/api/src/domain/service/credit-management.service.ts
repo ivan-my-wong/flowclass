@@ -93,17 +93,12 @@ export class CreditManagementService {
       throw new BadRequestException('Amount must be positive')
     }
 
-    // Always book against the parent alias so the write side matches what
-    // getBalance/getHistory read. Without this, a transaction submitted under
-    // a child alias is invisible to every subsequent balance query.
-    const parentUserAliasId = await this.getParentUserAliasId(payload.userAliasId, institutionId)
-
     return await this.creditTransactionsRepository.manager.transaction(async (entityManager) => {
-      const beforeBalance = await this.getBalance(institutionId, parentUserAliasId, entityManager)
+      const beforeBalance = await this.getBalance(institutionId, payload.userAliasId, entityManager)
       const balanceAfter = beforeBalance.balance + payload.amount
       const creditTransaction = entityManager.create(CreditTransactions, {
         institutionId,
-        userAliasId: parentUserAliasId,
+        userAliasId: payload.userAliasId,
         amount: payload.amount,
         sourceType: payload.sourceType,
         description: payload.description,
@@ -119,17 +114,15 @@ export class CreditManagementService {
     institutionId: number,
     payload: AddOrDeductCreditDTO
   ): Promise<CreditTransactions> {
-    const parentUserAliasId = await this.getParentUserAliasId(payload.userAliasId, institutionId)
-
     return await this.creditTransactionsRepository.manager.transaction(async (entityManager) => {
-      const beforeBalance = await this.getBalance(institutionId, parentUserAliasId, entityManager)
+      const beforeBalance = await this.getBalance(institutionId, payload.userAliasId, entityManager)
       if (beforeBalance.balance < payload.amount) {
         throw new BadRequestException('Insufficient balance to deduct credit.')
       }
       const balanceAfter = beforeBalance.balance - payload.amount
       const creditTransaction = entityManager.create(CreditTransactions, {
         institutionId,
-        userAliasId: parentUserAliasId,
+        userAliasId: payload.userAliasId,
         amount: -payload.amount,
         sourceType: payload.sourceType,
         description: payload.description,

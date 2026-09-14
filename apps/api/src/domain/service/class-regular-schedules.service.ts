@@ -182,18 +182,8 @@ export class ClassRegularSchedulesV2Service {
     )
 
     if (createDto.periodsV2) {
-      // Strip IDs from periods and their repeat formats so the update method
-      // creates new records instead of trying to update originals (important for duplication)
-      const cleanedPeriods = createDto.periodsV2.map((period) => {
-        const { id: _periodId, ...periodFields } = period as any
-        if (periodFields.lessonRepeatFormat) {
-          const { id: _repeatId, ...repeatFields } = periodFields.lessonRepeatFormat
-          periodFields.lessonRepeatFormat = repeatFields
-        }
-        return periodFields
-      })
       await this.update(schedule.id, {
-        periodsV2: cleanedPeriods,
+        periodsV2: createDto.periodsV2,
       })
     }
 
@@ -443,20 +433,10 @@ export class ClassRegularSchedulesV2Service {
     return await this.getRegularSchedulePreview(classEntity.regularScheduleV2.id)
   }
 
-  private getDefaultPeriodCount(unit: string, every: number): number {
-    const daysPerUnit: Record<string, number> = {
-      [RepeatUnit.days]: 1,
-      [RepeatUnit.weeks]: 7,
-      [RepeatUnit.month]: 30,
-    }
-    const daysPerPeriod = (daysPerUnit[unit] ?? 7) * every
-    return Math.ceil((24 * 30) / daysPerPeriod)
-  }
-
   async getRegularSchedulePreview(
     scheduleId: number,
     startingScheduleIndex = 0,
-    previewPeriodCount?: number
+    previewPeriodCount = 5
   ): Promise<RegularSchedulePreviewResponseDto> {
     const schedule = await this.findById(scheduleId)
 
@@ -485,13 +465,6 @@ export class ClassRegularSchedulesV2Service {
       every: scheduleEvery,
     } = periodRepeatFormat
 
-    // Use periodRepeatCount if finite, otherwise generate enough periods to cover 24 months
-    const resolvedPeriodCount =
-      previewPeriodCount ??
-      (periodRepeatCount && periodRepeatCount > 0
-        ? periodRepeatCount
-        : this.getDefaultPeriodCount(scheduleUnit, scheduleEvery))
-
     // Calculate period start dates
     const periodDates: { startDate: string; endDate: string }[] = []
     let currentPeriodStart = dayjs(scheduleStartTime)
@@ -508,7 +481,7 @@ export class ClassRegularSchedulesV2Service {
       }
     }
 
-    for (let i = 0; i < resolvedPeriodCount; i++) {
+    for (let i = 0; i < previewPeriodCount; i++) {
       periodDates.push({
         startDate: currentPeriodStart.clone().toISOString(),
         endDate: currentPeriodStart.clone().toISOString(),
@@ -690,10 +663,10 @@ export class ClassRegularSchedulesV2Service {
       return dayjs(a.startTime).diff(dayjs(b.startTime))
     })
 
-    // Check if there are more periods available beyond the current preview
+    // Check if there are more periods available beyond the current preview. If period
     const hasNextPeriod =
       periodRepeatCount && periodRepeatCount > 0
-        ? startingScheduleIndex + resolvedPeriodCount < periodRepeatCount
+        ? startingScheduleIndex + previewPeriodCount < periodRepeatCount
         : true
 
     // Group by period and assign lesson numbers

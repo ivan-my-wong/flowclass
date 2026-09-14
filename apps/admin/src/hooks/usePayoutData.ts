@@ -10,7 +10,7 @@ import { useRecoilState, useRecoilValue } from 'recoil'
 import { toast } from 'sonner'
 import Stripe from 'stripe'
 
-import { createCustomerAccount, createExpressStripeAccount } from '@/api/admin'
+import { createExpressStripeAccount } from '@/api/admin'
 import { ApiError, handleApiError } from '@/api/errors/apiError'
 import { GtmEvent, setGtmEvent } from '@/api/external/gtmEvent'
 import {
@@ -37,7 +37,7 @@ import { Payout, PayoutResponse } from '@/types/payout'
 import {
   StripeConnectAccount,
   StripeConnectDetail,
-} from '@/types/stripe-connect'
+} from '@/types/schoolSubscriptionPlan'
 
 import useAuth from './useAuth'
 
@@ -71,23 +71,6 @@ const usePayoutData = () => {
       }
     )
     return result
-  }
-
-  const useCreateCustomerAccount = (): UseMutationResult<
-    StripeConnectAccount,
-    ApiError,
-    number,
-    unknown
-  > => {
-    return useMutation({
-      mutationFn: (schoolId: number) => createCustomerAccount(schoolId),
-      onSuccess: () => {
-        toast.success(t('payout:stripe.accountCreated'))
-      },
-      onError: (error: ApiError) => {
-        handleApiError({ error, t })
-      },
-    })
   }
 
   const useCreateExpressStripeAccount = (
@@ -274,7 +257,6 @@ const usePayoutData = () => {
   }
 
   return {
-    useCreateCustomerAccount,
     useFetchExpressAccountDetail,
     useFetchStripeConnectDetail,
     useCreatePayoutMethod,

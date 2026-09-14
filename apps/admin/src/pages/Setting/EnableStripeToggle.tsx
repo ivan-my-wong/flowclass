@@ -12,7 +12,7 @@ import { ConfirmOptionsType } from '@/reducers/confirm.reducers'
 import {
   StripeConnectDetail,
   StripeConnectStatus,
-} from '@/types/stripe-connect'
+} from '@/types/schoolSubscriptionPlan'
 
 const EnableStripeToggle = ({
   stripeDetailResult,

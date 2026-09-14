@@ -42,6 +42,13 @@ export class UpdateUserDto {
   })
   @MaxLength(255)
   @IsOptional()
+  firebaseId: string
+
+  @ApiPropertyOptional({
+    example: '',
+  })
+  @MaxLength(255)
+  @IsOptional()
   company: string
 
   @ApiPropertyOptional({

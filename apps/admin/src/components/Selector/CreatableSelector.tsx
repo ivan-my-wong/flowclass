@@ -4,26 +4,30 @@ import { useTranslation } from 'react-i18next'
 import { StylesConfig } from 'react-select'
 import CreatableSelect from 'react-select/creatable'
 
+import { theme } from '../../styles'
+
 const selectCustomStyles = (width: string): StylesConfig => ({
-  option: styles => ({
-    ...styles,
-    backgroundColor: 'var(--color-background)',
-    color: 'var(--color-text)',
-  }),
+  option: styles => {
+    return {
+      ...styles,
+      backgroundColor: theme.colors.background.toString(),
+      color: theme.colors.text.toString(),
+    }
+  },
   control: styles => ({
     ...styles,
-    backgroundColor: 'var(--color-background)',
-    color: 'var(--color-text)',
-    borderColor: 'var(--color-border)',
+    backgroundColor: theme.colors.background.toString(),
+    color: theme.colors.text.toString(),
+    borderColor: theme.colors.borderColor.toString(),
   }),
   singleValue: styles => ({
     ...styles,
     padding: '0.25rem',
-    color: 'var(--color-text)',
+    color: theme.colors.text.toString(),
   }),
   input: styles => ({
     ...styles,
-    color: 'var(--color-text)',
+    color: theme.colors.text.toString(),
   }),
   container: styles => ({
     ...styles,
@@ -35,8 +39,9 @@ const selectCustomStyles = (width: string): StylesConfig => ({
   }),
   multiValue: styles => ({
     ...styles,
-    backgroundColor: 'var(--color-background-layer-3)',
-    color: 'var(--color-text)',
+    // width: '100%',
+    backgroundColor: theme.colors.backgroundLayer3.toString(),
+    color: theme.colors.text.toString(),
   }),
   multiValueLabel: styles => ({
     ...styles,
@@ -45,7 +50,7 @@ const selectCustomStyles = (width: string): StylesConfig => ({
   multiValueRemove: styles => ({
     ...styles,
     ':hover': {
-      backgroundColor: 'var(--color-primary-highlight)',
+      backgroundColor: theme.colors.primaryHighlight.toString(),
     },
   }),
 })

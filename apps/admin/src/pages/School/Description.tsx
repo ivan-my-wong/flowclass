@@ -23,10 +23,10 @@ import { useResponsive } from '@/hooks/useResponsive'
 import useSchoolData from '@/hooks/useSchoolData'
 import { useSchoolEditSave } from '@/hooks/useSchoolEditSave'
 import { AlertTypes } from '@/reducers/confirm.reducers'
+import { styled } from '@/styles'
 import { SectionDescription } from '@/types/course'
 import { DropDownMenuType } from '@/types/options'
 import { SectionTag } from '@/types/school'
-import { cn } from '@/utils/cn'
 
 import { getDescriptionTourSteps } from './schoolTourSteps'
 
@@ -300,11 +300,7 @@ const Description = ({
   }, [allSaveMethods, tabName, handleSaveAll])
 
   return (
-    <Box
-      direction="column"
-      id={tabName}
-      className={cn('flex w-full sm:w-full sm:justify-center')}
-    >
+    <StyledBox direction="column" id={tabName}>
       <BoxWithToggleGroup
         toggleGroupLabels={toggleGroupLabels}
         title={t('school:selectSection')}
@@ -336,7 +332,12 @@ const Description = ({
                   <div>
                     <Box>
                       <AiOutlineQuestionCircle />
-                      <Text className="block border-b border-dotted">
+                      <Text
+                        css={{
+                          display: 'block',
+                          borderBottom: '1px dotted',
+                        }}
+                      >
                         {t(`school:hints.needSomeGuidance`)}
                       </Text>
                     </Box>
@@ -350,16 +351,25 @@ const Description = ({
                 trigger={
                   // trigger component must be wrapped by div idk why
                   <div>
-                    <Box className="cursor-help">
+                    <Box css={{ cursor: 'help' }}>
                       <AiOutlineQuestionCircle />
-                      <Text className="block underline decoration-dotted">
+                      <Text
+                        css={{
+                          display: 'block',
+                          textDecoration: 'underline dotted',
+                        }}
+                      >
                         {t(`school:hints.needSomeGuidance`)}
                       </Text>
                     </Box>
                   </div>
                 }
               >
-                <Text className="block">
+                <Text
+                  css={{
+                    display: 'block',
+                  }}
+                >
                   {t(`school:hints.school.${currentSection}`)}
                 </Text>
               </Tooltip>
@@ -396,8 +406,18 @@ const Description = ({
         icon
         autoStart={false}
       />
-    </Box>
+    </StyledBox>
   )
 }
+
+const StyledBox = styled(Box, {
+  display: 'flex',
+  width: '100%',
+
+  '@sm': {
+    width: '100%',
+    justifyContent: 'center',
+  },
+})
 
 export default Description

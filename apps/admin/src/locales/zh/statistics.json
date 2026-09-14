@@ -30,20 +30,14 @@
   "invoices": {
     "activeStudents": "活躍學生",
     "attendanceStatus": "出席狀況",
-    "averageInvoiceValue": "平均發票金額",
     "completedLessons": "已完成課堂",
     "creditApplied": "已使用積分",
     "netPayments": "淨付款",
-    "overdueInvoices": "逾期發票",
-    "paidInvoices": "已付款發票",
     "paymentStatus": "付款狀況",
-    "revenueGenerated": "產生收入",
     "searchByStudentName": "按學生姓名搜尋",
     "studentPaymentsForLessons": "學生課堂付款",
-    "totalInvoices": "發票總數",
     "totalLessonValue": "課堂總金額",
-    "totalRevenue": "總收入",
-    "unpaidInvoices": "未付款發票"
+    "totalRevenue": "總收入"
   },
   "revenue": {
     "noClassData": "無可用課堂數據",

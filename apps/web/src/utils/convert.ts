@@ -1,18 +1,6 @@
-import { API_BASE_URL } from '@/lib/config'
-
-export const getMediaFileUrl = (key: string | undefined) => {
+export const getS3FileUrl = (key: string | undefined) => {
   if (!key) return ''
-  if (key.startsWith('http://') || key.startsWith('https://')) {
-    return key
-  }
-
-  const baseUrl = API_BASE_URL.replace(/\/+$/, '')
-  const encodedKey = key
-    .split('/')
-    .filter(Boolean)
-    .map(segment => encodeURIComponent(segment))
-    .join('/')
-  return `${baseUrl}/media/file/${encodedKey}`
+  return `https://s3.${process.env.NEXT_PUBLIC_AWS_REGION}.amazonaws.com/${process.env.NEXT_PUBLIC_AWS_BUCKET_NAME}/${key}`
 }
 
 export const rearrangeOrder = <T extends { id: number }>(data: T[], order: number[]): T[] => {

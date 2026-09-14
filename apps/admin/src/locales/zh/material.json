@@ -12,25 +12,16 @@
   "editExpiry": {
     "currentExpiry": "當前到期時間",
     "expiryDate": "到期日期",
-    "expiryTime": "到期時間",
     "materialName": "資料",
-    "removeExpiry": "移除到期時間",
     "selectDate": "選擇到期日期",
     "student": {
       "studentName": "學生",
       "title": "編輯學生資料到期時間"
     },
-    "studentName": "學生",
     "title": "編輯到期時間"
   },
-
-  "items": "項",
   "materialListHeading": "資料",
-  "noMaterials": "未添加資料",
-
   "updateExpirySuccess": "到期時間更新成功",
-  "uploadedLinks": "{{count}} 連結",
-  "uploadedPercentage": "{{percentage}}% 上傳中",
   "uploadMaterials": {
     "addLinks": "添加連結",
     "chooseFiles": "選擇檔案",
@@ -47,7 +38,6 @@
       "materialNameLabel": "資料名稱",
       "materialNamePlaceholder": "輸入資料名稱（顯示給學生）",
       "materialNameRequired": "資料名稱是必填項",
-      "linkUrlRequired": "連結地址是必填項",
       "invalidUrl": "請輸入有效的URL",
       "pleaseSelectLesson": "請選擇單一課堂",
       "pleaseAddAtLeastOneMaterial": "請添加至少一個資料"
@@ -61,7 +51,6 @@
       "uploadingCompleted": "上傳完成",
       "uploadingFailed": "上傳失敗",
       "uploadingMaterials": "上傳資料",
-      "uploadingPending": "上傳中",
       "uploadingToGoogleDrive": "上傳到谷歌雲端硬碟",
       "uploadMaterialsSuccess": "上傳資料成功"
     }
@@ -69,7 +58,6 @@
   "notifyStudents": {
     "title": "發送課程資料提醒",
     "emailNotification": "郵件通知",
-    "whatsappNotification": "WhatsApp 通知",
     "student": "學生",
     "email": "郵箱",
     "phone": "電話",
@@ -77,7 +65,6 @@
     "send": "發送"
   },
   "filter": {
-    "selectLessons": "選擇課程",
     "searchByName": "按名稱搜尋",
     "sortBy": "排序方式"
   },

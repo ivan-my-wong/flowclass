@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { AiOutlineInfoCircle } from 'react-icons/ai'
 import { useMutation } from 'react-query'
+import { useRecoilState } from 'recoil'
 import { toast } from 'sonner'
 
 import { ApiError, handleApiError } from '@/api/errors/apiError'
@@ -19,8 +20,10 @@ import Text from '@/components/Texts/Text'
 import { getFreeDomainList } from '@/constants/domain'
 import { useSchoolEditSave } from '@/hooks/useSchoolEditSave'
 import useSiteData from '@/hooks/useSiteData'
-import { getAppDomain } from '@/lib/config'
+import usePlanData from '@/hooks/useSubscriptionPlanData'
+import { subscriptionDialogOpenState } from '@/stores/schoolSubscriptionData'
 import { CustomSiteUpdateProps, Site } from '@/stores/siteData'
+import { FeatureEnableEnum } from '@/types/schoolSubscriptionPlan'
 import { getDomainFromUrl } from '@/utils/generate-link.utils'
 import { validateCustomDomain, validateDomain } from '@/utils/validate'
 
@@ -33,8 +36,13 @@ const BasicSite = ({
 }): JSX.Element => {
   const { t } = useTranslation()
   const { siteData, updateCurrentSite } = useSiteData()
+  const { checkSubscriptionAccess } = usePlanData()
+  const [, setShowSubscriptionPopup] = useRecoilState(
+    subscriptionDialogOpenState
+  )
+
   const { currentSite } = siteData
-  const fixedDomain = `.${getAppDomain()}`
+  const fixedDomain = `.${import.meta.env.VITE_FLOWCLASS_DOMAIN}`
   const [newSiteBanner, setNewSiteBanner] = useState<string>(
     currentSite?.banner ?? ''
   )
@@ -53,7 +61,10 @@ const BasicSite = ({
     customDomain: defaultCustomDomain,
   }
 
-  const isCustomDomainEnabled = true
+  const isCustomDomainEnabled = checkSubscriptionAccess(
+    'featureEnable',
+    FeatureEnableEnum.OWN_BRANDING
+  )
 
   const {
     register,
@@ -174,6 +185,9 @@ const BasicSite = ({
                 },
               })}
             />
+            {/* <Text align="right" type="primary" size="medium" bold> */}
+            {/*  {fixedDomain} */}
+            {/* </Text> */}
           </Box>
           <Box
             css={{
@@ -243,10 +257,17 @@ const BasicSite = ({
           <Text>{t('setting:customizeSite.customDomainGuide')}</Text>
           <Button
             onClick={() => {
-              window.open(
-                'https://api.whatsapp.com/send/?phone=85257225763&text=I%20want%20to%20link%20to%20my%20custom%20domain',
-                '_blank'
-              )
+              if (isCustomDomainEnabled) {
+                window.open(
+                  'https://api.whatsapp.com/send/?phone=85257225763&text=I%20want%20to%20link%20to%20my%20custom%20domain',
+                  '_blank'
+                )
+              } else {
+                setShowSubscriptionPopup({
+                  open: true,
+                  message: t(`subscription:subscriptionDialog.upgradePlan`),
+                })
+              }
             }}
           >
             {t('setting:customizeSite.contactUs')}

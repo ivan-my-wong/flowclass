@@ -5,10 +5,12 @@ import { InstitutionDetailDto } from '@/application/admin/institutions/dto/insti
 import { PhoneContactMethod, StudentPrimaryIdentifier } from '@/models/enums'
 import { Invoice } from '@/models/invoice.entity'
 import { NotificationRecord } from '@/models/notification-record.entity'
+import { StudentMemo } from '@/models/student-memo.entity'
 import { BaseEntity } from '@/modules/base/base.entity'
 import { MediaDetailDto } from '@/modules/media/dto/media.dto'
 
 import { Appointment } from './appointment.entity'
+import { AutomationSettings } from './automation-settings.entity'
 import { ClassEntity } from './classes.entity'
 import { CommentEntity } from './comments.entity'
 import { Coupon } from './coupons.entity'
@@ -52,10 +54,13 @@ export class addressDetail {
   }
 }
 
-export type InstitutionWithSettingsDTO = Omit<InstitutionDetailDto, 'medias' | 'siteSetting'> & {
+export type InstitutionWithSettingsDTO = Omit<
+  InstitutionDetailDto,
+  'medias' | 'siteSetting' | 'studentMemo'
+> & {
   siteSetting: SettingSite
   medias: MediaDetailDto[]
-  studentMemo: UserAlias[]
+  studentMemo: StudentMemo[]
 }
 
 @Entity('institutions')
@@ -122,6 +127,9 @@ export class Institution extends BaseEntity {
   })
   courseOrder: number[]
 
+  @Column({ name: 'n8n_workflow_id', nullable: true })
+  n8nWorkflowId: string
+
   @OneToMany(() => Course, (course) => course.institution)
   courses: Promise<Course[]>
 
@@ -155,6 +163,9 @@ export class Institution extends BaseEntity {
   @OneToMany(() => InstitutionGallery, (gallery) => gallery.institution)
   galleries: InstitutionGallery[]
 
+  @OneToMany(() => StudentMemo, (studentMemo) => studentMemo.institution)
+  studentMemo: StudentMemo[]
+
   @OneToOne(() => SettingNotifications, (setting) => setting.institution, {
     createForeignKeyConstraints: false,
   })
@@ -187,6 +198,9 @@ export class Institution extends BaseEntity {
   // @deprecated TODO: Remove this
   @Column({ name: 'plan_expiry_date', nullable: true })
   planExpiryDate: Date
+
+  @OneToMany(() => AutomationSettings, (automationSettings) => automationSettings.institution)
+  automationSettings: Promise<AutomationSettings[]>
 
   @Column({
     name: 'student_primary_identifier',

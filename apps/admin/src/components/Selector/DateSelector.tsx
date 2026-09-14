@@ -5,13 +5,52 @@ import { DatePickerProps } from 'react-datepicker'
 import { useTranslation } from 'react-i18next'
 
 import useSiteData from '@/hooks/useSiteData'
-import { cn } from '@/utils/cn'
+import { keyframes, styled } from '@/styles'
 
 import Button from '../Buttons/Button'
 import CustomDatePicker from '../DatePickers/DatePicker'
 import { StyledOverlay } from '../Popups/Modal'
 import ModalCloseButton from '../Popups/ModalCloseButton'
 import Separator from '../Separators/Separator'
+
+const contentShow = keyframes({
+  '0%': { opacity: 0, transform: 'translate(-50%, -50%) scale(.1)' },
+  '100%': { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
+})
+
+const StyledContent = styled(Content, {
+  display: 'flex',
+  flexDirection: 'column',
+  backgroundColor: '$background',
+  position: 'fixed',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  maxWidth: '90%',
+  minWidth: '50%',
+  maxHeight: '90vh',
+  overflowY: 'auto',
+  borderRadius: '$medium',
+  padding: '$4',
+  boxShadow: `$shadows[1]`,
+  zIndex: '$modalContent',
+  animation: `${contentShow} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
+  '.react-datepicker__day': {
+    width: '4rem',
+  },
+  '.react-datepicker__day-name': {
+    width: '4rem',
+  },
+  '@sm': {
+    minWidth: '90%',
+    '.react-datepicker__day': {
+      width: '1.5rem',
+    },
+    '.react-datepicker__day-name': {
+      width: '1.5rem',
+    },
+  },
+})
 
 type DateSelectorProps = Omit<
   DatePickerProps,
@@ -49,25 +88,16 @@ const DateSelector = forwardRef<DateSelectorHandle, DateSelectorProps>(
     return (
       <Root open={open} onOpenChange={handleOpenChange}>
         <Trigger asChild>
-          <Button className={hidden ? 'hidden' : ''}>
+          <Button css={{ display: `${hidden ? 'none' : ''}` }}>
             {t(`school:addSchool`)}
           </Button>
         </Trigger>
         <Portal>
           <StyledOverlay />
 
-          <Content
-            className={cn(
-              'flex flex-col fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-              'max-w-[90%] min-w-[50%] md:min-w-[90%] max-h-[90vh] overflow-y-auto',
-              'rounded-lg p-4 bg-background z-[1050]',
-              'data-[state=open]:animate-dialog-content data-[state=closed]:animate-none',
-              '[&_.react-datepicker__day]:w-16 [&_.react-datepicker__day-name]:w-16',
-              'md:[&_.react-datepicker__day]:w-6 md:[&_.react-datepicker__day-name]:w-6'
-            )}
-          >
+          <StyledContent>
             <Title>{t(`component:dateSelector.title`)}</Title>
-            <Separator className="mb-4" />
+            <Separator css={{ marginBottom: '1rem' }} />
             <CustomDatePicker
               inline
               {...props}
@@ -81,13 +111,18 @@ const DateSelector = forwardRef<DateSelectorHandle, DateSelectorProps>(
               }}
             />
             <Button
-              className="mt-4 w-fit ml-auto h-12"
+              css={{
+                marginTop: '1rem',
+                width: 'fit-content',
+                marginLeft: 'auto',
+                height: '3rem',
+              }}
               onClick={handleButtonClick}
             >
               {t(`component:dateSelector.confirm`)}
             </Button>
             <ModalCloseButton />
-          </Content>
+          </StyledContent>
         </Portal>
       </Root>
     )

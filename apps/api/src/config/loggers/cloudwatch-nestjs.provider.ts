@@ -1,18 +1,44 @@
-import { Injectable, Logger, LoggerService } from '@nestjs/common'
+import { PutLogEventsCommand } from '@aws-sdk/client-cloudwatch-logs'
+import { Injectable, LoggerService } from '@nestjs/common'
+
+import { CloudWatchLoggerFactory } from './cloudwatch-factory.provider'
 
 @Injectable()
-export class CloudWatchLoggerProvider implements LoggerService {
-  private readonly logger = new Logger()
-
-  log(message: string) {
-    this.logger.log(message)
+export class CloudWatchLoggerProvider extends CloudWatchLoggerFactory implements LoggerService {
+  constructor() {
+    super()
   }
 
-  error(message: string, trace?: string) {
-    this.logger.error(message, trace)
+  log(message: string) {
+    if (this.isCloudWatch) {
+      const command = new PutLogEventsCommand({
+        logGroupName: this.logGroupName,
+        logStreamName: this.logStreamName,
+        logEvents: [
+          {
+            message,
+            timestamp: Date.now(),
+          },
+        ],
+      })
+
+      this.getClient()
+        .send(command)
+        .then()
+        .catch(() => {
+          this.defaultLogger.log(message)
+        })
+    } else {
+      this.defaultLogger.log(message)
+    }
+  }
+
+  error(message: string, trace: string) {
+    // You can customize the error log format according to your needs.
+    this.log(`[error] ${message} | ${trace}`)
   }
 
   warn(message: string) {
-    this.logger.warn(message)
+    this.log(`[warn] ${message}`)
   }
 }

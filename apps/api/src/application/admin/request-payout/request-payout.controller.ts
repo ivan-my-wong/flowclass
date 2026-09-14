@@ -1,5 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Post, Query, Res, UseGuards } from '@nestjs/common'
-import { Response } from 'express'
+import { Body, Controller, Delete, Get, HttpStatus, Post, Query, UseGuards } from '@nestjs/common'
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -56,16 +55,9 @@ export class RequestPayoutController {
     description: 'Payout reference is created',
   })
   async setPayoutMethodPreference(
-    @Body() receivePayoutPreferenceDto: PayoutPreferenceDto,
-    @Res({ passthrough: true }) res: Response
+    @Body() receivePayoutPreferenceDto: PayoutPreferenceDto
   ): Promise<{ item: PayoutPreferenceDto; status: HttpStatus }> {
-    const result = await this.requestPayoutService.setPayoutMethodPreference(
-      receivePayoutPreferenceDto
-    )
-    // POST always returns 201 in Nest by default; reflect 200 on update so the
-    // frontend can distinguish create-vs-update in toast/UX layers.
-    res.status(result.status)
-    return result
+    return await this.requestPayoutService.setPayoutMethodPreference(receivePayoutPreferenceDto)
   }
 
   @Get()

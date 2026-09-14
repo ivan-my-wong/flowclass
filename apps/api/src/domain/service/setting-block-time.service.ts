@@ -44,6 +44,8 @@ export class SetingBlockTimeService {
       endTime
     )
 
+    this.classLessonService.pushClassLessonToQueue(data)
+
     const blockTime = await this.settingBlockTimeRepository.save(
       this.settingBlockTimeRepository.create(data)
     )
@@ -104,6 +106,10 @@ export class SetingBlockTimeService {
     })
 
     if (blockTimeWithSameTime) throw new ApiError(ErrorCode.BLOCK_TIME_ALREADY_EXIST)
+
+    if (body.startTime != blockTime.startTime || body.endTime != blockTime.endTime) {
+      this.classLessonService.pushClassLessonToQueue(body)
+    }
 
     return this.settingBlockTimeRepository.save({ ...blockTime, ...body })
   }

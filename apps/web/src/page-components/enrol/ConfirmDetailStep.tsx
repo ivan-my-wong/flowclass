@@ -25,7 +25,6 @@ import CourseDetail from '@/entities/CourseDetail'
 import useFormFieldsData from '@/hooks/useFormFieldsData'
 import { useGlobalError } from '@/hooks/useGlobalError'
 import useResponsive from '@/hooks/useResponsive'
-import { API_BASE_URL } from '@/lib/config'
 import PaymentAmountAdditionalFee from '@/page-components/enrol/PaymentSteps/PaymentAmountAdditionalFee'
 import { enrolState, prevSelectedOptionState } from '@/stores/enrol'
 import { useEnrolState } from '@/stores/enrolContext'
@@ -286,7 +285,7 @@ const ConfirmDetailStep = (): JSX.Element => {
   >({
     mutationFn: (payload: EnrolCourseData) => enrolCourse(payload),
     onSuccess: (data: EnrollTriggerData) => {
-      const baseUrl = API_BASE_URL
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL
       const newEventSource = new EventSource(`${baseUrl}/stream/${data.id}`)
       setIsInitiateSubmit(false)
       newEventSource.onmessage = event => {

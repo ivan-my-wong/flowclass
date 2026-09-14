@@ -202,7 +202,7 @@ export function CalendarHeader({
           >
             <SelectTrigger
               className="w-24 sm:w-32"
-              data-testid="calendar-view-select"
+              dataTestId="calendar-view-select"
             >
               <SelectValue />
             </SelectTrigger>

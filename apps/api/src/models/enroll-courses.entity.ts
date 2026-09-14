@@ -88,6 +88,7 @@ export class EnrollCourse extends BaseEntity {
   @Column({ name: 'user_id' })
   userId: number
 
+  @Index('IX_enroll_courses_user_alias_id')
   @Column({ name: 'user_alias_id', nullable: true })
   userAliasId: number
 
@@ -101,6 +102,7 @@ export class EnrollCourse extends BaseEntity {
   @JoinColumn({ name: 'course_id' })
   course: Course
 
+  @Index('IX_enroll_courses_invoice_id')
   @Column({ name: 'invoice_id', nullable: true })
   invoiceId: number
 
@@ -110,6 +112,7 @@ export class EnrollCourse extends BaseEntity {
   @JoinColumn({ name: 'invoice_id' })
   invoice: Invoice
 
+  @Index('IX_enroll_courses_confirm_state')
   @Column({ name: 'confirm_state', enum: EnrollConfirmStatus, type: 'varchar' })
   confirmState: EnrollConfirmStatus
 

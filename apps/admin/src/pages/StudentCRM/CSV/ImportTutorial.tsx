@@ -18,6 +18,7 @@ import { HeaderBackButtonStatus } from '@/components/TabWithListAndButton/Header
 import Heading from '@/components/Texts/Heading'
 import Text from '@/components/Texts/Text'
 import ContentLayout from '@/layouts/ContentLayout'
+import { styled } from '@/styles'
 
 interface Props {
   open: boolean
@@ -28,7 +29,7 @@ const ImportTutorialCSV = ({ open, handleClose }: Props) => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const leftHeaderContent = (
-    <Box className="text-xl">{t('student:importCsv.title')}</Box>
+    <Box css={{ fontSize: '$6' }}>{t('student:importCsv.title')}</Box>
   )
 
   const headerBackButton: HeaderBackButtonStatus = {
@@ -44,9 +45,9 @@ const ImportTutorialCSV = ({ open, handleClose }: Props) => {
         headerBackButton={headerBackButton}
         leftHeader={leftHeaderContent}
       >
-        <Box direction="column" className="my-6">
+        <Box direction="column" css={{ margin: '$6 0px' }}>
           <Box
-            className="bg-background-layer-3 rounded-md"
+            css={{ background: '$backgroundLayer3', borderRadius: '$1' }}
             padding="medium"
             justify="flex-start"
             align="flex-start"
@@ -58,17 +59,15 @@ const ImportTutorialCSV = ({ open, handleClose }: Props) => {
           </Box>
           <Heading as="h6">{t('student:importCsv.titleTutotial')}</Heading>
           <Box direction="column" align="flex-start">
-            <div className="leading-[22px]">
+            <PText>
               1.{t('student:importCsv.step1')}
-              <button
-                type="button"
+              <LinkText
                 onClick={() => navigate('/settings/student-information-field')}
-                className="cursor-pointer text-primary px-1 bg-transparent border-0 font-inherit"
               >
                 {t('student:importCsv.step11')}
-              </button>
+              </LinkText>
               {t('student:importCsv.step12')}
-            </div>
+            </PText>
             <Text>2.{t('student:importCsv.step2')}</Text>
           </Box>
           <Heading as="h6">{t('student:importCsv.prepareFile')}</Heading>
@@ -85,7 +84,7 @@ const ImportTutorialCSV = ({ open, handleClose }: Props) => {
             </Thead>
             <tbody>
               <TrBody>
-                <TdPrepareTable>Alex</TdPrepareTable>
+                <TdPrepareTable>Ivan</TdPrepareTable>
                 <TdPrepareTable>Form 5</TdPrepareTable>
                 <TdPrepareTable />
                 <TdPrepareTable />
@@ -106,19 +105,18 @@ const ImportTutorialCSV = ({ open, handleClose }: Props) => {
           </Table>
           <Box direction="column" align="flex-start">
             <ul>
-              <li className="leading-[22px] pr-2.5">
-                {t('student:importCsv.prepare1')}
-              </li>
-              <li className="leading-[22px] pr-2.5">
-                {t('student:importCsv.prepare2')}
-              </li>
-              <li className="leading-[22px] pr-2.5">
-                {t('student:importCsv.prepare3')}
-              </li>
+              <LiTag>{t('student:importCsv.prepare1')}</LiTag>
+              <LiTag>{t('student:importCsv.prepare2')}</LiTag>
+              <LiTag>{t('student:importCsv.prepare3')}</LiTag>
             </ul>
           </Box>
           <Box
-            className="bg-background-layer-3 rounded-md leading-5 font-bold"
+            css={{
+              background: '$backgroundLayer3',
+              borderRadius: '$1',
+              lineHeight: '20px',
+              fontWeight: 700,
+            }}
             padding="medium"
             justify="flex-start"
             align="center"
@@ -160,4 +158,16 @@ const ImportTutorialCSV = ({ open, handleClose }: Props) => {
   )
 }
 
+const PText = styled('div', {
+  lineHeight: '22px',
+})
+const LinkText = styled('span', {
+  cursor: 'pointer',
+  color: '$primary',
+  padding: '0px 4px',
+})
+const LiTag = styled('li', {
+  lineHeight: '22px',
+  paddingRight: 10,
+})
 export default ImportTutorialCSV

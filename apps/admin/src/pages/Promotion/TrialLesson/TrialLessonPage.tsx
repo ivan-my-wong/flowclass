@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
 import { LuPlus } from 'react-icons/lu'
+import { useRecoilState } from 'recoil'
 
 import { ParamsFetchingTrialLessons } from '@/api/trialLesson'
 import Box from '@/components/Containers/Box'
@@ -12,9 +13,12 @@ import { HeaderBackButtonStatus } from '@/components/TabWithListAndButton/Header
 import { Button } from '@/components/ui/Button'
 import useCourseData from '@/hooks/useCourseData'
 import useSiteData from '@/hooks/useSiteData'
+import usePlanData from '@/hooks/useSubscriptionPlanData'
 import useTrialLessonData from '@/hooks/useTrialLessonData'
 import ContentLayout from '@/layouts/ContentLayout'
 import TrialLessonCard from '@/pages/Promotion/TrialLesson/TrialLessonCard'
+import { subscriptionDialogOpenState } from '@/stores/schoolSubscriptionData'
+import { PromotionType } from '@/types/coupon'
 
 const TrialLessonPage = () => {
   const { t } = useTranslation()
@@ -22,7 +26,15 @@ const TrialLessonPage = () => {
   const { siteData } = useSiteData()
 
   const navigate = useNavigate()
-  const hasTrialLessonAccess = true
+  const { checkSubscriptionAccess } = usePlanData()
+  const [, setShowSubscriptionPopup] = useRecoilState(
+    subscriptionDialogOpenState
+  )
+
+  const hasTrialLessonAccess = checkSubscriptionAccess(
+    'promotionTier',
+    PromotionType.TRIAL_LESSON
+  )
   const [params, setParams] = useState<ParamsFetchingTrialLessons>({
     num: 10,
     page: 1,
@@ -51,7 +63,16 @@ const TrialLessonPage = () => {
         data-testid="add-trial-btn"
         size="sm"
         className="px-4 gap-x-2"
-        onClick={() => navigate('/promotion/trial-lesson/create')}
+        onClick={() => {
+          if (hasTrialLessonAccess) {
+            navigate('/promotion/trial-lesson/create')
+          } else {
+            setShowSubscriptionPopup({
+              open: true,
+              message: t(`subscription:subscriptionDialog.upgradePlan`),
+            })
+          }
+        }}
       >
         <LuPlus /> {t('common:action.add')}
       </Button>

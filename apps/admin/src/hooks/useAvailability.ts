@@ -34,7 +34,7 @@ const useAvailability = () => {
   const { currentSchool } = useSchoolData()
   const institutionId = currentSchool?.id
   const siteId = currentSchool?.siteId
-  const { isLogin } = useAuth()
+  const { isLogin, signInWithGoogle } = useAuth()
 
   const [availabilityStateData, setAvailabilityStateData] =
     useRecoilState(availabilityState)

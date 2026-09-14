@@ -107,7 +107,7 @@ export default () => {
                     <li>
                       Enter the URL under{' '}
                       <strong>What's the website address?</strong>. For example,
-                      if your Flowclass page is abcschool.example.com . Simply
+                      if your Flowclass page is abcschool.flowclass.io . Simply
                       enter the website into the box.
                     </li>{' '}
                   </ol>{' '}

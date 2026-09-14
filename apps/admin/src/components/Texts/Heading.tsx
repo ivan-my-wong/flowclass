@@ -1,49 +1,73 @@
 import { ComponentProps } from 'react'
 
-import { cn } from '@/utils/cn'
+import { styled } from '../../styles'
 
-const sizeClasses = {
-  small: 'text-base leading-5',
-  smallMedium: 'text-lg',
-  medium: 'text-xl',
-  large: 'text-2xl leading-10',
-}
+const StyledHeading = styled('h2', {
+  width: '100%',
+  margin: '$small auto',
+  padding: 0,
+  fontWeight: 'bold',
+  lineHeight: '1.75rem',
+  fontSize: '$large',
+
+  variants: {
+    size: {
+      small: {
+        fontSize: '$medium',
+        lineHeight: '$5',
+      },
+      smallMedium: {
+        fontSize: '$mediumLarge',
+      },
+      medium: {
+        fontSize: '$large',
+      },
+      large: {
+        fontSize: '$extraLarge',
+        lineHeight: '2.5rem',
+      },
+    },
+    bold: {
+      true: {
+        fontWeight: 'bold',
+      },
+    },
+    align: {
+      left: {
+        textAlign: 'left',
+      },
+      center: {
+        textAlign: 'center',
+      },
+    },
+    noGutter: {
+      true: {
+        marginBottom: '-$1',
+      },
+    },
+  },
+  defaultVariants: {
+    size: 'medium',
+  },
+})
 
 type HeadingProps = {
   children?: React.ReactNode
   as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
   align?: 'left' | 'center' | 'right'
-  size?: keyof typeof sizeClasses
-  bold?: boolean
-  noGutter?: boolean
-} & Omit<ComponentProps<'h2'>, 'size'>
+} & ComponentProps<typeof StyledHeading>
 
 const Heading = ({
   children,
-  as: Component = 'h2',
+  as = 'h2',
   align,
-  size = 'medium',
-  bold = true,
-  noGutter,
-  className,
+  css,
   ...props
 }: HeadingProps): JSX.Element => {
   return (
-    <Component
-      className={cn(
-        'w-full my-2 mx-auto p-0 font-bold leading-7 text-xl',
-        sizeClasses[size],
-        bold && 'font-bold',
-        align === 'left' && 'text-left',
-        align === 'center' && 'text-center',
-        align === 'right' && 'text-right',
-        noGutter && '-mb-1',
-        className
-      )}
-      {...props}
-    >
+    <StyledHeading as={as} css={{ textAlign: align, ...css }} {...props}>
       {children}
-    </Component>
+    </StyledHeading>
   )
 }
 export default Heading

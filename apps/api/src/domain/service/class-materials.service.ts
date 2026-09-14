@@ -14,6 +14,7 @@ import {
   PaginationParamsDto,
 } from '@/application/admin/class-materials/dto/search-params.dto'
 import { ALLOWED_MIME_TYPES } from '@/common/constants/files.constants'
+import { MetaWhatsappService } from '@/domain/external/meta-whatsapp.service'
 import { ClassLesson } from '@/models/class-lessons.entity'
 import { ClassMaterials } from '@/models/class-materials.entity'
 import { ClassMaterialsRepository } from '@/models/class-materials.repository'
@@ -31,8 +32,6 @@ import { EmailService } from '../external/email.service'
 import { GoogleDriveFile, IntegrationGoogleService } from '../external/integration-google.service'
 import { UploadProgressService } from '../external/upload-progress'
 
-import { WhatsappWebService } from './whatsapp-web.service'
-
 @Injectable()
 export class ClassMaterialsService {
   constructor(
@@ -48,7 +47,7 @@ export class ClassMaterialsService {
     private readonly studentLessonRepository: Repository<StudentLesson>,
     @InjectRepository(ClassLesson)
     private readonly classLessonRepository: Repository<ClassLesson>,
-    private readonly whatsappWebService: WhatsappWebService,
+    private readonly whatsappService: MetaWhatsappService,
     private readonly emailService: EmailService
   ) {}
 
@@ -420,11 +419,18 @@ export class ClassMaterialsService {
     classMaterial: ClassMaterials,
     siteLink: string
   ) {
-    await this.whatsappWebService.sendMessage(
-      institution.id,
-      phone,
-      this.buildContentWithVariable(content, userAlias, classMaterial, siteLink, institution.name)
+    if (!phone) return
+    const messageText = this.buildContentWithVariable(
+      content,
+      userAlias,
+      classMaterial,
+      siteLink,
+      institution.name
     )
+    await this.whatsappService.sendDirectWhatsappMessage({
+      toPhone: phone,
+      body: messageText,
+    })
   }
   async sendViaEmail(
     _siteEmail: string,
@@ -441,7 +447,6 @@ export class ClassMaterialsService {
       emailAddress: userAlias.email,
       courseName: course.name,
       className: classEntity?.name,
-      institutionId: institution.id,
       institutionName: institution.name,
       studentName: userAlias.name,
       siteLink,

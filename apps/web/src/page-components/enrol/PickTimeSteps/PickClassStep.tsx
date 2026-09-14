@@ -524,6 +524,11 @@ const PickClassStep = (): JSX.Element => {
       )}
 
       <ClassSelectionBox />
+      {/*{getSortedClassesByApplicationStatus('notApplicable').length > 0 &&*/}
+      {/*  course.type !== ClassType.recurring && (*/}
+      {/*    <Text className="mt-4">{t('enrol:pickPeriodStep.startedClass')}</Text>*/}
+      {/*  )}*/}
+      {/*<ClassSelectonBox applicable={false} />*/}
 
       {enrolForm.selectedClassData.length > 0 && enrolForm.setMultipleClass && (
         <div className="box-row">

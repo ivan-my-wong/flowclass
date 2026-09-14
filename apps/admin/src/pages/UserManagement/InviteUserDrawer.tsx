@@ -1,5 +1,6 @@
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { useRecoilState } from 'recoil'
 
 import Drawer from '@/components/Drawer/Drawer'
 import { HeaderBackButtonStatus } from '@/components/TabWithListAndButton/HeaderBackButton'
@@ -8,8 +9,12 @@ import Box from '@/components/ui/Box'
 import { Button } from '@/components/ui/Button'
 import Form from '@/components/ui/Form'
 import Text from '@/components/ui/Text'
+import useCheckPermissionAndQuota from '@/hooks/useCheckPermissionAndQuota'
 import useUsersManagement from '@/hooks/useUsersManagement'
 import ContentLayout from '@/layouts/ContentLayout'
+import { subscriptionDialogOpenState } from '@/stores/schoolSubscriptionData'
+import { UserRole } from '@/stores/userPermissionData'
+import { PlanType } from '@/types/schoolSubscriptionPlan'
 import { InviteUserFormData } from '@/types/userManagement'
 import { cn } from '@/utils/cn'
 
@@ -26,6 +31,10 @@ const InviteUserDrawer = ({
   open,
 }: InviteUserDrawerProps): JSX.Element => {
   const { t } = useTranslation()
+  const [, setShowSubscriptionPopup] = useRecoilState(
+    subscriptionDialogOpenState
+  )
+  const { checkQuota } = useCheckPermissionAndQuota()
   const formData = useForm<InviteUserFormData>()
   const headerBackButton: HeaderBackButtonStatus = {
     mode: 'back',
@@ -42,7 +51,22 @@ const InviteUserDrawer = ({
   } = useInviteUser()
 
   const handleConfirm: SubmitHandler<InviteUserFormData> = async data => {
-    await mutateAsyncInviteUser(data)
+    const { role } = data
+    const planType: PlanType =
+      role === UserRole.Instructor
+        ? PlanType.MULTIPLE_TUTOR
+        : PlanType.MULTIPLE_ADMIN
+
+    const isAllowed = checkQuota(planType)
+    if (!isAllowed) {
+      setShowSubscriptionPopup({
+        open: true,
+        message: t(`subscription:subscriptionDialog.upgradePlan`),
+      })
+    } else {
+      await mutateAsyncInviteUser(data)
+    }
+    // closeBtnRef.current?.click()
   }
 
   return (

@@ -7,7 +7,6 @@ import {
 } from '@/components/Containers/Draggable'
 import { DEFAULT_CURRENCY } from '@/constants/invoices'
 import useSiteData from '@/hooks/useSiteData'
-import { useInvoiceEditorContext } from '@/pages/TemplateManagement/InvoiceTemplates/Editor/InvoiceEditorContext'
 import { DiscountType } from '@/types/coupon'
 import {
   AppliedPromotion,
@@ -22,7 +21,6 @@ import { useContextInvoiceEditDialog } from './EditInvoiceContext'
 const AppliedDiscount = (): JSX.Element => {
   const { t } = useTranslation(['invoiceCampaign'])
   const siteData = useSiteData()
-  const { isViewOnly } = useInvoiceEditorContext()
 
   const {
     appliedPromotions,
@@ -114,23 +112,6 @@ const AppliedDiscount = (): JSX.Element => {
                             </div>
                           </>
                         )}
-                      {promo.type === PromotionTypeItem.PACKAGE && (
-                        <div className="flex items-center gap-1">
-                          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-purple-100 text-purple-800">
-                            {t('promotion:packageDiscount.badge')}
-                          </span>
-                          {promo.packageDiscountPerLesson && (
-                            <span className="text-sm text-gray-600">
-                              {t(
-                                'promotion:packageDiscount.perLessonDiscount',
-                                {
-                                  amount: promo.packageDiscountPerLesson,
-                                }
-                              )}
-                            </span>
-                          )}
-                        </div>
-                      )}
                     </div>
                   </div>
 
@@ -168,13 +149,11 @@ const AppliedDiscount = (): JSX.Element => {
                     />
                   )}
               </div>
-              {!isViewOnly && (
-                <LuTrash
-                  className="text-red-600 hover:text-red-700 cursor-pointer ml-4 text-2xl"
-                  onClick={() => removeDiscount(promo)}
-                  aria-hidden="true"
-                />
-              )}
+              <LuTrash
+                className="text-red-600 hover:text-red-700 cursor-pointer ml-4 text-2xl"
+                onClick={() => removeDiscount(promo)}
+                aria-hidden="true"
+              />
             </DraggableCard>
           )
         })}

@@ -14,7 +14,7 @@ const SendWhatsappMessage = (): JSX.Element => {
         <TextInput
           id="token"
           value=""
-          placeholder="Enter your WhatsApp API token"
+          placeholder="Enter WhatsApp API token"
           label="Whatsapp api token"
         />
       </Box>
@@ -23,14 +23,15 @@ const SendWhatsappMessage = (): JSX.Element => {
         <TextInput
           id="sid"
           value=""
-          placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          placeholder="Enter WhatsApp API SID"
           label="Whatsapp api sid"
         />
       </Box>
       <Box>
         <TextInput
           id="phone number"
-          value="+14155238886"
+          value=""
+          placeholder="+14155238886"
           label="Phone number (sender)"
         />
       </Box>
@@ -38,7 +39,7 @@ const SendWhatsappMessage = (): JSX.Element => {
         <TextInput
           id="phone number"
           value=""
-          placeholder="+1234567890"
+          placeholder="+15555550100"
           label="Phone number (receiver)"
         />
       </Box>

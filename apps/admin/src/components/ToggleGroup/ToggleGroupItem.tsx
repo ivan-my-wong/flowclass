@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { ComponentProps, useEffect, useMemo, useRef, useState } from 'react'
 
 import { ArchiveIcon } from '@radix-ui/react-icons'
 import { Item } from '@radix-ui/react-toggle-group'
@@ -14,6 +14,7 @@ import DeleteIcon from '@/assets/svgs/DeleteIcon'
 import EditIcon from '@/assets/svgs/EditIcon'
 import UndoIcon from '@/assets/svgs/UndoIcon'
 import useClassData from '@/hooks/useClassData'
+import { loadingSpinner, styled } from '@/styles'
 import { Classes } from '@/types/classes'
 import { DataTestId } from '@/types/common'
 import { cn } from '@/utils/cn'
@@ -54,6 +55,75 @@ export interface DragItem {
   index: number
   id: string
   type: string
+}
+
+const comboToggleGroupCss = {
+  all: 'unset',
+  cursor: 'pointer',
+  // boxShadow: '$1',
+  gap: '$2',
+  background: '$backgroundLayer2',
+  color: '$text',
+  minHeight: '$8',
+  display: 'flex',
+  fontSize: '$4',
+  lineHeight: 1,
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '$2 $1',
+  borderRadius: '$small',
+  width: '100%',
+  minWidth: '8rem',
+
+  // '&:hover': { backgroundColor: '$primarySubtle', color: '$textContrast' },
+  // '&[data-state=on]': {
+  //   border: '3px solid $colors$primary',
+  // },
+
+  variants: {
+    status: {
+      normal: {},
+      highlight: {},
+      error: {
+        borderBottom: '3px solid $colors$warn!important',
+        '&:hover': { color: '$secondarySubtle' },
+      },
+    },
+  },
+}
+
+const standaloneCss = {
+  all: 'unset',
+  cursor: 'pointer',
+  // boxShadow: '$1',
+  gap: '$2',
+  background: '$backgroundLayer2',
+  color: '$text',
+  height: '$8',
+  display: 'flex',
+  fontSize: '$4',
+  lineHeight: 1,
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '$2 $2 $2 $4',
+  borderRadius: '$small',
+  width: '100%',
+  minWidth: '8rem',
+  '&:hover': { backgroundColor: '$primarySubtle', color: '$textContrast' },
+  '&[data-state=on]': {
+    border: '3px solid $colors$primary',
+  },
+
+  variants: {
+    status: {
+      normal: {},
+      highlight: {},
+      error: {
+        borderBottom: '3px solid $colors$warn!important',
+        '&:hover': { color: '$secondarySubtle' },
+      },
+    },
+  },
 }
 
 const ToggleGroupItemComponent = ({
@@ -155,6 +225,11 @@ const ToggleGroupItemComponent = ({
   }, [])
   drag(drop(ref))
 
+  const ToggleGroupItem = styled(
+    Item,
+    isStandalone ? standaloneCss : comboToggleGroupCss
+  )
+
   const effectiveDropdownModules =
     item.dropdownMenuModules || dropdownMenuModules
 
@@ -167,7 +242,7 @@ const ToggleGroupItemComponent = ({
             type: 'item',
             content: (
               <>
-                <SvgIcon className="mr-4">
+                <SvgIcon css={{ marginRight: '1rem' }}>
                   <EditIcon />
                 </SvgIcon>
                 <Text>{t(`teachingService:dropDownMenu.edit${type}`)}</Text>
@@ -186,7 +261,7 @@ const ToggleGroupItemComponent = ({
             type: 'item',
             content: (
               <>
-                <SvgIcon className="mr-4">
+                <SvgIcon css={{ marginRight: '1rem' }}>
                   <CopyIcon />
                 </SvgIcon>
                 <Text>{t(`teachingService:dropDownMenu.copy${type}`)}</Text>
@@ -207,7 +282,7 @@ const ToggleGroupItemComponent = ({
             type: 'item',
             content: (
               <>
-                <SvgIcon className="mr-4">
+                <SvgIcon css={{ marginRight: '1rem' }}>
                   {multipleClass ? <UndoIcon /> : <MdGroupWork />}
                 </SvgIcon>
                 <Text>
@@ -233,7 +308,9 @@ const ToggleGroupItemComponent = ({
             type: 'item',
             content: (
               <>
-                <SvgIcon className="mr-4 text-primary">
+                <SvgIcon
+                  css={{ marginRight: '1rem', color: 'var(--colors-primary)' }}
+                >
                   <ArchiveIcon />
                 </SvgIcon>
                 <Text>{t(`teachingService:dropDownMenu.archive${type}`)}</Text>
@@ -251,7 +328,9 @@ const ToggleGroupItemComponent = ({
             type: 'item',
             content: (
               <>
-                <SvgIcon className="mr-4 text-primary">
+                <SvgIcon
+                  css={{ marginRight: '1rem', color: 'var(--colors-primary)' }}
+                >
                   <UndoIcon />
                 </SvgIcon>
 
@@ -272,7 +351,11 @@ const ToggleGroupItemComponent = ({
             type: 'item',
             content: (
               <>
-                <SvgIcon className="mr-4">
+                <SvgIcon
+                  css={{
+                    marginRight: '1rem',
+                  }}
+                >
                   <DeleteIcon fill="var(--colors-warn)" />
                 </SvgIcon>
                 <Text>{t(`teachingService:dropDownMenu.delete${type}`)}</Text>
@@ -298,26 +381,21 @@ const ToggleGroupItemComponent = ({
           data-testid="dirty-indicator"
         />
       )}
-      <Item
+      <ToggleGroupItem
         key={item.label}
         value={item.value?.toString()}
         aria-label={item.value?.toString()}
         aria-placeholder={item.label}
+        status={item.status as ComponentProps<typeof ToggleGroupItem>['status']}
         data-testid={dataTestId}
-        className={cn(
-          'cursor-pointer gap-2 bg-background-layer-2 text-text flex items-center justify-center p-2 rounded-sm w-full min-w-32',
-          isStandalone
-            ? 'h-8 p-2 pl-4 hover:bg-primary-subtle hover:text-text-contrast data-[state=on]:border-[3px] data-[state=on]:border-primary'
-            : 'min-h-8 py-2 px-1',
-          item.status === 'error' &&
-            'border-b-[3px] border-warn hover:text-secondary-subtle',
-          item.actionButton ? 'justify-between' : 'justify-center',
-          item.icon && 'min-h-16'
-        )}
         onClick={() => {
           if (!isEditing) {
             onChange({ value: item.value, label: item.label })
           }
+        }}
+        css={{
+          justifyContent: item.actionButton ? 'space-between' : 'center',
+          minHeight: item.icon ? '$16' : undefined,
         }}
       >
         {isEditing ? (
@@ -369,7 +447,9 @@ const ToggleGroupItemComponent = ({
 
             {isDuplicating && <Spinner />}
             {isIndicatorLoading && (
-              <SvgIcon className="animate-spin">
+              <SvgIcon
+                css={{ animation: `${loadingSpinner} 1s linear infinite` }}
+              >
                 <FaSpinner />
               </SvgIcon>
             )}
@@ -393,7 +473,7 @@ const ToggleGroupItemComponent = ({
               )}
           </>
         )}
-      </Item>
+      </ToggleGroupItem>
     </Box>
   )
 }

@@ -21,6 +21,7 @@ export class PaymentEvidence extends BaseEntity {
   @Column({ name: 'enroll_course_id' })
   enrollCourseId: number
 
+  @Index('IX_payment_evidences_invoice_id')
   @Column({ name: 'invoice_id', nullable: true })
   invoiceId: number
 

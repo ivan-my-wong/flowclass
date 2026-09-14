@@ -1,0 +1,42 @@
+{
+  "automationFlow": "Automation Flow",
+  "setting": {
+    "sendInvoiceReminder": "Send Invoice Reminder",
+    "automaticallyGenerateInvoice": "Automatically generate invoice",
+    "sendWhatsappMessageAfterGeneration": "Send WhatsApp message after generation",
+    "updateSuccess": "Automation-flow settings updated successfully",
+    "sendLessonReminder": "Send Lesson Reminder",
+    "sendWhatsappMessageForLessonComing": "Send WhatsApp message for lesson coming"
+  },
+  "form": {
+    "name": "Automation Flow Name",
+    "fieldRequired": "Field is required",
+    "namePlaceholder": "Enter automation flow name",
+    "editPeriod": "Edit Reminder Period",
+    "labelUnpaidFor": "If Unpaid for",
+    "labelBeforeLesson": "Before Lesson",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "activateThisFlow": "Activate this flow",
+    "startEvery": "Start Every",
+    "frequencyCron": "Period",
+    "frequencyUnit": "Frequency Unit",
+    "frequencyPlaceholder": "Enter number of frequency",
+    "frequencyUnitPlaceholder": "Select frequency unit",
+    "pickCourses": "Pick Courses",
+    "pickClassesDescription": "Keep courses empty will pass all process",
+    "selectCourses": "Select Courses",
+    "selectCourseDescription": "Please select the course where your class will be enabled for this process.",
+    "selectClasses": "Select Classes",
+    "selectClassesDescription": "Please select the class that will be enabled for this process.",
+    "afterRegistered": "after registered",
+    "afterApproved": "after approved",
+    "editMessage": "Edit Message"
+  },
+  "alertOnlyTypeAutomationFlow": "Only whatsapp templates with type \"{automationFlowName}\" can be selected here.",
+  "coursesSelected": "{countCourses} courses",
+  "message": {
+    "updateAutomationFlowSuccess": "You have updated automation flow successfully.",
+    "updateAutomationFlowStepSuccess": "You have updated automation flow step successfully."
+  }
+}

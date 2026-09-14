@@ -1,8 +1,11 @@
 import React from 'react'
 
+import clsx from 'clsx'
+
 import HeaderBackButton, {
   HeaderBackButtonStatus,
 } from '@/components/TabWithListAndButton/HeaderBackButton'
+import { css } from '@/styles'
 import { cn } from '@/utils/cn'
 
 type HeaderProps = {
@@ -10,8 +13,8 @@ type HeaderProps = {
   leftHeader?: React.ReactNode
   rightHeader?: React.ReactNode
   isCustomStylesApply?: boolean
-  leftHeaderCSS?: string
-  rightHeaderCSS?: string
+  leftHeaderCSS?: any
+  rightHeaderCSS?: any
   bordered?: boolean
 } & React.ComponentPropsWithoutRef<'header'>
 
@@ -26,31 +29,64 @@ const ContentHeader = ({
   className,
   ...props
 }: HeaderProps): React.ReactElement => {
-  const leftStyles = cn(
-    'flex flex-row items-center font-bold gap-2 pl-4',
-    isCustomStylesApply && 'w-[90%] xl:w-4/5 lg:w-[78%] md:w-[68%] sm:w-[90%]',
-    leftHeaderCSS
-  )
-  const rightStyles = cn('ml-auto justify-end pr-4', rightHeaderCSS)
-
+  const leftAndCustomStyles = clsx({
+    [leftStyles()]: true,
+    [customStyles()]: isCustomStylesApply,
+    [leftHeaderCSS]: leftHeaderCSS,
+  })
+  const rightAndCustomStyles = clsx({
+    [rightStyles()]: true,
+    [rightHeaderCSS]: rightHeaderCSS,
+  })
   return (
     <header
       className={cn(
-        'py-2 gap-2 items-center flex flex-row md:flex',
-        bordered && 'border-b border-solid border-text-disabled',
+        'py-2 gap-2 items-center flex flex-row',
+        'md:flex',
+        bordered && 'border-b border-solid border-textDisabled',
         className
       )}
-      {...props}
     >
-      <div className={leftStyles}>
+      <div className={leftAndCustomStyles}>
         {headerBackButton && <HeaderBackButton {...headerBackButton} />}
         <div className="flex items-center flex-row font-bold gap-2">
           {leftHeader}
         </div>
       </div>
-      {rightHeader && <div className={rightStyles}>{rightHeader}</div>}
+      {rightHeader && <div className={rightAndCustomStyles}>{rightHeader}</div>}
     </header>
   )
 }
+
+const leftStyles = css({
+  display: 'flex',
+  flexDirection: 'row',
+  alignContent: 'center',
+  fontWeight: 'bold',
+  gap: '$2',
+  paddingLeft: '$4',
+})
+
+const customStyles = css({
+  width: '90%',
+  '@xl': {
+    width: '80%',
+  },
+  '@lg': {
+    width: '78%',
+  },
+  '@md': {
+    width: '68%',
+  },
+  '@sm': {
+    width: '90%',
+  },
+})
+
+const rightStyles = css({
+  marginLeft: 'auto',
+  justifyContent: 'flex-end',
+  paddingRight: '$4',
+})
 
 export default ContentHeader

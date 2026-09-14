@@ -1,7 +1,6 @@
 import { LocalStorageKeys } from '@/constants/localStorageKeys'
-import { API_BASE_URL } from '@/lib/config'
 
-const baseUrl = API_BASE_URL
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL
 
 export type ApiResponse<T> = {
   data: T
@@ -130,7 +129,17 @@ async function customFetch<Data>(path: string, param: FetchParam): Promise<ApiRe
     })
   }
 
-  const rawRes = await fetch(url, requestInit)
+  let rawRes: Response
+  try {
+    rawRes = await fetch(url, requestInit)
+  } catch (e: any) {
+    throw new ApiError({
+      errorCode: 'NETWORK_ERROR',
+      statusCode: 0,
+      message: e?.message || 'Failed to fetch',
+      data: null,
+    })
+  }
   let res: ApiResponse<Data>
   try {
     res = (await rawRes.json()) as ApiResponse<Data>

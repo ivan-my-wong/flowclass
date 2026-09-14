@@ -25,10 +25,6 @@ export const VALID_PATH_PATTERN = /^[a-zA-Z0-9\-_/]*(%[0-9a-fA-F]{2}[a-zA-Z0-9\-
 export const VALID_DOMAIN_PATTERN =
   /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\.(flowclass\.io|staging\.flowclass\.io|flowclass\.site|course\.site|educator\.site|staging\.flowclass\.site|staging\.course\.site|staging\.educator\.site)$/
 
-/** Free-form domain: localhost, example.com, my-school.local, etc. */
-export const VALID_FREE_FORM_DOMAIN_PATTERN =
-  /^(localhost|[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+)$/
-
 export const VALID_CUSTOM_DOMAIN_PATTERN =
   /^(?:[a-z0-9]+(?:[-.][a-z0-9]+)*\.[a-z0-9]+(?:[-.][a-z0-9]+)*|)$/
 export const DEFAULT_AI_CREDIT = 0
@@ -36,6 +32,9 @@ export const DEFAULT_AI_CREDIT_MAX = 10
 export const DB = 'FLOWCLASS_DB'
 
 export const JOB_NAME_CLASS_LESSON = 'class-lesson-job'
+export const QUEUE_NAME_BLOCK_TIME = 'block-time'
+export const QUEUE_ENROLL_COURSE = 'enroll-course-job'
+export const QUEUE_NAME_IMPORT_CSV = 'csv'
 export type DefaultFieldType = {
   question: string
   type: FieldType
@@ -95,5 +94,7 @@ export const REMIND_RULE = {
   T8: 'T+8',
   Lesson: 'Lesson',
 }
+
+export const QUEUE_REMIND = 'remind-eroll-course'
 
 export const QUEUE_UPDATE_APPROVAL = 'queue-update-approval'

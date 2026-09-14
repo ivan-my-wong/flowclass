@@ -5,75 +5,77 @@ import {
   Thumb,
   Viewport,
 } from '@radix-ui/react-scroll-area'
+import { styled } from '@stitches/react'
 
-import { cn } from '@/utils/cn'
+const SCROLLBAR_SIZE = 10
 
-export const ScrollAreaViewport = ({
-  className,
-  ...props
-}: React.ComponentProps<typeof Viewport>) => (
-  <Viewport className={cn('w-full h-full', className)} {...props} />
-)
+const StyledRoot = styled(Root, {
+  height: '100%',
+  width: '100%',
+  overflow: 'auto',
+})
 
-export const ScrollAreaScrollbar = ({
-  className,
-  ...props
-}: React.ComponentProps<typeof Scrollbar>) => (
-  <Scrollbar
-    className={cn('flex select-none touch-none p-0.5', className)}
-    {...props}
-  />
-)
+const StyledViewport = styled(Viewport, {
+  width: '100%',
+  height: '100%',
+})
 
-export const ScrollAreaThumb = ({
-  className,
-  ...props
-}: React.ComponentProps<typeof Thumb>) => (
-  <Thumb
-    className={cn(
-      'flex-1 bg-primary rounded-[10px] relative',
-      'before:content-[""] before:absolute before:top-1/2 before:left-1/2',
-      'before:-translate-x-1/2 before:-translate-y-1/2',
-      'before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]',
-      className
-    )}
-    {...props}
-  />
-)
+const StyledScrollbar = styled(Scrollbar, {
+  display: 'flex',
+  // ensures no selection
+  userSelect: 'none',
+  // disable browser handling of all panning and zooming gestures on touch devices
+  touchAction: 'none',
+  padding: '2px',
+  '&[data-orientation="vertical"]': { width: SCROLLBAR_SIZE },
+  '&[data-orientation="horizontal"]': {
+    flexDirection: 'column',
+    height: SCROLLBAR_SIZE,
+  },
+})
 
-export const ScrollAreaCorner = (
-  props: React.ComponentProps<typeof Corner>
-) => <Corner {...props} />
+const StyledThumb = styled(Thumb, {
+  flex: 1,
+  backgroundColor: '$primary',
+  borderRadius: SCROLLBAR_SIZE,
+  // increase target size for touch devices https://www.w3.org/WAI/WCAG21/Understanding/target-size.html
+  position: 'relative',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '100%',
+    height: '100%',
+    minWidth: 44,
+    minHeight: 44,
+  },
+})
+
+const StyledCorner = styled(Corner, {})
+
+// Exports
+export const ScrollAreaViewport = StyledViewport
+export const ScrollAreaScrollbar = StyledScrollbar
+export const ScrollAreaThumb = StyledThumb
+export const ScrollAreaCorner = StyledCorner
 
 type ScrollAreaProps = {
   children: JSX.Element
 }
 
 const ScrollArea: React.FC<ScrollAreaProps> = ({ children }) => (
-  <Root className="h-full w-full overflow-auto">
+  <StyledRoot>
     <ScrollAreaViewport>{children}</ScrollAreaViewport>
-    <Scrollbar
-      orientation="vertical"
-      className={cn(
-        'flex select-none touch-none p-0.5',
-        'data-[orientation=vertical]:w-[10px]',
-        'data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-[10px]'
-      )}
-    >
+    <ScrollAreaScrollbar orientation="vertical">
       <ScrollAreaThumb />
-    </Scrollbar>
-    <Scrollbar
-      orientation="horizontal"
-      className={cn(
-        'flex select-none touch-none p-0.5',
-        'data-[orientation=vertical]:w-[10px]',
-        'data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-[10px]'
-      )}
-    >
+    </ScrollAreaScrollbar>
+    <ScrollAreaScrollbar orientation="horizontal">
       <ScrollAreaThumb />
-    </Scrollbar>
+    </ScrollAreaScrollbar>
     <ScrollAreaCorner />
-  </Root>
+  </StyledRoot>
 )
 
 export default ScrollArea

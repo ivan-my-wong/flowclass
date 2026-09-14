@@ -303,22 +303,12 @@ export class CoursesService extends BaseService<Course> {
         siteSettings: true,
       },
       courseActivitiesOrder: true,
-      classes: {
-        regularPeriods: {
-          lessons: true,
-        },
-        regularScheduleV2: {
-          periodsV2: {
-            lessonRepeatFormat: true,
-          },
-        },
-        recurringSchedules: true,
-        recurringFormat: true,
-        priceOptions: true,
-      },
+      classes: true,
     }
 
     const courses = await this.courseRepository.pagination(dto, whereOption, orderOption, relations)
+
+    await this.populateClassesRelations(courses.content)
 
     for (const course of courses.content) {
       if (course.classes && course.classes.length > 0) {
@@ -336,6 +326,45 @@ export class CoursesService extends BaseService<Course> {
     }
     return courses
   }
+
+  private async populateClassesRelations(courses: Course[]): Promise<void> {
+    const allFlatClasses: ClassEntity[] = []
+    for (const course of courses) {
+      if (course.classes) {
+        allFlatClasses.push(...course.classes)
+      }
+    }
+
+    if (allFlatClasses.length > 0) {
+      const classIds = allFlatClasses.map((c) => c.id)
+      const detailedClasses = await this.classRepository.find({
+        where: { id: In(classIds) },
+        relations: {
+          regularPeriods: {
+            lessons: true,
+          },
+          regularScheduleV2: {
+            periodsV2: {
+              lessonRepeatFormat: true,
+            },
+          },
+          recurringSchedules: true,
+          recurringFormat: true,
+          priceOptions: true,
+        },
+      })
+
+      const detailedClassesMap = new Map<number, ClassEntity>()
+      detailedClasses.forEach((c) => detailedClassesMap.set(c.id, c))
+
+      for (const course of courses) {
+        if (course.classes) {
+          course.classes = course.classes.map((c) => detailedClassesMap.get(c.id) || c)
+        }
+      }
+    }
+  }
+
   private async enrichClassesWithPriceInfo(classes: ClassEntity[]): Promise<ClassEntity[]> {
     const classIds = classes.map((c) => c.id)
     const allPriceOptions = await this.classPriceOptionService.getByClassIds(classIds)
@@ -381,22 +410,12 @@ export class CoursesService extends BaseService<Course> {
       site: {
         siteSettings: true,
       },
-      classes: {
-        regularPeriods: {
-          lessons: true,
-        },
-        recurringSchedules: true,
-        regularScheduleV2: {
-          periodsV2: {
-            lessonRepeatFormat: true,
-          },
-        },
-        recurringFormat: true,
-        priceOptions: true,
-      },
+      classes: true,
     }
 
     const result = await this.courseRepository.pagination(dto, whereOption, orderOption, relations)
+
+    await this.populateClassesRelations(result.content)
 
     for (const course of result.content) {
       if (course.classes && course.classes.length > 0) {

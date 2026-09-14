@@ -11,6 +11,8 @@ logs
 *.log
 npm-debug.log*
 pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 lerna-debug.log*
 
 # OS
@@ -40,6 +42,7 @@ lerna-debug.log*
 # .env.stage.dev
 # .env.stage.stg
 # .env.stage.prod
+firebase-adminsdk.json
 .env.local
 .env.staging.local
 .env.production.local

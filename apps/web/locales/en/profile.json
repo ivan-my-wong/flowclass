@@ -9,8 +9,6 @@
   "sendPaymentSuccess": "Are you sure you want to send payment successfully to {count} students?",
   "sendPaymentReminderSuccess": "Send payment reminder successfully",
   "action": "Action",
-  "confirmReceiptSuccess": "Confirm receipt successfully",
-  "rejectReceiptSuccess": "Rejected receipt successfully",
   "sendPaymentProofUploadEmail": "Send Payment Proof Upload Email",
   "sendPaymentReceiptEmail": "Send Payment Receipt Email",
   "sendLessonReminderEmail": "Send Lesson Reminder Email",
@@ -87,10 +85,7 @@
     "logout": "Logout"
   },
   "login": {
-    "title": "Student Login",
-    "subtitle": "Access your profile at {institutionName}",
     "phoneNumber": "Phone Number",
-    "name": "Name (Optional)",
     "password": "Password",
     "loginButton": "Login",
     "newStudent": {
@@ -127,7 +122,6 @@
   "children": "Child Account",
   "lessons": {
     "loadingLessons": "Loading lessons...",
-    "searchLessons": "Search Lessons",
     "materialsUploaded": "{{count}} Materials Uploaded",
     "assignmentSubmitted": "Assignment Submitted",
     "noLessonSelected": "No Lesson Selected",

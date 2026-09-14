@@ -8,6 +8,7 @@
   "SERVER_ERROR": "無法驗證您的帳號。請重新整理頁面或重新登錄。",
   "NAME_LENGTH_ERROR": "名稱輸入過長",
   "WRONG_DOMAIN": "此網域不存在。請檢查您輸入的連結",
+  "PAYLOAD_TOO_LARGE": "您上傳的檔案超過10MB的大小限制，請重試。",
   "AUTHENTICATE": {
     "PLEASE_AUTHENTICATE": "您尚未登錄。請重新整理頁面或嘗試登錄。",
     "ACCOUNT_NOT_FOUND": "登錄失敗。請檢查您的電子郵件或密碼。",
@@ -33,8 +34,12 @@
     "creditCardNotActivated": "教育者尚未啟動此付款方式。請嘗試“通過現金或銀行付款”方式。"
   },
   "COUPON": {
-    "EXPIRED": "優惠券已過期",
-    "USED_UP": "優惠券已被用完"
+    "EXPIRED": "優惠券已過期或無效",
+    "USED_UP": "優惠券已被用完",
+    "NOT_FOUND": "找不到該優惠券",
+    "NOT_APPLY_FOR_THIS_COURSE": "此優惠券不適用於此課程或班別",
+    "NOT_APPLY_FOR_USER": "此優惠券不適用於此帳戶",
+    "IS_NOT_ACTIVE": "此優惠券尚未啟用"
   },
   "ENROL": {
     "PLEASE_PICK_CLASS": "請先選擇您的班別。",

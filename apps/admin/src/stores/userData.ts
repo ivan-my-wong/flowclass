@@ -14,6 +14,7 @@ export const defaultUserState: UserState = {
   userNameLower: '',
   displayId: null,
   isEmailVerified: false,
+  firebaseId: '',
   phone: null,
   lastActiveTime: null,
   avatar: null,

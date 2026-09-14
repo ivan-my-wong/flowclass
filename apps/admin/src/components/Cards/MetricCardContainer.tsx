@@ -1,3 +1,5 @@
+import { CSS } from '@stitches/react'
+
 import { cn } from '@/utils/cn'
 
 import SkeletonLoader from '../Loaders/SkeletonLoader'
@@ -8,7 +10,7 @@ type MetricCardContainerProps = {
   isLoading: boolean
   className?: string
 }
-
+// MetricCardContainer component
 const MetricCardContainer = ({
   children,
   isLoading,
@@ -22,7 +24,13 @@ const MetricCardContainer = ({
             key={index}
             width="100%"
             height="100px"
-            boxClassName="flex flex-col items-start gap-4"
+            boxCSS={
+              {
+                direction: 'column',
+                align: 'flex-start',
+                gap: 'medium',
+              } as CSS
+            }
           />
         ))}
       </>

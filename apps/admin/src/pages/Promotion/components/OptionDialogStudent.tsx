@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/Button'
 import { Combobox } from '@/components/ui/Combobox'
 import usePromotionData from '@/hooks/usePromotionData'
 import ContentLayout from '@/layouts/ContentLayout'
+import { css } from '@/styles'
 import { StudentProps } from '@/types/coupon'
 import { cn } from '@/utils/cn'
 import { formatPhoneNumber } from '@/utils/misc'
@@ -148,6 +149,7 @@ const OptionStudentDialog = ({
     try {
       // Update the coupon with new student list
       await updateCoupon.mutateAsync({
+        userAliasIds: selectedStudents.map(student => +student.value),
         userIds: selectedStudents.map(student => +student.value),
       })
 
@@ -194,10 +196,14 @@ const OptionStudentDialog = ({
     </div>
   )
 
+  const leftHeaderCSS = css({
+    maxHeight: '100%',
+  })
+
   return (
     <Drawer open={open} onClose={setOpen}>
       <ContentLayout
-        leftHeaderCSS="max-h-full"
+        leftHeaderCSS={leftHeaderCSS}
         headerBackButton={headerBackButton}
         leftHeader={leftHeaderContent}
         rightHeader={rightHeaderContent}

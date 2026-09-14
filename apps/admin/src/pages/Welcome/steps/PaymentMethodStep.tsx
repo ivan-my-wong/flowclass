@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { FormProvider, UseFormReturn } from 'react-hook-form'
+import { Form, UseFormReturn } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import FileInput from '@/components/ui/FileInput'
@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/Inputs/Input'
 import TextArea from '@/components/ui/TextAreaBase'
 import { MediaFileDirectory } from '@/constants/MediaFileDirectory'
 import { cn } from '@/utils/cn'
-import { getMediaFileUrl } from '@/utils/generate-link.utils'
+import { getS3FileUrl } from '@/utils/generate-link.utils'
 
 type PaymentMethodStepProps = {
   formPaymentMethod: UseFormReturn<
@@ -47,13 +47,13 @@ const PaymentMethodStep: React.FC<PaymentMethodStepProps> = ({
         </p>
       </div>
 
-      <FormProvider {...formPaymentMethod}>
+      <Form {...formPaymentMethod}>
         <div className="flex flex-col px-3 py-6 gap-1 h-[450px] sm:h-[460px] overflow-y-auto">
           <div className="space-y-4 mt-2 h-auto">
-            <div className="box-col-full items-start">
+            <div className="box-col-full">
               <label
                 htmlFor="methodName"
-                className="text-sm font-medium block mb-1 text-left"
+                className="text-sm font-medium block mb-1"
               >
                 {t('payout:paymentMethodName')}
                 <span className="text-red-500 ml-1">*</span>
@@ -122,7 +122,7 @@ const PaymentMethodStep: React.FC<PaymentMethodStepProps> = ({
                   formPaymentMethod.setValue('qrCodePic', url)
 
                   try {
-                    const result = await getMediaFileUrl(url)
+                    const result = await getS3FileUrl(url)
                     setPayoutPreview(result)
                   } finally {
                     setIsPayoutUploading(false)
@@ -135,7 +135,7 @@ const PaymentMethodStep: React.FC<PaymentMethodStepProps> = ({
             </div>
           </div>
         </div>
-      </FormProvider>
+      </Form>
     </div>
   )
 }

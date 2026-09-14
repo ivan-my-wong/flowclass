@@ -1,19 +1,17 @@
-import { cn } from '@/utils/cn'
+import { styled } from '../../styles'
 
-type LabelProps = {
-  marginBottom?: 'medium'
-  className?: string
-} & React.ComponentProps<'p'>
-
-const Label = ({ marginBottom, className, ...props }: LabelProps) => (
-  <p
-    className={cn(
-      'bg-transparent text-text font-bold text-sm',
-      marginBottom === 'medium' && 'mb-4',
-      className
-    )}
-    {...props}
-  />
-)
+export const Label = styled('p', {
+  backgroundColor: 'transparent',
+  color: '$text',
+  fontWeight: 'bold',
+  fontSize: '$normal',
+  variants: {
+    marginBottom: {
+      medium: {
+        marginBottom: '$medium',
+      },
+    },
+  },
+})
 
 export default Label

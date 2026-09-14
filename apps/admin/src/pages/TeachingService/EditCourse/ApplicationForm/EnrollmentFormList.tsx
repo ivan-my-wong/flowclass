@@ -24,6 +24,7 @@ import { useCourseEditSave } from '@/hooks/useCourseEditSave'
 // import { defaultApplicationForm } from '@/Setting/ApplicationForm'
 import { applicationFormState } from '@/stores/applicationFormData'
 import { courseState } from '@/stores/courseData'
+import { styled } from '@/styles'
 import {
   DefaultInformationFieldTypes,
   InformationFieldTypes,
@@ -171,12 +172,12 @@ const EnrollmentFormList = forwardRef<any, any>((props, ref): JSX.Element => {
   const Option = ({ data, ...props }: any) => {
     if (data.isButton) {
       return (
-        <div className="w-full h-[42px] flex justify-center items-center gap-2.5 text-base cursor-pointer border-t border-[#BFBFBF]">
+        <ButtonCustom>
           <PlusIcon fill="#5C95FF" />
           {t(
             'teachingService:enrollment.enrollmentForm.createNewApplicationForm'
           )}
-        </div>
+        </ButtonCustom>
       )
     }
     return (
@@ -244,15 +245,33 @@ const EnrollmentFormList = forwardRef<any, any>((props, ref): JSX.Element => {
           /> */}
 
           {isLoading && (
-            <div className="w-full flex justify-center">
+            <Loading>
               <Spinner />
-            </div>
+            </Loading>
           )}
           {fieldsForm.length > 0 && <RegistrationFields fields={fieldsForm} />}
         </Box>
       </Box>
     </Box>
   )
+})
+
+const ButtonCustom = styled('div', {
+  width: '100%',
+  height: 42,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: 10,
+  fontSize: 16,
+  // color: '$text',
+  cursor: 'pointer',
+  borderTop: '1px solid #BFBFBF',
+})
+const Loading = styled('div', {
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
 })
 
 export default EnrollmentFormList

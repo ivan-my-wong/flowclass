@@ -18,6 +18,7 @@ import { requiredParamsState } from '@/stores/requiredParamsData'
 import { schoolState } from '@/stores/schoolData'
 import { siteState } from '@/stores/siteData'
 import { AddTeachingServiceMode, studentState } from '@/stores/studentData'
+import { styled } from '@/styles'
 import { Classes } from '@/types/classes'
 import { ClassTypeEnum, PriceType } from '@/types/course'
 import { PriceOption } from '@/types/regularClass'
@@ -25,7 +26,6 @@ import { ClassOpts, CourseOpts, TypeOpts } from '@/types/student'
 import { StudentUser } from '@/types/user'
 import { getLessonCountInPeriodOrRecurring } from '@/utils/calculate-course'
 import { filterClassOptionItems } from '@/utils/class-options.utils'
-import { cn } from '@/utils/cn'
 import dayjsTz from '@/utils/dayjs'
 import {
   getRegularClassLessonsFromSchedule,
@@ -75,7 +75,6 @@ export type InputFields = {
 export type CreateStudentAndAddLessonInputFields = InputFields & {
   alias: string
   email: string
-  secondaryEmail?: string
   phone: string
 }
 
@@ -185,8 +184,8 @@ const CreateTeachingService = ({
   )
 
   const displayName = useMemo(
-    () => studentMemo?.name || firstName || firstStudent?.name || '',
-    [studentMemo?.name, firstName, firstStudent?.name]
+    () => studentMemo?.userAlias?.name || firstName || firstStudent?.name || '',
+    [studentMemo?.userAlias?.name, firstName, firstStudent?.name]
   )
   const displayPhone = useMemo(
     () => phone || firstStudent?.phone || '',
@@ -341,8 +340,6 @@ const CreateTeachingService = ({
     }
 
     if (isChangeLesson) {
-      // Use local variable to avoid stale closure on the render-time `courseId`
-      const enrolCourseId = Number(currentEnrol?.courseId)
       const classId = Number(currentEnrol?.classId) ?? 0
       const recurringScheduleId = String(
         currentEnrol?.invoice?.invoiceId ??
@@ -355,7 +352,7 @@ const CreateTeachingService = ({
       if (!objOpts?.[courseId]) return
       setClassOpts(objOpts[courseId]?.classes)
 
-      const classData = objOpts[enrolCourseId].classes?.find(
+      const classData = objOpts[courseId].classes?.find(
         o => Number(o.value) === classId
       )
       if (!classData) return
@@ -372,12 +369,26 @@ const CreateTeachingService = ({
       setDateTimePickerOpts(dateTimeOptions)
 
       if (classData?.type === ClassTypeEnum.appointment) {
-        const apptOptions = (periodOpts.map(o => o.data).flat() ||
+        const dateTimeOptions = (periodOpts.map(o => o.data).flat() ||
           []) as string[]
-        setDateTimePickerOpts(apptOptions)
+        setDateTimePickerOpts(dateTimeOptions)
       }
 
-      if (dateTimeOptions.length > 0) pickDate(dateTimeOptions)
+      // Set default date to closest future date
+      if (dateTimeOptions.length > 0) {
+        const closestFutureDate = findClosestFutureDate(dateTimeOptions)
+        if (closestFutureDate) {
+          setSelectDate(closestFutureDate)
+          // Find the corresponding dateTime string for the closest future date
+          const dateTimeStr = dateTimeOptions.find(dateTimeStr => {
+            const datePart = dateTimeStr.split(' ')[0]
+            return dayjs(datePart).isSame(dayjs(closestFutureDate), 'day')
+          })
+          if (dateTimeStr) {
+            setValue('classLessonDate', dateTimeStr)
+          }
+        }
+      }
     }
   }, [currentEnrol, mode, open, objOpts, setValue, getValues])
 
@@ -459,29 +470,6 @@ const CreateTeachingService = ({
       }
     }
   }
-  // In changeLesson mode, auto-select the period and date that match the
-  // original lesson's start time so the admin doesn't need to scroll to find it.
-  // Returns true when a match is found and values are set.
-  const autoSelectOriginalDate = (periodOptions: TypeOpts[]): boolean => {
-    if (!isChangeLesson || !currentEnrol?.originalLessonStart) return false
-    const originalDateStr = dayjs(currentEnrol.originalLessonStart).format(
-      'YYYY-MM-DD'
-    )
-    const matchedPeriod = periodOptions.find(p =>
-      (p.data ?? []).some(dt => dt.split(' ')[0] === originalDateStr)
-    )
-    if (!matchedPeriod) return false
-    setValue('periodId', matchedPeriod.value ?? '')
-    const dtOptions = matchedPeriod.data ?? []
-    setDateTimePickerOpts(dtOptions)
-    const matchedDt = dtOptions.find(dt => dt.split(' ')[0] === originalDateStr)
-    if (matchedDt) {
-      setSelectDate(new Date(matchedDt.split(' ')[0]))
-      setValue('classLessonDate', matchedDt)
-    }
-    return true
-  }
-
   const onValueChangeSelectClass = (opt: string | undefined) => {
     if (opt) {
       const courseId = getValues('courseId')
@@ -535,6 +523,7 @@ const CreateTeachingService = ({
             data: lessonsByPeriod[idx + 1] ?? [],
           }
         })
+        setSelectDate(undefined)
         setPeriodOpts(builtPeriodOpts)
         setValue('periodId', '')
         setValue('classLessonDate', '')
@@ -569,6 +558,7 @@ const CreateTeachingService = ({
         })
       }
 
+      setSelectDate(undefined)
       setPeriodOpts(getPeriodOpts)
 
       setValue('periodId', '')
@@ -674,6 +664,8 @@ const CreateTeachingService = ({
   const handleSelectDate = (date: Date | null) => {
     // If you see isRequired error or 此欄位為必填, please check the function here
     if (date) {
+      // I love dayjs for saving me with this simple function - Ivan
+      // Did I write this???? From Ivan
       const newOpts = dateTimePickerOpts.filter(time =>
         dayjs(time?.split(' ')[0]).isSame(dayjs(date), 'day')
       )
@@ -744,7 +736,7 @@ const CreateTeachingService = ({
     searchParams.append('classId', String(data.classId))
 
     const normalDomain = import.meta.env.DEV
-      ? `http://localhost:3001`
+      ? `http://localhost:4000`
       : `https://${domain}`
     const urlWithParams = `${normalDomain}/enrol?${searchParams.toString()}`
 
@@ -776,7 +768,6 @@ const CreateTeachingService = ({
   const defaultProps = {
     headerBackButton,
     handleCloseAndClearData,
-    // onLessonChanged,
     currentDetail,
     form,
     isFreeLesson,
@@ -809,19 +800,9 @@ const CreateTeachingService = ({
     isLoadingCourseOptions,
   }
 
-  const getDrawerMaxWidth = () => {
-    if (mode === AddTeachingServiceMode.addCourseDirectly) return '40%'
-    if (mode === AddTeachingServiceMode.changeLesson) return '500px'
-    return undefined
-  }
-
   if (open) {
     return (
-      <Drawer
-        open={open}
-        onClose={handleCloseAndClearData}
-        maxWidth={getDrawerMaxWidth()}
-      >
+      <Drawer open={open} onClose={handleCloseAndClearData}>
         <div className="pb-4">
           {mode === AddTeachingServiceMode.addCourseDirectly && (
             <AddCourseDirectly {...defaultProps} />
@@ -856,60 +837,31 @@ const CreateTeachingService = ({
   return <></>
 }
 
-export const Loading = ({
-  children,
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('ml-2.5', className)} {...props}>
-    {children}
-  </div>
-)
+export const Loading = styled('div', {
+  marginLeft: 10,
+})
 
-export const LabelField = ({
-  children,
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('mb-2 mt-4 text-base', className)} {...props}>
-    {children}
-  </div>
-)
+export const LabelField = styled('div', {
+  marginBottom: '0.5rem',
+  marginTop: '1rem',
+  fontSize: '$medium',
+})
 
-export const Field = ({
-  children,
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('w-full relative', className)} {...props}>
-    {children}
-  </div>
-)
+export const Field = styled('div', {
+  width: '100%',
+  position: 'relative',
+})
+export const ErrorField = styled('div', {
+  position: 'absolute',
+  color: '#ff4d4f',
+  bottom: '-18px',
+  left: 0,
+  fontSize: 14,
+})
 
-export const ErrorField = ({
-  children,
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn(
-      'absolute text-[#ff4d4f] -bottom-[18px] left-0 text-sm',
-      className
-    )}
-    {...props}
-  >
-    {children}
-  </div>
-)
-
-export const Link = ({
-  children,
-  className,
-  ...props
-}: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
-  <a className={cn('cursor-pointer break-words', className)} {...props}>
-    {children}
-  </a>
-)
+export const Link = styled('a', {
+  cursor: 'pointer',
+  wordBreak: 'break-word',
+})
 
 export default CreateTeachingService

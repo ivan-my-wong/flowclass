@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
+import { getAuth } from '@firebase/auth'
 import {
   Controller,
   FieldValues,
@@ -11,6 +12,7 @@ import { useTranslation } from 'react-i18next'
 import { FaChevronLeft, FaChevronRight, FaPaperPlane } from 'react-icons/fa'
 import { useMutation } from 'react-query'
 import { toast } from 'sonner'
+import { v4 as uuidv4 } from 'uuid'
 
 import { registerAccount } from '@/api/auth'
 import { ApiError } from '@/api/errors/apiError'
@@ -21,11 +23,13 @@ import LabelInput from '@/components/Inputs/LabelInput'
 import PhoneNumberInput from '@/components/Inputs/PhoneInput'
 import { TextInput } from '@/components/Inputs/TextInput'
 import { Spinner } from '@/components/Loaders/Spinner'
+import SocialLogin from '@/components/SocialLogin'
 import Text from '@/components/Texts/Text'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Inputs/Input'
 import { LinkToGuides } from '@/constants/guides'
 import { useUserCountry } from '@/hooks/useLocalization'
+import { css } from '@/styles'
 import { UserState } from '@/types/user'
 import { validateEmail, validatePassword } from '@/utils/validate'
 
@@ -37,12 +41,32 @@ export interface RegisterFormProps {
   confirmPassword: string
 }
 
+const stepStyles = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '$4',
+  width: '100%',
+})
+
 const RegisterForm: React.FC = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [country] = useUserCountry()
   const [hasPrivacyConsent, setHasPrivacyConsent] = useState(false)
+  const [currentStep, setCurrentStep] = useState<
+    'method' | 'google-phone' | 'email-flow'
+  >('method')
   const [emailFlowStep, setEmailFlowStep] = useState(0)
+
+  const sourceParams = useSearchParams()[0].get('source')
+
+  const firebaseAuth = getAuth()
+
+  useEffect(() => {
+    if (sourceParams === 'google-login' && firebaseAuth.currentUser) {
+      setCurrentStep('google-phone')
+    }
+  }, [sourceParams])
 
   const {
     register,
@@ -51,6 +75,7 @@ const RegisterForm: React.FC = () => {
     handleSubmit,
     setError,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm()
   const watchAllFields = watch()
@@ -90,7 +115,9 @@ const RegisterForm: React.FC = () => {
         })
 
         // Navigate back to phone step if we're in email flow
-        setEmailFlowStep(1)
+        if (currentStep === 'email-flow') {
+          setEmailFlowStep(1)
+        }
       } else if (error.statusCode === 422) {
         if (Array.isArray(error.message) && error.message.length > 0) {
           error.message.forEach(message => {
@@ -106,6 +133,23 @@ const RegisterForm: React.FC = () => {
       }
     },
   })
+
+  const handleGooglePhoneSubmit = (data: FieldValues) => {
+    // For Google login, we only need phone number
+    // This would typically integrate with Google OAuth and then just collect phone
+
+    const { phone } = data
+    const tempPassword = uuidv4()
+      .replace(/-/g, 'A')
+      .concat(Math.floor(Math.random() * 9000 + 1000).toString())
+
+    mutateAsync({
+      firstName: firebaseAuth.currentUser?.displayName ?? '',
+      email: firebaseAuth.currentUser?.email ?? '',
+      phone,
+      password: tempPassword,
+    })
+  }
 
   const handleEmailStep = (data: FieldValues) => {
     if (validateEmail(data.email)) {
@@ -134,17 +178,28 @@ const RegisterForm: React.FC = () => {
   }
 
   const goBack = () => {
-    if (emailFlowStep > 0) {
-      setEmailFlowStep(emailFlowStep - 1)
+    if (currentStep === 'google-phone') {
+      setCurrentStep('method')
+    } else if (currentStep === 'email-flow') {
+      if (emailFlowStep === 0) {
+        setCurrentStep('method')
+      } else {
+        setEmailFlowStep(emailFlowStep - 1)
+      }
     }
   }
 
   const getStepIndicator = () => {
-    const steps = ['email']
-    if (emailFlowStep >= 1) steps.push('phone')
-    if (emailFlowStep >= 2) steps.push('name')
-    if (emailFlowStep >= 3) steps.push('password')
-    return steps
+    if (currentStep === 'method') return ['method']
+    if (currentStep === 'google-phone') return ['method', 'phone']
+    if (currentStep === 'email-flow') {
+      const steps = ['method', 'email']
+      if (emailFlowStep >= 1) steps.push('phone')
+      if (emailFlowStep >= 2) steps.push('name')
+      if (emailFlowStep >= 3) steps.push('password')
+      return steps
+    }
+    return []
   }
 
   const getStepLabel = (step: string) => {
@@ -165,7 +220,9 @@ const RegisterForm: React.FC = () => {
   }
 
   const getTotalSteps = () => {
-    return 4
+    if (currentStep === 'method') return 1
+    if (currentStep === 'google-phone') return 2
+    return 5 // email flow
   }
 
   const renderStepIndicator = () => {
@@ -175,7 +232,7 @@ const RegisterForm: React.FC = () => {
     return (
       <div className="mb-6">
         <div className="box-row-full sm:items-center sm:justify-between mb-2 space-y-2 sm:space-y-0">
-          {emailFlowStep > 0 && (
+          {currentStep !== 'method' && (
             <Button
               variant="ghost"
               size="sm"
@@ -206,11 +263,109 @@ const RegisterForm: React.FC = () => {
     )
   }
 
+  const renderMethodSelection = () => (
+    <div className={stepStyles()}>
+      {renderStepIndicator()}
+
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          {t('login:register.createAccount')}
+        </h2>
+        <p className="text-gray-600">
+          {t('login:register.chooseSignupMethod')}
+        </p>
+      </div>
+
+      <SocialLogin onSuccess={() => setCurrentStep('google-phone')} />
+
+      <div className="relative w-full">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-300" />
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="px-2 bg-white text-gray-500">
+            {t('login:register.or')}
+          </span>
+        </div>
+      </div>
+
+      <Button
+        onClick={() => {
+          setCurrentStep('email-flow')
+          setEmailFlowStep(0)
+        }}
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
+      >
+        {t('login:register.continueWithEmail')}
+      </Button>
+      <p className="text-center text-gray-500 text-sm">
+        {t('login:register.alreadyHaveAccountSignIn')}{' '}
+        <a
+          href="/login"
+          className="text-blue-600 hover:text-blue-700 font-medium"
+        >
+          {t('login:loginModal.login')}
+        </a>
+      </p>
+    </div>
+  )
+
+  const renderGooglePhoneStep = () => (
+    <div className={stepStyles()}>
+      {renderStepIndicator()}
+
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          {t('login:register.almostDone')}
+        </h2>
+        <p className="text-gray-600">
+          {t('login:register.enterPhoneForGoogle')}
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit(handleGooglePhoneSubmit)} className="w-full">
+        <LabelInput
+          label={t('school:contact.phoneForContact')}
+          vertical
+          isError={!!errors?.phone}
+          helperText={
+            errors.phone?.message && (errors.phone?.message as string)
+          }
+        >
+          <Controller
+            name="phone"
+            control={control}
+            rules={{ required: t('login:errors.required') as string }}
+            render={({ field: { onChange, value } }) => (
+              <PhoneNumberInput
+                fullWidth
+                country={country.toString().toLowerCase()}
+                onChange={onChange}
+                value={value}
+              />
+            )}
+          />
+        </LabelInput>
+
+        <div className="mt-8">
+          <Button
+            type="submit"
+            className="w-full"
+            iconAfter={<FaChevronRight />}
+            onClick={() => handleGooglePhoneSubmit(getValues())}
+          >
+            {t('login:register.continue')}
+          </Button>
+        </div>
+      </form>
+    </div>
+  )
+
   const renderEmailFlow = () => {
     switch (emailFlowStep) {
       case 0:
         return (
-          <div className="flex flex-col gap-4 w-full">
+          <div className={stepStyles()}>
             {renderStepIndicator()}
 
             <div className="text-center mb-6">
@@ -256,7 +411,7 @@ const RegisterForm: React.FC = () => {
 
       case 1:
         return (
-          <div className="flex flex-col gap-4 w-full">
+          <div className={stepStyles()}>
             {renderStepIndicator()}
 
             <div className="text-center mb-6">
@@ -306,7 +461,7 @@ const RegisterForm: React.FC = () => {
 
       case 2:
         return (
-          <div className="flex flex-col gap-4 w-full">
+          <div className={stepStyles()}>
             {renderStepIndicator()}
 
             <div className="text-center mb-6">
@@ -349,7 +504,7 @@ const RegisterForm: React.FC = () => {
 
       case 3:
         return (
-          <div className="flex flex-col gap-4 w-full">
+          <div className={stepStyles()}>
             {renderStepIndicator()}
 
             <div className="text-center mb-6">
@@ -453,7 +608,18 @@ const RegisterForm: React.FC = () => {
     }
   }
 
-  const renderCurrentStep = () => renderEmailFlow()
+  const renderCurrentStep = () => {
+    switch (currentStep) {
+      case 'method':
+        return renderMethodSelection()
+      case 'google-phone':
+        return renderGooglePhoneStep()
+      case 'email-flow':
+        return renderEmailFlow()
+      default:
+        return renderMethodSelection()
+    }
+  }
 
   return (
     <>

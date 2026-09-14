@@ -16,6 +16,8 @@ import { RolesGuard } from '@/common/guards/roles.guard'
 import { StripeProductPricesService } from '@/domain/service/stripe-product-prices.service'
 import { Role } from '@/models/enums/'
 
+import { getAllPlanSchema } from '../subscription-plans/dto/subscription-plans.schema'
+
 import { getAllPlanPricesReponse } from './dto/get-all-plan-prices.dto'
 import {
   StripeProductPricesPageDto,
@@ -45,7 +47,14 @@ export class StripeProductPricesController {
   @ApiOkResponse({
     // schema: getAllPlanSchema,
   })
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @Roles(
+    Role.MASTER_ADMIN,
+    Role.SITE_MANAGER,
+    Role.INSTITUTION_MANAGER,
+    Role.INSTRUCTOR,
+    Role.OPERATOR,
+    Role.STUDENT
+  )
   @UseGuards(RolesGuard)
   findAll(
     @Query() pageOptionsDto: StripeProductPricesPageOptionDto
@@ -69,7 +78,7 @@ export class StripeProductPricesController {
     summary: 'This api for master admin use to change stripe plan prices',
   })
   @ApiOkResponse({
-    description: 'Updated Stripe price',
+    schema: getAllPlanSchema,
   })
   @Roles(Role.MASTER_ADMIN)
   @UseGuards(RolesGuard)

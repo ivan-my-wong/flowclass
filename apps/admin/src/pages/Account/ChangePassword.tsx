@@ -11,8 +11,23 @@ import Text from '@/components/Texts/Text'
 import Box from '@/components/ui/Box'
 import { Button } from '@/components/ui/Button'
 import ContentLayout from '@/layouts/ContentLayout'
+import { styled } from '@/styles'
 import { ChangePasswordProps } from '@/types/user'
 import { validatePassword } from '@/utils/validate'
+
+const Container = styled('div', {
+  width: '100%',
+  padding: '$6 $6 0 $6',
+  borderRadius: '$2',
+  backgroundColor: '$backgroundLayer2',
+  boxShadow: '0 0 10px $colors$shadowColor',
+  marginTop: '$4',
+})
+
+const Section = styled('div', {
+  width: '100%',
+  marginBottom: '$6',
+})
 
 const ChangePassword = (): JSX.Element => {
   const { t } = useTranslation()
@@ -142,13 +157,13 @@ const ChangePassword = (): JSX.Element => {
       <Box direction="col" align="start" padding="base">
         <Heading>{t(`account:changePassword`)}</Heading>
         <Text>{t('account:changePasswordExplanation')}</Text>
-        <div className="w-full pt-6 px-6 rounded-lg bg-background-layer-2 shadow-[0_0_10px_var(--shadow)] mt-4">
+        <Container>
           {inputFields.map(
             ({ label, value, onChange, emptyWarning }, index) => (
-              <div key={label} className="w-full mb-6">
+              <Section key={label}>
                 <TextInput
                   key={label}
-                  className="w-full"
+                  css={{ width: '100%' }}
                   id={label.toLowerCase()}
                   name={label.toLowerCase()}
                   value={value}
@@ -165,7 +180,7 @@ const ChangePassword = (): JSX.Element => {
                   }
                   boxProps={{ direction: 'column', align: 'flex-start' }}
                 />
-              </div>
+              </Section>
             )
           )}
 
@@ -180,7 +195,7 @@ const ChangePassword = (): JSX.Element => {
               </ul>
             </Box>
           )}
-        </div>
+        </Container>
       </Box>
     </ContentLayout>
   )

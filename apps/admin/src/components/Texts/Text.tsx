@@ -1,65 +1,91 @@
 import { ComponentProps } from 'react'
 
-import { cn } from '@/utils/cn'
+import { styled } from '../../styles'
 
-const typeClasses = {
-  plain: '',
-  error: 'mt-2 text-warn text-sm font-bold',
-  primary: 'text-primary',
-  disabled: 'text-text-disabled pointer-events-none opacity-50',
-  subtle: 'text-text-subtle',
-}
-
-const sizeClasses = {
-  extraSmall: 'text-xs',
-  small: 'text-sm',
-  medium: 'text-base',
-  mediumLarge: 'text-lg',
-  large: 'text-xl',
-  extraLarge: 'text-2xl',
-}
+export const StyledText = styled('p', {
+  margin: 0,
+  padding: 0,
+  fontSize: '$normal',
+  lineHeight: '1.25rem',
+  variants: {
+    type: {
+      plain: {},
+      error: {
+        marginTop: '$2 0',
+        color: '$warn',
+        fontSize: '$3',
+        fontWeight: 700,
+      },
+      primary: {
+        color: '$primary',
+      },
+      disabled: {
+        color: '$textDisabled',
+        pointerEvents: 'none',
+        opacity: '0.5',
+      },
+      subtle: {
+        color: '$textSubtle',
+      },
+    },
+    bold: {
+      true: {
+        fontWeight: 700,
+      },
+    },
+    noFlexShrink: {
+      true: {
+        flexShrink: 0,
+      },
+    },
+    size: {
+      extraSmall: {
+        fontSize: '$extraSmall',
+      },
+      small: {
+        fontSize: '$small',
+      },
+      medium: {
+        fontSize: '$medium',
+      },
+      mediumLarge: {
+        fontSize: '$mediumLarge',
+      },
+      large: {
+        fontSize: '$large',
+      },
+      extraLarge: {
+        fontSize: '$extraLarge',
+      },
+    },
+    noWrap: {
+      true: {
+        whiteSpace: 'nowrap',
+        // overflow: 'hidden',
+        // textOverflow: 'ellipsis',
+      },
+    },
+  },
+})
 
 type TextProps = {
   children?: React.ReactNode
   align?: 'left' | 'center' | 'right'
   width?: string
-  type?: keyof typeof typeClasses
-  bold?: boolean
-  noFlexShrink?: boolean
-  size?: keyof typeof sizeClasses
-  noWrap?: boolean
-  className?: string
-} & ComponentProps<'p'>
+  css?: ComponentProps<typeof StyledText>['css']
+} & ComponentProps<typeof StyledText>
 
 const Text = ({
   children,
   align = 'left',
   width,
-  type = 'plain',
-  bold,
-  noFlexShrink,
-  size,
-  noWrap,
-  className,
-  style,
+  css,
   ...props
 }: TextProps): React.ReactElement => {
   return (
-    <p
-      className={cn(
-        'm-0 p-0 text-sm leading-5',
-        typeClasses[type],
-        bold && 'font-bold',
-        noFlexShrink && 'shrink-0',
-        size && sizeClasses[size],
-        noWrap && 'whitespace-nowrap',
-        className
-      )}
-      style={{ textAlign: align, width, ...style }}
-      {...props}
-    >
+    <StyledText css={{ textAlign: align, width, ...css }} {...props}>
       {children}
-    </p>
+    </StyledText>
   )
 }
 

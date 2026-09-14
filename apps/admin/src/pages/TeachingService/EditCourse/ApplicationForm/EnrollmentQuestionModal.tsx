@@ -30,8 +30,8 @@ import ModalCloseButton from '@/components/Popups/ModalCloseButton'
 import SelectDefault from '@/components/Selector/Select'
 import Separator from '@/components/Separators/Separator'
 import Text from '@/components/Texts/Text'
+import { styled } from '@/styles'
 import { Course, QuestionData } from '@/types/course'
-import { cn } from '@/utils/cn'
 
 import useSelectItems from '../SelectItems'
 
@@ -155,9 +155,15 @@ const EnrollmentQuestionModal = forwardRef<
                 direction="column"
                 align="flex-start"
                 responsive
-                className="sm:items-start"
+                css={{
+                  '@sm': {
+                    alignItems: 'flex-start',
+                  },
+                }}
               >
-                <Label className="w-1/4">{t('common:fields.options')}</Label>
+                <Label css={{ width: '25%' }}>
+                  {t('common:fields.options')}
+                </Label>
                 {copiedQuestionData.fieldData?.map((field, fieldIndex) => {
                   const key = `field-${fieldIndex}`
                   // const key = uuidv4()
@@ -165,7 +171,11 @@ const EnrollmentQuestionModal = forwardRef<
                     <Box
                       key={key}
                       justify="flex-start"
-                      className="sm:items-start"
+                      css={{
+                        '@sm': {
+                          alignItems: 'flex-start',
+                        },
+                      }}
                     >
                       <TextInput
                         value={field.label}
@@ -184,14 +194,30 @@ const EnrollmentQuestionModal = forwardRef<
                       />
                       <IconButton
                         icon={<ImCross />}
-                        className="w-fit h-fit p-0 m-0 ml-2 text-primary bg-transparent"
+                        css={{
+                          width: 'fit-content',
+                          height: 'fit-content',
+                          padding: 0,
+                          margin: 0,
+                          marginLeft: '$2',
+                          color: '$primary',
+                          backgroundColor: '$transparent',
+                        }}
                         onClick={() => handleDeleteOption(fieldIndex)}
                       />
                     </Box>
                   )
                 })}
                 <Text
-                  className="text-primary cursor-pointer self-center hover:underline hover:text-primary-highlight"
+                  css={{
+                    color: '$primary',
+                    cursor: 'pointer',
+                    alignSelf: 'center',
+                    '&:hover': {
+                      textDecoration: 'underline',
+                      color: '$primaryHighlight',
+                    },
+                  }}
                   onClick={handleAddOption}
                 >
                   {t(`enrollment.enrollmentModal.addOption`)}
@@ -217,12 +243,22 @@ const ModalTrigger = ({
 }): JSX.Element => {
   return (
     <Trigger asChild>
-      <Box className={cn('cursor-pointer w-fit', hidden && 'hidden')}>
-        <BiEditAlt size="2rem" className="text-[#1877f2]" />
+      <Box
+        css={{
+          cursor: 'pointer',
+          width: 'fit-content',
+          display: `${hidden ? 'none' : ''}`,
+        }}
+      >
+        <ModalTriggerIcon size="2rem" />
       </Box>
     </Trigger>
   )
 }
+
+const ModalTriggerIcon = styled(BiEditAlt, {
+  color: '$facebookBlue',
+})
 
 const QuestionDataDescriptionField = ({
   register,
@@ -293,7 +329,9 @@ const QuestionDataInputTypeField = ({
   const selectItems = useSelectItems() // Question Data Input Type Select Options
   return (
     <Box justify="space-between">
-      <Label className="w-1/4">{t(`enrollment.enrollmentModal.type`)}</Label>
+      <Label css={{ width: '25%' }}>
+        {t(`enrollment.enrollmentModal.type`)}
+      </Label>
       <SelectDefault
         placeholder={t(`school:addSchoolModalPlaceholder`)}
         selectItems={selectItems}
@@ -320,7 +358,7 @@ const QuestionDataValidationField = ({
   if (copiedQuestionData.inputType.includes('display')) return <></>
   return (
     <Box justify="space-between">
-      <Label className="w-1/4">
+      <Label css={{ width: '25%' }}>
         {t(`enrollment.enrollmentModal.validation`)}
       </Label>
       <SelectDefault
@@ -361,7 +399,7 @@ const SaveButton = ({
   const { t } = useTranslation(['teachingService'])
   return (
     <Button
-      className="w-fit self-end"
+      css={{ width: 'fit-content', alignSelf: 'flex-end' }}
       onClick={() => {
         handleSubmit(handleCompleteUpdateQuestionData)()
       }}

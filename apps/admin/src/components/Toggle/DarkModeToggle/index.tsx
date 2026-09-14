@@ -1,24 +1,31 @@
 import { ComponentProps } from 'react'
 
+import { styled } from '@stitches/react'
 import { useTranslation } from 'react-i18next'
 import { MdDarkMode, MdLightMode } from 'react-icons/md'
 import { useRecoilState } from 'recoil'
-
-import { cn } from '@/utils/cn'
 
 import { darkModeState } from '../../../stores/darkMode'
 import IconButton from '../../Buttons/IconButton'
 import Text from '../../Texts/Text'
 
+const DarkModeToggleWrapper = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '$4',
+  cursor: 'pointer',
+  userSelect: 'none',
+})
+
 const DarkModeToggle = ({
   iconOnly = false,
   iconSize = 'medium',
-  className,
   ...props
 }: {
   iconOnly?: boolean
   iconSize?: 'small' | 'medium'
-} & ComponentProps<'div'>) => {
+} & ComponentProps<typeof DarkModeToggleWrapper>) => {
   const { t } = useTranslation()
   const [isDarkMode, setDarkMode] = useRecoilState(darkModeState)
 
@@ -27,22 +34,7 @@ const DarkModeToggle = ({
   }
 
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      className={cn(
-        'flex items-center justify-center gap-4 cursor-pointer select-none',
-        className
-      )}
-      onClick={toggleDarkMode}
-      onKeyDown={e => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          toggleDarkMode()
-        }
-      }}
-      {...props}
-    >
+    <DarkModeToggleWrapper onClick={toggleDarkMode} {...props}>
       <IconButton
         icon={isDarkMode ? <MdLightMode /> : <MdDarkMode />}
         size={iconSize}
@@ -54,7 +46,7 @@ const DarkModeToggle = ({
             ? t(`component:darkModeToggle.lightMode`)
             : t(`component:darkModeToggle.darkMode`))}
       </Text>
-    </div>
+    </DarkModeToggleWrapper>
   )
 }
 

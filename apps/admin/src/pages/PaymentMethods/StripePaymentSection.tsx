@@ -15,8 +15,9 @@ import usePayoutData from '@/hooks/usePayoutData'
 import { useResponsive } from '@/hooks/useResponsive'
 import useSchoolData from '@/hooks/useSchoolData'
 import useSiteData from '@/hooks/useSiteData'
+import usePlanData from '@/hooks/useSubscriptionPlanData'
 import { ConfirmOptionsType } from '@/reducers/confirm.reducers'
-import { StripeConnectStatus } from '@/types/stripe-connect'
+import { StripeConnectStatus } from '@/types/schoolSubscriptionPlan'
 import { goToExternalLink } from '@/utils/external-link.utils'
 
 import EnableStripeToggle from '../Setting/EnableStripeToggle'
@@ -32,6 +33,8 @@ const StripePaymentSection = ({
   const navigate = useNavigate()
   const { isSafari } = useResponsive()
   const { siteData } = useSiteData()
+  const { schoolSubscription } = usePlanData()
+  const { activePlan } = schoolSubscription
   const {
     useFetchExpressAccountDetail,
     useFetchStripeConnectDetail,

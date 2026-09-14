@@ -23,18 +23,25 @@ import { Button } from '@/components/ui/Button'
 import { QUERY_KEY } from '@/constants/queryKey'
 import { useResponsive } from '@/hooks/useResponsive'
 import useSchoolData from '@/hooks/useSchoolData'
+import usePlanData from '@/hooks/useSubscriptionPlanData'
 import notificationSettingState from '@/stores/NotificationSettingData'
-import { FeatureEnableEnum } from '@/types/feature-enable'
+import { subscriptionDialogOpenState } from '@/stores/schoolSubscriptionData'
 import { NotificationsSettingProps } from '@/types/notifications'
+import { FeatureEnableEnum } from '@/types/schoolSubscriptionPlan'
 
 const EmailSetting = ({ tabName }: { tabName?: string }) => {
   const { schoolData } = useSchoolData()
   const { currentSchool } = schoolData
   const { useFetchCurrentSchoolNotificationsSetting } = useSchoolData()
+  const { checkSubscriptionAccess } = usePlanData()
   const { isMobile } = useResponsive()
 
   const [hasSetting, setHasSetting] = useState(false)
-  const isOwnBrandingEnabled = true
+
+  const isOwnBrandingEnabled = checkSubscriptionAccess(
+    'featureEnable',
+    FeatureEnableEnum.OWN_BRANDING
+  )
 
   const [schoolSetting, setSchoolSetting] =
     useState<NotificationsSettingProps>()
@@ -109,6 +116,10 @@ const EmailSetting = ({ tabName }: { tabName?: string }) => {
     </Button>
   )
 
+  const [, setShowSubscriptionPopup] = useRecoilState(
+    subscriptionDialogOpenState
+  )
+
   return (
     <>
       {isIdle && <FullScreenAlertBox text={t(`teachingService:noSchool`)} />}
@@ -127,10 +138,22 @@ const EmailSetting = ({ tabName }: { tabName?: string }) => {
                 className="justify-start"
                 textClassName="w-[60%]"
                 onCheckedChange={value => {
-                  setSchoolSetting({
-                    ...schoolSetting,
-                    displayEmailLogo: value,
-                  })
+                  if (
+                    checkSubscriptionAccess(
+                      'featureEnable',
+                      FeatureEnableEnum.OWN_BRANDING
+                    )
+                  ) {
+                    setSchoolSetting({
+                      ...schoolSetting,
+                      displayEmailLogo: value,
+                    })
+                  } else {
+                    setShowSubscriptionPopup({
+                      open: true,
+                      message: t(`subscription:subscriptionDialog.upgradePlan`),
+                    })
+                  }
                 }}
                 label={t(`setting:emailLogoSetting.displayLogo`)}
               />
@@ -156,6 +179,11 @@ const EmailSetting = ({ tabName }: { tabName?: string }) => {
                     setSchoolSetting({
                       ...schoolSetting,
                       customEmailSender: value,
+                    })
+                  } else {
+                    setShowSubscriptionPopup({
+                      open: true,
+                      message: t(`subscription:subscriptionDialog.upgradePlan`),
                     })
                   }
                 }}

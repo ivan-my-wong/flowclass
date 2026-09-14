@@ -6,7 +6,6 @@ import { BsCreditCard2Back } from 'react-icons/bs'
 import { Separator } from '@/components/ui/Separator'
 import { Switch } from '@/components/ui/Switch'
 import useSiteData from '@/hooks/useSiteData'
-import { useInvoiceEditorContext } from '@/pages/TemplateManagement/InvoiceTemplates/Editor/InvoiceEditorContext'
 import { formatCurrency } from '@/utils/currency'
 
 import { useContextInvoiceEditDialog } from './EditInvoiceContext'
@@ -14,7 +13,6 @@ import { useContextInvoiceEditDialog } from './EditInvoiceContext'
 const ApplyCreditBalance = (): JSX.Element => {
   const { t } = useTranslation('invoiceCampaign')
   const siteData = useSiteData()
-  const { isViewOnly } = useInvoiceEditorContext()
   const {
     isPayByCredit,
     setPayByCredit,
@@ -44,7 +42,7 @@ const ApplyCreditBalance = (): JSX.Element => {
           checked={isPayByCredit}
           onCheckedChange={setPayByCredit}
           className="ml-auto"
-          disabled={isViewOnly || creditBalance <= 0}
+          disabled={creditBalance <= 0}
           aria-label={t('invoice.applyCreditBalance.accountCredit') as string}
         />
       </div>

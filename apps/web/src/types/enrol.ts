@@ -22,7 +22,6 @@ export type FieldAnswer = {
 export enum PaymentMethods {
   PAY_LATER = 'PAY_LATER',
   PAY_NOW = 'PAY_NOW',
-  PAY_NOW_DIVIT = 'PAY_NOW_DIVIT',
 }
 
 export enum EnrollConfirmState {
@@ -193,6 +192,7 @@ export type ReCreateStripeClientSecret = {
   institutionId: number
   paymentAmount: number
   redirectUrl?: string
+  coupon?: string
 }
 
 export type GetEnrolPriceData = {

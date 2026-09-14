@@ -8,11 +8,11 @@ import { MdOutlineMailOutline } from 'react-icons/md'
 import FullScreenLoading from '@/components/FullScreen/FullScreenLoading'
 import BoxWithToggleGroup from '@/components/ToggleGroup/BoxWithToggleGroup'
 import useCheckPermissionAndQuota from '@/hooks/useCheckPermissionAndQuota'
-import { FeatureEnableEnum } from '@/types/feature-enable'
+import NoActiveSubscription from '@/pages/CustomMessages/components/NoActiveSubscription'
+import { FeatureEnableEnum } from '@/types/schoolSubscriptionPlan'
 
 import CreditSystem from './CreditSystem'
 import EmailSetting from './EmailSetting'
-import IntegrationsSetting from './IntegrationsSetting'
 import StudentPortalSetting from './StudentPortalSetting'
 import TextVersionSetting from './TextVersionSetting'
 
@@ -28,19 +28,16 @@ const FeatureEnable = (): JSX.Element => {
   const [currentSection, setCurrentSection] = useState(
     FeatureSections.EMAIL_NOTIFICATION
   )
-  const { isLoadingPermissionAndQuota, checkPermission } =
+  const { checkPermission, isLoadingPermissionAndQuota } =
     useCheckPermissionAndQuota()
   const isStudentPortalAllowed = checkPermission(
-    FeatureEnableEnum.STUDENT_PORTAL,
-    ''
+    'featureEnable',
+    FeatureEnableEnum.STUDENT_PORTAL
   )
-  const isTextVersionAllowed = checkPermission(
-    FeatureEnableEnum.TEXT_VERSION,
-    ''
-  )
+
   const isCreditSystemAllowed = checkPermission(
-    FeatureEnableEnum.CREDIT_SYSTEM,
-    ''
+    'featureEnable',
+    FeatureEnableEnum.CREDIT_SYSTEM
   )
 
   return (
@@ -84,16 +81,14 @@ const FeatureEnable = (): JSX.Element => {
                 {isStudentPortalAllowed ? (
                   <StudentPortalSetting />
                 ) : (
-                  <div className="p-8 text-center text-gray-500">
-                    {t('common:noActiveSubscription')}
-                  </div>
+                  <NoActiveSubscription />
                 )}
               </>
             )}
           </>
         )}
-        {currentSection === FeatureSections.INTEGRATIONS && (
-          <IntegrationsSetting />
+        {currentSection === FeatureSections.TEXT_VERSION && (
+          <TextVersionSetting />
         )}
         {currentSection === FeatureSections.CREDIT_SYSTEM && (
           <>
@@ -104,15 +99,12 @@ const FeatureEnable = (): JSX.Element => {
                 {isCreditSystemAllowed ? (
                   <CreditSystem />
                 ) : (
-                  <div className="p-8 text-center text-gray-500">
-                    {t('common:noActiveSubscription')}
-                  </div>
+                  <NoActiveSubscription />
                 )}
               </>
             )}
           </>
         )}
-        {currentSection === FeatureSections.CREDIT_SYSTEM && <CreditSystem />}
       </BoxWithToggleGroup>
     </div>
   )

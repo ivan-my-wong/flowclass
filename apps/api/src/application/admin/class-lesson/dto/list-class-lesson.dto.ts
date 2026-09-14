@@ -1,10 +1,9 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
 import {
   IsArray,
   IsBoolean,
   IsDate,
-  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -12,7 +11,6 @@ import {
 } from 'class-validator'
 
 import { PageOptionsDto } from '@/common/pagination/page-options.dto'
-import { SharedVideoStatus } from '@/models/enums/status'
 
 export class ListClassLessonDto {
   @ApiProperty({ required: false, isArray: true, items: { type: 'number' }, type: Number })
@@ -151,22 +149,4 @@ export class CheckQuotaResponseDto {
   @IsOptional()
   @IsArray()
   conflict?: any[]
-}
-
-export class BulkUpdateSharedVideoDto {
-  @ApiProperty({ isArray: true, items: { type: 'number' }, type: Number })
-  @IsArray()
-  @IsNumber({}, { each: true })
-  classLessonIds: number[]
-
-  @ApiPropertyOptional({ isArray: true, items: { type: 'number' }, type: Number })
-  @IsOptional()
-  @IsArray()
-  @IsNumber({}, { each: true })
-  studentLessonIds?: number[]
-
-  @ApiProperty({ enum: SharedVideoStatus })
-  @IsEnum(SharedVideoStatus)
-  @IsNotEmpty()
-  hasSharedVideo: SharedVideoStatus
 }

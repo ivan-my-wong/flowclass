@@ -35,10 +35,6 @@
     "Fri": "Fri",
     "Sat": "Sat"
   },
-  "time": {
-    "AM": "AM",
-    "PM": "PM"
-  },
   "months": {
     "January": "January",
     "February": "February",

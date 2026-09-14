@@ -19,12 +19,9 @@ const buildApplicationLink = ({
   if (!siteUrl || !validateDomain(siteUrl)) {
     throw new Error('Site URL is required')
   }
-  const environment = process.env.NODE_ENV
+  const environment = process.env.APP_ENV
 
-  const domain =
-    environment === 'local' || environment === 'development'
-      ? 'http://localhost:3001'
-      : `https://${siteUrl}`
+  const domain = environment === 'local' ? 'http://localhost:4000' : `https://${siteUrl}`
 
   const baseUrl = `${domain}/enrol`
   const url = new URL(baseUrl)
@@ -95,22 +92,4 @@ const buildSuccessPaymentLink = ({
   return successPaymentLink
 }
 
-/**
- * Upload-receipt link pointing to the CMS app (LINK_FLOWCLASS_CMS).
- * Matches the copy-link button in PaymentProofTable — the page only reads
- * `token` and `institutionId`.
- */
-const buildCmsUploadReceiptLink = ({
-  proofToken,
-  institutionId,
-}: {
-  proofToken: string
-  institutionId: number
-}): string => {
-  const cmsHost = process.env.LINK_FLOWCLASS_CMS ?? ''
-  const base = process.env.APP_ENV === 'local' ? 'http://localhost:5173' : `https://${cmsHost}`
-  const params = new URLSearchParams({ token: proofToken, institutionId: String(institutionId) })
-  return `${base}/pay/upload-receipt?${params.toString()}`
-}
-
-export { buildApplicationLink, buildCmsUploadReceiptLink, buildSuccessPaymentLink, buildUploadReceiptLink }
+export { buildApplicationLink, buildSuccessPaymentLink, buildUploadReceiptLink }

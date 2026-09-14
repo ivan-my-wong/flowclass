@@ -4,12 +4,74 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
+  changes:
+    name: Detect changed apps
+    runs-on: ubuntu-latest
+    outputs:
+      api_changed: ${{ steps.changes.outputs.api_changed }}
+      web_changed: ${{ steps.changes.outputs.web_changed }}
+      admin_changed: ${{ steps.changes.outputs.admin_changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect app changes
+        id: changes
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "api_changed=true" >> "$GITHUB_OUTPUT"
+            echo "web_changed=true" >> "$GITHUB_OUTPUT"
+            echo "admin_changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          api_changed=false
+          web_changed=false
+          admin_changed=false
+
+          if [[ "${{ github.event.before }}" == "0000000000000000000000000000000000000000" ]]; then
+            mapfile -t changed_files < <(git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA")
+          else
+            mapfile -t changed_files < <(git diff --name-only "${{ github.event.before }}" "$GITHUB_SHA")
+          fi
+
+          for file in "${changed_files[@]}"; do
+            case "$file" in
+              apps/api/*|.github/workflows/deploy.yml)
+                api_changed=true
+                ;;
+            esac
+
+            case "$file" in
+              apps/web/*|.github/workflows/deploy.yml)
+                web_changed=true
+                ;;
+            esac
+
+            case "$file" in
+              apps/admin/*|.github/workflows/deploy.yml)
+                admin_changed=true
+                ;;
+            esac
+          done
+
+          echo "api_changed=$api_changed" >> "$GITHUB_OUTPUT"
+          echo "web_changed=$web_changed" >> "$GITHUB_OUTPUT"
+          echo "admin_changed=$admin_changed" >> "$GITHUB_OUTPUT"
+
   deploy:
     runs-on: ubuntu-latest
     environment: production
-
+    needs: changes
+    if: |
+      needs.changes.outputs.api_changed == 'true' ||
+      needs.changes.outputs.web_changed == 'true' ||
+      needs.changes.outputs.admin_changed == 'true'
     steps:
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -34,13 +96,16 @@ jobs:
           FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
           FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
           FIREBASE_CLIENT_ID: ${{ secrets.FIREBASE_CLIENT_ID }}
+          API_CHANGED: ${{ needs.changes.outputs.api_changed }}
+          WEB_CHANGED: ${{ needs.changes.outputs.web_changed }}
+          ADMIN_CHANGED: ${{ needs.changes.outputs.admin_changed }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
           script_stop: true
-          envs: DATABASE_URL,JWT_SECRET,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_REGION,AWS_BUCKET_NAME,AWS_PRIVATE_BUCKET_NAME,MAILERSEND_API_KEY,MAIL_FROM_ADDRESS,MAIL_FROM_NAME,STRIPE_SECRET_KEY,STRIPE_ENDPOINT_SECRET,STRIPE_CONNECT_ENDPOINT_SECRET,STRIPE_SUBSCRIPTION_SUCCESS_URL,STRIPE_SUBSCRIPTION_CANCEL_URL,NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,FIREBASE_PROJECT_ID,FIREBASE_PRIVATE_KEY,FIREBASE_CLIENT_EMAIL,FIREBASE_CLIENT_ID
+          envs: DATABASE_URL,JWT_SECRET,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_REGION,AWS_BUCKET_NAME,AWS_PRIVATE_BUCKET_NAME,MAILERSEND_API_KEY,MAIL_FROM_ADDRESS,MAIL_FROM_NAME,STRIPE_SECRET_KEY,STRIPE_ENDPOINT_SECRET,STRIPE_CONNECT_ENDPOINT_SECRET,STRIPE_SUBSCRIPTION_SUCCESS_URL,STRIPE_SUBSCRIPTION_CANCEL_URL,NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,FIREBASE_PROJECT_ID,FIREBASE_PRIVATE_KEY,FIREBASE_CLIENT_EMAIL,FIREBASE_CLIENT_ID,API_CHANGED,WEB_CHANGED,ADMIN_CHANGED
           script: |
             echo "==> Accessing application directory..."
             cd /var/www/flowclass-open-source
@@ -93,17 +158,34 @@ jobs:
             printf "FIREBASE_CLIENT_EMAIL=%s\n" "$FIREBASE_CLIENT_EMAIL" >> .env
             printf "FIREBASE_CLIENT_ID=%s\n" "$FIREBASE_CLIENT_ID" >> .env
             
-            echo "==> Building production Docker images..."
-            docker compose -f docker-compose.prod.yml build
+            # Determine which services need to be built and restarted
+            BUILD_SERVICES=""
+            if [[ "$API_CHANGED" == "true" ]]; then
+              BUILD_SERVICES="$BUILD_SERVICES api"
+            fi
+            if [[ "$WEB_CHANGED" == "true" ]]; then
+              BUILD_SERVICES="$BUILD_SERVICES web"
+            fi
+            if [[ "$ADMIN_CHANGED" == "true" ]]; then
+              BUILD_SERVICES="$BUILD_SERVICES admin"
+            fi
+
+            if [[ -n "$BUILD_SERVICES" ]]; then
+              echo "==> Building production Docker images for:$BUILD_SERVICES..."
+              docker compose -f docker-compose.prod.yml build $BUILD_SERVICES
+            else
+              echo "==> No application changes detected. Skipping Docker build."
+            fi
             
-            echo "==> Running database migrations on Supabase..."
-            docker compose -f docker-compose.prod.yml run --rm api pnpm migration:up:prod
+            if [[ "$API_CHANGED" == "true" ]]; then
+              echo "==> Running database migrations on Supabase..."
+              docker compose -f docker-compose.prod.yml run --rm api pnpm migration:up:prod
+            fi
             
-            echo "==> Starting production Docker containers..."
+            echo "==> Deploying Docker containers..."
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
             
             echo "==> Cleaning up unused Docker images..."
             docker image prune -f
             
             echo "==> Clean Docker-based deployment completed successfully!"
-

@@ -1,43 +1,28 @@
-import { cn } from '@/utils/cn'
+import { styled } from '../../styles'
 
-type TableProps = React.ComponentProps<'table'>
-type TheadProps = React.ComponentProps<'thead'>
-type TrProps = React.ComponentProps<'tr'>
-type TdProps = React.ComponentProps<'td'>
+export const Table = styled('table', {
+  borderCollapse: 'collapse',
+  width: '100%',
+})
+export const Thead = styled('thead', {})
+export const TrHead = styled('tr', {
+  border: '1px solid #ddd',
+  backgroundColor: '$backgroundLayer3',
+  padding: '$2',
+  height: 50,
+})
+export const TrBody = styled('tr', {
+  border: '1px solid #ddd',
+  height: 50,
+})
+export const TdPrepareTable = styled('td', {
+  border: '1px solid #ddd',
+  padding: '8px',
+  minWidth: '70px',
+  lineHeight: '22px',
+})
 
-export const Table = ({ className, ...props }: TableProps) => (
-  <table className={cn('border-collapse w-full', className)} {...props} />
-)
-
-export const Thead = (props: TheadProps) => <thead {...props} />
-
-export const TrHead = ({ className, ...props }: TrProps) => (
-  <tr
-    className={cn(
-      'border border-[#ddd] bg-background-layer-3 p-2 h-[50px]',
-      className
-    )}
-    {...props}
-  />
-)
-
-export const TrBody = ({ className, ...props }: TrProps) => (
-  <tr className={cn('border border-[#ddd] h-[50px]', className)} {...props} />
-)
-
-export const TdPrepareTable = ({ className, ...props }: TdProps) => (
-  <td
-    className={cn(
-      'border border-[#ddd] p-2 min-w-[70px] leading-[22px]',
-      className
-    )}
-    {...props}
-  />
-)
-
-export const Td = ({ className, ...props }: TdProps) => (
-  <TdPrepareTable
-    className={cn('min-w-[170px] text-center', className)}
-    {...props}
-  />
-)
+export const Td = styled(TdPrepareTable, {
+  minWidth: '170px',
+  textAlign: 'center',
+})

@@ -1,7 +1,7 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
 
 import { EnrollCourse } from '@/models/enroll-courses.entity'
-import { AttendanceStatus, SharedVideoStatus } from '@/models/enums/status'
+import { AttendanceStatus } from '@/models/enums/status'
 import { StudentSchedule } from '@/models/student-schedule.entity'
 import { User } from '@/models/user.entity'
 import { BaseEntity } from '@/modules/base/base.entity'
@@ -23,6 +23,7 @@ export class StudentLesson extends BaseEntity {
   @Column({ name: 'course_id' })
   courseId: number
 
+  @Index('IX_student_lesson_enroll_course_id')
   @Column({ name: 'enroll_course_id', nullable: true })
   enrollCourseId: number
 
@@ -44,6 +45,7 @@ export class StudentLesson extends BaseEntity {
   @JoinColumn({ name: 'class_id' })
   class: ClassEntity
 
+  @Index('IX_student_lesson_student_schedule_id')
   @Column({ name: 'student_schedule_id', nullable: true })
   studentScheduleId: number
 
@@ -135,15 +137,4 @@ export class StudentLesson extends BaseEntity {
     default: () => "NOW() + INTERVAL '30 days'",
   })
   expiryDate: Date
-
-  @Column({ name: 'remarks', type: 'text', nullable: true, default: null })
-  remarks: string | null
-
-  @Column({
-    name: 'has_shared_video',
-    type: 'varchar',
-    nullable: true,
-    default: SharedVideoStatus.NONE,
-  })
-  hasSharedVideo?: SharedVideoStatus
 }

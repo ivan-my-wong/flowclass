@@ -2,13 +2,14 @@ module.exports = {
   apps: [
     {
       name: 'flowclass-web',
-      script: 'pnpm',
-      args: 'start',
+      script: './node_modules/next/dist/bin/next',
+      args: 'start -p 3001',
       instances: 1,
       exec_mode: 'fork',
-      interpreter: 'none',
       env: {
+        PORT: 3001,
         NODE_ENV: 'production',
+        APP_ENV: 'production',
         NODE_OPTIONS: '--max-old-space-size=3584', // 3.5GB V8 heap size to prevent OOM crashes
       },
       autorestart: true,
@@ -34,6 +35,7 @@ module.exports = {
       ignore_watch: ['node_modules', 'logs', '.git'],
       env_production: {
         NODE_ENV: 'production',
+        APP_ENV: 'production',
         NODE_OPTIONS: '--max-old-space-size=3584', // 3.5GB V8 heap size to prevent OOM crashes
       },
     },

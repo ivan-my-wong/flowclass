@@ -1,6 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
 
-import { StudentNotificationSettings } from '@/application/admin/student-onboard/dtos/student-memo.dto'
+import { StudentMemo } from '@/models/student-memo.entity'
 import { User } from '@/models/user.entity'
 import { BaseEntity } from '@/modules/base/base.entity'
 
@@ -19,6 +19,7 @@ export class UserAlias extends BaseEntity {
   @Column({ name: 'user_id' })
   userId: number
 
+  @Index('IX_user_aliases_institution_id')
   @Column({ name: 'institution_id', nullable: true })
   institutionId: number
 
@@ -48,12 +49,6 @@ export class UserAlias extends BaseEntity {
   @Column({ name: 'alias_password', nullable: true, select: false })
   aliasPassword?: string
 
-  @Column({ name: 'remarks', nullable: true, type: 'text' })
-  remarks?: string | null
-
-  @Column({ name: 'secondary_email', nullable: true })
-  secondaryEmail?: string | null
-
   @ManyToOne(() => User, (user) => user.aliases)
   @JoinColumn({ name: 'user_id' })
   user: User
@@ -66,20 +61,8 @@ export class UserAlias extends BaseEntity {
   @JoinColumn({ name: 'ref_user_id' })
   refUser: User
 
-  @Column({ name: 'memo', default: '', nullable: true })
-  memo: string
-
-  @Column({ name: 'assignable_lesson_count', default: 0, nullable: true })
-  assignableLessonCount: number
-
-  @Column({ name: 'overdue_reminder', type: 'jsonb', nullable: true, default: {} })
-  overdueReminder?: StudentNotificationSettings
-
-  @Column({ name: 'lesson_reminder', type: 'jsonb', nullable: true, default: {} })
-  lessonReminder?: StudentNotificationSettings
-
-  @Column({ name: 'payment_reminder', type: 'jsonb', nullable: true, default: {} })
-  paymentReminder?: StudentNotificationSettings
+  @OneToMany(() => StudentMemo, (studentMemo) => studentMemo.userAlias)
+  studentMemos: StudentMemo[]
 
   @OneToMany(() => StudentForm, (studentForm) => studentForm.userAlias)
   studentForms: StudentForm[]

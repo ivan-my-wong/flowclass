@@ -24,6 +24,7 @@ export class StudentForm extends BaseEntity {
   @Column({ name: 'user_id' })
   userId: number
 
+  @Index('IX_student_form_user_alias_id')
   @Column({ name: 'user_alias_id', nullable: true })
   userAliasId: number
 

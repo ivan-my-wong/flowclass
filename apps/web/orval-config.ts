@@ -1,11 +1,16 @@
-import path from 'path';
 import { defineConfig } from 'orval';
 import dotenv from 'dotenv';
 
-// Load from monorepo root
-const rootDir = path.resolve(__dirname, '../..');
-dotenv.config({ path: path.join(rootDir, '.env'), override: false });
-dotenv.config({ path: path.join(rootDir, '.env.local'), override: true });
+// Load environment variables
+const ENV = process.env.NODE_ENV || 'development'
+const envPath = [
+    `.env.${ENV}`,
+    `.env.${ENV}.local`,
+]
+dotenv.config({
+    path: envPath,
+    override: true,
+});
 
 export default defineConfig({
     flowclassApi: {
@@ -36,7 +41,7 @@ export default defineConfig({
             tsconfig: './tsconfig.json',
         },
         input: {
-            target: 'http://localhost:3100/api-json',
+            target: process.env.NEXT_PUBLIC_OPENAPI_URL || 'http://localhost:5001/api-json',
             validation: false, // Validates the OpenAPI specification
             override: {
                 // Only receive js file

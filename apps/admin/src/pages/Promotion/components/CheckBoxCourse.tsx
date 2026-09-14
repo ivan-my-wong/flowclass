@@ -4,6 +4,7 @@ import React from 'react'
 import Checkbox from '../../../components/Checkbox/Checkbox'
 import Box from '../../../components/Containers/Box'
 import ImageAspect from '../../../components/Images/ImageAspect'
+import { styled } from '../../../styles'
 
 export type CheckboxCourseProps = {
   items: CheckboxCourseOptionProps[]
@@ -23,10 +24,25 @@ const CheckboxCourse: React.FC<CheckboxCourseProps> = ({
   handleValueChange,
 }) => {
   return (
-    <Box className="flex gap-4 w-full flex-wrap">
+    <Box
+      css={{
+        display: 'flex',
+        gap: '$3',
+        width: '100%',
+        flexWrap: 'wrap',
+      }}
+    >
       {items.map(item => (
-        <Box key={item.id} direction="column" className="mt-6">
-          <Box className="w-full h-full flex items-center">
+        <Box key={item.id} direction="column" css={{ marginTop: '$6' }}>
+          <Box
+            css={{
+              all: 'unset',
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
             <Box gap="large" justify="flex-start">
               <Checkbox
                 name="test"
@@ -43,22 +59,43 @@ const CheckboxCourse: React.FC<CheckboxCourseProps> = ({
                 alt={item.id}
               />
 
-              <label
+              <Label
                 htmlFor={item.id}
-                className="flex flex-grow items-center whitespace-nowrap text-text text-base font-semibold leading-none pl-[15px]"
+                css={{
+                  display: 'flex',
+                  flexGrow: 1,
+                  alignItems: 'center',
+                  whiteSpace: 'nowrap',
+                }}
               >
                 {item.label}
-              </label>
+              </Label>
             </Box>
           </Box>
           <Box
             direction="column"
-            className="mt-6 ml-8 pl-[25px] border-l border-text-disabled"
+            css={{
+              margin: '$6  0 0 $8',
+              paddingLeft: '25px',
+              borderLeft: '1px solid $colors$textDisabled',
+            }}
           >
             {item.children &&
               item.children.map(subItem => (
-                <Box key={subItem.id} direction="column" className="mb-6">
-                  <Box className="w-full h-full flex items-center">
+                <Box
+                  key={subItem.id}
+                  direction="column"
+                  css={{ marginBottom: '$6' }}
+                >
+                  <Box
+                    css={{
+                      all: 'unset',
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
                     <Box gap="large" justify="flex-start">
                       <Checkbox
                         name="test"
@@ -76,12 +113,17 @@ const CheckboxCourse: React.FC<CheckboxCourseProps> = ({
                           alt={item.id}
                         />
                       )}
-                      <label
+                      <Label
                         htmlFor={subItem.id}
-                        className="flex flex-grow items-center whitespace-nowrap text-text text-base font-semibold leading-none pl-[15px]"
+                        css={{
+                          display: 'flex',
+                          flexGrow: 1,
+                          alignItems: 'center',
+                          whiteSpace: 'nowrap',
+                        }}
                       >
                         {subItem.label}
-                      </label>
+                      </Label>
                     </Box>
                   </Box>
                 </Box>
@@ -92,5 +134,13 @@ const CheckboxCourse: React.FC<CheckboxCourseProps> = ({
     </Box>
   )
 }
+
+const Label = styled('label', {
+  color: '$text',
+  fontSize: '$4',
+  fontWeight: 600,
+  lineHeight: 1,
+  paddingLeft: 15,
+})
 
 export default CheckboxCourse

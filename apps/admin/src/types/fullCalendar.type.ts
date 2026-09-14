@@ -71,6 +71,7 @@ export enum SemanticDatePreset {
   Last3Months = 'last3Months',
   ThisYear = 'thisYear',
   LastYear = 'lastYear',
+  AllTime = 'allTime',
 }
 
 export enum RollingDatePreset {

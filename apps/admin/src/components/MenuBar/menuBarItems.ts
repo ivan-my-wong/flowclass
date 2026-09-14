@@ -25,7 +25,6 @@ import {
 // import LessonDateTimeIcon from '@/assets/svgs/LessonDateTimeIcon'
 import { RiWhatsappLine } from 'react-icons/ri'
 
-// import LessonDateTimeIcon from '@/assets/svgs/LessonDateTimeIcon'
 import { UserRole } from '@/stores/userPermissionData'
 import { SiteFeature } from '@/types/site-feature'
 
@@ -119,6 +118,17 @@ const menuItems: MenuItem[] = [
   },
 
   {
+    label: FeatureMenu.PaymentCampaign,
+    icon: LuAppWindow,
+    path: '/invoice-templates',
+    permissions: [
+      UserRole.MasterAdmin,
+      UserRole.SchoolAdmin,
+      UserRole.SiteAdmin,
+    ],
+  },
+
+  {
     label: 'headings.schedule',
     icon: LuRocket,
     path: '#',
@@ -146,6 +156,7 @@ const menuItems: MenuItem[] = [
       UserRole.SiteAdmin,
       UserRole.SchoolAdmin,
     ],
+    availableSites: [],
   },
   {
     label: 'rescheduleApproval',
@@ -353,18 +364,29 @@ const menuItems: MenuItem[] = [
     ],
   },
 
-  // {
-  //   label: 'subscription',
-  //   icon: LuCreditCard,
-  //   path: '/subscription',
-  //   permissions: [
-  //     UserRole.MasterAdmin,
-  //     UserRole.SiteAdmin,
-  //     UserRole.SchoolAdmin,
-  //     UserRole.Instructor,
-  //     UserRole.Operations,
-  //   ],
-  // },
+  {
+    label: 'subscription',
+    icon: LuCreditCard,
+    path: '/subscription',
+    permissions: [
+      UserRole.MasterAdmin,
+      UserRole.SiteAdmin,
+      UserRole.SchoolAdmin,
+      UserRole.Instructor,
+      UserRole.Operations,
+    ],
+  },
+
+  {
+    label: 'integrations',
+    icon: LuLink,
+    path: '/integrations',
+    permissions: [
+      UserRole.MasterAdmin,
+      UserRole.SiteAdmin,
+      UserRole.SchoolAdmin,
+    ],
+  },
 
   {
     label: 'featureEnable',
@@ -391,7 +413,8 @@ const menuItems: MenuItem[] = [
   {
     label: 'whatsappTemplate',
     icon: RiWhatsappLine,
-    path: '/whatsapp-templates',
+    path: '/custom-messages',
+    // availableSites: [318],
     permissions: [
       UserRole.MasterAdmin,
       UserRole.SiteAdmin,
@@ -488,6 +511,13 @@ const menuItems: MenuItem[] = [
     label: 'admin',
     icon: LuUser,
     path: '/admin',
+    permissions: [UserRole.MasterAdmin],
+  },
+
+  {
+    label: 'chargeClients',
+    icon: LuRocket,
+    path: '/admin/manage-clients',
     permissions: [UserRole.MasterAdmin],
   },
 ]

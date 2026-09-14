@@ -1,7 +1,7 @@
-import { WhatsappService } from '@/domain/external/whatsapp.service'
+import { MetaWhatsappService } from '@/domain/external/meta-whatsapp.service'
 
 class SendWhatsappWorker {
-  constructor(private readonly whatsappService: WhatsappService) {}
+  constructor(private readonly whatsappService: MetaWhatsappService) {}
 }
 
 export default SendWhatsappWorker

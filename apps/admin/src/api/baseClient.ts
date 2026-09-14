@@ -88,6 +88,11 @@ export default class BaseClient {
   ): Record<string, string> | undefined {
     if (!needAuth) return undefined
 
+    const firebaseToken = localStorage.getItem(LocalStorageKeys.Firebase)
+    if (firebaseToken) {
+      return { Authorization: `Firebase ${firebaseToken}` }
+    }
+
     const accessToken = localStorage.getItem(LocalStorageKeys.UserAccessToken)
     if (!accessToken) return undefined
 

@@ -23,12 +23,46 @@ import { Button } from '@/components/ui/Button'
 import useCourseData from '@/hooks/useCourseData'
 import { schoolState } from '@/stores/schoolData'
 import { siteState } from '@/stores/siteData'
+import { keyframes, styled } from '@/styles'
 import { Course } from '@/types/course'
-import { cn } from '@/utils/cn'
 import { generatePathFromName } from '@/utils/generate-link.utils'
 import { validateDomain } from '@/utils/validate'
 
 import { initializeCourseSectionValues } from './EditCourse/PageContent'
+
+const StyledOverlay = styled(Overlay, {
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  position: 'fixed',
+  inset: 0,
+})
+
+const contentShow = keyframes({
+  '0%': { opacity: 0, transform: 'translate(-50%, -50%) scale(.1)' },
+  '100%': { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
+})
+
+const StyledContent = styled(Content, {
+  display: 'flex',
+  flexDirection: 'column',
+  backgroundColor: '$background',
+  position: 'fixed',
+  top: '50%',
+  left: '50%',
+  gap: '$4',
+  transform: 'translate(-50%, -50%)',
+  maxWidth: '90%',
+  minWidth: '50%',
+  maxHeight: '90vh',
+  overflowY: 'auto',
+  borderRadius: '$medium',
+  padding: '$large',
+  boxShadow: `$shadows[1]`,
+  zIndex: '$modalContent',
+  animation: `${contentShow} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
+  '@sm': {
+    minWidth: '90%',
+  },
+})
 
 type CreateCourseModalProps = {
   hidden?: boolean
@@ -107,30 +141,25 @@ const CreateCourseModal = forwardRef<
         <></>
       </Trigger>
       <Portal>
-        <Overlay
-          className="fixed inset-0 bg-black/50 data-[state=open]:animate-dialog-overlay data-[state=closed]:animate-none"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-        />
-        <Content
-          className={cn(
-            'flex flex-col fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-            'gap-4 max-w-[90%] min-w-[50%] md:min-w-[90%] max-h-[90vh] overflow-y-auto',
-            'rounded-lg p-6 bg-background z-[1050]',
-            'data-[state=open]:animate-dialog-content data-[state=closed]:animate-none'
-          )}
-        >
+        <StyledOverlay />
+        <StyledContent>
           <Title>{t('teachingService:createCourseModal.title')}</Title>
           <Separator />
           <Text>{`${t('teachingService:createCourseModal.textInput')}:`}</Text>
           <Box
             justify="space-between"
             responsive
-            className="md:gap-6 md:items-start"
+            css={{
+              '@sm': {
+                gap: '$6',
+                alignItems: 'flex-start',
+              },
+            }}
           >
             <Box
               direction="column"
               justify="flex-start"
-              className="md:items-start"
+              css={{ '@sm': { alignItems: 'flex-start' } }}
             >
               <Box>
                 <TextInput
@@ -168,10 +197,16 @@ const CreateCourseModal = forwardRef<
                   })}
                 />
               </Box>
-              <Text className="mt-4">{`${t(
+              <Text css={{ marginTop: '$4' }}>{`${t(
                 `teachingService:view.courseLink`
               )}: `}</Text>
-              <Text className="break-all leading-tight underline">
+              <Text
+                css={{
+                  wordBreak: 'break-all',
+                  lineHeight: 1.25,
+                  textDecoration: 'underline',
+                }}
+              >
                 {customLink}
               </Text>
             </Box>
@@ -189,7 +224,7 @@ const CreateCourseModal = forwardRef<
             )}
           </Button>
           <ModalCloseButton />
-        </Content>
+        </StyledContent>
       </Portal>
     </Root>
   )

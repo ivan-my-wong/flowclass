@@ -20,6 +20,7 @@ import Box from '@/components/ui/Box'
 import { Button } from '@/components/ui/Button'
 import ModalDialog from '@/components/ui/ModalDialog'
 import { Switch } from '@/components/ui/Switch'
+import { styled } from '@/styles'
 import { DateOverride } from '@/types/availability.type'
 import { formatChartDate, getDateStringByTimeString } from '@/utils/timeString'
 
@@ -161,8 +162,7 @@ const AddDateOverride = ({
       scrollable
     >
       <div className="box-responsive-full gap-4">
-        <DayPicker
-          className="[&_.rdp-nav]:z-[1050]"
+        <StyledDaypicker
           mode="single"
           selected={dateSelection}
           onSelect={setDateSelection}
@@ -305,3 +305,9 @@ const AddDateOverride = ({
 }
 
 export default AddDateOverride
+
+const StyledDaypicker = styled(DayPicker, {
+  '.rdp-nav': {
+    zIndex: '$modalContent',
+  },
+})

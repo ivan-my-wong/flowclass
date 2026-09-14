@@ -50,7 +50,14 @@ export const getServerSideProps: GetServerSideProps = async ({
     }
   }
 
-  const site = await getSiteByDomain(domain)
+  let site = null
+  try {
+    site = await getSiteByDomain(domain)
+  } catch (error) {
+    return {
+      notFound: true,
+    }
+  }
 
   if (!query) {
     return {

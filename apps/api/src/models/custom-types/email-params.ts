@@ -1,3 +1,5 @@
+import { Attachment } from 'mailersend'
+import { Personalization, Variable } from 'mailersend/lib/modules/Email.module'
 import { Mixin } from 'ts-mixer'
 
 import { SupportedType } from '@/application/admin/custom-messages/dto/custom-message.dto'
@@ -6,7 +8,7 @@ import {
   StudentData,
   StudentMultipleClassInfo,
 } from '@/application/student/enroll-courses/dto/create-enroll-course.dto'
-import { Attachment, Personalization, Variable } from '@/domain/external/email-transport.provider'
+import { AutomationFlow } from '@/models/automation-flow.entity'
 import { StudentEnrollCourseAlias } from '@/models/custom-types/enroll-course'
 import { EnrollCourse } from '@/models/enroll-courses.entity'
 import { PaymentMethod } from '@/models/enums'
@@ -145,7 +147,9 @@ export class ClassAdminPaymentConfirmationEmailParams extends Mixin(
   CourseEmailParams,
   ApplicationEmailParams,
   PaymentEmailParams
-) {}
+) {
+  attachments?: any[]
+}
 
 export class ClassAdminPaymentSubmittedEmailParams extends Mixin(
   CommonEmailParams,
@@ -216,14 +220,15 @@ export class SendEmailPayload {
   emailAddress: string
   recipientUserId: number
   recipientName: string
-  templateId: string
+  templateId?: string
   notificationType: SupportedType | NotificationType
-  personalization: Variable[]
+  personalization?: Variable[]
   advancePersonalization?: Personalization[]
   institutionId?: number
   institutionName?: string
   siteId?: number
   attachments?: Attachment[]
+  html?: string
 }
 
 export interface RemindPaymentT0 {
@@ -288,6 +293,7 @@ export type StudentLessonReminderDataDto = {
 
 export type StudentLessonReminderDto = {
   data: StudentLessonReminderDataDto
+  automationFlow?: AutomationFlow
   enrollCourse?: EnrollCourse
   customTemplateId?: string
 }
@@ -312,6 +318,7 @@ export type StudentPostPoneParams = {
 
 export type ReminderEnrollCourseParams<T> = {
   emailData: T
+  automationFlow?: AutomationFlow
   enrollCourse?: EnrollCourse
 }
 
@@ -322,6 +329,7 @@ export type SendRequestAiCreditParams = {
 
 export type SendEmailParams = {
   emailPayload: SendEmailPayload
+  automationFlow?: AutomationFlow
   enrollCourse?: EnrollCourse
 }
 
@@ -333,6 +341,7 @@ export type SendStudentConfirmCourseParams = {
   payload: ClassStudentConfirmationEmailParams
   enrollCourse: EnrollCourse
   invoice: Partial<Invoice>
+  automationFlow?: AutomationFlow
 }
 
 export type SendStudentPaymentRejectParams = {
@@ -375,6 +384,7 @@ export type SendAssignCouponParams = {
   couponCode: string
   discountAmountUnit: string
   expiredDate: Date
+  institutionId?: number
 }
 
 export type SendForgetPasswordParams = {
@@ -404,6 +414,7 @@ export type SendClassStudentWaitingParams = {
   firstStudentAccount: StudentEnrollCourseAlias
   parentUserAlias?: UserAlias
   params: SendEmailFunctionBuildParams
+  automationFlow?: AutomationFlow
 }
 
 export type GetPaymentMethodParams = {
@@ -454,7 +465,6 @@ export type RequestTimeChangeEmailProps = {
   studentEmail: string
   studentName: string
   status: RequestTimeChangeStatus
-  institutionId: number
   institutionName: string
   newClassDateTime: string
   originalClassDateTime: string
@@ -474,7 +484,6 @@ export type SendClassMaterialsEmailProps = {
   emailAddress: string
   courseName: string
   className: string
-  institutionId: number
   institutionName: string
   studentName: string
   siteLink: string

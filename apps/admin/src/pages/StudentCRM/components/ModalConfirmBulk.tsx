@@ -80,6 +80,12 @@ const ModalConfirmBulk = (params: IProps) => {
             <div className="w-full md:col-span-3 px-2 text-sm">
               <div className="font-semibold">{selectedCourse?.name}</div>
               <div>{selectedClass?.name}</div>
+              {/** TODO: Do later, because we need to calculate the tuition mode */}
+              {/* <div>
+                {`${currency} ${getSymbolFromCurrency(currency ?? '')} ${
+                  selectedClass?.tuition
+                }`}
+              </div> */}
             </div>
           </div>
 

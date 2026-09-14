@@ -6,6 +6,8 @@ import { AiOutlineStop } from 'react-icons/ai'
 import { FaCheckCircle } from 'react-icons/fa'
 import { LuX } from 'react-icons/lu'
 
+import { theme } from '@/styles'
+
 import LoadingButton from '../Buttons/LoadingButton'
 import Text from '../Texts/Text'
 import Box from '../ui/Box'
@@ -58,9 +60,7 @@ const SelectedActions: React.FC<SelectedActionsProps> = ({
             variant="ghost"
             className="rounded-full h-8 w-8 hover:bg-background-disabled hover:text-text-sub justify-center text-center p-0"
           >
-            <span className="text-primary">
-              <LuX fill="currentColor" />
-            </span>
+            <LuX fill={theme.colors.primary.toString()} />
           </Button>
           <p>
             {selectedCount} {countText}

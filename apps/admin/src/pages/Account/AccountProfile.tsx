@@ -16,7 +16,21 @@ import { countryOptions } from '@/constants/countryConfig'
 import ContentLayout from '@/layouts/ContentLayout'
 import { siteState } from '@/stores/siteData'
 import { defaultUserState } from '@/stores/userData'
+import { styled } from '@/styles'
 import { UserState } from '@/types/user'
+
+const Container = styled('div', {
+  width: '100%',
+  padding: '$6 $6 0 $6',
+
+  borderRadius: '$2',
+  backgroundColor: '$backgroundLayer2',
+})
+
+const Section = styled('div', {
+  width: '100%',
+  marginBottom: '$6',
+})
 
 const ProfilePage = (): JSX.Element => {
   const { t } = useTranslation()
@@ -32,12 +46,12 @@ const ProfilePage = (): JSX.Element => {
   const loadProfile = async (): Promise<void> => {
     const res = await getUserProfile()
     setProfile(res)
-    setEmail(res.email ?? '')
-    setFirstName(res.firstName ?? '')
-    setLastName(res.lastName ?? '')
-    setCompany(res.company ?? '')
-    setPhone(res.phone ?? '')
-    setPosition(res.position ?? '')
+    setEmail(res.email)
+    setFirstName(res.firstName)
+    setLastName(res.lastName)
+    setCompany(res.company != null ? res.company : '')
+    setPhone(res.phone != null ? res.phone : '')
+    setPosition(res.position != null ? res.position : '')
   }
 
   const updateProfile = async (): Promise<void> => {
@@ -45,6 +59,7 @@ const ProfilePage = (): JSX.Element => {
       email,
       firstName,
       lastName,
+      firebaseId: profile.firebaseId,
       company,
       phone,
       country: profile.country,
@@ -101,9 +116,9 @@ const ProfilePage = (): JSX.Element => {
     >
       <Box justify="start" direction="col" padding="lg">
         {/* <Heading>{t(`account:updateProfile`)}</Heading> */}
-        <div className="w-full pt-6 px-6 rounded-lg bg-background-layer-2">
+        <Container>
           <form action="" method="POST">
-            <div className="w-full mb-6">
+            <Section>
               <TextInput
                 disabled
                 label={t(`account:email`)}
@@ -111,8 +126,8 @@ const ProfilePage = (): JSX.Element => {
                 value={email}
                 placeholder={email}
               />
-            </div>
-            <div className="w-full mb-6">
+            </Section>
+            <Section>
               <LabelInput label={t(`account:phone`)}>
                 <PhoneNumberInput
                   fullWidth
@@ -121,23 +136,23 @@ const ProfilePage = (): JSX.Element => {
                   onChange={setPhone}
                 />
               </LabelInput>
-            </div>
+            </Section>
 
             {inputFields.map(({ label, value, onChange }) => (
-              <div key={label} className="w-full mb-6">
+              <Section key={label}>
                 <TextInput
                   key={label}
-                  className="w-full"
+                  css={{ width: '100%' }}
                   id={label.toLowerCase()}
                   name={label.toLowerCase()}
                   value={value}
                   onChange={e => onChange(e.target.value)}
                   label={label}
                 />
-              </div>
+              </Section>
             ))}
           </form>
-        </div>
+        </Container>
       </Box>
     </ContentLayout>
   )

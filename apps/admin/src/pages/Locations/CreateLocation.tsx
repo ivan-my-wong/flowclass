@@ -12,6 +12,7 @@ import Box from '@/components/ui/Box'
 import Form from '@/components/ui/Form'
 import { useLocationRoom } from '@/hooks/useRoomLocation'
 import ContentLayout from '@/layouts/ContentLayout'
+import { css } from '@/styles'
 import { LocationRoomForm } from '@/types/classes'
 
 import FormLocation from './components/FormLocation'
@@ -38,6 +39,10 @@ const CreateLocation = (): JSX.Element => {
   })
   const navigate = useNavigate()
   const { t } = useTranslation()
+
+  const leftHeaderCSS = css({
+    maxHeight: '100%',
+  })
 
   const headerBackButton: HeaderBackButtonStatus = {
     mode: 'back',
@@ -77,7 +82,7 @@ const CreateLocation = (): JSX.Element => {
   return (
     <Drawer open={isOpen} onClose={handleCloseAndRemove}>
       <ContentLayout
-        leftHeaderCSS="max-h-full"
+        leftHeaderCSS={leftHeaderCSS}
         headerBackButton={headerBackButton}
         leftHeader={leftHeaderContent}
         rightHeader={rightHeaderContent}

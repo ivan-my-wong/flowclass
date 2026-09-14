@@ -1,5 +1,5 @@
 import { ReactElement, Suspense } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 
 import { useRecoilState, useRecoilValue } from 'recoil'
 
@@ -7,9 +7,12 @@ import FullScreenLoading from '@/components/FullScreen/FullScreenLoading'
 import { Spinner } from '@/components/Loaders/Spinner'
 import useAuth from '@/hooks/useAuth'
 import useSiteData from '@/hooks/useSiteData'
+import NoActiveSubscription from '@/pages/CustomMessages/components/NoActiveSubscription'
 import Forbidden from '@/pages/PageNotFound/Forbidden'
+import { schoolSubscriptionState } from '@/stores/schoolSubscriptionData'
 import { userState } from '@/stores/userData'
 import { userPermissionState, UserRole } from '@/stores/userPermissionData'
+import { hasWhatsappAccess } from '@/utils/subscription-plan.utils'
 
 interface IProtectedRouteProps {
   roleAllowed?: UserRole[]
@@ -24,7 +27,10 @@ const ProtectedRoute: React.FC<IProtectedRouteProps> = ({
   const { siteData } = useSiteData()
   const [userPermission] = useRecoilState(userPermissionState)
   const currentUser = useRecoilValue(userState)
+  const location = useLocation()
+  const { activePlan } = useRecoilValue(schoolSubscriptionState)
 
+  // set up check user role later
   if (!isLogin) {
     return <Navigate to="/login" replace />
   }
@@ -33,6 +39,7 @@ const ProtectedRoute: React.FC<IProtectedRouteProps> = ({
     return <Navigate to="/welcome/set-up" replace />
   }
 
+  // set up check user role later
   if (
     isLogin &&
     roleAllowed &&
@@ -52,6 +59,15 @@ const ProtectedRoute: React.FC<IProtectedRouteProps> = ({
     }
 
     return <Forbidden />
+  }
+
+  if (
+    location.pathname.startsWith('/custom-messages') ||
+    location.pathname.startsWith('/whatsapp-templates')
+  ) {
+    if (!hasWhatsappAccess(userPermission, currentUser, activePlan)) {
+      return <NoActiveSubscription />
+    }
   }
 
   return <Suspense fallback={<FullScreenLoading />}>{element}</Suspense>

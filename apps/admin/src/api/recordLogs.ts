@@ -1,4 +1,5 @@
 import { INotificationLogFieldsType } from '@/constants/notificationLogs'
+import { AutomationFlow } from '@/types/automationFlow'
 import { StudentActivityType } from '@/types/studentActivity.type'
 import { WhatsappTemplate } from '@/types/whatsappTemplate'
 
@@ -55,7 +56,7 @@ export type NotificationRecordItem = {
   subject: string
   message?: string
   sentAt?: Date
-  automationFlow?: { id: number; name: string }
+  automationFlow?: AutomationFlow
   whatsappTemplate?: WhatsappTemplate
   associatedClass?: AssociatedClass[]
   notificationType: NotificationType
@@ -108,3 +109,41 @@ export const getNotificationLogs = async ({
   })
   return res?.data?.data ?? []
 }
+
+export type ResendNotificationLogsRequestDto = {
+  siteId: number
+  institutionId?: number
+  recordIds: number[]
+}
+
+export type ResendNotificationLogsResponseDto = {
+  total: number
+  succeeded: number
+  failed: number
+  results: {
+    id: number
+    success: boolean
+    status: string
+    error?: string
+  }[]
+}
+
+export const resendNotificationLogs = async ({
+  siteId,
+  institutionId,
+  recordIds,
+}: ResendNotificationLogsRequestDto): Promise<ResendNotificationLogsResponseDto> => {
+  const res = await apiClient.post({
+    url: `/admin/record-logs/notification-log/resend`,
+    needAuth: true,
+    params: {
+      siteId,
+      institutionId,
+    },
+    data: {
+      recordIds,
+    },
+  })
+  return res?.data?.data
+}
+

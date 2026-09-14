@@ -59,8 +59,19 @@ const defaultStudentState: StudentState = {
   tableDrawers: initialDrawerState,
   initFetch: false,
 }
+type MemoTypes = {
+  [key: number]: {
+    memo: string | null
+    isShow: boolean
+  }
+}
 export const studentState = atom<StudentState>({
   key: ATOM_KEY.StudentState,
   default: defaultStudentState,
   effects: [persistLocalStorage],
+})
+
+export const remarksState = atom<MemoTypes>({
+  key: ATOM_KEY.RemarkState,
+  default: {},
 })

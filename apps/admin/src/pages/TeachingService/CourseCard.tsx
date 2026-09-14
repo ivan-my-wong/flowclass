@@ -26,6 +26,7 @@ import useCourseData from '@/hooks/useCourseData'
 import { useResponsive } from '@/hooks/useResponsive'
 import useSiteData from '@/hooks/useSiteData'
 import { AlertTypes } from '@/reducers/confirm.reducers'
+import { styled } from '@/styles'
 import { Course } from '@/types/course'
 import { rearrangeOrder } from '@/utils/convert'
 import { getCourseIcon } from '@/utils/options'
@@ -202,7 +203,7 @@ const CourseCard = ({
         type: 'item',
         content: (
           <>
-            <SvgIcon className="mr-4">
+            <SvgIcon css={{ marginRight: '1rem' }}>
               <EditIcon />
             </SvgIcon>
             <Text>{t('teachingService:dropDownMenu.edit')}</Text>
@@ -217,7 +218,7 @@ const CourseCard = ({
         type: 'item',
         content: (
           <>
-            <SvgIcon className="mr-4">
+            <SvgIcon css={{ marginRight: '1rem' }}>
               <CopyIcon />
             </SvgIcon>
             <Text>{t('teachingService:dropDownMenu.copy')}</Text>
@@ -275,7 +276,7 @@ const CourseCard = ({
           disabled: hasInvoices,
           content: (
             <>
-              <SvgIcon className="mr-4">
+              <SvgIcon css={{ marginRight: '1rem' }}>
                 <DeleteIcon fill="var(--colors-warn)" />
               </SvgIcon>
               <Text>{t('teachingService:dropDownMenu.delete')}</Text>
@@ -343,11 +344,7 @@ const CourseCard = ({
 
   return (
     <Card className="box-col p-4 bg-background-layer-2 hover:bg-background-layer-3">
-      <Box
-        responsive
-        gap="medium"
-        className="flex flex-row justify-start items-center rounded-md md:w-full md:items-start"
-      >
+      <ImageBox responsive gap="medium" className="items-center">
         <ImageAspect
           s3="public"
           ratio={16 / 9}
@@ -406,12 +403,10 @@ const CourseCard = ({
 
           <div className="box-row-full justify-start flex-wrap">{allRows}</div>
         </Box>
-      </Box>
+      </ImageBox>
 
-      <div
+      <DropDownMenuContainer
         id={`${course.name}-dropdown`}
-        role="group"
-        className="absolute w-fit top-6 right-6 z-[1]"
         onClick={e => e.stopPropagation()}
       >
         <DropdownMenu
@@ -422,7 +417,7 @@ const CourseCard = ({
             zIndex: 999,
           }}
         />
-      </div>
+      </DropDownMenuContainer>
 
       {/* Delete Confirmation Modal */}
       <CustomedAlertDialog
@@ -465,5 +460,25 @@ const CourseCard = ({
     </Card>
   )
 }
+
+const ImageBox = styled(Box, {
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-start !important',
+  alignItems: 'center',
+  borderRadius: '$medium',
+  '@md': {
+    width: '100%',
+    alignItems: 'flex-start!important',
+  },
+})
+
+const DropDownMenuContainer = styled(Box, {
+  position: 'absolute !important',
+  width: 'fit-content !important',
+  top: '1.5rem',
+  right: '1.5rem',
+  zIndex: 1,
+})
 
 export default CourseCard

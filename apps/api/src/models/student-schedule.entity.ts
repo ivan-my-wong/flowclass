@@ -28,6 +28,7 @@ export class StudentSchedule extends BaseEntity {
   @Column({ name: 'period_id', nullable: true })
   periodId: number
 
+  @Index('IX_student_schedule_invoice_id')
   @Column({ name: 'invoice_id', nullable: true })
   invoiceId: number
 

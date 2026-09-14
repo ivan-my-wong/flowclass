@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Dispatch, SetStateAction } from 'react'
+import { Dispatch, SetStateAction, useMemo } from 'react'
 
 import { useTranslation } from 'react-i18next'
 
@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/Select'
 import { whatsAppStatusesSupported } from '@/constants/whatsappTemplate'
+import useAutomationFlowData from '@/hooks/useAutomationFlowData'
 
 type PropsType = {
   params: Record<string, any>
@@ -23,6 +24,19 @@ const FilterWhatsappTemplate = ({
 }: PropsType): JSX.Element => {
   const { t } = useTranslation()
 
+  const { useFetchAutomationFunctions } = useAutomationFlowData()
+  const { data: dataFunctions } = useFetchAutomationFunctions()
+  const functionsOptions = useMemo(() => {
+    const all = {
+      value: 'all',
+      label: t('whatsappTemplate:filter.assignedToPlaceholder'),
+    }
+    const others = (dataFunctions || []).map(item => ({
+      label: t(item.name),
+      value: item.functionName,
+    }))
+    return [all, ...others]
+  }, [dataFunctions, t])
   return (
     <div className="md:flex w-full gap-x-4 space-y-1">
       <Input
@@ -43,6 +57,23 @@ const FilterWhatsappTemplate = ({
           {whatsAppStatusesSupported.map(item => (
             <SelectItem key={item.value} value={item.value}>
               {t(item.name)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Select
+        name="assignedTo"
+        onValueChange={value => setParams({ ...params, assignedTo: value })}
+      >
+        <SelectTrigger className="md:w-[180px]">
+          <SelectValue
+            placeholder={t('whatsappTemplate:filter.assignedToPlaceholder')}
+          />
+        </SelectTrigger>
+        <SelectContent>
+          {functionsOptions.map(item => (
+            <SelectItem key={item.value} value={item.value}>
+              {t(item.label)}
             </SelectItem>
           ))}
         </SelectContent>

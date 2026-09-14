@@ -24,7 +24,6 @@ import {
   invoiceCampaignState,
   invoiceClassesSelector,
 } from '@/stores/studentInvoice.store'
-import { formatCurrency } from '@/utils/currency'
 import { formatTotalPriceInvoice } from '@/utils/invoice-campaign.utils'
 
 import { useContextInvoiceEditDialog } from '../components/CourseAssigment/Invoice/EditInvoiceContext'
@@ -83,47 +82,47 @@ const PreviewInvoiceContent = () => {
       : currentActiveStudent?.phone ?? ''
   }, [isCombined, currentActiveParent, currentActiveStudent])
 
-  const paymentDate = useMemo(() => {
-    if (!currentActiveStudent) return null
-    return currentActiveStudent.paymentDate
-      ? new Date(currentActiveStudent.paymentDate)
-      : null
-  }, [currentActiveStudent])
-
   return (
     <div className="p-8">
-      {/* Invoice Header */}
-      <div className="flex justify-between items-start mb-8">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">
-            {studentName}
-          </h3>
-          <p className="text-sm text-gray-500">
-            {[studentEmail, studentPhone].filter(Boolean).join(' • ')}
-          </p>
-        </div>
-        <div className="text-right text-gray-600">
-          <h2 className="text-xl font-bold text-gray-900 mb-1">
-            {currentSchool?.name}
-          </h2>
-        </div>
+      {/* Invoice For Section */}
+      <div className="mb-8 p-4 bg-blue-50 rounded-lg">
+        <h3 className="text-lg font-semibold text-blue-900 mb-2">
+          {t('editor.invoicePreview.invoiceFor', {
+            studentName,
+          })}
+        </h3>
+        <p className="text-blue-700">
+          {[studentEmail, studentPhone].filter(Boolean).join(' • ')}
+        </p>
       </div>
 
-      {/* Payment Date */}
-      {paymentDate && (
-        <div className="mb-4 flex items-center gap-2 text-sm text-gray-600">
-          <span className="font-medium">
-            {t('editor.paymentDate')}:
-          </span>
-          <span>
-            {paymentDate.toLocaleDateString(undefined, {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </span>
+      {/* Invoice Header */}
+      <div className="flex justify-between items-start mb-12">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4 uppercase">
+            {t('editor.invoicePreview.invoice')}
+          </h1>
+          <div className="text-gray-600 space-y-1">
+            {/* <p className="font-semibold">{currentInvoice?.invoiceNumber}</p> */}
+            {/* <p>Date: {currentInvoice?.}</p> */}
+            {/* <p>{currentInvoice.phone}</p> */}
+          </div>
         </div>
-      )}
+        <div className="text-right text-gray-600">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            {currentSchool?.name}
+          </h2>
+          <div className="space-y-1">
+            {currentSchool?.address?.addressLine1 && (
+              <p>{currentSchool.address.addressLine1}</p>
+            )}
+            {currentSchool?.address?.city && (
+              <p>{currentSchool.address.city}</p>
+            )}
+            {currentSchool?.email && <p>{currentSchool.email}</p>}
+          </div>
+        </div>
+      </div>
 
       {/* Invoice Table */}
       <div className="mb-8">
@@ -186,7 +185,7 @@ const PreviewInvoiceContent = () => {
                 {t('editor.invoicePreview.discount')}
               </TableCell>
               <TableCell className="text-right text-red-600 py-1">
-                {`-${formatCurrency(calculatedDiscount?.totalDiscount ?? 0, currency)}`}
+                {calculatedDiscount?.totalDiscountLabel}
               </TableCell>
             </TableRow>
             {(usedBalance?.value ?? 0) > 0 && (

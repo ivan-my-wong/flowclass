@@ -1,34 +1,56 @@
-import { forwardRef } from 'react'
+import { styled } from '../../styles'
 
-import { cn } from '@/utils/cn'
+const RawInput = styled('input', {
+  padding: '$small',
+  width: '100%',
+  borderRadius: '$medium',
+  outline: 'none',
+  backgroundColor: '$background',
+  border: `1px solid $colors$borderColor`,
+  color: '$text',
+  caretColor: '$text',
+  '&:hover:enabled, &:focus:enabled': {
+    borderColor: '$borderColor',
+  },
+  '&:focus:enabled': {
+    focusOutline: '$primary',
+  },
+  '&::placeholder': {
+    color: '$textSubtle',
+  },
+  '&:disabled': {
+    backgroundColor: '$backgroundDisabled',
+  },
 
-type RawInputProps = {
-  error?: boolean
-  variants?: 'line' | 'border'
-} & React.ComponentProps<'input'>
+  '&[type=password]': {
+    fontFamily: 'Verdana',
+    letterSpacing: '0.125rem',
+  },
 
-const RawInput = forwardRef<HTMLInputElement, RawInputProps>(
-  ({ error, variants, className, ...props }, ref) => (
-    <input
-      ref={ref}
-      className={cn(
-        'p-2 w-full rounded-md outline-none bg-background border border-border text-text caret-text',
-        'hover:enabled:border-border focus:enabled:border-border focus:enabled:ring-2 focus:enabled:ring-primary focus:enabled:ring-offset-0',
-        'placeholder:text-text-subtle disabled:bg-background-disabled',
-        '[&[type=password]]:font-[Verdana] [&[type=password]]:tracking-wider',
-        variants === 'line' &&
-          'border-0 rounded-none bg-transparent border-b border-text',
-        variants === 'border' &&
-          'border border-background-layer-4 rounded-sm bg-transparent h-[38px]',
-        error &&
-          'border-warn hover:enabled:border-warn focus:enabled:border-warn',
-        className
-      )}
-      {...props}
-    />
-  )
-)
-
-RawInput.displayName = 'RawInput'
+  variants: {
+    variants: {
+      line: {
+        border: 'unset',
+        borderRadius: 'unset',
+        backgroundColor: 'unset',
+        borderBottom: '1px solid $colors$text',
+      },
+      border: {
+        border: '1px solid $backgroundLayer4',
+        borderRadius: '$small',
+        backgroundColor: 'unset',
+        height: '38px',
+      },
+    },
+    error: {
+      true: {
+        borderColor: '$secondary',
+        '&:hover:enabled, &:focus:enabled': {
+          borderColor: '$secondary',
+        },
+      },
+    },
+  },
+})
 
 export default RawInput

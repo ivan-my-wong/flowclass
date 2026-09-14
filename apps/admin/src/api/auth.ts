@@ -5,17 +5,6 @@ import { UserState } from '../types/user'
 import { ApiError } from './errors/apiError'
 import apiClient from './index'
 
-export const hasUsers = async (): Promise<boolean> => {
-  const res = await apiClient.get({
-    url: '/admin/auth/has-users',
-    needAuth: false,
-  })
-  if (res.status === 200 && res.data?.data?.hasUsers !== undefined) {
-    return res.data.data.hasUsers
-  }
-  return true
-}
-
 export const registerAccount = async ({
   firstName,
   email,
@@ -119,6 +108,30 @@ export const login = async ({
   throw new Error('Unexpected response status')
 }
 
+export const socialLogin = async (accessToken: string): Promise<boolean> => {
+  const res = await apiClient.post({
+    url: '/admin/auth/login/social',
+    needAuth: false,
+    data: {
+      idToken: accessToken,
+    },
+  })
+
+  if (res.status === 201) {
+    localStorage.setItem(
+      LocalStorageKeys.UserAccessToken,
+      res.data.data.accessToken
+    )
+    localStorage.setItem(
+      LocalStorageKeys.UserRefreshToken,
+      res.data.data.refreshToken
+    )
+    return true
+  }
+  if (res instanceof ApiError) throw new Error(res.message)
+  throw new Error('Unexpected response status')
+}
+
 export const logout = (): void => {
   const keysToPreserve = ['displayLanguageState', 'i18nextLng', 'darkMode']
 
@@ -216,9 +229,9 @@ export const deleteAccount = async (userId: number): Promise<boolean> => {
 }
 
 export default {
-  hasUsers,
   registerAccount,
   login,
+  socialLogin,
   logout,
   forgotPassword,
   deleteAccount,

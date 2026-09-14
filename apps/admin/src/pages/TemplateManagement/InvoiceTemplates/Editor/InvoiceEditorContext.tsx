@@ -23,7 +23,6 @@ import dayjs from '@/utils/dayjs'
 import { generateIdEventByTimeSlot } from '@/utils/invoice-campaign.utils'
 
 type InvoiceEditorContextType = {
-  isViewOnly: boolean
   isOpenDialog: boolean
   setOpenDialog: Dispatch<SetStateAction<boolean>>
   regularV2Lessons: LessonPreview[]
@@ -65,8 +64,7 @@ const InvoiceEditorContext = createContext<
 
 export function InvoiceEditorProvider({
   children,
-  isViewOnly = false,
-}: PropsWithChildren<{ isViewOnly?: boolean }>): JSX.Element {
+}: PropsWithChildren): JSX.Element {
   const [isOpenDialog, setOpenDialog] = useState<boolean>(true)
   const [currentClass, setCurrentClass] = useState<Classes | null>(null)
   const [currentDate, setCurrentDate] = useState<Date>(new Date())
@@ -227,7 +225,6 @@ export function InvoiceEditorProvider({
 
   const value = useMemo(
     () => ({
-      isViewOnly,
       isOpenDialog,
       setOpenDialog,
       regularV2Lessons,
@@ -258,7 +255,6 @@ export function InvoiceEditorProvider({
       setAllClassesLessonsData,
     }),
     [
-      isViewOnly,
       isOpenDialog,
       regularV2Lessons,
       selectedSessions,

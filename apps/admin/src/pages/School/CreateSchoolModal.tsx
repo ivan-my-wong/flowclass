@@ -1,7 +1,14 @@
 import { forwardRef, useImperativeHandle, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { Portal, Root, Title, Trigger } from '@radix-ui/react-dialog'
+import {
+  Content,
+  Overlay,
+  Portal,
+  Root,
+  Title,
+  Trigger,
+} from '@radix-ui/react-dialog'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useMutation } from 'react-query'
@@ -11,7 +18,6 @@ import ApiError, { handleApiError } from '@/api/errors/apiError'
 import { createWebpageStyle } from '@/api/settingSite'
 import { TextInput } from '@/components/Inputs/TextInput'
 import { Spinner } from '@/components/Loaders/Spinner'
-import { StyledContent, StyledOverlay } from '@/components/Popups/Modal'
 import ModalCloseButton from '@/components/Popups/ModalCloseButton'
 import Separator from '@/components/Separators/Separator'
 import Text from '@/components/Texts/Text'
@@ -19,8 +25,43 @@ import { Button } from '@/components/ui/Button'
 import { defaultThemeColor, WebsiteTemplate } from '@/constants/websiteTemplate'
 import useSchoolData from '@/hooks/useSchoolData'
 import useSiteData from '@/hooks/useSiteData'
+import { keyframes, styled } from '@/styles'
 import { WebpageInstitutionSettingProps } from '@/types/settingWebpageInstitution'
 import { validateDomain } from '@/utils/validate'
+
+export const StyledOverlay = styled(Overlay, {
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  position: 'fixed',
+  inset: 0,
+})
+
+export const contentShow = keyframes({
+  '0%': { opacity: 0, transform: 'translate(-50%, -50%) scale(.1)' },
+  '100%': { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
+})
+
+export const StyledContent = styled(Content, {
+  display: 'flex',
+  flexDirection: 'column',
+  backgroundColor: '$background',
+  position: 'fixed',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  maxWidth: '90%',
+  minWidth: '50%',
+  maxHeight: '90vh',
+  overflowY: 'auto',
+  borderRadius: '$medium',
+  padding: '$4',
+  gap: '$4',
+  boxShadow: `$shadows[1]`,
+  zIndex: '$modalContent',
+  animation: `${contentShow} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
+  '@sm': {
+    minWidth: '90%',
+  },
+})
 
 type AddSchoolModalProps = {
   hidden?: boolean
@@ -154,8 +195,14 @@ const AddSchoolModal = forwardRef<AddSchoolModalHandle, AddSchoolModalProps>(
                 },
               })}
             />
-            <Text className="mt-4">{t(`school:visitSchoolSite`)}</Text>
-            <Text className="break-all leading-[1.25] underline">
+            <Text css={{ marginTop: '$4' }}>{t(`school:visitSchoolSite`)}</Text>
+            <Text
+              css={{
+                wordBreak: 'break-all',
+                lineHeight: 1.25,
+                textDecoration: 'underline',
+              }}
+            >
               {customLink}
             </Text>
             <Button

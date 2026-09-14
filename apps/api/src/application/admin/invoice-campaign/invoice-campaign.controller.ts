@@ -24,7 +24,6 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger'
 
-import { CurrentUser } from '@/common/decorators/current-user.decorator'
 import { RequireParams } from '@/common/decorators/require-param.decorator'
 import { Roles } from '@/common/decorators/roles.decorator'
 import { AdminAuthGuard } from '@/common/guards/admin-auth.guard'
@@ -33,7 +32,6 @@ import { RolesGuard } from '@/common/guards/roles.guard'
 import { InvoiceCampaignService } from '@/domain/service/invoice-campaign.service'
 import { DocumentCampaign } from '@/models/document-campaign.entity'
 import { RequireParam, Role } from '@/models/enums'
-import { User } from '@/models/user.entity'
 
 import {
   InvoiceCampaignDto,
@@ -41,7 +39,6 @@ import {
   ResendInvoiceDto,
   SendInvoiceDirectlyDto,
   SendInvoiceDto,
-  SyncEnrollCoursesDto,
 } from './dto/send-invoice.dto'
 
 @ApiTags('Invoice Campaign')
@@ -94,7 +91,7 @@ export class InvoiceCampaignController {
   }
 
   @Patch(':documentId/send-campaign')
-  @ApiOperation({ summary: 'Send invoice to designated contact for a campaign (initial send)' })
+  @ApiOperation({ summary: 'Send invoice to designated contact for a campaign' })
   @RequireParams(RequireParam.INSTITUTION_ID)
   @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
   @UseGuards(RolesGuard, RequireParamsGuard)
@@ -104,44 +101,11 @@ export class InvoiceCampaignController {
   async sendInvoice(
     @Query('institutionId', ParseIntPipe) institutionId: number,
     @Param('documentId', ParseIntPipe) documentId: number,
-    @Body() payload: SendInvoiceDto,
-    @CurrentUser() currentUser: User
+    @Body() payload: SendInvoiceDto
   ): Promise<{
     jobId: string
   }> {
-    return this.invoiceCampaignService.sendInvoiceSynchronous(
-      documentId,
-      institutionId,
-      payload,
-      currentUser.id
-    )
-  }
-
-  @Patch(':documentId/edit-and-resend')
-  @ApiOperation({
-    summary: 'Edit and re-send a completed invoice campaign, preserving the original amountPaid',
-  })
-  @RequireParams(RequireParam.INSTITUTION_ID)
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
-  @UseGuards(RolesGuard, RequireParamsGuard)
-  @ApiBody({ type: SendInvoiceDto })
-  @ApiResponse({
-    status: HttpStatus.ACCEPTED,
-    description: 'Invoice updated and re-sent successfully',
-  })
-  @HttpCode(HttpStatus.ACCEPTED)
-  async editAndResendInvoice(
-    @Query('institutionId', ParseIntPipe) institutionId: number,
-    @Param('documentId', ParseIntPipe) documentId: number,
-    @Body() payload: SendInvoiceDto,
-    @CurrentUser() currentUser: User
-  ): Promise<{ jobId: string }> {
-    return this.invoiceCampaignService.editAndResendInvoiceCampaign(
-      documentId,
-      institutionId,
-      payload,
-      currentUser.id
-    )
+    return this.invoiceCampaignService.sendInvoiceSynchronous(documentId, institutionId, payload)
   }
 
   @Get(':documentId/detail')
@@ -220,28 +184,6 @@ export class InvoiceCampaignController {
     return duplicatedCampaign
   }
 
-  @Patch(':documentId/sync-enroll-courses')
-  @ApiOperation({
-    summary: 'Sync enrollCourse class mappings from a diff (add/remove classes per invoice)',
-  })
-  @RequireParams(RequireParam.INSTITUTION_ID)
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
-  @UseGuards(RolesGuard, RequireParamsGuard)
-  @ApiBody({ type: SyncEnrollCoursesDto })
-  @ApiResponse({ status: HttpStatus.OK, description: 'EnrollCourses synced successfully' })
-  @HttpCode(HttpStatus.OK)
-  async syncEnrollCourses(
-    @Query('institutionId', ParseIntPipe) institutionId: number,
-    @Param('documentId', ParseIntPipe) documentId: number,
-    @Body() payload: SyncEnrollCoursesDto
-  ) {
-    await this.invoiceCampaignService.syncEnrollCoursesForCampaign(
-      documentId,
-      institutionId,
-      payload
-    )
-  }
-
   @Delete(':documentId')
   @ApiOperation({ summary: 'Delete an existing invoice campaign' })
   @RequireParams(RequireParam.INSTITUTION_ID)
@@ -296,5 +238,41 @@ export class InvoiceCampaignController {
   ) {
     payload.invoiceId = invoiceId
     return this.invoiceCampaignService.sendInvoiceDirectly(payload, institutionId)
+  }
+
+  @Get('automation-settings')
+  @ApiOperation({ summary: 'Get invoice campaign automation settings' })
+  @RequireParams(RequireParam.INSTITUTION_ID)
+  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @UseGuards(RolesGuard, RequireParamsGuard)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Invoice campaign automation settings retrieved successfully',
+  })
+  @HttpCode(HttpStatus.OK)
+  async getAutomationSettings(@Query('institutionId', ParseIntPipe) institutionId: number) {
+    return this.invoiceCampaignService.getAutomationSettings(institutionId)
+  }
+
+  @Put('automation-settings')
+  @ApiOperation({ summary: 'Update invoice campaign automation settings' })
+  @RequireParams(RequireParam.INSTITUTION_ID)
+  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
+  @UseGuards(RolesGuard, RequireParamsGuard)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Invoice campaign automation settings updated successfully',
+  })
+  @HttpCode(HttpStatus.OK)
+  async updateAutomationSettings(
+    @Query('institutionId', ParseIntPipe) institutionId: number,
+    @Body()
+    payload: {
+      enableInvoiceCampaignDuplication?: boolean
+      invoiceCampaignTemplateId?: number
+      invoiceCampaignDuplicationDay?: number
+    }
+  ) {
+    return this.invoiceCampaignService.updateAutomationSettings(institutionId, payload)
   }
 }

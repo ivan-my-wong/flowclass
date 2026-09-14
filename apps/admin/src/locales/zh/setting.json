@@ -2,52 +2,31 @@
   "pageTitle": "設定",
   "freeAlert": "你現在正在使用我們的免費計劃，升級以解鎖更多功能",
   "upgrade": "升級",
-
   "featureEnable": {
     "title": "功能啟用"
   },
-
   "enrollmentForm": "報名表格預設",
   "headings": {
-    "websiteConfiguration": "後臺設定",
-    "localizationUserPreferences": "本地化與偏好",
     "communicationEngagement": "溝通與參與",
-    "monetizationServices": "獲利與服務",
-    "paymentNotifications": "付款與通知",
     "firstTimeConfig": "首次上線設定",
-    "branding": "網站配置",
-    "timeTable": "時間表設定",
-    "systemSetting": "系統設置"
+    "branding": "網站配置"
   },
-
   "menu": {
-    "payment": "付款設定",
-
     "webpage": "網站樣式與模板",
-
     "languageTimezone": "地區、語言與時區",
     "domainSettings": "網站域名",
     "appointment": "預約課程預設",
-
     "engagementTool": "學生互動工具",
-
     "socialMedia": "社交媒體連結",
     "webPanel": "Flowclass編輯器設定",
-    "emailSettings": "電郵設定",
     "blockTime": "閉校時間",
     "studentInformationField": "自訂資料欄目",
     "applicationForm": "申請表格",
-    "embedWebsite": "嵌入網站",
-    "whatsappSettings": "WhatsApp設定",
     "T&C": "條款和條件",
     "userPermission": "使用者權限",
-    "additionalFee": "額外費用",
-    "automationFlow": "自動化流程"
+    "additionalFee": "額外費用"
   },
   "socialMedia": {
-    "shownContent": "查看社交媒體內容顯示的位置",
-    "tutorialVideo": "觀看我們的教學影片",
-    "contactUs": "聯繫我們尋求幫助",
     "updateSuccess": "你已成功更新社交媒體連結。",
     "updateError": "更新社交媒體連結時發生了錯誤。請稍後再試。",
     "creatSocialMediaLink": "新增社交媒體連結",
@@ -55,30 +34,14 @@
     "linkIsRequired": "連結為必填項"
   },
   "termsConditions": {
-    "title": "條款和條件",
-    "updateT&C": "更新條款和條件",
-    "t&cDescription": "這將顯示在報名您的課程的最終確認前，學生必須同意您的條款和條件。",
     "updateSuccess": "你已成功更新條款和條件。",
     "updateError": "更新條款和條件時發生了錯誤。請稍後再試。"
   },
   "notificationSettings": {
-    "title": "付款提醒設置",
-    "description": "您可以選擇通過電子郵件發送提醒通知。",
-    "schedule": "申請日期後的第一天以及之後的每四天，將向學生發送一封電子郵件。",
-    "email": "電子郵件",
     "tierRestriction": "此功能僅適用於成長層級或更高",
-    "updateSuccess": "您已成功更新通知設置。",
-
-    "notificationType": "通知類型",
-    "notificationChannel": "通知渠道"
+    "notificationType": "通知類型"
   },
   "next": "下一步",
-  "Instagram": "Instagram",
-  "Facebook": "Facebook",
-  "Twitter": "Twitter",
-  "Youtube": "Youtube",
-  "alert2": "為了查看Facebook和Instagram用戶如何與您網站上的內容互動，我們需要連接您的Metal Pixel ID",
-  "alert3": "設置轉換追踪，可以讓您精確了解有多少人通過廣告與您聯繫，以便運行Google廣告。",
   "userManagement": {
     "title": "職員管理",
     "userProfile": "使用者個人資料",
@@ -128,15 +91,11 @@
     "totalSalary": "總薪資",
     "totalHours": "總時數",
     "hideEmptyLessons": "隱藏無學生課程",
-
     "filterByClass": "按班級篩選",
     "filterByLocation": "按地點篩選",
-
     "searchByClassName": "按班級名稱搜尋",
     "searchByClass": "搜尋班級",
-
     "includeFuture": "包含未來的課堂",
-
     "hourlyRates": {
       "manageHourlyRates": "管理時薪",
       "enableHourlyRates": "啟用時薪",
@@ -174,7 +133,6 @@
       "classSpecificStudentRatesHint": "留空以使用預設設定",
       "overrideDefaultSettings": "覆蓋預設設定"
     },
-
     "lessonTable": {
       "date": "日期",
       "time": "時間",
@@ -192,7 +150,6 @@
       "upcoming": "即將舉行",
       "salary": "薪資"
     },
-
     "profilePage": {
       "status": "狀態",
       "course": "課程",
@@ -202,7 +159,6 @@
       "lessons": "課堂"
     }
   },
-
   "webpageSetting": {
     "internationalization": "地區與語言",
     "defaultCountry": "預設國家/地區",
@@ -211,11 +167,8 @@
     "currency": "貨幣",
     "timezoneHint": "時區會跟隨預設國家/地區，若您想更改時區，請變更您的預設國家/地區。",
     "currencyHint": "貨幣會跟隨預設國家/地區，若您想更改貨幣，請變更您的預設國家/地區。",
-    "styles": "網站品牌",
     "save": "儲存",
     "themeColor": "網站主題色彩",
-    "secondaryColor": "網站次要色彩",
-    "highlightColor": "網站強調色彩",
     "templates": "模板",
     "default": "預設",
     "updateSuccess": "您已成功更新網站設定",
@@ -234,61 +187,20 @@
       "hero": "頁面頂部有大型主圖的模板。適合獨立網站。",
       "barebone": "最簡單的佈局，沒有導航欄。只有頂部的LOGO。適合嵌入其他網站。"
     },
-    "templatePreview": "模板預覽",
-    "websiteVersion": "網站版本",
     "mobileVersion": "手機版本"
   },
   "paymentSetting": {
-    "setup": "設置",
-    "stripePayNowTitle": "線上支付方式",
-    "stripePaymentMethod": "透過我們的軟件連接Stripe，快速、安全地開始接受網路付款。為您的學生提供多種付款選項，包括",
-    "stripe": "Stripe",
-    "creditCard": "信用卡",
-    "googlePay": "Google Pay",
-    "applePay": "Apple Pay",
-    "alipay": "支付寶",
-    "wechatPay": "微信支付",
     "connectStripe": "建立Stripe帳戶",
-
-    "ifHavePreviousAccount": "如果您已經有Stripe帳戶，請使用同電子郵件和密碼以跳過連接程序。",
-    "manageAccount": "管理付款",
-
-    "whyManageAccount": "使用我們與Stripe整合的軟件，簡化學費支付管理。輕鬆管理付款、追蹤學費歷史記錄，為教師和教育工作者優化行政任務。",
-    "pleaseLoginConnect": "請使用您創建Stripe帳戶時的相同電子郵件和密碼登入後台。",
-
-    "createLink": "連結你的帳戶",
-    "visitDashboard": "前往你的報表",
     "notCompleteOnboarding": "你尚未連結Stripe帳戶。請完成入門程序以前往你的報表。",
     "updateSuccess": "您將被重定向到 Stripe 以完成入門流程。我們期待與您再次見面！",
-    "dashboardSuccess": "您將能夠在新分頁中查看所有交易記錄！",
-
-    "editAccount": "編輯您的帳戶詳情",
-    "completePayout": "完成商業詳情以啟用付款",
-
-    "completeOnboarding": "請先完成Stripe的帳號註冊後，便能查閱你的報表。完成後，學生將能夠透過Stripe向你繳付費用",
-    "noStripeAccount": "您尚未創建Stripe帳戶。",
-    "migratingStripe": "我們正在將您的Stripe帳戶遷移到我們的新系統。您將需要創建一個新的Stripe帳戶。如果您在之前的Stripe帳戶中仍有資金，請使用角落中的聊天框與我們聯繫，我們將把餘下帳目立即發送至您的戶口。",
-
     "connectStripeTips": "準備創建Stripe帳戶以收取付款！",
-    "createStripeAccountReminder": "請確保您在網站設置中選擇的國家與您打算在Stripe上註冊的國家相符。註冊後，將無法在Stripe上修改您的國家。如果您需要更改國家，可以通過調整網站上的設置來實現。",
-    "currentCountry": "當前國家或地區",
-    "updateCountry": "更新國家或地區",
-    "createStripeAccount": "創建Stripe帳戶",
-    "createStripeAccountDescription": "當前國家：{{country}}。\n當前電郵：{{email}}。\n請確保在創建Stripe帳戶之前您的國家和電郵是正確的。一旦創建，將無法在Stripe上修改您的國家和電郵。\n\n如果您想使用不同的電郵，請登入正確的帳戶並返回此頁面 。",
-    "createStripeAccountProblem": "*如果在創建Stripe帳戶時遇到任何問題，請通過電子郵件 (admin@flowclass.io) 或在角落的聊天框與我們聯繫。",
-    "availableInYourCountry": "在您的國家/地區可用",
-    "unavailableInYourCountry": "在您的國家/地區不可用",
-
-    "connectedWithStripe": "已連接Stripe",
-    "missingInformation": "缺少啟用付款的信息",
-    "notconnectedStripeAccount": "未連接Stripe帳戶"
+    "createStripeAccountDescription": "當前國家：{{country}}。\n當前電郵：{{email}}。\n請確保在創建Stripe帳戶之前您的國家和電郵是正確的。一旦創建，將無法在Stripe上修改您的國家和電郵。\n\n如果您想使用不同的電郵，請登入正確的帳戶並返回此頁面 。"
   },
-
   "customizeSite": {
     "title": "域名設定",
     "inputReminder": "請只使用字母和數字。不允許使用特殊字符。",
     "description": "這將是學生使用的連結來前往您的網站。如果您更改連結，學生將無法使用舊連結前往。",
-    "description2": "輸入您網站的任何域名（例如 example.com、localhost）。您也可以按照本指南連接自己的自訂域名。",
+    "description2": "請注意，.flowclass.io 域名是按照先到先得的原則分配的。如果您有自己的域名，可以按照本指南連接。",
     "customSiteDomain": "自訂網站域名",
     "setYourDomain": "設定您自己的域名",
     "availableInStarter": "(只適用於入門方案)",
@@ -297,9 +209,6 @@
     "customDomainGuide": "保存您自己的域名後，請聯繫我們以幫助你完成域名設置",
     "contactUs": "聯繫我們",
     "planRestriction": "此功能僅適用於成長或更高級的帳戶計劃"
-  },
-  "studentManagement": {
-    "selectCourse": "選擇課程"
   },
   "emailLogoSetting": {
     "emailNotification": "電郵通知",
@@ -311,27 +220,17 @@
   "emailSenderSetting": {
     "title": "電郵寄件者設定",
     "sendByCustomEmail": "透過學校名稱和電郵發送電郵通知",
-    "tierRestriction": "此功能僅適用於入門或更高等級",
-    "updateSuccess": "您已成功更新電郵設置。"
+    "tierRestriction": "此功能僅適用於入門或更高等級"
   },
   "lessonReminderSettings": {
-    "title": "課程提醒設定",
-    "description": "您可以選擇透過電子郵件發送提醒通知。",
-    "schedule": "課程前一天將發送電子郵件給學生",
-    "email": "電子郵件",
-    "tierRestriction": "此功能僅適用於成長版或更高版本",
-    "updateSuccess": "您已成功更新通知設定。"
+    "tierRestriction": "此功能僅適用於成長版或更高版本"
   },
   "systemSettings": {
-    "blockTime": "閉校時間",
     "blockTimeSetting": "閉校時間",
     "addBlockTime": "新增閉校時間",
-    "fulltime": "全天閉校",
-    "notification": "如果一個課程在「閉校時間」內，那麼該課程及之後的課程將按照其重複條件延遲。",
     "start": "開始",
     "end": "結束",
     "inBeta": "此功能目前處於測試階段，僅適用於重複課程。所有閉校時間將阻止學生預約課程。",
-    "descriptionDeleteBlockTime": "此操作不可逆轉",
     "titleDeleteDialog": "您確定要刪除閉校時間嗎",
     "createBlockTimeSuccess": "您已成功創建閉校時間",
     "deleteBlockTimeSuccess": "成功刪除閉校時間",
@@ -350,18 +249,12 @@
     "titleDeleteDialog": "您確定要刪除自訂欄目：",
     "descriptionDelete": "此操作是不可逆轉的。存儲在此資料欄目下的相關學生信息將全部從學生個人資料中刪除。",
     "notification": "自訂資料欄目用於存儲學生信息（例如家長聯繫方式和學術水平）到其個人資料中。這些資料欄目可用於創建學生在申請課程時填寫的申請表。",
-    "descriptionCreate": "之後只能更改資料欄目名稱",
-    "descriptionEdit": "只能更改資料欄目名稱",
     "descriptionReorder": "重新排序自訂欄目將影響它們在學生個人資料中的順序。",
     "fieldType": "資料欄目類型",
     "placeHolderType": "請選擇資料欄目類型",
     "nameField": "問題",
     "descriptionField": "描述",
     "answerField": "答案",
-    "placeHolderName": "例如，家長聯繫方式",
-    "option": "選項",
-    "addOption": "添加選項",
-    "descriptionAddOption": "請添加用戶選擇的選項",
     "createInformationField": "成功創建自訂資料欄目",
     "updateInformationField": "成功更新自訂資料欄目",
     "reOrderInformationField": "成功重新排序自訂資料欄目",
@@ -382,17 +275,12 @@
     "nameOfForm": "表單名稱",
     "descriptionCreate": "僅供您識別，不會顯示給學生。",
     "placeholder": "例如，通用表單",
-    "informationFields": "自訂欄目",
     "applicantFields": "個人資料欄目",
     "commonFields": "申請欄目",
     "commonInformation": "當您將表單分配給接受多個申請人的課程選項時，這些欄目將會顯示",
-    "createField": "創建資料欄目",
     "description2Create": "請選擇要包含在申請表格中的資料欄目。系統記錄要求名稱、電子郵件和電話號碼為必填項。要進一步修改自訂欄目，請前往",
-    "dragAndDrop": "您可以拖動資料欄目以重新排列它們的順序",
-    "Field": "需要填寫的資料欄目：",
     "titleDeleteDialog": "您確定要刪除申請表：",
     "descriptionDelete": "此操作是不可逆轉的。",
-    "notification": "自訂資料欄目用於存儲學生信息（例如家長聯繫方式和學術水平）到其個人資料中。這些資料欄目可用於創建學生在申請課程時填寫的申請表。",
     "createApplicationForm": "成功創建申請表",
     "updateApplicationForm": "成功更新申請表",
     "deleteApplicationForm": "成功刪除申請表",
@@ -407,45 +295,27 @@
     "descriptionCommonFields": "這些欄目與整個申請有關，包括目的、申請人之間的關係和期望的結果。\n它們在申請過程結束時填寫一次。如果需要修改欄目，請前往"
   },
   "whatsappSetting": {
-    "settingHints": "我們使用Twilio來發送WhatsApp消息。如果您需要幫助，我們可以協助您進行設置。",
+    "settingHints": "我們使用 Meta WhatsApp Cloud API 來發送官方 WhatsApp 訊息。如果您需要幫助，我們可以協助您進行設置。",
     "contactUsOnWhatsapp": "通過WhatsApp聯繫我們",
     "reminder": "您應該在發送消息給學生之前設置WhatsApp API。",
     "whatsAppApiSettings": "WhatsApp API設定",
-    "customMessage": "自定義消息",
-    "wtsApiToken": "Twilio API 代碼",
-    "wtsApiSid": "Twilio API SID",
+    "wtsApiToken": "Meta API Token",
+    "wtsApiSid": "WhatsApp Business Account (WABA) ID",
     "phoneNumberSender": "發送消息的電話號碼",
     "phoneNumberReceiver": "接收消息的測試電話號碼",
     "customMessageVariable": {
       "studentName": "學生姓名",
       "schoolName": "學校名稱",
       "className": "班級名稱",
-      "paymentLink": "支付連結",
       "courseName": "課程名稱",
       "adminPhone": "管理員電話",
       "location": "位置",
       "classLessonDate": "課程日期",
       "newClassLessonDate": "新課程日期",
       "institutionName": "學校名稱",
-      "siteLink": "網站連結",
-      "period": "學期",
-      "payAmount": "學費總額",
-      "uploadPaymentUrl": "付款連結",
-      "courseItems": "課程項目（重複區塊）",
-      "lessonItems": "課堂項目（重複區塊）",
-      "courseIndex": "課程編號",
-      "schedule": "時間表",
-      "lessonCount": "堂數",
-      "teacherName": "老師名稱",
-      "lessonDatesLabel": "日期標籤",
-      "lessonDates": "課堂日期",
-      "coursePrice": "課程價格",
-      "lessonIndex": "課堂編號",
-      "lessonDate": "課堂日期",
-      "lessonTime": "課堂時間"
+      "siteLink": "網站連結"
     },
     "selectWhatsappTemplate": "選擇WhatsApp模板",
-    "customMessageExample": "您的定制消息將發送給學生。例如：你好！我們是{{schoolName}}。這是一個友好的提醒。",
     "send": "發送到測試電話號碼",
     "sendTestMsgSuccess": "您已成功發送 Whatsapp 訊息。",
     "sendMaterialPlaceholder": "你好 {{studentName}}，新教材已上傳到 {{courseName}}，\n\n只是想快速通知您，新教材已經上傳。\n\n此致敬禮，\n{{institutionName}}",
@@ -454,11 +324,9 @@
   "additionalFee": {
     "title": "額外費用",
     "createFee": "新增費用",
-    "createAdditionalFee": "新增額外費用",
     "unassignSuccess": "取消指派額外費用成功。",
     "createSuccess": "成功創建額外費用",
     "deleteSuccess": "成功刪除額外費用",
-    "editAdditionalFee": "編輯額外費用",
     "name": "名稱",
     "additionalFeeDisplay": "額外費用的名稱將會顯示給學生",
     "fee": "費用",
@@ -474,7 +342,6 @@
     "heading": "登入按鈕",
     "label": "在您的網站上顯示登入按鈕",
     "updateSuccess": "您已成功更新學生平台",
-
     "primaryIdentifier": "主要識別方式",
     "confirmChangeTitle": "更改主要識別方式？",
     "choosePrimaryIdentifier": "選擇學生註冊和登入的主要識別方式。",

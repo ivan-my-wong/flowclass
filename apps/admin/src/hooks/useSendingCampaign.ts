@@ -2,7 +2,6 @@
 import { useQueryClient } from 'react-query'
 import { useRecoilState } from 'recoil'
 
-import { API_BASE_URL } from '@/lib/config'
 import { sendingInvoiceCampaignState } from '@/stores/studentInvoice.store'
 import { SendingCampaignStatus, SendingInvoiceCampaignState, SendingInvoiceData, SendingProcessPhase } from '@/types/studentInvoice.type'
 import { InvoiceCampaign } from '@/types/templateManagement'
@@ -17,7 +16,7 @@ export const useSendingCampaign = () => {
     )
     const startEvent = (invoiceCampaign: InvoiceCampaign) => {
         const eventSource = new EventSource(
-            `${API_BASE_URL}/stream/${invoiceCampaign.jobId}`
+            `${import.meta.env.VITE_API_BASE_URL}/stream/${invoiceCampaign.jobId}`
         )
         eventSource.onerror = () => {
             eventSource.close()

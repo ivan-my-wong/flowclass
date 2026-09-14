@@ -7,10 +7,12 @@ import { PhoneContactMethod, StudentPrimaryIdentifier } from '@/models/enums/'
 import { InstitutionGallery } from '@/models/institution-gallery.entity'
 import { addressDetail } from '@/models/institutions.entity'
 import { SocialMedia } from '@/models/setting-webpage-institutions.entity'
+import { SubscriptionPlanRecordsEntity } from '@/models/subscription-plan-records.entity'
 import { MediaDetailDto } from '@/modules/media/dto/media.dto'
 
 import { SettingWebpageInstitutionDetailDto } from '../../setting-webpage-institution/dto/setting-webpage-institution-detail.dto'
 import { SiteRegionDto } from '../../sites/dto/site-detail.dto'
+import { PlanDetailResponse } from '../../subscription-plans/dto/subscription-plans.dto'
 
 @Exclude()
 export class InstitutionDetailDto {
@@ -91,6 +93,18 @@ export class InstitutionDetailDto {
   @Expose()
   @Type(() => MediaDetailDto)
   medias?: MediaDetailDto[]
+
+  @Expose()
+  @Type(() => SubscriptionPlanRecordsEntity)
+  subscriptionPlanRecords?: SubscriptionPlanRecordsEntity
+
+  @ApiPropertyOptional()
+  @Expose()
+  planId: number
+
+  @ApiPropertyOptional()
+  @Expose()
+  planExpiryDate: string
 
   @ApiPropertyOptional()
   @Expose()
@@ -180,6 +194,10 @@ export class PublicInstitutionDetailDto {
   @Expose()
   @Type(() => MediaDetailDto)
   institutionSettings?: SettingWebpageInstitutionDetailDto[]
+
+  @Expose()
+  @Type(() => PlanDetailResponse)
+  plan: PlanDetailResponse
 
   @ApiPropertyOptional()
   @Expose()

@@ -15,7 +15,7 @@ import { successSchema } from '@/models/schemas/success.schema'
 
 import { loginSchema } from './dto/auth.schema'
 import { StudentForgotPasswordDto } from './dto/forgot-password.dto'
-import { LoginResponse, StudentLoginDto } from './dto/login.dto'
+import { LoginResponse, StudentLoginDto, StudentLoginSocialDto } from './dto/login.dto'
 import { StudentParamForgotPasswordDto } from './dto/param-forgot-password.dto'
 import { StudentRegisterAccountDto } from './dto/register-account.dto'
 import { StudentResetPasswordDto } from './dto/reset-password.dto'
@@ -63,6 +63,22 @@ export class AuthController {
   })
   async login(@Body() loginDto: StudentLoginDto): Promise<LoginResponse> {
     return this.authService.findByLogin(loginDto)
+  }
+
+  @Post('login/social')
+  @ApiOperation({
+    operationId: 'studentAuthLoginSocial',
+    summary:
+      'This api for master admin, site manager, institution manager, instructor, operator to log into out system.',
+  })
+  @ApiOkResponse({
+    schema: loginSchema,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'This response when user not available in your system.',
+  })
+  async loginSocial(@Body() loginSocialDto: StudentLoginSocialDto): Promise<LoginResponse> {
+    return this.authService.loginSocial(loginSocialDto)
   }
 
   @Post('reset-password')

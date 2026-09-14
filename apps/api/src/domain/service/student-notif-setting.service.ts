@@ -59,7 +59,7 @@ export class StudentNotifSettingService {
           id: notification.id,
           studentId: user.id,
           institutionId,
-          notificationType: notification.notificationType as unknown as SupportedType,
+          notificationType: notification.notificationType,
         },
         {
           whatsapp: notification.whatsapp,

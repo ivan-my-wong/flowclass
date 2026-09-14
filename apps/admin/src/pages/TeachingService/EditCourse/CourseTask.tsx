@@ -10,6 +10,7 @@ import Text from '@/components/Texts/Text'
 import Box from '@/components/ui/Box'
 import useClassData from '@/hooks/useClassData'
 import useCourseData from '@/hooks/useCourseData'
+import { theme } from '@/styles'
 
 const CourseTask = (): JSX.Element => {
   const { courseData } = useCourseData()
@@ -140,13 +141,11 @@ const CourseTask = (): JSX.Element => {
               <Spacer space="y2" />
               <Box align="center" justify="center" className="w-fit">
                 {task.isDone ? (
-                  <span className="text-success">
-                    <BsFillCheckCircleFill color="currentColor" />
-                  </span>
+                  <BsFillCheckCircleFill
+                    color={theme.colors.success.toString()}
+                  />
                 ) : (
-                  <span className="text-warn">
-                    <RxCross2 color="currentColor" />
-                  </span>
+                  <RxCross2 color={theme.colors.warn.toString()} />
                 )}
                 <Text>{task.taskName}</Text>
               </Box>

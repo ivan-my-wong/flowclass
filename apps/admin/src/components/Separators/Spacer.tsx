@@ -1,28 +1,48 @@
-import { cn } from '@/utils/cn'
+import { styled } from '@/styles'
 
-const spaceClasses = {
-  y1: 'my-1',
-  y2: 'my-2',
-  y3: 'my-4',
-  y4: 'my-6',
-  y5: 'my-8',
-  y6: 'my-12',
-  x1: 'mx-1',
-  x2: 'mx-2',
-  x3: 'mx-4',
-  x4: 'mx-6',
-  x5: 'mx-8',
-  x6: 'mx-12',
-} as const
-
-type SpacerProps = {
-  space?: keyof typeof spaceClasses
-  className?: string
-}
-
-const Spacer = ({ space, className }: SpacerProps) => (
-  <div className={cn('flex-1', space && spaceClasses[space], className)} />
-)
+const Spacer = styled('div', {
+  flex: 1,
+  variants: {
+    space: {
+      y1: {
+        margin: '$1 0',
+      },
+      y2: {
+        margin: '$2 0',
+      },
+      y3: {
+        margin: '$4 0',
+      },
+      y4: {
+        margin: '$6 0',
+      },
+      y5: {
+        margin: '$8 0',
+      },
+      y6: {
+        margin: '$12 0',
+      },
+      x1: {
+        margin: '0 $1',
+      },
+      x2: {
+        margin: '0 $2',
+      },
+      x3: {
+        margin: '0 $4',
+      },
+      x4: {
+        margin: '0 $6',
+      },
+      x5: {
+        margin: '0 $8',
+      },
+      x6: {
+        margin: '0 $12',
+      },
+    },
+  },
+})
 
 Spacer.displayName = 'Spacer'
 

@@ -11,6 +11,15 @@ export class CreateIntegrationOnlineMeetingDto {
   institutionId: number
 
   @ApiProperty({
+    description: 'Firebase ID token',
+    example: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjFlOWdkazcifQ...',
+    format: 'jwt',
+  })
+  @IsString()
+  @IsNotEmpty()
+  idToken: string
+
+  @ApiProperty({
     description: 'Google OAuth access token',
     example: 'ya29.a0AfB_byC7R...',
   })

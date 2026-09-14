@@ -10,9 +10,9 @@ import { AdminAuthGuard } from '@/common/guards/admin-auth.guard'
 import { RequireParamsGuard } from '@/common/guards/require-params.guard'
 import { RolesGuard } from '@/common/guards/roles.guard'
 import {
-  StorageImageUploadInterceptor,
-  StorageTargetDirectory,
-} from '@/config/storage/storage-image-upload-interceptor'
+  S3ImageUploadInterceptor,
+  S3TargetDirectory,
+} from '@/config/s3/s3-image-upload-interceptor'
 import { InstitutionErrorMessage } from '@/exceptions/error-message/institution'
 import { SiteErrorMessage } from '@/exceptions/error-message/site'
 import { RequireParam, Role } from '@/models/enums'
@@ -36,7 +36,6 @@ import {
   deleteInstitutionSchema,
   getAllInstitutionSchema,
   getInstitutionSchema,
-  getWorkflowSchema,
 } from './dto/institution.schema'
 import { RemoveGalleryDto } from './dto/remove-gallery.dto'
 import { UpdateGalleryDto } from './dto/update-gallery.dto'
@@ -51,7 +50,6 @@ import {
   Param,
   Patch,
   Post,
-  Put,
   Query,
   UploadedFile,
   UploadedFiles,
@@ -78,7 +76,6 @@ import { existsSync, mkdirSync } from 'fs'
 import { diskStorage } from 'multer'
 import { extname } from 'path'
 import { CopyInstitutionDto } from './dto/copy-institution.dto'
-import { WorkflowDto } from './dto/workflow.dto'
 
 @ApiTags('Institutions')
 @ApiUnauthorizedResponse({
@@ -350,10 +347,10 @@ export class InstitutionsController {
     },
   ])
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(StorageImageUploadInterceptor(StorageTargetDirectory.INSTITUTION_GALLERY))
+  @UseInterceptors(S3ImageUploadInterceptor(S3TargetDirectory.INSTITUTION_GALLERY))
   uploadGallery(
     @Body() uploadGalleryDto: UploadGalleryDto,
-    @UploadedFile() file: Express.Multer.File & { key: string },
+    @UploadedFile() file: Express.MulterS3.File,
     @CurrentInstitution() currentInstitution: Institution
   ) {
     return this.institutionsService.uploadGallery(uploadGalleryDto, file, currentInstitution)
@@ -472,30 +469,5 @@ export class InstitutionsController {
   })
   copyInstitution(@Body() payload: CopyInstitutionDto): Promise<Institution[]> {
     return this.institutionsService.copyInstitution(payload)
-  }
-
-  @Get('workflow')
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
-  @UseGuards(RolesGuard)
-  @RequireParams(RequireParam.INSTITUTION_ID)
-  @UseGuards(RequireParamsGuard)
-  @ApiExtraModels(WorkflowDto)
-  @ApiOperation({
-    summary: 'This api for master admin, site manager, institution manager use to get workflow',
-  })
-  @ApiOkResponse({
-    schema: getWorkflowSchema,
-  })
-  getWorkflow(@Query('institutionId') institutionId: number) {
-    return this.institutionsService.getWorkflow(institutionId)
-  }
-
-  @Put('workflow')
-  @Roles(Role.MASTER_ADMIN, Role.SITE_MANAGER, Role.INSTITUTION_MANAGER)
-  @UseGuards(RolesGuard)
-  @RequireParams(RequireParam.INSTITUTION_ID)
-  @UseGuards(RequireParamsGuard)
-  updateWorkflow(@Query('institutionId') institutionId: number, @Body() payload: WorkflowDto) {
-    return this.institutionsService.updateWorkflow(institutionId, payload)
   }
 }

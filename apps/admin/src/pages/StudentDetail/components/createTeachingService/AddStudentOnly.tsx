@@ -76,11 +76,10 @@ const AddStudentOnly = (props: Props) => {
   const onSubmitAddStudentWithOptionalLesson = async (
     data: CreateStudentAndAddLessonInputFields
   ) => {
-    const { alias, email, secondaryEmail, phone, studentId } = data
+    const { alias, email, phone } = data
     const createStudentParams: TypeCreateStudent = {
       name: alias,
       email: email !== '' ? email : undefined,
-      secondaryEmail: secondaryEmail !== '' ? secondaryEmail : undefined,
       phone,
       institutionId: currentDetail?.institutionId,
       siteId: currentDetail.siteId,

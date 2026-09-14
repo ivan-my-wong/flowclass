@@ -16,6 +16,7 @@ import Text from '@/components/Texts/Text'
 import { Card } from '@/components/ui/Card'
 import useApplicationFormData from '@/hooks/useApplicationFormData'
 import { AlertTypes } from '@/reducers/confirm.reducers'
+import { styled } from '@/styles'
 import { ApplicationFormTypes } from '@/types/applicationForm'
 import { formatTs } from '@/utils/timeFormat'
 
@@ -54,7 +55,7 @@ const ApplicationCard = ({
       disabled: false,
       content: (
         <>
-          <SvgIcon className="mr-4">
+          <SvgIcon css={{ marginRight: '1rem' }}>
             <EditIcon />
           </SvgIcon>
           <Text> {t('setting:applicationForm.edit')}</Text>
@@ -70,7 +71,7 @@ const ApplicationCard = ({
       disabled: false,
       content: (
         <>
-          <SvgIcon className="mr-4">
+          <SvgIcon css={{ marginRight: '1rem' }}>
             <DeleteIcon fill="#F87575" />
           </SvgIcon>
           <Text> {t('common:action.delete')}</Text>
@@ -99,16 +100,12 @@ const ApplicationCard = ({
         {data.updatedAt &&
           formatTs(data.updatedAt.toString(), 'YYYY/MM/DD hh:mm')}
       </Text>
-      <div
-        role="group"
-        className="absolute w-fit top-4 right-4 z-[1]"
-        onClick={e => e.stopPropagation()}
-      >
+      <DropDownMenuContainer onClick={e => e.stopPropagation()}>
         <DropdownMenu
           menuItems={menuItems}
           contentProps={{ minWidth: '16rem', zIndex: 999 }}
         />
-      </div>
+      </DropDownMenuContainer>
       <CustomedAlertDialog
         open={showConfirmPopup}
         setOpen={setShowConfirmPopup}
@@ -124,4 +121,11 @@ const ApplicationCard = ({
     </Card>
   )
 }
+const DropDownMenuContainer = styled(Box, {
+  position: 'absolute !important',
+  width: 'fit-content !important',
+  top: '1rem',
+  right: '1rem',
+  zIndex: 1,
+})
 export default ApplicationCard

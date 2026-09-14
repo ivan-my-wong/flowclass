@@ -16,6 +16,7 @@ import {
   GenerateInvoicesNextMonthDTO,
   SendCustomMessagesDto,
 } from '@/application/admin/invoices/dto/invoices.dto'
+import { MetaWhatsappService } from '@/domain/external/meta-whatsapp.service'
 import { AuthService } from '@/domain/service/auth.service'
 import { ClassLessonService } from '@/domain/service/class-lesson.service'
 import { RecurringSchedulesService } from '@/domain/service/course-recurring-schedules.service'
@@ -26,7 +27,6 @@ import { NotificationRecordService } from '@/domain/service/notification-log.ser
 import { SetingBlockTimeService } from '@/domain/service/setting-block-time.service'
 import { StudentNotifSettingService } from '@/domain/service/student-notif-setting.service'
 import { UsersService } from '@/domain/service/users.service'
-import { WhatsappWebService } from '@/domain/service/whatsapp-web.service'
 import { InvoiceErrorMessage } from '@/exceptions/error-message/invoice'
 import { ClassEntity } from '@/models/classes.entity'
 import { ClassRepository } from '@/models/classes.repository'
@@ -75,7 +75,7 @@ class InvoiceWorker {
     private readonly classLessonService: ClassLessonService,
     private readonly recurrSchedulesService: RecurringSchedulesService,
     private readonly blockTimeService: SetingBlockTimeService,
-    private readonly whatsappWebService: WhatsappWebService
+    private readonly whatsappService: MetaWhatsappService
   ) {}
   get invoiceRelations() {
     return {
@@ -164,7 +164,7 @@ class InvoiceWorker {
     })
     const customMessage = await this.customMessageService.getCustomMessageByType(
       institutionId,
-      SupportedType.CREATE_INVOICE
+      SupportedType.STUDENT_NOTIF_PAYMENT_REMINDER
     )
     const result = []
     for (const invoice of res) {
@@ -522,7 +522,7 @@ class InvoiceWorker {
     const institution = invoice.institution
     institution.site = invoice.site
     const { billingNextDate, repeatFormat } = enrollCourse
-    if ([PaymentStatus.PENDING].includes(invoice.paymentState)) {
+    if ([PaymentStatus.UNPAID, PaymentStatus.PENDING].includes(invoice.paymentState)) {
       return
     }
     const applicants = await this.userRepository.findBy({
@@ -613,7 +613,7 @@ class InvoiceWorker {
       .where('studentSchedule.classId IN (:...classIds)', { classIds: dto.classIds })
       .andWhere('studentLesson.startTime BETWEEN :start AND :end', { start, end })
       .orderBy('studentLesson.endTime', 'DESC')
-      .addOrderBy('studentLesson.endTime', 'DESC')
+      .addOrderBy('studentLesson.changeEndTime', 'DESC')
       .getMany()
   }
 
@@ -695,7 +695,10 @@ class InvoiceWorker {
         }
         const contentMessage = replaceContentVariables(dto.message, jobData)
 
-        await this.whatsappWebService.sendMessage(institution.id, studentPhone, contentMessage)
+        await this.whatsappService.sendDirectWhatsappMessage({
+          toPhone: studentPhone,
+          body: contentMessage,
+        })
       }
     } catch (error) {
       console.log('ERROR', error)

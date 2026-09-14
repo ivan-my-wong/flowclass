@@ -1,5 +1,4 @@
 import { studentLinksBaseUrl } from '@/constants/enrollmentFormFieldNames'
-import { API_BASE_URL, getBaseUrl } from '@/lib/config'
 import { Site } from '@/stores/siteData'
 import { Invoice, PaymentProofTableItem } from '@/types/enrollCourse'
 import { School } from '@/types/school'
@@ -17,23 +16,12 @@ export const generatePathFromName = (name: string): string => {
   return ''
 }
 
-export const getMediaFileUrl = (key: string | undefined) => {
+export const getS3FileUrl = (key: string | undefined) => {
   if (!key) return ''
-  if (key.startsWith('http://') || key.startsWith('https://')) {
-    return key
-  }
-
-  const baseUrl = API_BASE_URL.replace(/\/+$/, '')
-  const encodedKey = key
-    .split('/')
-    .filter(Boolean)
-    .map(segment => encodeURIComponent(segment))
-    .join('/')
-
-  return `${baseUrl}/media/file/${encodedKey}`
+  return `https://s3.${import.meta.env.VITE_AWS_REGION}.amazonaws.com/${
+    import.meta.env.VITE_AWS_BUCKET_NAME
+  }/${key}`
 }
-
-export const getCmsOrigin = (): string => getBaseUrl()
 
 export const generatePaymentLink = (
   invoice: PaymentProofTableItem | Invoice | null,

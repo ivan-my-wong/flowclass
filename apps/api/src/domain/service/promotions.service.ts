@@ -30,10 +30,11 @@ export class PromotionsService {
     institution: Institution,
     checkPromotionDto: CheckPossiblePromotionsDto
   ): Promise<Coupon[]> {
-    const { userId, classId } = checkPromotionDto
+    const { userId, userAliasId, classId } = checkPromotionDto
     // Implement your logic to check possible promotions based on the provided IDs
     const coupons = await this.couponService.getCoupons({
       userId,
+      userAliasId,
       institutionId: institution.id,
       siteId: institution.siteId,
     })

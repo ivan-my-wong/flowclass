@@ -5,6 +5,7 @@ import { t } from 'i18next'
 
 import { UserSettingIcon } from '@/assets/svgs/common'
 import { RecordLogType, TimeFormat } from '@/constants/common'
+import { styled } from '@/styles'
 import { generateChangeString } from '@/utils/string'
 
 type Props = {
@@ -141,25 +142,55 @@ const BoxActivity = ({ item, personalName }: Props): JSX.Element => {
   }, [item, personalName])
 
   return (
-    <div
-      key={`${item.id}`}
-      className="w-full border-b border-[#BFBFBF] pb-[15px] mb-[15px]"
-    >
-      <div className="flex justify-between items-center h-[45px] px-2.5">
-        <div className="flex items-center gap-3">
-          <div className="w-[33px] h-[33px] [&_img]:w-full [&_img]:h-full [&_img]:object-contain">
-            {content?.icon}
-          </div>
-          <div className="text-base font-normal text-[#404040]">
+    <Item key={`${item.id}`}>
+      <Top>
+        <TopLeft>
+          <Icon>{content?.icon}</Icon>
+          <Text>
             {dayjs(content?.activityDateTime).format(
               TimeFormat.activityDateTime
             )}
-          </div>
-        </div>
-      </div>
+          </Text>
+        </TopLeft>
+      </Top>
       <div>{content?.content}</div>
-    </div>
+    </Item>
   )
 }
+
+const Item = styled('div', {
+  width: '100%',
+  borderBottom: '1px solid #BFBFBF',
+  paddingBottom: 15,
+  marginBottom: 15,
+})
+
+const Top = styled('div', {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  height: 45,
+  padding: '0 10px',
+})
+const TopLeft = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 12,
+})
+const Icon = styled('div', {
+  width: 33,
+  height: 33,
+  '& img': {
+    width: '100%',
+    height: '100%',
+    objectFit: 'contain',
+  },
+})
+
+const Text = styled('div', {
+  fontSize: 16,
+  fontWeight: 400,
+  color: '#404040',
+})
 
 export default BoxActivity

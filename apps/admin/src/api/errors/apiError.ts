@@ -60,7 +60,7 @@ export const handleApiError = ({
         toast.error(`${t('common:errors.NOT_AUTHENTICATE')}`)
       }
       break
-    case 400:
+    case 400: {
       errorMessage = ''
       if (Array.isArray(error.message)) {
         error.message.forEach((messageObject: Record<string, string>) => {
@@ -72,11 +72,15 @@ export const handleApiError = ({
         errorMessage = error.message
       }
 
-      errorMessage = errorMessage.replace(/[.:]/g, '')
-      errorMessage = errorMessage.replace(' ', '_')
+      const formattedKey = `common:errors.${errorMessage
+        .replace(/[.:]/g, '')
+        .replace(' ', '_')}`
+      const translated = t(formattedKey, { defaultValue: '' })
+      const displayMessage = translated || errorMessage
 
-      toast.error(t(`common:errors.${errorMessage}`))
-      return errorMessage
+      toast.error(displayMessage)
+      return displayMessage
+    }
     default:
       break
   }

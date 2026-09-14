@@ -6,7 +6,6 @@ import { IoSettingsOutline } from 'react-icons/io5'
 import { toast } from 'sonner'
 
 import { handleApiError } from '@/api/errors/apiError'
-import { StyledContent, StyledOverlay } from '@/components/Popups/Modal'
 import ModalCloseButton from '@/components/Popups/ModalCloseButton'
 import Separator from '@/components/Separators/Separator'
 import { Button } from '@/components/ui/Button'
@@ -17,6 +16,7 @@ import {
   useUpdateRescheduleSettings,
 } from '@/hooks/useRescheduleApproval'
 import useSchoolData from '@/hooks/useSchoolData'
+import { StyledContent, StyledOverlay } from '@/pages/School/CreateSchoolModal'
 import { RescheduleSettings } from '@/types/rescheduleApproval'
 
 const RescheduleSettingsModal = () => {

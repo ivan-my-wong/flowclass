@@ -1,8 +1,6 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { v4 as uuidv4 } from 'uuid'
 
-import { API_BASE_URL } from '@/lib/config'
-
 import { LocalStorageKeys } from '../constants/localStorageKeys'
 
 import ApiError from './errors/apiError'
@@ -78,26 +76,110 @@ AskChatWithSchoolIdProps): Promise<void> => {
 
     // Initialize EventSource
 
-    await fetchEventSource(`${API_BASE_URL}/admin/openai/chatgpt-stream`, {
-      method: 'POST',
+    await fetchEventSource(
+      `${import.meta.env.VITE_API_BASE_URL}/admin/openai/chatgpt-stream`,
+      {
+        method: 'POST',
 
-      headers: {
-        'Content-Type': 'text/event-source',
-      },
-      body: JSON.stringify(data),
-      onmessage(event: any) {
-        onMessage(event)
+        headers: {
+          'Content-Type': 'text/event-source',
+        },
+        body: JSON.stringify(data),
+        onmessage(event: any) {
+          onMessage(event)
 
-        if (event.event === 'DONE') {
-          onFinish()
-        }
-      },
-      onerror() {
-        onError()
-      },
-    })
+          if (event.event === 'DONE') {
+            onFinish()
+          }
+        },
+        onerror() {
+          onError()
+        },
+      }
+    )
   } catch (e) {
     throw new Error('Fail to obtain response from OpenAI.')
+  }
+}
+
+export const askChatPublic = async ({
+  prompt,
+  content,
+  temperature,
+  maxtokens,
+  language,
+  previousMessages,
+  imageUrls,
+  onMessage,
+  onFinish,
+  onError,
+}: AskChatProps): Promise<void> => {
+  const browserId =
+    localStorage.getItem(LocalStorageKeys.FfBrowserId) ?? uuidv4()
+
+  const data = {
+    prompt,
+    content,
+    language,
+    temperature: temperature.toString(),
+    previousMessages,
+    maxTokens: maxtokens.toString(),
+    imageUrls,
+  }
+
+  let timeoutId: any
+
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error('Request Time Out'))
+      onFinish()
+    }, 30000)
+  })
+
+  try {
+    await Promise.race([
+      fetchEventSource(
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/admin/openai-public/chatgpt-stream-turbo?browserId=${browserId}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+          onmessage(event: any) {
+            if (event.event === 'DONE') {
+              clearTimeout(timeoutId)
+              onFinish()
+            } else if (event.event === 'ERROR') {
+              clearTimeout(timeoutId)
+              const error = JSON.parse(event.data)
+              onError(error)
+            } else {
+              onMessage(event)
+            }
+          },
+          onerror() {
+            clearTimeout(timeoutId)
+            throw new Error('Too Many Requests')
+          },
+          onclose() {
+            clearTimeout(timeoutId)
+            onFinish()
+          },
+        }
+      ),
+      timeoutPromise,
+    ])
+  } catch (error: any) {
+    if (error.message === 'Request Time Out') {
+      onFinish()
+    } else {
+      onError()
+    }
+
+    // handle error
   }
 }
 

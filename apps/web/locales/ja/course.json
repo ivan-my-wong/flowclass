@@ -1,24 +1,16 @@
 {
   "enroll": "申し込むへ",
-  "seoTitle": "オンライン申し込み",
   "enquire": "お問い合わせ",
-  "feature": "課程の特徴",
-  "courseMaterial": "課程の教材",
-  "timeslots": "時間枠",
-  "achievement": "成果",
   "search": "検索",
   "searchCourse": "課程を検索",
   "searchByCategory": "分類で検索",
   "selectorNoOptions": "課程検索のためにカテゴリーを選択してください。",
   "searchByKeywords": "課程検索のためにカテゴリーのキーワードを選択してください。",
   "showSearchResult": "検索結果を表示",
-  "q&a": "問題集",
-  "noQ&A": "この課程には問題集がありません",
   "workshop": "ワークショップ",
   "appointment": "アポイントメント",
   "regular": "定期課程",
   "recurring": "繰り返す課程",
-  "courseEnquiry": "課程についてお問い合わせ",
   "technicalSupport": "技術サポート",
   "typeOfTeachServices": "教育サービスの種類",
   "regularDescription1": "この教育サービスは定期課程の一種です。",
@@ -30,15 +22,11 @@
   "workshopDescription1": "この教育サービスはイベントの一種です。",
   "workshopDescription2": "イベントのセッションのいずれかに参加できます。",
   "workshopDescription3": "各セッションは一日中以上続く可能性があります。",
-  "showing": "表示中",
   "results": "結果",
-
   "courseDetailCard": {
     "perLesson": "一レッスンあたり",
     "forEntire": "すべてのクラス",
     "forEntireEvent": "イベント全体",
-    "classSize": "クラスあたりの生徒数",
-    "minutesPerClass": "一レッスンあたりの時間",
     "earliestLesson": "開始時間",
     "freeLesson": "無料レッスンあり",
     "more": "さらに"
@@ -58,7 +46,6 @@
     "noQuota": "空席がありません",
     "noClasses": "利用可能なクラスがありません"
   },
-
   "courseDefaultSectionTitle": {
     "COURSE_FEATURES": "特徴",
     "COURSE_DESC": "課程説明",

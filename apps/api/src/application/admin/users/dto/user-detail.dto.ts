@@ -30,6 +30,10 @@ export class UserDetailDto {
 
   @ApiProperty()
   @Expose()
+  firebaseId: string
+
+  @ApiProperty()
+  @Expose()
   phone: string
 
   @ApiProperty()

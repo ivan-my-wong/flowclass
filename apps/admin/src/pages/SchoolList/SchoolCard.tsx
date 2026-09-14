@@ -19,6 +19,7 @@ import Text from '@/components/Texts/Text'
 import { Button } from '@/components/ui/Button'
 import useSchoolData from '@/hooks/useSchoolData'
 import { CustomSiteUpdateProps, siteState } from '@/stores/siteData'
+import { styled } from '@/styles'
 
 interface SchoolCardProps {
   id: number
@@ -86,21 +87,30 @@ const SchoolCard = ({
   }
 
   return (
-    <div className="flex w-full flex-row relative rounded-lg border border-text-disabled shadow-sm overflow-hidden">
-      <div className="flex-shrink-0 w-60 rounded-l-md overflow-hidden">
+    <CardBox>
+      <ImageBox>
         <ImageAspect
           s3="public"
           ratio={16 / 9}
           width="100%"
           src={bannerImage ?? banner}
           alt="Banner image"
-          borderRadius="0"
+          borderRadius="1rem"
         />
-      </div>
-      <Box responsive justify="flex-start" className="flex-1 pb-4 px-4 py-4">
-        <Box direction="column" align="flex-start" className="ml-4">
+      </ImageBox>
+      <Box responsive justify="flex-start" css={{ padding: '0 $4 $4 $4' }}>
+        <ImageAspect
+          s3="public"
+          ratio={1}
+          width="20%"
+          src={logo ?? logoImage}
+          alt="Logo image"
+          borderRadius="1rem"
+        />
+
+        <Box direction="column" align="flex-start" css={{ marginLeft: '$4' }}>
           <Heading align="left">{name}</Heading>
-          <Text className="mb-2">{schoolUrl}</Text>
+          <Text css={{ marginBottom: '$2' }}>{schoolUrl}</Text>
           <Box justify="flex-start" wrap>
             <Button onClick={handleViewSchool}>{t(`school:viewSchool`)}</Button>
             <Button
@@ -152,8 +162,27 @@ const SchoolCard = ({
         }}
         onActionClick={handleConfirm}
       />
-    </div>
+    </CardBox>
   )
 }
+
+const CardBox = styled(Box, {
+  display: 'flex',
+  flexDirection: 'column !important',
+  position: 'relative',
+  borderRadius: '$2',
+  border: '1px solid $colors$textDisabled',
+  boxShadow: '$1',
+  width: '45%!important',
+  overflow: 'hidden',
+  '@sm': {
+    width: '100%!important',
+  },
+})
+
+const ImageBox = styled(Box, {
+  display: 'flex',
+  borderRadius: '$medium',
+})
 
 export default SchoolCard

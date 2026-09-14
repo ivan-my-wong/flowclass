@@ -5,11 +5,11 @@ import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { CiWarning } from 'react-icons/ci'
 
-import { StyledContent, StyledOverlay } from '@/components/Popups/Modal'
 import ModalCloseButton from '@/components/Popups/ModalCloseButton'
 import Separator from '@/components/Separators/Separator'
 import { Button } from '@/components/ui/Button'
 import useClassData from '@/hooks/useClassData'
+import { StyledContent, StyledOverlay } from '@/pages/School/CreateSchoolModal'
 import { Classes, ClassesForm, ResValidateTimeslot } from '@/types/classes'
 
 import ValidationItem from './ValidationItem'

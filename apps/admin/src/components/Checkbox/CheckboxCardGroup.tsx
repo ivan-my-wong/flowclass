@@ -1,8 +1,7 @@
 // eslint-disable-next-line no-restricted-syntax
 import React from 'react'
 
-import { cn } from '@/utils/cn'
-
+import { styled } from '../../styles'
 import HorizontalBaseCard from '../Cards/HorizontalCard'
 import Box from '../Containers/Box'
 import ImageAspect from '../Images/ImageAspect'
@@ -27,10 +26,18 @@ const CheckboxCardGroup: React.FC<CheckboxCardProps> = ({
   handleValueChange,
 }) => {
   return (
-    <Box className="flex gap-3 w-full flex-wrap">
+    <Box css={{ display: 'flex', gap: '$3', width: '100%', flexWrap: 'wrap' }}>
       {items.map(item => (
         <HorizontalBaseCard key={item.id}>
-          <Box className={cn('w-full h-full flex items-center')}>
+          <Box
+            css={{
+              all: 'unset',
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
             <Box gap="large" justify="flex-start">
               <Checkbox
                 name="test"
@@ -50,20 +57,30 @@ const CheckboxCardGroup: React.FC<CheckboxCardProps> = ({
                 <Spacer space="x1" />
               )}
             </Box>
-            <label
+            <Label
               htmlFor={item.id}
-              className={cn(
-                'flex flex-grow items-center whitespace-nowrap',
-                'text-text text-base font-semibold leading-none pl-[15px]'
-              )}
+              css={{
+                display: 'flex',
+                flexGrow: 1,
+                alignItems: 'center',
+                whiteSpace: 'nowrap',
+              }}
             >
               {item.label}
-            </label>
+            </Label>
           </Box>
         </HorizontalBaseCard>
       ))}
     </Box>
   )
 }
+
+const Label = styled('label', {
+  color: '$text',
+  fontSize: '$4',
+  fontWeight: 600,
+  lineHeight: 1,
+  paddingLeft: 15,
+})
 
 export default CheckboxCardGroup

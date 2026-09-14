@@ -2,9 +2,82 @@ import { useNavigate } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
 
-import { cn } from '@/utils/cn'
-
+import { styled } from '../../styles'
 import Text from '../Texts/Text'
+
+const ActionCardContainer = styled('div', {
+  display: 'flex',
+  width: '100%',
+  marginBottom: '$5',
+  flexDirection: 'row',
+  '@sm': {
+    flexDirection: 'column',
+  },
+
+  variants: {
+    grid: {
+      true: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gridGap: '$4',
+        '@sm': {
+          gridTemplateColumns: 'repeat(1, 1fr)',
+        },
+      },
+    },
+  },
+})
+
+const ActionCardWrapper = styled('div', {
+  flexBasis: 'calc(33.333%)',
+  backgroundColor: '$backgroundLayer2',
+  borderRadius: '$1',
+  marginRight: '$5',
+  height: 'auto',
+  justifyContent: 'center',
+  alignItems: 'center',
+  '@sm': {
+    marginBottom: '$2',
+  },
+  cursor: 'pointer',
+  '&:hover': {
+    backgroundColor: '$backgroundLayer3',
+  },
+
+  variants: {
+    disabled: {
+      true: {
+        filter: 'grayscale(100%)',
+        opacity: 0.5,
+        cursor: 'default',
+
+        pointerEvents: 'none',
+      },
+    },
+  },
+})
+
+const ActionContent = styled('div', {
+  display: 'flex',
+  flowDirection: 'row',
+  alignItems: 'center',
+  padding: '$7',
+})
+
+const ActionIcon = styled('div', {
+  display: 'flex',
+  marginRight: '$5',
+  fontSize: '$5',
+  color: '$textSubtle',
+})
+
+const ComingSoonText = styled(Text, {
+  position: 'absolute',
+  right: '$4',
+  padding: '$2',
+  borderRadius: '$1',
+  backgroundColor: '$tertiary',
+})
 
 export type Card<T = string> = {
   label: string
@@ -25,23 +98,12 @@ const ActionCard = ({ items, grid }: ActionCardProps) => {
   const navigate = useNavigate()
 
   return (
-    <div
-      className={cn(
-        'flex w-full mb-5 flex-row sm:flex-col',
-        grid && 'grid grid-cols-3 gap-4 sm:grid-cols-1'
-      )}
-    >
+    <ActionCardContainer grid={grid}>
       {items.map(item => {
         return (
-          <div
+          <ActionCardWrapper
             key={item.label}
-            role="button"
-            tabIndex={item.disabled ? -1 : 0}
-            className={cn(
-              'basis-1/3 bg-background-layer-2 rounded mr-5 h-auto flex justify-center items-center sm:mb-2 cursor-pointer hover:bg-background-layer-3',
-              item.disabled &&
-                'grayscale opacity-50 cursor-default pointer-events-none'
-            )}
+            disabled={item.disabled}
             onClick={() => {
               if (!item.disabled) {
                 if (item.action) {
@@ -51,36 +113,21 @@ const ActionCard = ({ items, grid }: ActionCardProps) => {
                 }
               }
             }}
-            onKeyDown={e => {
-              if (!item.disabled && (e.key === 'Enter' || e.key === ' ')) {
-                e.preventDefault()
-                if (item.action) {
-                  item.action()
-                } else {
-                  navigate(`${item.path}`)
-                }
-              }
-            }}
           >
-            <div className="flex flex-row items-center p-7">
+            <ActionContent>
               {item.disabled && (
-                <Text
-                  bold
-                  className="absolute right-4 p-2 rounded bg-tertiary z-[999]"
-                >
+                <ComingSoonText bold css={{ zIndex: 999 }}>
                   {t('common:description.comingSoon')}
-                </Text>
+                </ComingSoonText>
               )}
-              <div className="flex mr-5 text-xl text-text-subtle">
-                {item.icon}
-              </div>
+              <ActionIcon>{item.icon}</ActionIcon>
 
               <div>{t(item.label)}</div>
-            </div>
-          </div>
+            </ActionContent>
+          </ActionCardWrapper>
         )
       })}
-    </div>
+    </ActionCardContainer>
   )
 }
 

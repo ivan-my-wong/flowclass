@@ -146,7 +146,8 @@ const useEnrollPaymentLogic = ({
       } else if (e.statusCode === 500) {
         // TODO: business logic error should not be represented by statusCode
         message = t('errors:PAYMENT.serverError')
-        setError({ isError: true, statusCode: e.statusCode, message: e })
+      } else if (e.errorCode === ServerErrorMessage.NETWORK_ERROR || e.name === 'TypeError') {
+        message = t('errors:NETWORK')
       } else if (e.message) {
         if (e.message.includes(EnrolErrorMessage.COURSE_RECRUITMENT_NOT_STARTED)) {
           const startDate = e.message.split(': ')[1]
@@ -155,7 +156,11 @@ const useEnrollPaymentLogic = ({
           ).format('YYYY-MM-DD h:mm a')}`
         } else if (e.message.includes(EnrolErrorMessage.DATE_PICKED_IS_IN_THE_PAST)) {
           message = t('errors:ENROL.DATE_PICKED_IS_IN_PAST')
-        } else if (e.message.includes(ServerErrorMessage.FAILED_TO_FETCH)) {
+        } else if (
+          e.message.includes(ServerErrorMessage.FAILED_TO_FETCH) ||
+          e.message.includes(ServerErrorMessage.LOAD_FAILED) ||
+          e.message.includes(ServerErrorMessage.NETWORK_ERROR)
+        ) {
           message = t('errors:NETWORK')
         }
       }
@@ -226,7 +231,8 @@ const useEnrollPaymentLogic = ({
       } else if (e.statusCode === 500) {
         // TODO: business logic error should not be represented by statusCode
         message = t('errors:PAYMENT.serverError')
-        setError({ isError: true, statusCode: e.statusCode, message: e })
+      } else if (e.errorCode === ServerErrorMessage.NETWORK_ERROR || e.name === 'TypeError') {
+        message = t('errors:NETWORK')
       } else if (e.message) {
         if (e.message.includes(EnrolErrorMessage.COURSE_RECRUITMENT_NOT_STARTED)) {
           const startDate = e.message.split(': ')[1]
@@ -235,7 +241,11 @@ const useEnrollPaymentLogic = ({
           ).format('YYYY-MM-DD h:mm a')}`
         } else if (e.message.includes(EnrolErrorMessage.DATE_PICKED_IS_IN_THE_PAST)) {
           message = t('errors:ENROL.DATE_PICKED_IS_IN_PAST')
-        } else if (e.message.includes(ServerErrorMessage.FAILED_TO_FETCH)) {
+        } else if (
+          e.message.includes(ServerErrorMessage.FAILED_TO_FETCH) ||
+          e.message.includes(ServerErrorMessage.LOAD_FAILED) ||
+          e.message.includes(ServerErrorMessage.NETWORK_ERROR)
+        ) {
           message = t('errors:NETWORK')
         }
       }
@@ -263,6 +273,7 @@ const useEnrollPaymentLogic = ({
             paymentAmount,
             courseId: invoice.course?.id || invoice?.courseId,
             redirectUrl: enrollPayload.redirectUrl,
+            coupon: invoiceData?.couponCode || undefined,
           },
         })
         if (Array.isArray(res)) {
@@ -286,7 +297,7 @@ const useEnrollPaymentLogic = ({
   useEffect(() => {
     if (
       couponCode &&
-      paymentAmount &&
+      paymentAmount !== undefined &&
       +paymentAmount > -1 &&
       +paymentAmount !== +invoice.payAmount &&
       +paymentAmount !== prevPaymentAmount.current

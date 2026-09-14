@@ -34,9 +34,11 @@ import {
   customMessageOptions,
   defaultWhatsappTemplate,
 } from '@/constants/whatsappTemplate'
+import useAutomationFlowData from '@/hooks/useAutomationFlowData'
 import useNavigateDialogPage from '@/hooks/useNavigateDialogPage'
 import useWhatsappTemplateData from '@/hooks/useWhatsappTemplateData'
 import { schoolState } from '@/stores/schoolData'
+import { AutomationFunction } from '@/types/automationFlow'
 import { CustomMessageType, WhatsappTemplate } from '@/types/whatsappTemplate'
 
 const ManageWhatsappTemplate = (): React.ReactElement => {
@@ -44,11 +46,13 @@ const ManageWhatsappTemplate = (): React.ReactElement => {
   const schoolData = useRecoilValue(schoolState)
 
   const currentSchoolId = schoolData.currentSchool?.id || 0
+  const { useFetchAutomationFunctions } = useAutomationFlowData()
   const {
     useFetchDetailWhatsappTemplate,
     useCreateWhatsappTemplate,
     useUpdateWhatsappTemplate,
   } = useWhatsappTemplateData()
+  const { data: dataFunctions } = useFetchAutomationFunctions()
 
   const [params] = useSearchParams()
 
@@ -71,7 +75,7 @@ const ManageWhatsappTemplate = (): React.ReactElement => {
   const { mutateAsync: submitUpdate, isLoading: isLoadingUpdate } =
     useUpdateWhatsappTemplate()
   const { isOpen, setIsOpen } = useNavigateDialogPage(
-    '/whatsapp-templates',
+    '/custom-messages?tab=whatsapp-templates',
     () => {}
   )
 
@@ -94,13 +98,15 @@ const ManageWhatsappTemplate = (): React.ReactElement => {
     data: WhatsappTemplate
   ) => {
     const variables = syncVariableWithContent(data.content)
+    const assignedTo = dataFunctions?.find(
+      (item: AutomationFunction) => item.functionName === data.assignedTo
+    )
 
     const payload = {
       ...data,
       variables,
-      assignedTo: data.assignedTo ?? {},
+      assignedTo,
       category: data.category ?? categoriesSupported[0].value,
-      isDefault: data.isDefault ?? false,
     }
 
     if (detail) {
@@ -150,33 +156,55 @@ const ManageWhatsappTemplate = (): React.ReactElement => {
     if (detail) {
       formData.reset({
         ...detail,
+        assignedTo:
+          dataFunctions?.find(
+            (item: AutomationFunction) =>
+              item.functionName ===
+              (detail.assignedTo as AutomationFunction | undefined)
+                ?.functionName
+          )?.functionName || '',
       })
     }
     return () => {
       formData.reset(defaultWhatsappTemplate)
     }
-  }, [detail, formData])
+  }, [detail, formData, dataFunctions])
 
   const isLoading = useMemo(
     () => isLoadingCreate || isLoadingUpdate,
     [isLoadingCreate, isLoadingUpdate]
   )
 
-  const contentValue = formData.watch('content')
+  const assignedToValue = formData.watch('assignedTo')
 
   const variablesOptions = useMemo(() => {
-    const variables = Object.keys(syncVariableWithContent(contentValue || ''))
+    if (!assignedToValue) return []
+    let variables: string[] = []
+    if (typeof assignedToValue === 'string') {
+      const assignedTo = dataFunctions?.find(
+        (item: AutomationFunction) => item.functionName === assignedToValue
+      )
+      variables = assignedTo?.variables || []
+    } else {
+      variables = assignedToValue?.variables || []
+    }
     return variables.map(d => ({
       name: t(d.replace(/{{|}}/g, '')),
-      value: `{{${d}}}`,
+      value: d,
     }))
-  }, [contentValue, t])
+  }, [assignedToValue, dataFunctions, t])
+
+  const supportedFunctions = useMemo(() => {
+    return (dataFunctions || [])?.filter(d => ![''].includes(d.functionName))
+  }, [dataFunctions])
 
   return (
     <ModalDialog
       title={
         t(
-          detail ? 'whatsappTemplate:form.edit' : 'whatsappTemplate:form.add'
+          whatsappTemplateId > 0 || detail
+            ? 'whatsappTemplate:form.edit'
+            : 'whatsappTemplate:form.add'
         ) as string
       }
       open={isOpen}
@@ -237,6 +265,39 @@ const ManageWhatsappTemplate = (): React.ReactElement => {
                   />
                 </FormControl>
                 <FormMessage className="text-warn" />
+              </FormItem>
+            )}
+          />
+          <FormField
+            name="assignedTo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('whatsappTemplate:form.assignedTo')}</FormLabel>
+                <FormControl>
+                  <Select
+                    {...field}
+                    onValueChange={field.onChange}
+                    defaultValue="all"
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue
+                        placeholder={t(
+                          'whatsappTemplate:form.assignedToPlaceholder'
+                        )}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {supportedFunctions?.map(d => (
+                        <SelectItem
+                          key={d.functionName}
+                          value={d.functionName.toString()}
+                        >
+                          {d.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
               </FormItem>
             )}
           />
@@ -309,24 +370,24 @@ const ManageWhatsappTemplate = (): React.ReactElement => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t('whatsappTemplate:form.language')}</FormLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <FormControl>
+                <FormControl>
+                  <Select {...field} onValueChange={field.onChange}>
                     <SelectTrigger className="w-full">
                       <SelectValue
                         placeholder={t('whatsappTemplate:language.all')}
                       />
                     </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {supportedLanguages
-                      .sort((a, b) => a.country.localeCompare(b.country))
-                      .map(item => (
-                        <SelectItem key={item.code} value={item.code}>
-                          {item.country}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
+                    <SelectContent>
+                      {supportedLanguages
+                        .sort((a, b) => a.country.localeCompare(b.country))
+                        .map(item => (
+                          <SelectItem key={item.code} value={item.code}>
+                            {item.country}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
               </FormItem>
             )}
           />
@@ -336,22 +397,22 @@ const ManageWhatsappTemplate = (): React.ReactElement => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t('whatsappTemplate:form.category')}</FormLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <FormControl>
+                <FormControl>
+                  <Select {...field} onValueChange={field.onChange}>
                     <SelectTrigger className="w-full">
                       <SelectValue
                         placeholder={t('whatsappTemplate:category.utility')}
                       />
                     </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {categoriesSupported.map(item => (
-                      <SelectItem key={item.name} value={item.value}>
-                        {t(item.name)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                    <SelectContent>
+                      {categoriesSupported.map(item => (
+                        <SelectItem key={item.name} value={item.value}>
+                          {t(item.name)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
               </FormItem>
             )}
           />

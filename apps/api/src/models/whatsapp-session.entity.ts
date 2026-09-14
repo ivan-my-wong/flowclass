@@ -29,6 +29,9 @@ export class WhatsAppSession extends BaseEntity {
 
   @Column({ type: 'jsonb', name: 'session_data' })
   sessionData: IWhatsAppSessionData
+
+  @Column({ type: 'int4', name: 'ezchat_account_id', nullable: true })
+  ezchatAccountId: number
 }
 
 @Injectable()

@@ -4,6 +4,8 @@ import Select, { StylesConfig } from 'react-select'
 
 import { SimpleSelectorItemProps } from '@/components/Selector/Select'
 
+import { styled, theme } from '../../../styles'
+
 export type StudentSelectorItem = SimpleSelectorItemProps & {
   name: string
 }
@@ -15,24 +17,26 @@ export type StudentSelectorProps = {
 }
 
 const selectCustomStyles = (width: string): StylesConfig => ({
-  option: styles => ({
-    ...styles,
-    backgroundColor: 'var(--color-background)',
-    color: 'var(--color-text)',
-  }),
+  option: styles => {
+    return {
+      ...styles,
+      backgroundColor: theme.colors.background.toString(),
+      color: theme.colors.text.toString(),
+    }
+  },
   control: styles => ({
     ...styles,
-    backgroundColor: 'var(--color-background)',
-    color: 'var(--color-text)',
+    backgroundColor: theme.colors.background.toString(),
+    color: theme.colors.text.toString(),
   }),
   singleValue: styles => ({
     ...styles,
     padding: '0.25rem',
-    color: 'var(--color-text)',
+    color: theme.colors.text.toString(),
   }),
   input: styles => ({
     ...styles,
-    color: 'var(--color-text)',
+    color: theme.colors.text.toString(),
   }),
   container: styles => ({
     ...styles,
@@ -42,6 +46,15 @@ const selectCustomStyles = (width: string): StylesConfig => ({
     ...styles,
     padding: 0,
   }),
+})
+
+const Wrapper = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: '100%',
+  height: '100%',
+  color: '$text',
 })
 
 const StudentSelector: React.FC<StudentSelectorProps> = ({
@@ -56,14 +69,11 @@ const StudentSelector: React.FC<StudentSelectorProps> = ({
       placeholder="Select Student"
       options={options}
       isMulti
-      formatOptionLabel={(data: any, formatMeta) => {
-        if (formatMeta?.context === 'value') return String(data.label ?? '')
-        return (
-          <div className="flex items-center justify-between w-full h-full text-text">
-            <span className="p-4">{data.label}</span>
-          </div>
-        )
-      }}
+      formatOptionLabel={(data: any) => (
+        <Wrapper className="country-option">
+          <span style={{ padding: '$4' }}>{data.label}</span>
+        </Wrapper>
+      )}
       styles={selectCustomStyles(width)}
       onChange={onChange}
     />

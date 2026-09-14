@@ -22,7 +22,7 @@ export class StudentCreatePaymentEvidenceDto {
     type: 'string',
     format: 'binary',
   })
-  file: Express.Multer.File
+  file: Express.MulterS3.File
 
   @ApiProperty({
     example: PayoutPreferenceDto.example,

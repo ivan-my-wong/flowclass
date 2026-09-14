@@ -1,67 +1,31 @@
 {
-  "StarterPromotion": "Upgrade to Starter plan could have tons of benefits including 500 AI chat attempts. Click Upgrade to see the details",
-  "TopUpPrice": "Per month US$",
-  "Attempts": "attempts",
-  "TopUpOption": "Upgrade Options",
   "upgrade": "Upgrade",
-  "TopUp": "Get more attempts",
-  "chatDescription": "Create your profile with AI",
   "itTakesTime": "The AI may need to think up to 30 seconds. Please wait patiently...",
-  "attemptsLeft": "attempts left for AI creator",
   "generate": "Create",
-  "useAi": "Use AI to create",
-  "needAssistance": "Enter your own prompt",
-  "useGuide": "Use the guided form",
-  "guidedPromptFormTitle": "Tell us more about your course",
   "input": "Command",
-  "output": "Output",
-
   "upgradePlans": {
     "STARTER_TIER": "You get 100 monthly AI attempts, and you can customize your site domain.",
     "GROWTH_TIER": "You get 500 monthly AI attempts, and you can create more course pages."
   },
-
   "controls": {
-    "language": "Output Chinese",
-    "markDown": "Output HTML Format",
-    "usePrevious": "Base on previous content",
     "temperature": "Creativity",
-    "useDavinci": "Use advanced model",
     "length": "Output words",
     "analyzeImage": "Analyze Image",
     "removeImage": "Remove Image",
     "otherInformation": "How you want the output to be?"
   },
   "scenarios": {
-    "title": "Choose your template",
-    "courseDescription": "Create course description",
-    "courseCurriculum": "Create course curriculum",
-    "writefromscratch": "Write your own prompt freely",
     "continueWriting": "Edit: Continue writing",
     "improveWriting": "Edit: Improve writing",
-    "makeitshort": "Edit: Make it short",
-    "shortcourseDescription": "Template: Short Course Description",
-    "averagecourseDescription": "Template: Average Course Description",
-    "detailcourseDescription": "Template: Detail Course Description",
-    "Facilities": "Template: Facilities Description",
-    "StudentAchievement": "Template: Student Achievement Description",
-    "Qualification": "Template: Qualification Description",
-    "StudentLife": "Template: Student Life Description",
-    "Alumni": "Template: Alumni Description",
-    "Awards": "Template: Awards Description",
-    "SuccessStories": "Template: Success Stories Description",
     "basicCourseDescription": "Template: Course Description (Basic)",
     "advanceCourseDescription": "Template: Course Description (Advance)",
-    "kidsCourseDescription": "Template: Course Description for Kids",
     "courseCurriculumTemplate": "Template: Course Curriculum",
     "writeYourPrompt": "Write your prompt from scratch"
   },
-
   "scenarioPlaceholders": {
     "improveWriting": "Simply paste your content in the input box ✨✨\nand get a better version of your content based on your poster",
     "continueWriting": "Simply paste your content in the input box ✨✨\nand continue writing based on your poster",
-    "prompt": "✨✨ Describe your course in a few sentences\n✨✨ Or you may pick a template to start\n✨✨ Flowclass AI will handle the rest",
-    "output": "✨✨ Flowclass AI is busy right now ✨✨\n✨✨ Try to refresh ✨✨"
+    "prompt": "✨✨ Describe your course in a few sentences\n✨✨ Or you may pick a template to start\n✨✨ Flowclass AI will handle the rest"
   },
   "displaytext": {
     "descriptionGenerator": "Create outline and description for your courses from a poster",
@@ -72,43 +36,14 @@
     "step4": "Step 4: Provide further instructions",
     "step5": "Step 5: Fine-tune  the length and the creativity",
     "finalResult": "Final Result",
-    "pending": "Flowclass AI is creating your content...",
-    "longContent": "If you entered a lot of text, it may take longer than usual to generate the result.",
-    "maxTokenReach": "Oops! Either OpenAI is down, or you have reached the maximum token limit.",
-    "cancel": "Cancel",
     "clear": "Clear",
-    "tryAgain": "Continue",
-    "submit": "Submit"
+    "tryAgain": "Continue"
   },
-
   "alertmsg": {
     "changeScenario": "Changing scenario will discard any unsaved changes, do you want to continue?",
-    "haveUnSavedChanges": "You have unsaved changes!",
-    "leaveWithoutSaved": "You have unsaved changes, do you want to leave without saving?",
-    "closePortal": "Closing portal will discard any unsaved changes, do you want to continue?",
     "noTextFound": "No text identified in the image"
   },
-  "fields": {
-    "tone": "Tone",
-    "qualification": "Teacher Qualification",
-    "teachingStyle": "Teaching style",
-    "teachingContent": "Course content",
-    "teachingSubject": "Subject to be taught",
-    "studentAccomplishments": "Student accomplishments",
-    "targetAudience": "Target audience",
-    "courseName": "Course name",
-    "courseValueProposition": "Course value proposition",
-    "courseDescription": "Course description",
-    "instructorName": "Instructor name",
-    "instructorQualifications": "Instructor qualifications",
-    "courseOutline": "Course outline",
-    "learningObjectives": "Learning objectives",
-    "pricing": "Pricing",
-    "callToAction": "Call to action"
-  },
-
   "courseDescriptionBasic": {
-    "instructions": "You can follow the questions below. Keep in mind that the more information you provide, the better the AI can generate the content.",
     "courseTitle": "Course Title",
     "courseTitlePlaceholder": "Your course title, e.g. Introduction to ...",
     "courseDescription": "Course Description",
@@ -117,12 +52,6 @@
     "suitableForPlaceholder": "The course is designed for students in ... level",
     "courseInstructor": "Course Instructor",
     "courseInstructorPlaceholder": "Instructor Name and contact method",
-    "courseCurriculum": "Course Curriculum",
-    "courseCurriculumPlaceholder": "Topics covered include ...",
-    "learningObjective": "Course Learning Objective",
-    "learningObjectivePlaceholder": "Students are expected to gain/reinforce/learn/benefit from ...",
-    "courseLength": "Course Length",
-    "courseLengthPlaceholder": "How many hours per lesson? How many lessons in total?",
     "courseSchedule": "Course Schedule",
     "courseSchedulePlaceholder": "How many lessons per week? How many lessons in total?",
     "courseMaterials": "Course Materials",
@@ -147,10 +76,6 @@
     "courseLengthPlaceholder": "The course consists of [number] hours of instructions. The course is divided into [number] lessons. Each lesson is approximately [number] hours.",
     "courseSchedule": "Course Schedule",
     "courseSchedulePlaceholder": "The course is offered [once/ twice] a week at [time option] Teaching Mode: [Face to face | Online | Self-paced]",
-    "courseMaterials": "aiTool:courseDescriptionBasic.courseMaterials",
-    "courseMaterialsPlaceholder": "aiTool:courseDescriptionBasic.courseMaterialsPlaceholder",
-    "prerequisites": "aiTool:courseDescriptionBasic.prerequisites",
-    "prerequisitesPlaceholder": "aiTool:courseDescriptionBasic.prerequisitesPlaceholder",
     "enquiry": "Enquiry",
     "enquiryPlaceholder": "Please contact [email] for any enquiry."
   }

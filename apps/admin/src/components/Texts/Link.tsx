@@ -1,39 +1,41 @@
-import { cn } from '@/utils/cn'
+import { styled } from '../../styles'
+
+const StyledLink = styled('a', {
+  margin: 0,
+  padding: 0,
+  fontSize: '$medium',
+  width: '100%',
+  color: '$primaryHighlight',
+  '&:visited': {
+    color: '$textHighlight',
+  },
+  overflowWrap: 'break-word',
+  variants: {
+    styled: {
+      true: {
+        cursor: 'pointer',
+        textDecoration: 'underline',
+      },
+    },
+    inline: {
+      true: {
+        width: 'unset',
+      },
+    },
+  },
+})
 
 type LinkProps = {
   href: string
   align?: 'left' | 'center' | 'right'
   children?: React.ReactNode
-  styled?: boolean
-  inline?: boolean
-} & React.ComponentProps<'a'>
+} & React.ComponentProps<typeof StyledLink>
 
-const Link = ({
-  href,
-  children,
-  align,
-  styled,
-  inline,
-  className,
-  ...rest
-}: LinkProps): JSX.Element => {
+const Link = ({ href, children, align, ...rest }: LinkProps): JSX.Element => {
   return (
-    <a
-      href={href}
-      className={cn(
-        'm-0 p-0 text-base w-full text-primary-highlight break-words',
-        'visited:text-text-highlight',
-        styled && 'cursor-pointer underline',
-        inline && 'w-auto',
-        align === 'left' && 'text-left',
-        align === 'center' && 'text-center',
-        align === 'right' && 'text-right',
-        className
-      )}
-      {...rest}
-    >
+    <StyledLink css={{ textAlign: align }} {...rest} href={href} {...rest}>
       {children}
-    </a>
+    </StyledLink>
   )
 }
 Link.displayName = 'Link'

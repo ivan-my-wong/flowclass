@@ -21,7 +21,11 @@ import {
   StudentSubmissionType,
   TeacherFeedbackType,
 } from './student-submission'
-import { UserAlias } from './studentMemo'
+import {
+  GetStudentMemoOnlyContactResponseDto,
+  StudentInfoResponse,
+  UserAlias,
+} from './studentMemo'
 
 export type EnrolInto = {
   type: ClassTypeEnum
@@ -78,12 +82,7 @@ export type SingleStudentCrmRecordEnrolledClassesInvoice = {
   updatedAt: string
   usedBalance: number
   proofToken?: string
-  remark?: string | null
-  documentCampaignId?: number | null
-  /** userId of the admin/instructor who created this invoice */
-  createdBy?: number | null
-  /** User who created this invoice — populated when backend joins the users table */
-  createdByUser?: { id: number; email: string } | null
+  paymentDate?: string | Date | null
 }
 
 export type SingleStudentCrmRecordEnrolledClassesStudentSchedule = {
@@ -123,15 +122,16 @@ export type StudentEnrolmentRecord = {
   id: number // userAliasId
   name: string
   email: string
-  secondaryEmail?: string | null
   phone: string
   // status?: string
   userId: number
   // fullName?: string
   user: SingleStudentCrmRecord
   enrollCourses?: SingleStudentCrmRecordEnrollCourse[]
-  remarks?: string | null
+  /** Deprecated  @deprecated */
+  studentMemo?: GetStudentMemoOnlyContactResponseDto
   studentForms: StudentFormListResponse[]
+  // studentMemos?: GetStudentMemoOnlyContactResponseDto[]
   isStudentParent?: boolean
   childOfUserAliasId?: number
   usedBalance?: number
@@ -164,7 +164,6 @@ export type CreateStudentProps = {
 export type TypeCreateStudent = {
   name: string
   email?: string
-  secondaryEmail?: string
   phone: string
   institutionId: number
   siteId: number
@@ -218,7 +217,8 @@ export type TypeGetStudentDetail = {
 export type TypeGetCouponParams = {
   institutionId: number
   siteId: number
-  userId: number
+  userId?: number
+  userAliasId?: number
 }
 
 export type TypeUserIdAndInstitutionId = {
@@ -272,6 +272,9 @@ export type StudentLesson = {
 export type ClassLesson = {
   id: number
   courseName: string
+  // @deprecated use class instead
+  className: string
+
   class: string
   start: string // ISO 8601 date-time string
   end: string // ISO 8601 date-time string
@@ -336,13 +339,6 @@ export type TypeTeachingServiceDetail = {
   classType?: ClassTypeEnum
   lessons: StudentLesson[]
   isPaused?: boolean
-  /** Period identifier for change-lesson init (from lesson matrix). Recurring: recurringScheduleId; Regular v1: periodId; Regular v2: regularScheduleId. */
-  recurringScheduleId?: number
-  regularScheduleId?: number
-  /** Period identifier for regular/workshop (v1) classes. */
-  periodId?: number
-  /** ISO start time of the lesson being changed — used to pre-select the matching date. */
-  originalLessonStart?: string
 }
 
 export type TypeTeachingServiceEnrollCourse = Omit<
@@ -602,6 +598,8 @@ export type ImportStudentResponse = {
   }
 
   userAlias: UserAlias
+
+  studentMemo: StudentInfoResponse
 
   customFields: StudentFormResponse[]
 }

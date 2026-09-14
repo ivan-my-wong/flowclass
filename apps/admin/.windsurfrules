@@ -1,0 +1,131 @@
+# Code Style & Formatting
+
+- Use English for all code and documentation
+- Always declare types (variables, function parameters, return values)
+- Avoid `any`, create necessary types instead
+- Use JSDoc for public classes and methods
+- No blank lines within functions
+- One export per file
+
+# Naming Conventions
+
+- PascalCase: classes, components
+- camelCase: variables, functions, methods
+- kebab-case: files, directories
+- UPPERCASE: environment variables
+- Define constants instead of magic numbers
+
+# Functions & Logic
+
+- Keep functions short (<20 lines) and single-purpose
+- Avoid nesting with early returns and utility functions
+- Use higher-order functions (map, filter, reduce)
+- Arrow functions for simple cases (<3 instructions), named functions otherwise
+- Use default parameter values instead of null/undefined checks
+- Use RO-RO (Receive Object, Return Object) pattern
+
+# Data Handling
+
+- Encapsulate data in composite types over primitive types
+- Use classes with internal validation instead of validation in functions
+- Prefer immutability: `readonly` properties, `as const` for literals
+
+# Project Structure
+
+## Components `/src/components/`
+
+- Reusable UI components, presentation-focused
+- Minimal dependencies, configurable via props
+- Define complex prop types in separate `type/*.type.ts`
+
+## Shadcn Components `/src/components/ui`
+
+- Use ShadCN components defined in this folder in ALL circumstances.
+- Components in this folder has the highest priority to be used.
+- These components are defined by ShadCN. Under no circumstances should you change the content of any file inside this folder.
+
+
+## API `/src/api/`
+
+- Use configured `apiClient` for backend requests
+- Structure: `client/index.ts`, `client/customFetch.ts`, service files
+
+## Assets `/src/assets/`
+
+- Images, fonts, icons in appropriate subdirectories
+- Use consistent naming, optimize file sizes
+
+## Constants `/src/constants/`
+
+- Store static values (API routes, action types)
+
+## Contexts `/src/contexts/`
+
+- Global state providers and shared logic
+
+## Hooks `/src/hooks/`
+
+- Custom hooks for reusable logic
+- Use the package `react-query` for all API calls. useQuery for GET calls and useMutation for POST calls.
+- Prefix with `use`, return objects not arrays
+
+## Layouts `/src/layouts/`
+
+- Page structure components (headers, footers, navigation)
+
+## Locales `/src/locales/`
+
+- Translation files by language
+- DO NOT hard code text inside any pages or components. 
+- Instead, after you have created the UI, create the appropriate translations inside the folder of our two main language `/src/locales/en` and `/src/locales/zh`
+- Please always check if both language has the same structure and the list of keys. And after everything, the text in the UI should be using t() function.
+
+## Reducers `/src/reducers/`
+
+- State management reducers
+
+## Routes `/src/routes/`
+
+- Route configuration with lazy loading
+
+## Stores `/src/stores/`
+
+- Recoil atoms and selectors
+
+## Styles `/src/styles/`
+
+- Global styles, themes, utilities
+
+## Types `/src/types/`
+
+- TypeScript types, interfaces
+
+## Utils `/src/utils/`
+
+- Utility functions
+
+## Pages `/src/pages/`
+
+- Page components using file system routing
+
+# Best Practices
+
+## File Naming & Structure
+
+- PascalCase for components (.tsx)
+- camelCase for utilities (.ts)
+- Consistent component structure with typed props
+
+## Imports
+
+- Use `@/` alias for absolute imports
+- Order: React, third-party, internal, styles
+
+## Testing
+
+- Add `data-testid` to important components
+
+## Variables
+
+- Use semantic names for sizes: xsmall, small, normal, medium, large, xlarge
+- For all tailwind colors, always use the colors defined in `colorTheme.ts`. Do not use color + number, such as blue-[100], instead, use primary

@@ -6,15 +6,19 @@ import { useRecoilValue } from 'recoil'
 import flowclassLogoBlack from '@/assets/logos/flowclass.png'
 import flowclassLogoWhite from '@/assets/logos/flowclassLogoWhite.png'
 import { darkModeState } from '@/stores/darkMode'
-import { cn } from '@/utils/cn'
+import { styled } from '@/styles'
+
+const Icon = styled('img', {
+  width: '8rem',
+  cursor: 'pointer',
+  '@sm': {
+    width: '6rem',
+  },
+})
 
 type PropTypes = ComponentPropsWithoutRef<'img'>
 
-const FlowclassLogo = ({
-  onClick,
-  className,
-  ...props
-}: PropTypes): JSX.Element => {
+const FlowclassLogo = ({ onClick, ...props }: PropTypes): JSX.Element => {
   const navigate = useNavigate()
   const isDarkMode = useRecoilValue(darkModeState)
   const defaultOnClick = () => {
@@ -24,12 +28,11 @@ const FlowclassLogo = ({
   const thisOnClick = onClick ?? defaultOnClick
 
   return (
-    <img
-      className={cn('w-32 cursor-pointer md:w-24', className)}
+    <Icon
+      {...props}
       src={isDarkMode ? flowclassLogoWhite : flowclassLogoBlack}
       onClick={thisOnClick}
       alt="Flowclass Logo"
-      {...props}
     />
   )
 }

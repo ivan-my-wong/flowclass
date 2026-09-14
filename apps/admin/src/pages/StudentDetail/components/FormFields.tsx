@@ -15,6 +15,7 @@ import { FieldTypes } from '@/constants/enrollmentFormFieldNames'
 import DropdownField from '@/pages/StudentDetail/components/customFields/DropdownField'
 import MultipleChoiceField from '@/pages/StudentDetail/components/customFields/MultipleChoiceField'
 import FormFieldWrapper from '@/pages/StudentDetail/components/FormFieldWrapper'
+import { styled } from '@/styles'
 import { InformationFieldTypes } from '@/types/applicationForm'
 import { generateDataTestId } from '@/utils/data-testid.utils'
 import { validateIsoDate } from '@/utils/validate'
@@ -71,11 +72,11 @@ const FormFields = ({
       case FieldTypes.SHORT_ANSWER:
         return (
           <>
-            <div className="w-full mb-[30px] relative">
-              <p className="mb-[9px] text-ellipsis" data-testid={dataTestId}>
+            <TextField>
+              <LabelForText data-testid={dataTestId}>
                 {customField.question}
                 {reqSign}
-              </p>
+              </LabelForText>
               <TextInput
                 className="raw-input"
                 type="text"
@@ -86,29 +87,29 @@ const FormFields = ({
                 helperText={errors[fieldName]?.message as string}
                 {...reg}
               />
-            </div>
+            </TextField>
           </>
         )
       case FieldTypes.PARAGRAPH:
         return (
           <>
-            <div className="w-full mb-[30px] relative">
-              <p className="mb-[9px] text-ellipsis" data-testid={dataTestId}>
+            <TextField>
+              <LabelForText data-testid={dataTestId}>
                 {customField.question}
                 {reqSign}
-              </p>
+              </LabelForText>
               <TextArea disabled={disabled} rows={5} {...reg} />
-            </div>
+            </TextField>
           </>
         )
       case FieldTypes.NUMBER:
         return (
           <>
-            <div className="w-full mb-[30px] relative">
-              <p className="mb-[9px] text-ellipsis" data-testid={dataTestId}>
+            <TextField>
+              <LabelForText data-testid={dataTestId}>
                 {customField.question}
                 {reqSign}
-              </p>
+              </LabelForText>
               <TextInput
                 className="raw-input"
                 dataTestId={textFieldDataTestId}
@@ -119,7 +120,7 @@ const FormFields = ({
                 helperText={errors[fieldName]?.message as string}
                 {...reg}
               />
-            </div>
+            </TextField>
           </>
         )
       case FieldTypes.MULTIPLE_CHOICE: {
@@ -147,11 +148,11 @@ const FormFields = ({
       case FieldTypes.SINGLE_CHOICE:
         return (
           <>
-            <div className="w-full mb-[30px] relative">
-              <p className="mb-[9px] text-ellipsis" data-testid={dataTestId}>
+            <TextField>
+              <LabelForText data-testid={dataTestId}>
                 {customField.question}
                 {reqSign}
-              </p>
+              </LabelForText>
 
               <SingleChoiceField
                 formItemClass="flex flex-row items-center justify-start mb-[30px]"
@@ -163,7 +164,7 @@ const FormFields = ({
                 disabled={disabled}
                 form={enrollmentForm}
               />
-            </div>
+            </TextField>
           </>
         )
 
@@ -173,11 +174,11 @@ const FormFields = ({
 
         return (
           <>
-            <div className="w-full mb-[30px] relative">
-              <p className="mb-[9px] text-ellipsis" data-testid={dataTestId}>
+            <TextField>
+              <LabelForText data-testid={dataTestId}>
                 {customField.question}
                 {reqSign}
-              </p>
+              </LabelForText>
               <DropdownField
                 formItemClass="flex flex-row items-center justify-center w-full"
                 key={value as string}
@@ -188,7 +189,7 @@ const FormFields = ({
                 labelClass={questionClassNames}
                 options={labelOptions}
               />
-            </div>
+            </TextField>
           </>
         )
       }
@@ -196,12 +197,12 @@ const FormFields = ({
       case FieldTypes.SWITCH:
         return (
           <>
-            <div className="w-full mb-[30px] relative">
+            <TextField>
               <div>
-                <p className="mb-[9px] text-ellipsis" data-testid={dataTestId}>
+                <LabelForText data-testid={dataTestId}>
                   {customField.question}
                   {reqSign}
-                </p>
+                </LabelForText>
               </div>
               <div className="box-row-full justify-start">
                 <Controller
@@ -220,17 +221,17 @@ const FormFields = ({
                   )}
                 />
               </div>
-            </div>
+            </TextField>
           </>
         )
       case FieldTypes.DATE:
         return (
           <>
-            <div className="w-full mb-[30px] relative">
-              <p className="mb-[9px] text-ellipsis" data-testid={dataTestId}>
+            <TextField>
+              <LabelForText data-testid={dataTestId}>
                 {customField.question}
                 {reqSign}
-              </p>
+              </LabelForText>
               <Controller
                 name={customFieldId.toString()}
                 control={control}
@@ -269,18 +270,18 @@ const FormFields = ({
                   )
                 }}
               />
-            </div>
+            </TextField>
           </>
         )
 
       case FieldTypes.PHONE:
         return (
           <>
-            <div className="w-full mb-[30px] relative">
-              <p className="mb-[9px] text-ellipsis" data-testid={dataTestId}>
+            <TextField>
+              <LabelForText data-testid={dataTestId}>
                 {customField.question}
                 {reqSign}
-              </p>
+              </LabelForText>
               <Controller
                 name={fieldName}
                 control={control}
@@ -297,23 +298,25 @@ const FormFields = ({
                 <Text
                   size="small"
                   type={errors[fieldName] ? 'error' : undefined}
-                  className={errors[fieldName] ? 'text-warn' : 'text-text'}
+                  css={{
+                    color: errors[fieldName] ? '$warn' : '$text',
+                  }}
                 >
                   {errors[fieldName]?.message as string}
                 </Text>
               )}
-            </div>
+            </TextField>
           </>
         )
 
       case FieldTypes.EMAIL:
         return (
           <>
-            <div className="w-full mb-[30px] relative">
-              <p className="mb-[9px] text-ellipsis" data-testid={dataTestId}>
+            <TextField>
+              <LabelForText data-testid={dataTestId}>
                 {customField.question}
                 {reqSign}
-              </p>
+              </LabelForText>
               <TextInput
                 id={fieldName}
                 className="raw-input"
@@ -325,7 +328,7 @@ const FormFields = ({
                 helperText={errors[fieldName]?.message as string}
                 {...reg}
               />
-            </div>
+            </TextField>
           </>
         )
       case FieldTypes.COUNTRY:
@@ -386,4 +389,14 @@ const FormFields = ({
     </FormFieldWrapper>
   )
 }
+const TextField = styled('div', {
+  width: '100%',
+  marginBottom: 30,
+  position: 'relative',
+})
+const LabelForText = styled('p', {
+  marginBottom: 9,
+  textOverflow: 'ellipsis',
+})
+
 export default FormFields

@@ -20,8 +20,8 @@ import Text from '@/components/Texts/Text'
 import usePromotionData from '@/hooks/usePromotionData'
 import useSchoolData from '@/hooks/useSchoolData'
 import { AlertTypes } from '@/reducers/confirm.reducers'
+import { styled } from '@/styles'
 import { CouponStatusEnum } from '@/types/coupon'
-import { cn } from '@/utils/cn'
 import { formatTs, getFormatDate } from '@/utils/timeFormat'
 
 type CouponCardProps = {
@@ -173,10 +173,10 @@ const CouponCard: React.FC<CouponCardProps> = ({
       // isHidden: !canDelete,
       content: (
         <>
-          <SvgIcon className="mr-4">
+          <SvgIcon css={{ marginRight: '1rem' }}>
             <DeleteIcon fill="var(--colors-warn)" />
           </SvgIcon>
-          <Text className="text-warn">
+          <Text css={{ color: '$warn' }}>
             {t('promotion:coupons.deleteCoupon')}
           </Text>
         </>
@@ -195,44 +195,59 @@ const CouponCard: React.FC<CouponCardProps> = ({
     <Box
       data-testid="coupon-card"
       direction="column"
-      role="button"
-      tabIndex={0}
-      onClick={handleEditCoupon}
-      onKeyDown={e => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          handleEditCoupon()
-        }
+      css={{
+        position: 'relative',
+        backgroundColor: !isActive
+          ? '$backgroundDisabled'
+          : '$backgroundLayer2',
+        borderRadius: '$medium',
+        filter: !isActive ? 'grayscale(100%)' : 'none',
+        padding: '1rem !important',
+        overflow: 'hidden',
+        cursor: 'pointer',
+        '&:hover': {
+          backgroundColor: '$backgroundLayer3',
+        },
       }}
-      className={cn(
-        'relative rounded-lg p-4 overflow-hidden cursor-pointer',
-        !isActive
-          ? 'bg-background-disabled grayscale'
-          : 'bg-background-layer-2 hover:bg-background-layer-3'
-      )}
     >
       <Box
         direction="column"
         justify="flex-start"
         align="flex-start"
-        className="px-1"
+        css={{ padding: '0 $1' }}
       >
         <Box
           justify="flex-start"
           align="flex-start"
-          className="pb-2 text-text-subtle text-sm border-b border-text-disabled"
+          css={{
+            paddingBottom: '$2',
+            color: '$textSubtle',
+            fontSize: '$small',
+            borderBottom: '1px solid $textDisabled',
+          }}
         >
           {t('promotion:validUntil')}: {getFormatDate(date)}
         </Box>
 
-        <Box justify="flex-start" align="flex-start" className="text-base">
+        <Box
+          justify="flex-start"
+          align="flex-start"
+          css={{
+            fontSize: '$mediumLarge',
+          }}
+        >
           {t('promotion:discountCode')}: {code}
         </Box>
 
         <Box
           justify="flex-start"
           align="flex-start"
-          className="text-base pb-2 border-b border-text-disabled"
+          css={{
+            fontSize: '$mediumLarge',
+            paddingBottom: '$2',
+
+            borderBottom: '1px solid $textDisabled',
+          }}
         >
           {t('promotion:amount')}: {amount}
         </Box>
@@ -240,16 +255,19 @@ const CouponCard: React.FC<CouponCardProps> = ({
         <Box
           justify="flex-start"
           align="flex-start"
-          className="text-sm text-text-subtle"
+          css={{
+            fontSize: '$small',
+            color: '$textSubtle',
+          }}
         >
           {description}
         </Box>
-        <Text className="text-base">{t('promotion:totalUsage')}</Text>
+        <Text css={{ fontSize: '$medium' }}>{t('promotion:totalUsage')}</Text>
         <Box justify="space-between" align="center">
           <ProgressBar percentage={(usage / quota) * 100} />
           <Button
             variants="outlined"
-            className="rounded-lg h-[30px] gap-1"
+            css={{ borderRadius: '$3', height: '30px', gap: '$1' }}
             // css={{ color: '$primary', border: '1px solid', padding: '10' }}
           >
             {`${usage ?? 0} / `}
@@ -262,16 +280,12 @@ const CouponCard: React.FC<CouponCardProps> = ({
         </Box>
       </Box>
 
-      <div
-        role="group"
-        className="absolute w-fit top-4 right-4 z-[1]"
-        onClick={e => e.stopPropagation()}
-      >
+      <DropDownMenuContainer onClick={e => e.stopPropagation()}>
         <DropdownMenu
           menuItems={menuItems}
           contentProps={{ minWidth: '16rem', zIndex: 999 }}
         />
-      </div>
+      </DropDownMenuContainer>
 
       <CustomedAlertDialog
         open={showConfirmPopup}
@@ -317,4 +331,11 @@ const CouponCard: React.FC<CouponCardProps> = ({
     </Box>
   )
 }
+const DropDownMenuContainer = styled(Box, {
+  position: 'absolute !important',
+  width: 'fit-content !important',
+  top: '1rem',
+  right: '1rem',
+  zIndex: 1,
+})
 export default CouponCard

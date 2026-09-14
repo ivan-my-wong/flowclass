@@ -2,6 +2,7 @@ import { ComponentProps, forwardRef } from 'react'
 
 import { DefaultTFuncReturn } from 'i18next'
 
+import { styled, theme } from '@/styles'
 import { DataTestId } from '@/types/common'
 import { cn } from '@/utils/cn'
 
@@ -11,27 +12,29 @@ import Text from '../Texts/Text'
 import Label from './Label'
 import RawInput from './RawInput'
 
-export type TextInputLabelProps = {
-  fullWidth?: boolean
-  className?: string
-} & ComponentProps<typeof Label>
-
-export const TextInputLabel = ({
-  fullWidth,
-  className,
-  ...props
-}: TextInputLabelProps) => (
-  <Label
-    className={cn(
-      'flex items-center shrink-0 pl-0 text-sm',
-      fullWidth
-        ? 'w-full max-w-full sm:my-2'
-        : 'w-[30%] min-w-[80px] max-w-[40%] shrink-0',
-      className
-    )}
-    {...props}
-  />
-)
+export const TextInputLabel = styled(Label, {
+  width: '30%',
+  maxWidth: '40%',
+  alignItems: 'center',
+  display: 'flex',
+  // height: '100%',
+  paddingLeft: 0,
+  fontSize: '$normal',
+  flexShrink: 0,
+  '@sm': {
+    width: '100%',
+    maxWidth: 'unset',
+    my: '$2',
+  },
+  variants: {
+    fullWidth: {
+      true: {
+        maxWidth: '100%',
+        width: '100%',
+      },
+    },
+  },
+})
 
 export type TextInputProps = {
   isError?: boolean
@@ -41,7 +44,7 @@ export type TextInputProps = {
   vertical?: boolean
   boxProps?: Omit<ComponentProps<typeof Box>, 'children'>
   required?: boolean
-  containerClassName?: string
+  containerCSSProps?: ComponentProps<typeof Box>['css']
 } & ComponentProps<typeof RawInput> &
   DataTestId
 
@@ -55,7 +58,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       helperText,
       boxProps,
       required = false,
-      containerClassName,
+      containerCSSProps,
       dataTestId,
       ...props
     },
@@ -66,28 +69,24 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         responsive
         {...boxProps}
         direction={vertical ? 'column' : 'row'}
-        align={vertical ? 'flex-start' : 'center'}
-        className={cn(
-          vertical && 'items-start',
-          !vertical && 'md:items-start',
-          containerClassName
-        )}
+        css={
+          vertical
+            ? { alignItems: 'flex-start', ...containerCSSProps }
+            : { '@md': { alignItems: 'flex-start' }, ...containerCSSProps }
+        }
       >
         {label && (
-          <TextInputLabel fullWidth={!!vertical}>
+          <TextInputLabel fullWidth={vertical}>
             <>
               {label}
-              {required && <span className="text-warn">*</span>}
+              {required && (
+                <span style={{ color: theme.colors.warn.toString() }}>*</span>
+              )}
             </>
           </TextInputLabel>
         )}
 
-        <Box
-          direction="column"
-          align="flex-start"
-          gap="none"
-          className="min-w-0 flex-1"
-        >
+        <Box direction="column" align="flex-start">
           <RawInput
             placeholder={placeholder}
             error={isError}
@@ -95,8 +94,11 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             ref={ref}
             className={cn(
               props.className,
-              'w-full ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none placeholder:text-muted-foreground'
+              'ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none placeholder:text-muted-foreground'
             )}
+            css={{
+              width: '100%',
+            }}
             data-testid={dataTestId}
           />
 
@@ -104,7 +106,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             <Text
               size="small"
               type={isError ? 'error' : undefined}
-              className={isError ? 'text-warn' : 'text-text'}
+              css={{ color: isError ? '$warn' : '$text' }}
             >
               {helperText}
             </Text>
@@ -114,7 +116,5 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     )
   }
 )
-
-TextInput.displayName = 'TextInput'
 
 export default TextInput

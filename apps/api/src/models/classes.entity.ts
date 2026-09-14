@@ -234,6 +234,12 @@ export class ClassEntity extends BaseEntity {
   @OneToMany(() => StudentSchedule, (StudentSchedule) => StudentSchedule.class)
   studentSchedules: StudentSchedule[]
 
+  // @ManyToMany(() => AutomationFlowStep, (step) => step.classes, {
+  //   onDelete: 'NO ACTION',
+  //   onUpdate: 'NO ACTION',
+  // })
+  // automation_flow_steps: AutomationFlowStep[]
+
   @Index('IX_classes_is_archived')
   @Column({ name: 'is_archived', type: 'boolean', default: false })
   isArchived: boolean

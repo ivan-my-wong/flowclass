@@ -24,11 +24,12 @@ export enum PromotionType {
   TRIAL_LESSON = 'TRIAL_LESSON',
   ADDITIONAL_FEE = 'ADDITIONAL_FEE',
   REFERRAL_DISCOUNT = 'REFERRAL_DISCOUNT',
-  PACKAGE_DISCOUNT = 'PACKAGE_DISCOUNT',
 }
 
 export type StudentProps = {
   id: number
+  userAliasId?: number
+  userId?: number
   email: string
   phone?: string
   couponCode: string
@@ -68,12 +69,14 @@ export type Coupon = {
   courseIds: number[]
   // The coupon may not expire
   expireDate?: Date
+  userAliasIds?: number[]
   userIds?: number[]
 
   status: string
   studentsAssigned: StudentProps[]
   courseAssigned: CourseProps[]
   classIds: number[]
+  couponUsed?: CoursePromotionUsed[]
 
   // For history
   usedCount: number
@@ -82,6 +85,7 @@ export type Coupon = {
 
 export type CreateCouponProps = {
   courseIds?: number[]
+  userAliasIds?: number[]
   userIds?: number[]
   emailNotifyOn?: boolean
   classIds: number[]
@@ -128,4 +132,17 @@ export type HistoryCouponProps = {
 export enum PromotionUsedStatus {
   REDEEMED = 'REDEEMED',
   USED = 'USED',
+}
+
+export type CoursePromotionUsed = {
+  id: number
+  siteId: number
+  institutionId: number
+  courseId: number
+  couponId: number
+  coupon?: { id: number } & CreateCouponProps
+  studentId: number
+  enrollId: number
+  invoiceId: number
+  usedStatus: PromotionUsedStatus
 }

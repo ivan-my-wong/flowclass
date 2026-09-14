@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { LuCalendar, LuHelpCircle } from 'react-icons/lu'
 import { RiRefreshFill } from 'react-icons/ri'
 import { useQueryClient } from 'react-query'
+import { useRecoilState } from 'recoil'
 
 import AppointmentIcon from '@/assets/svgs/courses/AppointmentIcon'
 import RegularCourseIcon from '@/assets/svgs/courses/RegularCourseIcon'
@@ -19,7 +20,9 @@ import Text from '@/components/ui/Text'
 import { QUERY_KEY } from '@/constants/queryKey'
 import useClassData from '@/hooks/useClassData'
 import useCourseData from '@/hooks/useCourseData'
+import usePlanData from '@/hooks/useSubscriptionPlanData'
 import ContentLayout from '@/layouts/ContentLayout'
+import { subscriptionDialogOpenState } from '@/stores/schoolSubscriptionData'
 import { ClassTypeEnum } from '@/types/course'
 import { cn } from '@/utils/cn'
 
@@ -68,6 +71,11 @@ const SelectClassType = ({
   const [searchParams] = useSearchParams()
 
   const queryClient = useQueryClient()
+
+  const { checkSubscriptionAccess } = usePlanData()
+  const [, setShowSubscriptionPopup] = useRecoilState(
+    subscriptionDialogOpenState
+  )
 
   const openModal = () => {
     addClassModalHandle.current?.handleOpenChange?.()
@@ -124,8 +132,26 @@ const SelectClassType = ({
     }
 
     if (!optionMode) {
-      setCreateCourseType(courseType)
-      openModal()
+      const isSubscriptionAvailable = checkSubscriptionAccess(
+        'classTypeEnable',
+        courseType
+      )
+
+      // This is just hacking to check if the regularV2 is available
+      const isRegularV2Available =
+        courseType === ClassTypeEnum.regularV2 &&
+        checkSubscriptionAccess('classTypeEnable', ClassTypeEnum.regular)
+
+      const isFreeClassType = ['workshop', 'subscription'].includes(courseType)
+      if (isFreeClassType || isSubscriptionAvailable || isRegularV2Available) {
+        setCreateCourseType(courseType)
+        openModal()
+      } else {
+        setShowSubscriptionPopup({
+          open: true,
+          message: t(`subscription:subscriptionDialog.upgradePlan`),
+        })
+      }
     }
   }
 

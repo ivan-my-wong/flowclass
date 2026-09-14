@@ -18,7 +18,7 @@ import { RoleInSite } from '@/models/enums/'
 
 export class InviteSiteMemberDto {
   @ApiProperty({
-    example: 'user@example.com',
+    example: 'flowclass@gmail.com',
   })
   @MaxLength(255)
   @IsNotEmpty()

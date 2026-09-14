@@ -151,7 +151,7 @@ const EmailSettings = forwardRef((props, ref): JSX.Element => {
                   {...field}
                   placeholder={
                     t('teachingService:emailSettings.templateIdPlaceholder') ??
-                    'Email Template ID'
+                    'MailerSend Template ID'
                   }
                   disabled={isLoading}
                 />

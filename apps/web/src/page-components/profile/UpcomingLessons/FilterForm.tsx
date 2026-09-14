@@ -71,7 +71,7 @@ const FilterForm = ({ courses, setCurrentFilter }: FilterFormProps) => {
         data-testid="course-select"
         options={courses?.map(course => ({ label: course.name, value: course.id })) || []}
         placeholder={t('profile:course')}
-        onChange={val => handleChange('courseId', val?.value)}
+        onChange={(val: any) => handleChange('courseId', val?.value)}
         isClearable
         isSearchable
         name="course"
@@ -81,7 +81,7 @@ const FilterForm = ({ courses, setCurrentFilter }: FilterFormProps) => {
         data-testid="payment-status-select"
         options={optionsPaymentState}
         placeholder={t('profile:paymentStatus')}
-        onChange={val => handleChange('paymentState', val?.value)}
+        onChange={(val: any) => handleChange('paymentState', val?.value)}
         isClearable
         isSearchable
         name="payment-status"
@@ -91,7 +91,7 @@ const FilterForm = ({ courses, setCurrentFilter }: FilterFormProps) => {
         data-testid="attendance-status-select"
         options={optionsAttendanceStatus}
         placeholder={t('profile:attendanceStatus')}
-        onChange={val => handleChange('attendanceStatus', val?.value)}
+        onChange={(val: any) => handleChange('attendanceStatus', val?.value)}
         isClearable
         isSearchable
         name="attendance-status"

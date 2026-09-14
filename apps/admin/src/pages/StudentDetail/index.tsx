@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { FaPencilAlt } from 'react-icons/fa'
 import { GiConfirmed } from 'react-icons/gi'
 import { ImCross } from 'react-icons/im'
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 import { useRecoilState } from 'recoil'
 import { toast } from 'sonner'
 
@@ -19,10 +19,10 @@ import FullScreenLoading from '@/components/FullScreen/FullScreenLoading'
 import { Spinner } from '@/components/Loaders/Spinner'
 import Separator from '@/components/Separators/Separator'
 import { HeaderBackButtonStatus } from '@/components/TabWithListAndButton/HeaderBackButton'
-import { Badge } from '@/components/ui/Badge'
 import Box from '@/components/ui/Box'
 import { Button } from '@/components/ui/Button'
 import { StudentStatus } from '@/constants/common'
+import { QUERY_KEY } from '@/constants/queryKey'
 import useEnrollmentFormData from '@/hooks/useEnrollmentFormData'
 import useSiteData from '@/hooks/useSiteData'
 import useStudentCRMData from '@/hooks/useStudentCRMData'
@@ -41,6 +41,7 @@ import RightHeaderStudentDetail from './components/RightHeaderStudentDetail'
 import TeachingService from './components/TeachingService'
 
 const StudentDetail = (): React.ReactElement => {
+  const queryClient = useQueryClient()
   const [schoolData] = useRecoilState(schoolState)
   const currentSchoolId = schoolData.currentSchool?.id || 0
   const [isDisabled, setIsDisabled] = useState(true)
@@ -79,7 +80,6 @@ const StudentDetail = (): React.ReactElement => {
       name: '',
       alias: '',
       email: '',
-      secondaryEmail: '',
       phone: '',
     },
   })
@@ -183,9 +183,11 @@ const StudentDetail = (): React.ReactElement => {
     mutationFn: (params: EditStudentContactInfoV2RequestDto) =>
       updateStudentContactInfoV2(params),
     onSuccess: () => {
-      // queryClient.invalidateQueries(
-      //   QUERY_KEY.enrollmentForm.studentEnrollmentKey
-      // ) // call API get detail
+      queryClient.invalidateQueries([
+        QUERY_KEY.student.getStudentDetailKey,
+        Number(userAliasId),
+      ])
+      queryClient.invalidateQueries([QUERY_KEY.student.studentListNewKey])
       toast.success(t('student:edit.updateEnrollmentSuccess'))
       setIsDisabled(true)
     },
@@ -322,6 +324,7 @@ const StudentDetail = (): React.ReactElement => {
                 disabled={isDisabled}
                 enrollmentForm={enrollmentForm}
                 studentEnrollment={studentEnrollment}
+                studentMemo={personalInfo?.studentMemo}
               />
             )}
           </Box>

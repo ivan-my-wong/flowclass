@@ -4,7 +4,7 @@ import { PaymentState } from '../constants/payment'
 
 import { RepeatFormats } from './classes'
 import { BaseModelWithTimestamps } from './common'
-import { PromotionType } from './coupon'
+import { CoursePromotionUsed, PromotionType } from './coupon'
 import { ClassTypeEnum, Course } from './course'
 import { StudentLesson, StudentSchedule } from './student'
 import {
@@ -100,12 +100,12 @@ export type Invoice = {
   paymentState: PaymentState
   paymentLinkId: string
   paymentEvidence: PaymentEvidence
+  paymentDate?: string | Date | null
 
   feePerLesson: number
   numOfLesson: number
   originalFee: number
   payAmount: number
-  amountPaid: number
   currency: string
   course: Course
   payBy: string
@@ -129,6 +129,7 @@ export type Invoice = {
   enrollCourse: EnrollCourseInstance
   enrollCourses: EnrollCourseInstance[]
   studentSchedules: StudentSchedule[]
+  promotionUsed?: CoursePromotionUsed
   isParent?: boolean
   discounts?: PromotionType[]
   adminDiscounts?: AppliedPromotion[]
@@ -139,19 +140,7 @@ export type Invoice = {
     'id' | 'payAmount' | 'payBy' | 'payById' | 'currency'
   >[]
   invoiceParentId?: number
-  documentCampaignId?: number
-  createdBy?: number
-  createdByUser?: { id: number; email: string }
-  invoicePromotionsUsed?: InvoicePromotionUsedItem[]
 } & BaseModelWithTimestamps
-
-export type InvoicePromotionUsedItem = {
-  promotionType: string
-  promotionId: number | null
-  name: string | null
-  amount: number
-  usedStatus: string | null
-}
 
 export type StudentFormResponse = {
   id: string | number
@@ -271,11 +260,6 @@ export type PaymentProofTableItem = {
   payLaterMethod?: {
     methodName: string
   }
-  divitOrder?: {
-    id: number
-    divitOrderId: string
-    environment: 'sandbox' | 'production'
-  } | null
   paymentEvidenceId: number | null
   paymentEvidence: PaymentEvidence
   paymentLink: string
@@ -293,6 +277,7 @@ export type PaymentProofTableItem = {
   userId: number
 
   userAlias: PaymentProofTableUserAlias
+  promotionUsed?: CoursePromotionUsed
   childInvoices?: Pick<
     Invoice,
     'id' | 'payAmount' | 'payBy' | 'payById' | 'currency'
@@ -300,7 +285,6 @@ export type PaymentProofTableItem = {
   splitItems?: InvoiceSplit[]
 
   remark?: string
-  invoicePromotionsUsed?: InvoicePromotionUsedItem[]
 }
 
 export type MultipleClassMapping = {

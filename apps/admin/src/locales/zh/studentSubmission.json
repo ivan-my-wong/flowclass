@@ -19,7 +19,6 @@
     "uploadResponseTo": "上載已批改的文件",
     "selectFilesUpload": "選擇檔案上傳",
     "supportForPDFDOCXJPGPNG": "支援PDF, DOC, DOCX, JPG, PNG",
-    "selectFiles": "選擇檔案",
     "selectedFiles": "已選擇檔案 ({{count}})"
   },
   "studentDocumentLength": "學生文檔 ({{count}})",

@@ -18,7 +18,6 @@
     "newLocation": "New Location",
     "updateLocation": "Update Location",
     "saveAction": "Save",
-    "cancelAction": "Cancel",
     "name": "Name",
     "namePlaceholder": "Enter Location Name",
     "capacity": "Capacity",
@@ -35,10 +34,7 @@
   "messages": {
     "createLocationSuccess": "Location created successfully",
     "updateLocationSuccess": "Location updated successfully",
-    "deleteLocationSuccess": "Location deleted successfully",
-    "createLocationError": "Failed to create location",
-    "updateLocationError": "Failed to update location",
-    "deleteLocationError": "Failed to delete location"
+    "deleteLocationSuccess": "Location deleted successfully"
   },
   "confirm": {
     "deleteLocation": "Delete Location",

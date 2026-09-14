@@ -32,6 +32,8 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
 
 // Default export to prevent next.js errors
 // eslint-disable-next-line @typescript-eslint/no-empty-function
-export default (): JSX.Element => {
+const SitemapSites = (): JSX.Element => {
   return <div />
 }
+
+export default SitemapSites

@@ -4,9 +4,8 @@ import { RefObject } from '@fullcalendar/core/preact'
 import FullCalendar from '@fullcalendar/react'
 import dayjs from 'dayjs'
 
-import { cn } from '@/utils/cn'
-
 import { TimeFormat } from '../../../constants/common'
+import { styled } from '../../../styles'
 
 type Props = {
   calendarRef: RefObject<FullCalendar>
@@ -54,41 +53,72 @@ const WeekHeaderCustom = ({
     }
   }
   return (
-    <div className="w-full flex gap-5 my-[15px] cursor-pointer">
+    <Wrapp>
       {weekDates?.map(item => {
         const date = currentDate || new Date()
-        const isActive =
-          dayjs(date).format(TimeFormat.DD_MM_YYYY) ===
-          dayjs(item.source).format(TimeFormat.DD_MM_YYYY)
         return (
-          <div
+          <DateItem
             key={item.id}
-            role="button"
-            tabIndex={0}
-            className="flex flex-col justify-center items-center"
             onClick={() => {
               handleClick(item)
             }}
-            onKeyDown={e => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                handleClick(item)
-              }
-            }}
           >
-            <div className="text-base font-normal h-fit">{item.dateString}</div>
-            <div
-              className={cn(
-                'w-[42px] h-[42px] rounded-full flex justify-center items-center mt-[7px] text-base font-normal',
-                isActive ? 'text-white bg-[#5C95FF]' : 'text-black bg-[#D9D9D9]'
-              )}
+            <DateString>{item.dateString}</DateString>
+            <DateNumber
+              status={
+                dayjs(date).format(TimeFormat.DD_MM_YYYY) ===
+                dayjs(item.source).format(TimeFormat.DD_MM_YYYY)
+                  ? 'active'
+                  : 'inactive'
+              }
             >
               {item.dateNumber}
-            </div>
-          </div>
+            </DateNumber>
+          </DateItem>
         )
       })}
-    </div>
+    </Wrapp>
   )
 }
+const Wrapp = styled('div', {
+  width: '100%',
+  display: 'flex',
+  gap: 20,
+  margin: '15px 0',
+  cursor: 'pointer',
+})
+
+const DateString = styled('div', {
+  fontSize: 16,
+  fontWeight: 400,
+  height: 'fit-content',
+})
+const DateNumber = styled(DateString, {
+  width: 42,
+  height: 42,
+  backgroundColor: '#D9D9D9',
+  borderRadius: '50%',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: 7,
+  variants: {
+    status: {
+      active: {
+        color: '#FFFFFF',
+        backgroundColor: '#5C95FF',
+      },
+      inactive: {
+        color: '#000000',
+        backgroundColor: '#D9D9D9',
+      },
+    },
+  },
+})
+const DateItem = styled('div', {
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+})
 export default WeekHeaderCustom

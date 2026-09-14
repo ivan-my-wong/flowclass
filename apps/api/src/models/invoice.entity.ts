@@ -18,18 +18,18 @@ import {
   InvoiceSplitType,
   SplitItem,
 } from '@/application/admin/invoice-campaign/dto/send-invoice.dto'
-import { ClassPriceOption } from '@/models/class-price-options.entity'
 import { Course } from '@/models/courses.entity'
 import { EnrollCourse } from '@/models/enroll-courses.entity'
 import { DiscountType, PaymentMethod } from '@/models/enums/'
 import { PaymentStatus } from '@/models/enums/status'
-import { InvoicePromotionUsed } from '@/models/invoice-promotion-used.entity'
 import { PaymentEvidence } from '@/models/payment-evidence.entity'
 import { PayoutMethod } from '@/models/payout-method.entity'
 import { StudentSchedule } from '@/models/student-schedule.entity'
 import { User } from '@/models/user.entity'
 import { BaseEntity } from '@/modules/base/base.entity'
 
+import { ClassPriceOption } from './class-price-options.entity'
+import { CoursePromotionUsed } from './course-promotion-used.entity'
 import { CreditTransactions } from './credit-transactions.entity'
 import { Institution } from './institutions.entity'
 import { Site } from './site.entity'
@@ -53,8 +53,6 @@ export type InvoiceSplit = {
 
 @Entity('invoices')
 export class Invoice extends BaseEntity {
-  divitOrder?: any
-
   @Index('IX_invoices_site_id')
   @Column({ name: 'site_id' })
   siteId: number
@@ -121,9 +119,6 @@ export class Invoice extends BaseEntity {
   @Column({ name: 'pay_amount', default: 0, type: 'numeric' })
   payAmount: number
 
-  @Column({ name: 'amount_paid', default: 0, type: 'numeric' })
-  amountPaid: number
-
   @Column({ name: 'currency', nullable: true })
   currency: string
 
@@ -188,10 +183,10 @@ export class Invoice extends BaseEntity {
   })
   paymentEvidence: PaymentEvidence
 
-  @OneToMany(() => InvoicePromotionUsed, (p) => p.invoice, {
+  @OneToOne(() => CoursePromotionUsed, (promotionUsed) => promotionUsed.invoice, {
     createForeignKeyConstraints: false,
   })
-  invoicePromotionsUsed: InvoicePromotionUsed[]
+  promotionUsed: CoursePromotionUsed
 
   @ManyToOne(() => Course, (course) => course.invoices, {
     createForeignKeyConstraints: false,
@@ -270,7 +265,11 @@ export class Invoice extends BaseEntity {
   @Column({ name: 'invoice_ids', type: 'jsonb', default: [] })
   invoiceIds: number[]
 
-  @Column('varchar', { name: 'split_type', default: InvoiceSplitType.SINGLE, nullable: true })
+  @Column('varchar', {
+    name: 'split_type',
+    default: InvoiceSplitType?.SINGLE ?? 'single',
+    nullable: true,
+  })
   splitType: InvoiceSplitType
 
   @Column('jsonb', { name: 'split_items', default: [], nullable: true })
@@ -332,7 +331,6 @@ export class Invoice extends BaseEntity {
     if (this.paymentState === PaymentStatus.PAID && !this.paymentDate) {
       this.paymentDate = new Date()
     }
-    this.amountPaid = 0
   }
 
   @BeforeUpdate()
@@ -350,17 +348,9 @@ export class Invoice extends BaseEntity {
     ) {
       this.paymentDate = null
     }
-
-    if (wasNotPaid && isNowPaid) {
-      this.amountPaid = this.payAmount ?? 0
-    }
   }
   @Column({ type: 'text', nullable: true })
   remark?: string
-
-  @ManyToOne(() => User, { createForeignKeyConstraints: false, nullable: true })
-  @JoinColumn({ name: 'created_by' })
-  createdByUser?: User
 }
 
 export class InvoiceDiscountDetail {

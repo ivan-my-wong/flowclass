@@ -1,20 +1,24 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
-import { ColDef, ICellRendererParams } from 'ag-grid-community'
+import { ColDef, ICellRendererParams, IRowNode } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import { utcToZonedTime } from 'date-fns-tz'
+import { AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { GiHamburgerMenu } from 'react-icons/gi'
 import { LuExternalLink } from 'react-icons/lu'
+import { TbRefresh } from 'react-icons/tb'
 import { MultiValue, StylesConfig } from 'react-select'
+import { toast } from 'sonner'
 
-// import { result } from "lodash-es";
 import { NotificationRecordItem } from '@/api/recordLogs'
+import LoadingButton from '@/components/Buttons/LoadingButton'
 import MetricCard from '@/components/Cards/MetricCard'
 import MetricCardContainer from '@/components/Cards/MetricCardContainer'
+import SelectedActions from '@/components/Cards/SelectedActions'
 import ChartDatePicker from '@/components/DatePickers/ChartDatePicker'
 import SkeletonLoader from '@/components/Loaders/SkeletonLoader'
+import { Spinner } from '@/components/Loaders/Spinner'
 import LabelSelector, {
   LabelSelectorRef,
 } from '@/components/Selector/LabelSelector'
@@ -32,11 +36,12 @@ import useNotificationMetrics from '@/hooks/useNotificationMetrics'
 import useSiteData from '@/hooks/useSiteData'
 import ContentLayout from '@/layouts/ContentLayout'
 import { ChartDate } from '@/types/chartDate.type'
-import { NotificationChannel, NotificationStatus } from '@/types/notifications'
-import { getInitialChartDateRange } from '@/utils/chartjsSetup'
+import { NotificationStatus } from '@/types/notifications'
 import { formatPhoneNumber } from '@/utils/misc'
 import { filterNotifications } from '@/utils/notification-log.utils'
 import { formatDuration } from '@/utils/timeFormat'
+
+import { getInitialChartDateRange } from '../GoogleAnalytics/components/chartjsSetup'
 
 import MessageSentCell from './NotificationTableCell/MessageSentCell'
 
@@ -58,16 +63,17 @@ const NotificationLog = (): JSX.Element => {
   const search = useMemo(() => params.get('search') || '', [params])
 
   const { setCurrentCourse } = useCourseData()
-  const [
-    selectedNotificationWhatsappTemplate,
-    setSelectedNotificationWhatsappTemplate,
-  ] = useState<MultiValue<SelectItemValuesProps>>([])
   const [selectedNotificationType, setSelectedNotificationType] = useState<
     MultiValue<SelectItemValuesProps>
   >([])
   const [selectedNotificationStatus, setSelectedNotificationStatus] = useState<
     MultiValue<SelectItemValuesProps>
   >([])
+
+  const [selectedRows, setSelectedRows] = useState<
+    IRowNode<NotificationRecordItem>[]
+  >([])
+  const [resendingId, setResendingId] = useState<number | null>(null)
 
   const startDate = params.get('startDate') || initialDate.startDate
   const endDate = params.get('endDate') || initialDate.endDate
@@ -88,8 +94,6 @@ const NotificationLog = (): JSX.Element => {
 
   const gridRef = useRef<AgGridReact<NotificationRecordItem>>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const automationFlowRef = useRef<LabelSelectorRef>(null)
-  const whatsappTemplateRef = useRef<LabelSelectorRef>(null)
   const statusRef = useRef<LabelSelectorRef>(null)
   const typeRef = useRef<LabelSelectorRef>(null)
 
@@ -98,7 +102,8 @@ const NotificationLog = (): JSX.Element => {
     setCurrentCourse(courseId)
     navigate('/teaching-service/edit-course')
   }
-  const { useFetchNotificationLogs } = useNotificationLogData()
+  const { useFetchNotificationLogs, useResendNotificationLogs } =
+    useNotificationLogData()
   const {
     data: notificationsList,
     refetch,
@@ -109,19 +114,149 @@ const NotificationLog = (): JSX.Element => {
     endDate,
   })
 
+  const { mutateAsync: resendNotifications, isLoading: isResending } =
+    useResendNotificationLogs()
+
+  const onSelectionChanged = useCallback(() => {
+    const selectedNodes = gridRef.current?.api.getSelectedNodes()
+    setSelectedRows(selectedNodes || [])
+  }, [])
+
+  const handleClearSelection = useCallback(() => {
+    gridRef.current?.api.deselectAll()
+    setSelectedRows([])
+  }, [])
+
+  const getRowId = useCallback((params: any) => {
+    if (!params.data?.id) return crypto.randomUUID()
+    return params.data?.id.toString()
+  }, [])
+
+  const handleSingleResend = async (id: number) => {
+    try {
+      setResendingId(id)
+      const res = await resendNotifications([id])
+      if (res?.succeeded > 0) {
+        toast.success(
+          t('recordLogs:notificationLogs.resendSuccess', {
+            defaultValue: 'Email resent successfully',
+          })
+        )
+      } else {
+        const errorMsg =
+          res?.results?.[0]?.error || 'Failed to resend email'
+        toast.error(errorMsg)
+      }
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to resend email')
+    } finally {
+      setResendingId(null)
+    }
+  }
+
+  const handleBulkResend = async () => {
+    const failedIds = selectedRows
+      .map(row => row.data)
+      .filter(
+        data =>
+          data &&
+          data.notificationStatus === 'FAILED' &&
+          (data.channel === 'EMAIL' || !data.channel)
+      )
+      .map(data => data!.id)
+
+    if (failedIds.length === 0) {
+      toast.error(
+        t('recordLogs:notificationLogs.noFailedEmailsSelected', {
+          defaultValue: 'No failed email records selected',
+        })
+      )
+      return
+    }
+
+    try {
+      const res = await resendNotifications(failedIds)
+      if (res?.succeeded > 0) {
+        toast.success(
+          t('recordLogs:notificationLogs.bulkResendSuccess', {
+            defaultValue: `Successfully resent ${res.succeeded} email(s)${
+              res.failed > 0 ? `, ${res.failed} failed` : ''
+            }`,
+            count: res.succeeded,
+          })
+        )
+        handleClearSelection()
+      } else {
+        toast.error(
+          t('recordLogs:notificationLogs.bulkResendFailed', {
+            defaultValue: 'Failed to resend selected emails',
+          })
+        )
+      }
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to resend emails')
+    }
+  }
+
+  const variantStatus = (status?: NotificationStatus | string | null) => {
+    switch (status) {
+      case NotificationStatus.SENT:
+      case NotificationStatus.SUCCESS:
+      case NotificationStatus.DELIVERED:
+      case NotificationStatus.OPENED:
+        return 'success'
+      case NotificationStatus.FAILED:
+      case NotificationStatus.BOUNCED:
+        return 'destructive'
+      case NotificationStatus.QUEUED:
+        return 'default'
+      default:
+        return 'secondary'
+    }
+  }
+
   const courseNotificationLogColumns: ColDef<NotificationRecordItem>[] = [
     {
       field: 'id',
-      headerName: t(
-        'recordLogs:notificationLogs.tableHeaders.action'
-      ) as string,
+      headerName: t('recordLogs:notificationLogs.tableHeaders.action', {
+        defaultValue: 'Action',
+      }) as string,
       filter: false,
-      hide: true,
-      width: 80,
-      cellRenderer: () => {
+      sortable: false,
+      width: 105,
+      cellRenderer: ({
+        data,
+      }: ICellRendererParams<NotificationRecordItem>) => {
+        if (!data) return null
+        const isFailed = data.notificationStatus === 'FAILED'
+        const isEmail = data.channel === 'EMAIL' || !data.channel
+
+        if (!isFailed || !isEmail) {
+          return <span className="text-gray-400 text-sm pl-2">-</span>
+        }
+
+        const isThisResending = resendingId === data.id
+
         return (
-          <Box className="pt-4" align="center">
-            <GiHamburgerMenu />
+          <Box align="center" className="h-full items-center">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs px-2.5 py-1 text-primary border-primary hover:bg-primary/10 flex items-center gap-1.5 h-8"
+              disabled={isThisResending || isResending}
+              onClick={() => handleSingleResend(data.id)}
+            >
+              {isThisResending ? (
+                <Spinner size="small" />
+              ) : (
+                <TbRefresh className="w-3.5 h-3.5" />
+              )}
+              <span>
+                {t('recordLogs:notificationLogs.action.resend', {
+                  defaultValue: 'Resend',
+                })}
+              </span>
+            </Button>
           </Box>
         )
       },
@@ -171,11 +306,13 @@ const NotificationLog = (): JSX.Element => {
       field: 'message',
       filter: true,
       cellRenderer: ({ data }: ICellRendererParams<NotificationRecordItem>) => {
-        let message = data?.message || ''
-        if (data?.channel === NotificationChannel.EMAIL) {
-          message = data?.subject
-        }
-        return data ? <MessageSentCell message={message} /> : null
+        return data ? (
+          <MessageSentCell
+            message={data.message}
+            subject={data.subject}
+            status={data.notificationStatus}
+          />
+        ) : null
       },
     },
     {
@@ -185,11 +322,13 @@ const NotificationLog = (): JSX.Element => {
       field: 'notificationStatus',
       filter: true,
       cellRenderer: ({ data }: ICellRendererParams<NotificationRecordItem>) => {
-        if (!data?.notificationStatus) return ''
+        const rawStatus = data?.notificationStatus
+        const displayStatus = rawStatus || 'PENDING'
         return (
-          <Badge variant={variantStatus(data.notificationStatus)}>
+          <Badge variant={variantStatus(rawStatus)}>
             {t(
-              `recordLogs:notificationLogs.notificationStatuses.${data?.notificationStatus}`
+              `recordLogs:notificationLogs.notificationStatuses.${displayStatus}`,
+              { defaultValue: displayStatus }
             )}
           </Badge>
         )
@@ -217,30 +356,6 @@ const NotificationLog = (): JSX.Element => {
           // If date-fns-tz fails, fall back to native Date
           return new Date(rawDate as any).toLocaleString()
         }
-      },
-    },
-    {
-      headerName: t(
-        `recordLogs:notificationLogs.tableHeaders.whatsappTemplate`
-      ) as string,
-      field: 'whatsappTemplate',
-      sortable: false,
-      filter: true,
-      valueGetter: data => {
-        return data?.data?.whatsappTemplate?.name || ''
-      },
-      cellRenderer: ({ data }: ICellRendererParams<NotificationRecordItem>) => {
-        if (data?.whatsappTemplate) {
-          return (
-            <Link
-              to={`/whatsapp-templates/edit?id=${data.whatsappTemplate.id}`}
-              className="capitalize text-link"
-            >
-              {data.whatsappTemplate.name.replaceAll('_', ' ')}
-            </Link>
-          )
-        }
-        return '-'
       },
     },
 
@@ -274,44 +389,18 @@ const NotificationLog = (): JSX.Element => {
     },
     { headerName: 'ID', field: 'id', filter: true },
   ]
-  const variantStatus = (status: NotificationStatus) => {
-    switch (status) {
-      case NotificationStatus.SENT:
-        return 'success'
-      case NotificationStatus.FAILED:
-        return 'destructive'
-      case NotificationStatus.QUEUED:
-        return 'default'
-      default:
-        return 'outline'
-    }
-  }
   const filteredList = useMemo(() => {
     if (!notificationsList) return []
     return filterNotifications(notificationsList, {
-      selectedNotificationWhatsappTemplate,
       selectedNotificationType,
       selectedNotificationStatus,
     })
   }, [
     notificationsList,
-    selectedNotificationWhatsappTemplate,
     selectedNotificationType,
     selectedNotificationStatus,
   ])
   const metrics = useNotificationMetrics(filteredList, chartDate)
-
-  const whatsappTemplateOptions = useMemo(() => {
-    const whatsappTemplates = (notificationsList || [])
-      .filter(d => !!d.whatsappTemplate)
-      .map(item => ({
-        value: item?.whatsappTemplate?.id as number,
-        label: item?.whatsappTemplate?.name as string,
-      }))
-    return Array.from(new Set(whatsappTemplates.map(obj => obj.value))).map(
-      id => whatsappTemplates.find(obj => obj.value === id)
-    ) as SelectItemValuesProps[]
-  }, [notificationsList])
 
   const typeOptions = useMemo(() => {
     const notificationTypes = new Set(
@@ -326,26 +415,29 @@ const NotificationLog = (): JSX.Element => {
   }, [notificationsList, t])
 
   const statusOptions = useMemo(() => {
-    const notificationStatuses = new Set(
-      (notificationsList || [])
-        .map(item => item.notificationStatus)
-        .filter(status => status !== null)
+    const standardStatuses = [
+      NotificationStatus.SENT,
+      NotificationStatus.DELIVERED,
+      NotificationStatus.OPENED,
+      NotificationStatus.QUEUED,
+      NotificationStatus.FAILED,
+      NotificationStatus.BOUNCED,
+    ]
+    const rawStatuses = (notificationsList || [])
+      .map(item => item.notificationStatus)
+      .filter((s): s is NotificationStatus => Boolean(s))
+    const uniqueStatuses = Array.from(
+      new Set([...standardStatuses, ...rawStatuses])
     )
-    return Array.from(notificationStatuses).map(notificationStatus => ({
+    return uniqueStatuses.map(notificationStatus => ({
       value: notificationStatus,
       label: t(
-        `recordLogs:notificationLogs.notificationStatuses.${notificationStatus}`
+        `recordLogs:notificationLogs.notificationStatuses.${notificationStatus}`,
+        { defaultValue: notificationStatus }
       ),
     }))
   }, [notificationsList, t])
 
-  const handleWhatsappTemplateChange = (
-    selectedOption: MultiValue<SelectItemValuesProps>
-  ) => {
-    if (selectedOption !== null) {
-      setSelectedNotificationWhatsappTemplate(selectedOption)
-    }
-  }
   const handleTypeChange = (
     selectedOption: MultiValue<SelectItemValuesProps>
   ) => {
@@ -369,7 +461,6 @@ const NotificationLog = (): JSX.Element => {
     handleChangeChartDate(initialDate)
     gridRef?.current?.api.setFilterModel(null)
     if (inputRef.current) inputRef.current.value = ''
-    if (whatsappTemplateRef.current) whatsappTemplateRef.current.clearValue()
     if (statusRef.current) statusRef.current.clearValue()
     if (typeRef.current) typeRef.current.clearValue()
   }
@@ -388,6 +479,35 @@ const NotificationLog = (): JSX.Element => {
         />
       }
     >
+      <AnimatePresence>
+        {selectedRows.length > 0 && (
+          <div className="flex w-full flex-row items-center justify-center gap-2 px-4 mt-4">
+            <SelectedActions
+              countText={t('recordLogs:notificationLogs.selectedRecords', {
+                defaultValue: 'selected records',
+              })}
+              onClearSelection={handleClearSelection}
+              selectedCount={selectedRows.length}
+              rightComponent={
+                <div className="flex gap-2">
+                  <LoadingButton
+                    variant="default"
+                    disabled={isResending}
+                    isLoading={isResending}
+                    onClick={handleBulkResend}
+                  >
+                    <TbRefresh className="w-4 h-4 mr-1.5" />
+                    {t('recordLogs:notificationLogs.resendSelected', {
+                      defaultValue: 'Resend Failed Emails',
+                    })}
+                  </LoadingButton>
+                </div>
+              }
+            />
+          </div>
+        )}
+      </AnimatePresence>
+
       {INCOMPLETE_FEATURE_FLAG.SHOW_STATS_IN_NOTIFICATION_LOG && (
         <MetricCardContainer
           isLoading={isLoadingNotificationList}
@@ -398,18 +518,6 @@ const NotificationLog = (): JSX.Element => {
               title={t('recordLogs:notificationLogs.bannerCards.sentOnEmail')}
               value={metrics?.EMAIL.current}
               growthRate={metrics?.EMAIL.growthRate}
-              subtitle={
-                t(
-                  'recordLogs:notificationLogs.bannerCards.SinceLastMonth'
-                ) as string
-              }
-            />
-            <MetricCard
-              title={t(
-                'recordLogs:notificationLogs.bannerCards.sentOnWhatsApp'
-              )}
-              value={metrics?.WHATSAPP.current}
-              growthRate={metrics?.WHATSAPP.growthRate}
               subtitle={
                 t(
                   'recordLogs:notificationLogs.bannerCards.SinceLastMonth'
@@ -452,72 +560,46 @@ const NotificationLog = (): JSX.Element => {
               height={dynamicHeight}
               isLoading={isLoadingNotificationList}
               handleReset={handleReset}
+              hasCheckboxSelection
+              onSelectionChanged={onSelectionChanged}
+              getRowId={getRowId}
               hasFilterSelection
-              filterSelector={({ handleReset: reset }) => (
-                <>
-                  <Box className="flex flex-col md:flex-row gap-2">
-                    {/* <LabelSelector
-                      options={automationFlowOptions ?? []}
-                      width="100%"
-                      onChange={(e: MultiValue<SelectItemValuesProps>) =>
-                        handleAutomationFlowChange(e)
-                      }
-                      placeHolder={t(
-                        'recordLogs:notificationLogs.selectLabels.selectAutomationFlowOptions'
-                      )}
-                      selectStyles={selectCustomStyles()}
-                      ref={automationFlowRef}
-                      isMulti
-                    /> */}
-                    <LabelSelector
-                      options={whatsappTemplateOptions ?? []}
-                      onChange={(e: MultiValue<SelectItemValuesProps>) =>
-                        handleWhatsappTemplateChange(e)
-                      }
-                      placeHolder={t(
-                        'recordLogs:notificationLogs.selectLabels.selectWhatsappTemplateOptions'
-                      )}
-                      selectStyles={selectCustomStyles()}
-                      ref={whatsappTemplateRef}
-                      isMulti
-                    />
-                    <LabelSelector
-                      options={statusOptions ?? []}
-                      onChange={(e: MultiValue<SelectItemValuesProps>) =>
-                        handleStatusChange(e)
-                      }
-                      placeHolder={t(
-                        'recordLogs:notificationLogs.selectLabels.selectNotificationStatus'
-                      )}
-                      selectStyles={selectCustomStyles()}
-                      ref={statusRef}
-                      isMulti
-                    />
-                  </Box>
-                  <Box className="flex flex-col md:flex-row gap-2">
-                    <LabelSelector
-                      options={typeOptions ?? []}
-                      onChange={(e: MultiValue<SelectItemValuesProps>) =>
-                        handleTypeChange(e)
-                      }
-                      placeHolder={t(
-                        'recordLogs:notificationLogs.selectLabels.selectNotificationType'
-                      )}
-                      selectStyles={selectorStyles()}
-                      ref={typeRef}
-                      isMulti
-                    />
+              filterSelector={
+                <Box className="flex flex-col md:flex-row gap-2 w-full">
+                  <LabelSelector
+                    options={typeOptions ?? []}
+                    onChange={(e: MultiValue<SelectItemValuesProps>) =>
+                      handleTypeChange(e)
+                    }
+                    placeHolder={t(
+                      'recordLogs:notificationLogs.selectLabels.selectNotificationType'
+                    )}
+                    selectStyles={selectorStyles()}
+                    ref={typeRef}
+                    isMulti
+                  />
+                  <LabelSelector
+                    options={statusOptions ?? []}
+                    onChange={(e: MultiValue<SelectItemValuesProps>) =>
+                      handleStatusChange(e)
+                    }
+                    placeHolder={t(
+                      'recordLogs:notificationLogs.selectLabels.selectNotificationStatus'
+                    )}
+                    selectStyles={selectorStyles()}
+                    ref={statusRef}
+                    isMulti
+                  />
 
-                    <Button
-                      className="w-full md:w-[80px]"
-                      variant="outline"
-                      onClick={reset}
-                    >
-                      {t('recordLogs:notificationLogs.selectLabels.reset')}
-                    </Button>
-                  </Box>
-                </>
-              )}
+                  <Button
+                    className="w-full md:w-[80px]"
+                    variant="outline"
+                    onClick={handleReset}
+                  >
+                    {t('recordLogs:notificationLogs.selectLabels.reset')}
+                  </Button>
+                </Box>
+              }
             />
           )}
         </Box>
@@ -526,12 +608,6 @@ const NotificationLog = (): JSX.Element => {
   )
 }
 
-const selectCustomStyles = (): StylesConfig => ({
-  control: styles => ({
-    ...styles,
-    backgroundColor: 'white',
-  }),
-})
 const selectorStyles = (): StylesConfig => ({
   control: styles => ({
     ...styles,

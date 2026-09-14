@@ -15,7 +15,7 @@ export const usersSchema = {
                 },
                 email: {
                   type: 'string',
-                  example: 'user@example.com',
+                  example: 'flowclass@gmail.com',
                 },
                 gender: {
                   type: 'string',
@@ -40,6 +40,10 @@ export const usersSchema = {
                 isEmailVerified: {
                   type: 'boolean',
                   example: 'true',
+                },
+                firebaseId: {
+                  type: 'string',
+                  example: '1',
                 },
                 phone: {
                   type: 'string',
@@ -128,7 +132,7 @@ export const responseCreateUserSchema = {
         },
         email: {
           type: 'string',
-          example: 'user@example.com',
+          example: 'flowclass@gmail.com',
         },
         gender: {
           type: 'string',
@@ -153,6 +157,10 @@ export const responseCreateUserSchema = {
         isEmailVerified: {
           type: 'boolean',
           example: 'true',
+        },
+        firebaseId: {
+          type: 'string',
+          example: '1',
         },
         phone: {
           type: 'string',
@@ -236,7 +244,7 @@ export const meSchema = {
         },
         email: {
           type: 'string',
-          example: 'user@example.com',
+          example: 'flowclass@gmail.com',
         },
         gender: {
           type: 'string',
@@ -261,6 +269,10 @@ export const meSchema = {
         isEmailVerified: {
           type: 'boolean',
           example: 'true',
+        },
+        firebaseId: {
+          type: 'string',
+          example: '1',
         },
         phone: {
           type: 'string',
@@ -344,7 +356,7 @@ export const userSchema = {
         },
         email: {
           type: 'string',
-          example: 'user@example.com',
+          example: 'flowclass@gmail.com',
         },
         gender: {
           type: 'string',
@@ -369,6 +381,10 @@ export const userSchema = {
         isEmailVerified: {
           type: 'boolean',
           example: 'true',
+        },
+        firebaseId: {
+          type: 'string',
+          example: '1',
         },
         phone: {
           type: 'string',

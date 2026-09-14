@@ -23,7 +23,6 @@ import { MediaFileDirectory } from '@/constants/MediaFileDirectory'
 import { useResponsive } from '@/hooks/useResponsive'
 import useSiteData from '@/hooks/useSiteData'
 import ContentLayout from '@/layouts/ContentLayout'
-import { getAppDomain } from '@/lib/config'
 import { darkModeState } from '@/stores/darkMode'
 import { displayLanguageState, SupportedLang } from '@/stores/displayLanguage'
 import { CustomSiteUpdateProps, Site } from '@/stores/siteData'
@@ -41,7 +40,7 @@ const WebsitePanel = (): JSX.Element => {
   const { siteData, updateCurrentSite } = useSiteData()
   const [isDarkMode, setDarkMode] = useRecoilState(darkModeState)
   const { currentSite } = siteData
-  const fixedDomain = `.${getAppDomain()}`
+  const fixedDomain = `.${import.meta.env.VITE_FLOWCLASS_DOMAIN}`
   const [newSiteBanner, setNewSiteBanner] = useState<string>(
     currentSite?.banner ?? ''
   )

@@ -1,22 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Expose } from 'class-transformer'
 import { IsBoolean, IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator'
+import { Matches } from 'class-validator'
 
+import { AutomationFunction } from '@/common/constants/automationFlow'
 import { defaultSupportedLanguages, supportedLanguagesObject } from '@/common/constants/locales'
 import { WhatsappTemplateCategory, WhatsappTemplateLanguage } from '@/models/enums/status'
-import {
-  IsValidWhatsappTemplateName,
-  whatsappTemplateNameDefaultMessage,
-} from '@/utils/validate/whatsapp-template-name.utils'
 
 export class WhatsappTemplateDTO {
   @ApiProperty({
-    example: 'Name of the template',
+    example: 'name_of_the_template',
     required: true,
   })
   @IsNotEmpty()
-  @IsValidWhatsappTemplateName({
-    message: whatsappTemplateNameDefaultMessage,
+  @Matches(/^[a-z0-9_]+$/, {
+    message: 'Template name can only contain lowercase letters, numbers, and underscores.',
   })
   name: string
 
@@ -54,7 +52,7 @@ export class WhatsappTemplateDTO {
   @IsObject()
   @IsOptional()
   // @IsNotEmpty()
-  assignedTo: Record<string, any>
+  assignedTo: AutomationFunction
 
   @ApiProperty({
     example: {

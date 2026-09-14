@@ -1,8 +1,13 @@
 import { useNavigate } from 'react-router-dom'
 
 import { useTranslation } from 'react-i18next'
+import { useRecoilState } from 'recoil'
 
-import { cn } from '@/utils/cn'
+import Box from '@/components/Containers/Box'
+import Text from '@/components/Texts/Text'
+import usePlanData from '@/hooks/useSubscriptionPlanData'
+import { subscriptionDialogOpenState } from '@/stores/schoolSubscriptionData'
+import { PromotionType } from '@/types/coupon'
 
 type PromotionCardProps = {
   icon: string
@@ -23,26 +28,40 @@ const PromotionCard: React.FC<PromotionCardProps> = ({
 }) => {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const [, setShowSubscriptionPopup] = useRecoilState(
+    subscriptionDialogOpenState
+  )
 
   return (
-    <div
+    <Box
       data-testid={`promotion-${title.toLowerCase().replace(' ', '-')}`}
-      className={cn(
-        'flex flex-col items-center justify-start gap-2 rounded-lg p-4',
-        'w-[47%] md:w-[24%] h-[250px]',
-        'bg-background-layer-2 transition-colors duration-300',
-        disabled
-          ? 'grayscale cursor-default'
-          : 'cursor-pointer hover:bg-background-layer-3'
-      )}
-      role="button"
-      tabIndex={disabled ? -1 : 0}
-      onClick={() => {
-        if (!disabled) navigate(url)
+      direction="column"
+      responsive
+      css={{
+        backgroundColor: '$backgroundLayer2',
+        borderRadius: '$1',
+        gap: '$2',
+        width: '47%', // Set default width to 50%
+        height: '250px',
+        filter: disabled ? 'grayscale(100%)' : 'none',
+        transition: 'background-color 0.3s ease-in-out',
+        '&:hover': {
+          backgroundColor: disabled ? '$backgroundLayer2' : '$backgroundLayer3',
+          cursor: disabled ? 'default' : 'pointer',
+        },
+        '@media (min-width: 768px)': {
+          // Apply styles for screens 768px and larger (desktop)
+          width: '24%', // Set width to 200px on desktop
+        },
       }}
-      onKeyDown={e => {
-        if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
-          e.preventDefault()
+      padding="medium"
+      onClick={() => {
+        if (!haveAccess && !disabled) {
+          setShowSubscriptionPopup({
+            open: true,
+            message: t(`subscription:subscriptionDialog.upgradePlan`),
+          })
+        } else if (!disabled) {
           navigate(url)
         }
       }}
@@ -50,27 +69,42 @@ const PromotionCard: React.FC<PromotionCardProps> = ({
       <img
         src={icon}
         alt=""
-        className="w-[100px] h-[100px] object-contain"
+        style={{ width: '100px', height: '100px' }}
         draggable={false}
       />
 
-      <p
-        className={cn(
-          'text-base font-semibold text-center mt-4',
-          disabled ? 'text-text-disabled' : 'text-text'
-        )}
+      <Text
+        align="center"
+        css={{
+          fontSize: '$mediumLarge',
+          color: disabled ? '$textDisabled' : '$text',
+          fontWeight: 600,
+          marginTop: '$4',
+        }}
       >
         {title}
-      </p>
+      </Text>
 
       {!disabled ? (
-        <p className="text-base mt-2 text-text">{numOfPromotion}</p>
+        <Text
+          css={{
+            fontSize: '$mediumLarge',
+            marginTop: '$2',
+          }}
+        >
+          {numOfPromotion}
+        </Text>
       ) : (
-        <p className="text-sm text-text-disabled">
+        <Text
+          css={{
+            fontSize: '$medium',
+            color: disabled ? '$textDisabled' : '$text',
+          }}
+        >
           {t('promotion:comingSoon')}
-        </p>
+        </Text>
       )}
-    </div>
+    </Box>
   )
 }
 

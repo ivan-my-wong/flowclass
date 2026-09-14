@@ -4,20 +4,21 @@ import { useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
 
 import ImageWithFallback from '@/components/Images/ImageWithFallback'
+import { TabsProps } from '@/components/Tabs/Tabs'
 import Heading from '@/components/Texts/Heading'
 import imageUrls from '@/constants/imageUrls'
 import { currentWebsiteTheme } from '@/stores/schoolContext'
 import { useTabContext } from '@/stores/tabContext'
 import { School } from '@/types'
-import { MenuTabsProps, WebsiteTemplate } from '@/types/websiteTemplate'
+import { WebsiteTemplate } from '@/types/websiteTemplate'
 import { cn } from '@/utils/cn'
-import { getMediaFileUrl } from '@/utils/convert'
+import { getS3FileUrl } from '@/utils/convert'
 
 const Header = ({
   school,
 }: {
   school: School
-  menu?: MenuTabsProps
+  menu?: TabsProps
   showMenu?: boolean
 }): JSX.Element => {
   const router = useRouter()
@@ -62,7 +63,7 @@ const Header = ({
     >
       <div className="box-row-full w-fit gap-2 md:gap-4">
         <ImageWithFallback
-          src={getMediaFileUrl(school.logo) ?? imageUrls.defaultFallback}
+          src={getS3FileUrl(school.logo) ?? imageUrls.defaultFallback}
           fallbackSrc={imageUrls.defaultFallback}
           alt={school.name}
           className="h-12 w-12 shrink-0 cursor-pointer"

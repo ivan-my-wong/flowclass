@@ -16,15 +16,15 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { CSS as SiitchesCSS } from '@stitches/react'
 import { MdOutlineDragIndicator } from 'react-icons/md'
 
-import { cn } from '@/utils/cn'
+import { styled } from '@/styles'
 
 type DraggableCardMultiGroupProps = {
   id: string | number
   children: React.ReactNode
-  cardStyle?: React.CSSProperties
-  cardClassName?: string
+  cardStyle?: SiitchesCSS
   groupKeys: string[]
 }
 
@@ -32,7 +32,6 @@ const DraggableCardMultiGroup = ({
   id,
   children,
   cardStyle,
-  cardClassName,
   groupKeys,
 }: DraggableCardMultiGroupProps): JSX.Element => {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -56,30 +55,26 @@ const DraggableCardMultiGroup = ({
   if (groupKeys.includes(id.toString())) return <div ref={setNodeRef} />
 
   return (
-    <div
+    <DraggableCardMultiGroupBox
+      css={{ ...cardStyle }}
       key={id}
       ref={setNodeRef}
-      style={{ ...style, ...cardStyle }}
-      className={cn(
-        'w-full min-w-[9rem] gap-1 h-fit flex flex-row content-center items-center bg-background-layer-2 p-4 rounded-lg',
-        cardClassName
-      )}
+      style={{ ...style }}
     >
-      <div
+      <DraggableBoxHandler
         {...attributes}
         {...listeners}
-        className={cn(
-          'w-fit rounded-[20%] cursor-grab text-text-subtle',
-          isHovering ? 'bg-text-disabled' : 'bg-background-layer-2'
-        )}
+        css={{
+          backgroundColor: isHovering ? '$textDisabled' : '$backgroundLayer2',
+        }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <MdOutlineDragIndicator size="2rem" />
-      </div>
+      </DraggableBoxHandler>
 
       {children}
-    </div>
+    </DraggableCardMultiGroupBox>
   )
 }
 
@@ -176,9 +171,9 @@ const DraggableMultiGroup = ({
               key={item.id}
               id={item.id ?? 0}
               cardStyle={{
-                padding: '0.5rem',
-                border: '1px solid var(--primary)',
-                borderRadius: '0.25rem',
+                padding: '$2',
+                border: '1px solid $primary',
+                borderRadius: '$1',
                 display: 'grid',
                 gridTemplateColumns: '9% 90%',
               }}
@@ -194,3 +189,25 @@ const DraggableMultiGroup = ({
 }
 
 export default DraggableMultiGroup
+
+const DraggableBoxHandler = styled('div', {
+  width: 'fit-content',
+  borderRadius: '20%',
+  cursor: 'grab',
+  color: '$textSubtle',
+})
+
+const DraggableCardMultiGroupBox = styled('div', {
+  width: '100%',
+  minWidth: '9rem',
+  gap: '$1',
+  height: 'fit-content',
+  display: 'flex',
+  flexDirection: 'row',
+  alignContent: 'center',
+  // justifyContent: 'space-between',
+  alignItems: 'center',
+  backgroundColor: '$backgroundLayer2',
+  padding: '$4',
+  borderRadius: '$medium',
+})

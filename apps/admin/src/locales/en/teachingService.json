@@ -7,15 +7,11 @@
   "updateEnrollmentSuccess": "Update Enrollment successfully",
   "updateMessageSuccess": "Update registration message successfully",
   "updateRecruitmentSuccess": "Update recruitment successfully",
-  "updateFail": "Something went wrong!",
   "createCourse": "Create course",
-  "unnamedCourse": "Unnamed Course",
   "searchPlaceholder": "Search courses, classes, or IDs...",
   "view": {
     "viewSite": "View course page",
     "viewApplicationLink": "View application link",
-    "courseLink": "The link to your course page will be",
-    "applicationLink": "The link to your application page will be",
     "copyApplicationLink": "Copy application link",
     "copySuccess": "Application link copied to clipboard"
   },
@@ -24,26 +20,16 @@
     "description": "A QR code will be sent to the student's email after they register for the course. The QR code will be used to check in for the course."
   },
   "publishCourse": {
-    "published": "Published",
-    "notPublish": "Unpublished",
     "archived": "Archive",
     "countArchived": "Archived ({{count}})",
     "unArchived": "Unarchive",
     "publishCourseSuccessfully": "Published the course successfully",
     "unpublishCourseSuccessfully": "Unpublished the course successfully",
-    "archiveCourseSuccessfully": "Archived the course successfully",
     "unarchiveCourseSuccessfully": "Unarchived the course successfully",
-    "publishCourseTitle": "Publish course",
-    "unpublishCourseTitle": "Unpublish course",
     "archiveCourseTitle": "Archive course",
     "unarchiveCourseTitle": "Unarchive course",
-    "publishCourseDescription": "Are you sure you want to publish this course?",
-    "unpublishCourseDescription": "Are you sure you want to unpublish this course?",
     "archiveCourseDescription": "Are you sure you want to archive this course?\n* All course records, schedules, and payment receipts will remain accessible for review.\n* Archived courses cannot accept new applications.\nYou can unarchive this course at any time from the Archived Courses section.",
     "unarchiveCourseDescription": "Are you sure you want to unarchive this course?\n* This course will be moved back to the active courses list.\n* It will become available for new applications and management actions.\nYou can archive this course again at any time if needed.",
-    "archiveCourseDetails": "All course records, schedules, and payment receipts will remain accessible for review.",
-    "archiveCourseRestriction": "Archived courses cannot accept new applications.",
-    "archiveCourseReversible": "You can unarchive this course at any time from the Archived Courses section.",
     "remindLongDescriptions": "Your course has not been published yet. Please type something in the 'Description' tab. Then, save and try again.",
     "recruitmentTimeEnded": "You have set the end date of the recruitment duration in the past. Please set it to a future time."
   },
@@ -55,17 +41,10 @@
     "successCreate": "The course has been created. You can start to edit it.",
     "name": "Course name",
     "path": "Path",
-    "invalidPath": "Please enter only letters, numbers, or dashes _ -",
     "duplicatePath": "This path is already taken. Please enter a new one.",
     "duplicateId": "This course ID is already taken. Please enter a new one."
   },
   "deleteCourseModal": {
-    "deleteSchool": "Delete course",
-    "title": "Are you sure you want to delete this course?",
-    "textInput": "Please enter 'delete' to confirm delete this course.",
-    "description": "This action cannot be undone. This will permanently delete this course and remove your data from our servers.",
-    "cancel": "Cancel",
-    "confirm": "Yes, delete course",
     "successDelete": "Course is successfully deleted!"
   },
   "courseType": {
@@ -169,7 +148,6 @@
   },
   "dropDownMenu": {
     "edit": "Edit",
-    "website": "View in website",
     "delete": "Delete",
     "copy": "Duplicate",
     "editSection": "Edit Section",
@@ -196,10 +174,7 @@
   "tabBar": {
     "basic": "General",
     "description": "Page Content",
-    "faq": "Q&A",
     "class": "Class",
-    "payment": "Payment",
-    "enrollment": "Enrollment form",
     "message": "After Application",
     "recruitment": "Recruitment Duration",
     "settings": "Settings"
@@ -207,12 +182,9 @@
   "basic": {
     "previewImage": "Preview image",
     "previewImageTips": "Recommend image of aspect ratio 21:9 and width greater than 1,000 pixels.",
-    "backgroundInformationTitle": "Basic information",
     "name": "Course name",
     "id": "Course ID (optional)",
     "optionalCustomIdPlaceholder": "Optional. Custom ID",
-    "description": "Description",
-    "longDescription": "Long description",
     "shortDescription": "Short description",
     "path": "Link",
     "location": "Location",
@@ -221,21 +193,11 @@
     "selectInstructor": "No Instructor Selected"
   },
   "subscriptionSetting": {
-    "productName": "Product name",
     "freeSubscription": "Free subscription",
     "chargingMode": "Charging mode",
-    "oneOff": "One-off payment",
-    "recurring": "Recurring Subscription",
-    "cycle": "Cycle",
-    "for": "for",
-    "billingCycle": "Billing cycle",
     "billingCycleName": "Billing cycle name",
     "billingStartDate": "Billing start date",
-    "billingAmount": "Billing amount",
-    "chargeCycleHint": "The billing date will count from the date of enrolment.",
-    "paymentAutomation": "Payment automation",
-    "autoCharge": "Automatically charge a payment if the user pays by credit card",
-    "manualCharge": "Email invoice to the users to pay manually, including those who pay by credit card"
+    "billingAmount": "Billing amount"
   },
   "faq": {
     "question": "Question",
@@ -243,25 +205,11 @@
     "addQuestionPair": "+ New pair of Q&A"
   },
   "enrollment": {
-    "enrollmentTitle": "Enrollment",
-    "enrollmentDescription": "Enrollment description",
-    "enrollmentDescriptionTips": "This description will appear on the enrollment page. You can use this to explain the enrollment process, or any other information that is relevant to the enrollment.",
-    "enrollmentFormTitle": "Enrollment form",
-    "enrollmentFormDescription": "Enrollment form description",
-    "enrollmentFormDescriptionTips": "This description will appear on the enrollment form. You can use this to explain the enrollment form, or any other information that is relevant to the enrollment.",
     "enrollmentForm": {
-      "title": "Enrollment Form Questions Design",
-      "studentName": "* Name of student",
-      "schoolName": "The name of the school",
-      "email": "* Email",
-      "phone": "* Phone number",
       "specialStudy": "Please specify any special study need if applicable",
       "specialStudyTips": "With around 9% of the students having special education needs, it is important to understand your students better before onboarding",
-      "requiredField": "* are required fields which cannot be disabled",
-      "disableField": "Disable the field by toggling the switch",
       "addNewField": "+ New field",
       "createNewApplicationForm": "Create new application form",
-      "selectApplicationForm": "Select application form",
       "editForm": "Edit form",
       "addForm": "Add form",
       "defaultForm": "Default Form",
@@ -270,7 +218,6 @@
     },
     "enrollmentModal": {
       "title": "Edit enrollment form question",
-      "field": "Name of field",
       "question": "Question",
       "description": "Description",
       "staticType": "Static Information",
@@ -290,10 +237,7 @@
       "displayDescription": "Description",
       "displayImage": "Image",
       "displayFileUpload": "File Upload",
-      "displayStepSeparator": "Step Separator",
       "addOption": "+ New options",
-      "textInput": "Are you sure to save the enrollment form?",
-      "cancel": "Cancel",
       "confirm": "Save",
       "addDesc": "Add title and description",
       "addInput": "Add input field",
@@ -306,7 +250,6 @@
     }
   },
   "message": {
-    "title": "Message after registration",
     "registrationMessage": "This message will be displayed on the page when a student registers for your course."
   },
   "recruitment": {
@@ -316,32 +259,20 @@
     "endTime": "End time"
   },
   "session": {
-    "name": "Name of the session",
-    "totalFee": "Total event fee",
     "startTime": "Start time",
-    "to": "To",
     "endTime": "End time",
-    "selectSession": "Select session",
-    "save": "Save session",
-    "createSession": "Create session",
-    "deleteSession": "Delete session",
     "days": "days",
     "createSessionSuccess": "Create session successfully",
     "duplicateSessionSuccess": "Duplicate session successfully",
     "updateSessionSuccess": "Update session successfully",
-    "deleteSessionDescription": "Are you sure you want to delete this session?",
     "confirm": "Confirm",
     "deleteSessionSuccess": "Delete session successfully",
-    "repeatBy": "Duplicate by",
     "repeatByDay": "Day",
     "repeatByWeek": "Week",
-    "negFeeValueError": "Invalid value for session fee",
-    "freeSession": "Free Session",
     "noSessionYet": "This event does not have any sessions yet.",
     "addSession": "Add a new timeslot",
     "invalidEndTime": "Please enter an end time later than the start time.",
-    "timeslotOverlap": "The time slot start time is overlapping with another timeslot.",
-    "validate": "Validate"
+    "timeslotOverlap": "The time slot start time is overlapping with another timeslot."
   },
   "validate": {
     "title": "Validate",
@@ -354,31 +285,13 @@
   },
   "feeNTime": {
     "freeLesson": "Free of charge",
-    "PaidLesson": "Paid lesson",
-    "tuitionrenderPriceRangeTitle": "Tuition",
     "tooLow": "You must enter a value greater than 0.5 USD in your currency.",
     "tuitionPerLesson": "Price per lesson",
     "tuitionPerClass": "Cost for entire class",
     "multiplePriceOption": "Multiple price options",
-    "minLesson": "Min. no. of class to be purchased each time",
-    "bookingConditionTitle": "Booking condition",
-    "bookingConfirmation": "Require your confirmation after students submit the booking request",
-    "studentBookingConditionTitle": "Student can schedule their class",
     "daysIntoFuture": "days into the future",
     "withinDayRange": "Within a day range",
-    "studentCannotScheduleWithin": "Student cannot schedule within",
-    "withinHours": "hours of a class start time",
-    "ExpiryDateTitle": "Expiry date",
-    "purchasedLessonsExpiredTitle": "Any purchased lessons will be expired:",
     "daysAfterPurchase": "days after purchase",
-    "onTheCertainDate": "On the certain date",
-    "addTimeSlot": "+ New time slot",
-    "Unavailable": "Unavailable",
-    "duration": "Duration",
-    "hours": "hour(s)",
-    "createAppointment": "Create appointment",
-    "noAppointment": "You have no appointment yet. Please create a new appointment.",
-    "save": "Save changes",
     "createAppointmentSuccess": "Create appointment successfully",
     "updateAppointmentSuccess": "Update appointment successfully",
     "weekName": {
@@ -497,16 +410,11 @@
     }
   },
   "tag": {
-    "createCourseTag": "Tags",
     "description": "A tag is a custom label that you assign to the course. You can create tags to identify the course.",
     "addTag": "Add a tag",
     "createMultipleValues": "Value for the category, e.g. 'Beginner' or 'English'",
-    "value": "Value",
-    "enabled": "Enabled",
-    "disabled": "Disabled",
     "tagName": "Name of a category, e.g. 'Level' or 'Topic'",
     "updateTagsSuccess": "You have updated course tags successfully.",
-    "updateTagsError": "Fail to update course tags. Please try again later",
     "tagsDuplicateError": "Tags name cannot be duplicate. Please check again.",
     "tagsEmptyError": "Tags name cannot be empty. Please check again."
   },
@@ -529,7 +437,6 @@
     "clickGuide": "You can revisit the tour by clicking the",
     "clickGuideContent": "located at the bottom of the webpage. If you encounter any issues along the way, dont hesitate to reach out for help",
     "floatingButton": "By clicking this button, we give you the suggestions for crafting an attractive course landing page.",
-    "ClickfloatingButton": "After clicking the button, a list will pop up.",
     "floatingContent": "This menu will provide instructions on the actions you need to take in order to publish your course",
     "congratulations": "Congratulations!",
     "congratulationsContent": "You have completed the tour on how to create a course. Now, you can quickly create your first course and start your business",
@@ -541,7 +448,6 @@
     "previewImage": "Upload a 21:9 banner to showcase your course. If you can't design one yourself, we can help you with that.",
     "descriptionSection": "Write a description for your course. This should include information about what you teach and who your target audience is, as well as application procedures.",
     "descriptionSection2": "You can freely edit the name of the section titles by clicking the 'three lines' icon. You may also rearrange the order, add new or delete existing sections.",
-    "aiChat": "Need help writing a captivating educator description? Our AI helper can do it for you.",
     "textEditor": "You can provide your students with more information by including images or videos. We've provided a text editor with options to stylize your text.",
     "messageTabTextEditor": "You may want to send additional info to students after they sign up, such as the link to your course or any preparation they'll need before the first lesson.",
     "messageTabTextEditor2": "This content will be displayed in the email sent to students after they enrol in your course",
@@ -562,19 +468,11 @@
     "modalTitle": "Duplicate Course",
     "modalDescription": "Please select the destination institution and confirm the course details before duplicating.",
     "destinationInstitution": "Destination Institution",
-    "courseName": "Course Name",
     "status": "Status",
-    "published": "Published",
-    "notPublished": "Not Published",
-    "numberOfClasses": "Number of Classes",
     "cancel": "Cancel",
     "confirmDuplicate": "Confirm Duplicate",
     "successDuplicate": "Course duplicated successfully.",
     "unknownError": "Unknown error"
-  },
-  "duplicateClass": {
-    "successDuplicate": "Successfully Duplicated",
-    "copy": "copy"
   },
   "paymentStatus": {
     "title": "Payment status",
@@ -592,45 +490,33 @@
   "rejectReceiptSuccess": "Rejected receipt successfully",
   "resetReceiptSuccess": "Reset payment status successfully",
   "free": "Free",
-  "courseGuide": "How to create a complete course?",
   "updateStatus": {
     "changeSttEnrollmentSuccess": "Update status course successfully",
     "updateInvoicePaymentStatusSuccess": "Updated invoice payment status successfully"
   },
   "allCourses": "All courses",
-  "noClassesPrice": "No classes price yet",
   "enrollFormQuestions": "Custom",
   "recurringClass": {
     "createTimeslot": "Create timeslot",
-    "singleLessonDuration": "Single lesson duration",
     "createMultipleClass": "Create multiple class",
-    "lessonBuffer": "Buffer/break between lesson",
-    "numOfLessonGenerate": "No. of lessons to generate",
     "weeklyHours": "Weekly hours",
-    "repeatEvery": "Repeat every",
     "repeatUnit": {
       "days": "day(s)",
       "weeks": "week(s)",
       "months": "month(s)"
     },
     "overlapWarning": "This timeslot has been already created.",
-    "lessonDurationWarning": "lesson duration should be greater than 0!",
-    "numOfLessonsWarning": "number of lessons should be greater than 1!",
     "maxLesson": "Maximum number of lessons is 99"
   },
   "additionalFee": {
     "addFee": "Add fee",
-    "editReminder": "Edit an existing fee will affect all other courses added with that fee",
     "remove": "Remove",
     "add": "Add",
     "noFee": "You haven't created any additional fee",
     "createNewFee": "Create new fee"
   },
   "sendEmail": "Send email",
-  "sendApplicationLinkEmailSuccess": "The email has been sent to the student.",
-  "sendApplicationLinkEmailError": "Failed to send email.",
   "prerequisites": {
-    "prerequisites": "Pre-requisites",
     "description": "All applicants will have to verify their eligibility through the system before being able to access the application page.",
     "newGroup": "New Group",
     "newCondition": "New Condition",
@@ -639,27 +525,16 @@
     "courseIsRequired": "Course is required",
     "classIsRequired": "Class is required",
     "operatorIsRequired": "Operator is required",
-    "successCreate": "Created successfully",
     "successUpdate": "Updated successfully",
     "successDelete": "Deleted successfully"
   },
   "SEO": {
     "description": "SEO settings allow you to optimize your course page for search engines. This will help improve your course's visibility and attract more students. Leave the fields blank to use the default value.",
-    "SEOSettings": "SEO Settings",
-    "addSettings": "Add setting",
-    "editSettings": "Edit setting",
-    "addSEOSettings": "Add SEO setting",
-    "SEOContent": "SEO Content",
     "metaTitle": "Title",
     "metaDescription": "Description",
     "regenerate": "Regenerate SEO Settings",
-    "save": "Save",
-    "delete": "Delete",
     "noSEOSettings": "You don't have any SEO settings",
     "createSuccess": "Create SEO setting successfully",
-    "deleteSuccess": "Delete SEO setting successfully",
-    "titleDeleteDialog": "Are you sure you want to delete this SEO setting?",
-    "SEOSettingsDelete": "SEO will be set to default, are you sure you want to delete this SEO setting?",
     "errors": {
       "descriptionTooLong": "Description is too long, maximum characters is"
     }
@@ -679,13 +554,9 @@
     "createUpdateSuccess": "Email settings saved"
   },
   "updateEmailVerification": {
-    "updateEmailVerificationSuccess": "Successfully updated email verification settings",
-    "updateEmailVerificationError": "Failed to update email verification settings",
     "needEmailVerification": "Require email verification to access application link"
   },
   "courseSettings": {
-    "title": "Settings",
-    "courseSettings": "Course Settings",
     "seo": "SEO Settings",
     "prerequisites": "Application Prerequisites",
     "tags": "Tags",
@@ -714,10 +585,7 @@
     "priceRequired": "Price is required"
   },
   "courseTabLabel": {
-    "class": "Class",
-    "session": "Session",
-    "feeNTime": "Fee & Time",
-    "schedule": "Schedule"
+    "class": "Class"
   },
   "regularV2": {
     "betaWarning": "This feature is currently in beta. Some bugs might occur. Please contact our support team if you encounter any issues.",

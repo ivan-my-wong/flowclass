@@ -21,7 +21,6 @@ import { GlobalErrorContextProvider } from '@/contexts/ErrorContext'
 import useFormFieldsData from '@/hooks/useFormFieldsData'
 import { useGlobalError } from '@/hooks/useGlobalError'
 import useResponsive from '@/hooks/useResponsive'
-import { API_BASE_URL } from '@/lib/config'
 import { useEnrolState } from '@/stores/enrolContext'
 import { WishlistItem, wishlistState } from '@/stores/wishlist'
 import { GtmEvent, setGtmEvent } from '@/types'
@@ -181,7 +180,7 @@ const ConfirmApplyWishlistDetailStep: React.FC<ConfirmApplyWishlistDetailStepPro
       const failedStreams: EnrollCourseStreamWithIdType[] = []
 
       streamIds.forEach(async streamId => {
-        const baseUrl = API_BASE_URL
+        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL
         const eventSource = new EventSource(`${baseUrl}/stream/${streamId}`)
 
         eventSource.onmessage = event => {

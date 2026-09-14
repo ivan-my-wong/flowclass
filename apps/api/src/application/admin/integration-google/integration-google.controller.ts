@@ -633,17 +633,13 @@ export class IntegrationGoogleController {
       if (error) {
         console.error('❌ OAuth Error:', error)
         return res.redirect(
-          `${
-            process.env.NEXT_PUBLIC_WEB_BASE_URL
-          }/integrations/google-drive?error=${encodeURIComponent(error)}`
+          `${process.env.FRONTEND_URL}/integrations/google-drive?error=${encodeURIComponent(error)}`
         )
       }
 
       if (!code) {
         console.error('❌ No authorization code')
-        return res.redirect(
-          `${process.env.NEXT_PUBLIC_WEB_BASE_URL}/integrations/google-drive?error=no_code`
-        )
+        return res.redirect(`${process.env.FRONTEND_URL}/integrations/google-drive?error=no_code`)
       }
 
       // ✅ Extract userId from state
@@ -652,7 +648,7 @@ export class IntegrationGoogleController {
         console.error('❌ Invalid state - cannot extract userId:', state)
         console.error('❌ State format should be: user_{userId}|{random}')
         return res.redirect(
-          `${process.env.NEXT_PUBLIC_WEB_BASE_URL}/integrations/google-drive?error=invalid_state`
+          `${process.env.FRONTEND_URL}/integrations/google-drive?error=invalid_state`
         )
       }
 
@@ -667,14 +663,12 @@ export class IntegrationGoogleController {
 
       console.log('✅ OAuth success, redirecting to frontend')
 
-      return res.redirect(
-        `${process.env.NEXT_PUBLIC_WEB_BASE_URL}/integrations/google-drive?status=connected`
-      )
+      return res.redirect(`${process.env.FRONTEND_URL}/integrations/google-drive?status=connected`)
     } catch (err) {
       console.error('❌ OAuth callback failed:', err)
       const errorMessage = encodeURIComponent(err.message || 'unknown_error')
       return res.redirect(
-        `${process.env.NEXT_PUBLIC_WEB_BASE_URL}/integrations/google-drive?error=${errorMessage}`
+        `${process.env.FRONTEND_URL}/integrations/google-drive?error=${errorMessage}`
       )
     }
   }

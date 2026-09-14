@@ -1,35 +1,13 @@
 {
   "detailPageTitle": "Online Application & Payment Platform",
-  "callToAction": "View all courses",
-
-  "applyNow": "Apply Now",
-  "introduction": "Introduction",
-  "classList": "Classes",
-  "commentList": "Comments",
-  "addComment": "Leave your comment",
   "noClass": "There is no course yet",
   "noGallery": "There is no gallery yet",
   "noComment": "There is no comment yet",
-  "contactCentre": "Contact the Centre",
   "scanQrCode": "Scan the QR code and contact the centre through Flowclass app",
   "online": "Online",
-  "loginPrompt": "Please log in before you comment",
-  "commentPrompt": "Only students enrolled in the courses can leave comments. For any enquiries, please contact Flowclass Admin",
-  "recommendedCentres": "Suggested tutorial centres",
-
-  "courseCard": {
-    "nPeopleEnrolledAlready": "Enrolled by {{count}}",
-    "perCourse": "Course   or above",
-    "details": "Browse all details",
-    "ratingNumber": "comments",
-    "canUse75Coupon": "Coupon available",
-    "discount": "Discount"
-  },
-
   "helperText": {
     "commentNumber": "comment(s)"
   },
-
   "heading": {
     "basicInfo": "Introduction",
     "searchTitle": "Relevant tutorial centres",
@@ -47,24 +25,6 @@
     "home": "Home",
     "calendar": "Calendar"
   },
-
-  "gallery": {
-    "all": "All",
-    "environment": "Environment",
-    "student": "Student",
-    "course": "Course Details",
-    "qualification": "Qualifications",
-    "exit": "Exit"
-  },
-  "description": {
-    "SCHOOL_ABOUT_US": "About Us",
-    "SCHOOL_FACILITIES": "Facilities",
-    "SCHOOL_STUDENT_ACHIEVEMENT": "Student Achievement",
-    "SCHOOL_QUALIFICATION": "Qualification",
-    "SCHOOL_STUDENT_LIFE": "Student Life",
-    "SCHOOL_AWARDS": "Awards",
-    "SCHOOL_SUCCESS_STORIES": "Success Stories"
-  },
   "imageTag": {
     "all": "All",
     "environment": "Environment",
@@ -79,12 +39,10 @@
   "noContent": "No Content",
   "profile": {
     "login": "Log In",
-    "logout": "Logout",
     "save": "Save",
     "modalTitle": "Access your student profile at {{institutionName}}",
     "findMyProfile": "Find My Profile",
     "visitMyProfile": "Visit My Profile",
-    "viewProfile": "View Profile",
     "continueTheApplication": "Continue the Application",
     "tryAgain": "Try again",
     "profileNotEnabled": "Your login session has expired. Please log in again.",
@@ -120,10 +78,7 @@
       "email": "E-mail",
       "whatsapp": "WhatsApp"
     },
-    "updateProfile": "Profile updated successfully",
     "updateNotification": "Notification updated successfully",
-    "paid": "Paid",
-    "unpaid": "Unpaid",
     "resendPaymentRecord": "Re-send Payment Record",
     "viewUploadedPaymentProof": "View Uploaded Payment Proof",
     "successResend": "Payment record has been re-sent",

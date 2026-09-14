@@ -43,7 +43,8 @@
     "tests/**/*",
     ".eslintrc.js",
     "*.config.js",
-    "*.config.ts"
+    "*.config.ts",
+    "playwright.config.ts"
   ],
   "baseUrl": "."
 }

@@ -11,7 +11,7 @@ import {
   updateCreditSettings,
 } from '@/api/credit'
 import { CreditSourceType, CreditTransactionType } from '@/types/credit'
-import { FeatureEnableEnum } from '@/types/feature-enable'
+import { FeatureEnableEnum } from '@/types/schoolSubscriptionPlan'
 
 import useCheckPermissionAndQuota from './useCheckPermissionAndQuota'
 import useSchoolData from './useSchoolData'

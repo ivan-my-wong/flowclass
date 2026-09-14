@@ -2,6 +2,8 @@ import React from 'react'
 
 import { useTranslation } from 'react-i18next'
 
+import usePlanData from '@/hooks/useSubscriptionPlanData'
+
 import { getFreeDomainList, getTierDomainList } from '../../constants/domain'
 
 import Select from './Select'
@@ -23,6 +25,8 @@ const DomainSelector: React.FC<DomainSelectorProps> = ({
   onValueChange,
 }) => {
   const { t } = useTranslation()
+  const { schoolSubscription } = usePlanData()
+  const { activePlan } = schoolSubscription
 
   const DomainSelectorItems = [
     {
@@ -36,8 +40,13 @@ const DomainSelector: React.FC<DomainSelectorProps> = ({
       group: t('pricingPlan:starterTier') as string,
       itemValues: getTierDomainList.map(domain => ({
         value: domain,
-        label: domain,
-        disabled: false,
+        label:
+          domain +
+          (activePlan && activePlan.planIds && activePlan.planIds.length === 0
+            ? ` ${t('setting:customizeSite.availableInStarter')}`
+            : ''),
+        disabled:
+          activePlan && activePlan.planIds && activePlan.planIds.length === 0,
       })),
     },
   ]

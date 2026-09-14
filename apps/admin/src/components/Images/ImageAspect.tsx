@@ -8,18 +8,19 @@ import {
 
 import { Root } from '@radix-ui/react-aspect-ratio'
 
-import { getPrivateFileAccessUrl } from '@/api/uploadFile'
+import { getS3PrivateFileUrl } from '@/api/uploadFile'
 import imageFailed from '@/assets/fallback/imageFailed.png'
+import { styled } from '@/styles'
 import { cn } from '@/utils/cn'
-import { getMediaFileUrl } from '@/utils/generate-link.utils'
+import { getS3FileUrl } from '@/utils/generate-link.utils'
 
 import Box from '../ui/Box'
 
-const objectFitClasses = {
-  cover: 'object-cover',
-  fill: 'object-fill',
-  contain: 'object-contain',
-}
+const Img = styled('img', {
+  objectFit: 'cover',
+  width: '100%',
+  height: '100%',
+})
 
 type ImageAspectProps = {
   s3?: 'public' | 'private'
@@ -68,9 +69,9 @@ const ImageAspect = forwardRef<HTMLImageElement, ImageAspectProps>(
         return
       }
       if (s3 === 'public') {
-        setImageSrc(getMediaFileUrl(src))
+        setImageSrc(getS3FileUrl(src))
       } else {
-        setImageSrc(await getPrivateFileAccessUrl(src))
+        setImageSrc(await getS3PrivateFileUrl(src))
       }
 
       setLoading(true)
@@ -99,22 +100,20 @@ const ImageAspect = forwardRef<HTMLImageElement, ImageAspectProps>(
               <div className="w-6 h-6 border-4 border-gray-300 border-t-primary rounded-full animate-spin" />
             </div>
           )}
-          <img
-            ref={ref}
+          <Img
             src={imageSrc}
             onError={handleImageError}
             onLoad={() => setLoading(false)}
             style={{ display: loading ? 'none' : 'block' }}
             alt={alt}
-            className={cn('w-full h-full', objectFitClasses[objectFit])}
+            {...ref}
             {...props}
+            css={{ objectFit: `${objectFit}` }}
           />
         </Root>
       </Box>
     )
   }
 )
-
-ImageAspect.displayName = 'ImageAspect'
 
 export default ImageAspect

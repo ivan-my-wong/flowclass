@@ -2,9 +2,8 @@
 import React from 'react'
 
 import * as Collapsible from '@radix-ui/react-collapsible'
+import { styled } from '@stitches/react'
 import { LuChevronDown, LuChevronUp } from 'react-icons/lu'
-
-import { cn } from '@/utils/cn'
 
 import Text from '../Texts/Text'
 import Box from '../ui/Box'
@@ -34,19 +33,9 @@ const CollapsibleWrapper = ({
         <Collapsible.Trigger asChild>
           <Box justify="between" className="cursor-pointer">
             <Text>{title}</Text>
-            <button
-              type="button"
-              className={cn(
-                'font-inherit rounded-full h-8 w-8',
-                'inline-flex items-center justify-center text-primary',
-                'data-[state=closed]:bg-background',
-                'data-[state=open]:bg-background-layer-3',
-                'hover:bg-background-layer-3',
-                'focus:shadow-[0_0_0_2px_hsl(var(--text))]'
-              )}
-            >
+            <IconButton>
               {collapsibleOpen || isOpen ? <LuChevronUp /> : <LuChevronDown />}
-            </button>
+            </IconButton>
           </Box>
         </Collapsible.Trigger>
       </Box>
@@ -57,5 +46,22 @@ const CollapsibleWrapper = ({
     </Collapsible.Root>
   )
 }
+
+const IconButton = styled('button', {
+  all: 'unset',
+  fontFamily: 'inherit',
+  borderRadius: '100%',
+  height: '$8',
+  width: '$8',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  color: '$primary',
+  //   boxShadow: `$1`,
+  '&[data-state="closed"]': { backgroundColor: '$background' },
+  '&[data-state="open"]': { backgroundColor: 'backgroundLayer3' },
+  '&:hover': { backgroundColor: '$backgroundLayer3' },
+  '&:focus': { boxShadow: `0 0 0 2px $text` },
+})
 
 export default CollapsibleWrapper

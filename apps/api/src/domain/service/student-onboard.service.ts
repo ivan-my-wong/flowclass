@@ -2,6 +2,7 @@
 // eslint-disable-next-line simple-import-sort/imports
 import {
   CreateAndUpdateStudentContactInfoDto,
+  CreateAndUpdateStudentMemoDto,
   CreateOrUpdateStudentContactInfoV2Dto,
   StudentNotificationSettings,
 } from '@/application/admin/student-onboard/dtos/student-memo.dto'
@@ -22,7 +23,6 @@ import {
   ImportStuDto,
   ImportStuResponseDto,
   StudentAllLessonsReponseDto,
-  GetTeachingServiceByInvoiceDto,
   StudentAttendanceDataResponse,
   StudentChangeLessonDto,
   StudentChangeLessonOptDto,
@@ -95,6 +95,8 @@ import { SitesRepository } from '@/models/sites.repository'
 import { StudentForm, StudentFormMetadata } from '@/models/student-form.entity'
 import { StudentLesson } from '@/models/student-lesson.entity'
 import { StudentLessonRepository } from '@/models/student-lesson.repository'
+import { StudentMemo } from '@/models/student-memo.entity'
+import { StudentMemoRepository } from '@/models/student-memo.repository'
 import { StudentSchedule, StudentScheduleType } from '@/models/student-schedule.entity'
 import { StudentScheduleRepository } from '@/models/student-schedule.repository'
 import { UserRole } from '@/models/user-role.entity'
@@ -103,12 +105,13 @@ import { User } from '@/models/user.entity'
 import { UsersRepository } from '@/models/users.repository'
 import {
   getNumberIdFromFieldId,
+  lessonDateToString,
   lessonObjectToString,
   parseStringToArray,
   transformEmail,
   transformPhone,
 } from '@/utils/string.utils'
-import * as bcrypt from 'bcryptjs'
+import * as bcrypt from 'bcrypt'
 
 import { ClassLessonService } from './class-lesson.service'
 
@@ -125,6 +128,7 @@ import { AddToParentGroupDto } from '@/application/admin/student-onboard/dtos/ad
 import { ChangeParentGroupDto } from '@/application/admin/student-onboard/dtos/change-parent-group.dto'
 import { RemoveFromParentGroupDto } from '@/application/admin/student-onboard/dtos/remove-from-parent-group.dto'
 import { SetParentAccountDto } from '@/application/admin/student-onboard/dtos/set-parent-account.dto'
+import { FREE_SUBSCRIPTION_PLAN_RECORDS } from '@/common/constants/subscription-plans.constant'
 import { AppointmentRepository } from '@/models/appointment.entity'
 import { ClassPriceOptionRepository } from '@/models/class-price-options.repository'
 import { CommonFieldRepository } from '@/models/common-field.repository'
@@ -136,7 +140,7 @@ import { Institution } from '@/models/institutions.entity'
 import { NotificationStatus } from '@/models/notification-record.entity'
 import { PaymentEvidenceRepository } from '@/models/payment-evidence.repository'
 import { PeriodLessons } from '@/models/period-lessons.entity'
-import { DEFAULT_BASE_USER_QUOTA } from '@/common/constants/default-quotas.constant'
+import { SubscriptionPlanRecordsRepository } from '@/models/subscription-plan-records.entity'
 import { UserAlias } from '@/models/user-aliases.entity'
 import { UserAliasesRepository } from '@/models/user-aliases.repository'
 import { buildSuccessPaymentLink } from '@/utils/payment-link.utils'
@@ -157,7 +161,9 @@ import {
   DataSource,
   FindOptionsWhere,
   In,
+  LessThanOrEqual,
   Like,
+  MoreThanOrEqual,
   Not,
   Repository,
 } from 'typeorm'
@@ -172,7 +178,7 @@ import { NotificationRecordService } from './notification-log.service'
 import { PaymentEvidenceService } from './payment-evidence.service'
 import { StudentNotifSettingService } from './student-notif-setting.service'
 import { UsersService } from './users.service'
-import { WhatsappWebService } from './whatsapp-web.service'
+import { MetaWhatsappService } from '@/domain/external/meta-whatsapp.service'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const dayjs = require('dayjs')
@@ -224,17 +230,19 @@ export class StudentOnbService {
     private readonly jwtService: JwtService,
     private readonly invoiceRepository: InvoiceRepository,
     private readonly sitesRepository: SitesRepository,
+    private readonly studentMemoRepository: StudentMemoRepository,
     private readonly coursesService: CoursesService,
     private readonly enrollmentFormService: EnrollmentFormService,
     private readonly paymentEvidenceRepository: PaymentEvidenceRepository,
     private readonly customMessageService: CustomMessageService,
-    private readonly whatsappWebService: WhatsappWebService,
+    private readonly whatsappService: MetaWhatsappService,
     private readonly notificationRecordService: NotificationRecordService,
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
     private readonly appointmentService: AppointmentService,
     private readonly appointmentRepository: AppointmentRepository,
     private readonly studentNotifSettingService: StudentNotifSettingService,
+    private readonly subscriptionPlanRecordsRepository: SubscriptionPlanRecordsRepository,
     private readonly classPriceOptionRepository: ClassPriceOptionRepository,
     private readonly classPriceOptionService: ClassPriceOptionService,
     private readonly paymentEvidenceService: PaymentEvidenceService,
@@ -268,6 +276,9 @@ export class StudentOnbService {
     })
 
     const userRolesIds = userRoles.map((ur) => ur.userId)
+
+    if (userRolesIds.length === 0) return []
+
     let whereClause: FindOptionsWhere<UserAlias> = {
       institutionId: params.institutionId,
       userId: In(userRolesIds),
@@ -290,6 +301,7 @@ export class StudentOnbService {
       where: whereClause,
       relations: {
         user: true,
+        studentMemos: true,
         enrollCourses: {
           studentSchedule: {
             class: true,
@@ -306,23 +318,15 @@ export class StudentOnbService {
   async getAllStudentsInInstitutionQueryBuilder(
     params: StudentOnbListDto
   ): Promise<GetStudentDetailResponseDto[]> {
-    // First get eligible student user IDs
-    const userRoles = await this.userRoleRepository.find({
-      where: {
-        institutionId: params.institutionId,
-        siteId: params.siteId,
-        isStudent: true,
-      },
-      select: ['userId'], // Only select userId to minimize data transfer
-    })
-
-    const userRolesIds = userRoles.map((ur) => ur.userId)
-
-    if (userRolesIds.length === 0) return []
-
-    // Build the main query using QueryBuilder
+    // Build the main query using QueryBuilder (without studentForms and studentLessons)
     const query = this.userAliasesRepository
       .createQueryBuilder('userAlias')
+      .innerJoin(
+        UserRole,
+        'userRole',
+        'userRole.userId = userAlias.userId AND userRole.institutionId = :institutionId AND userRole.siteId = :siteId AND userRole.isStudent = true AND userRole.deletedAt IS NULL',
+        { institutionId: params.institutionId, siteId: params.siteId }
+      )
       .leftJoinAndSelect('userAlias.user', 'user')
       .leftJoinAndSelect('userAlias.parentUserAlias', 'parentUserAlias')
       .leftJoinAndSelect('parentUserAlias.user', 'parentUser')
@@ -331,11 +335,7 @@ export class StudentOnbService {
       .leftJoinAndSelect('enrollCourse.studentSchedule', 'studentSchedule')
       .leftJoinAndSelect('studentSchedule.class', 'class')
       .leftJoinAndSelect('enrollCourse.invoice', 'invoice')
-      .leftJoinAndSelect('invoice.createdByUser', 'createdByUser')
-      .leftJoinAndSelect('userAlias.studentForms', 'studentForms')
-      .leftJoinAndSelect('studentSchedule.studentLessons', 'studentLessons')
       .where('userAlias.institutionId = :institutionId', { institutionId: params.institutionId })
-      .andWhere('userAlias.userId IN (:...userRolesIds)', { userRolesIds })
       .andWhere(
         new Brackets((qb) => {
           qb.where('invoice.id IS NULL').orWhere('invoice.institutionId = :institutionId', {
@@ -355,7 +355,6 @@ export class StudentOnbService {
           }
         })
       )
-
       .select([
         'userAlias.id',
         'userAlias.userId',
@@ -363,11 +362,6 @@ export class StudentOnbService {
         'userAlias.email',
         'userAlias.isStudentParent',
         'userAlias.childOfUserAliasId',
-        'userAlias.remarks',
-
-        'studentForms.formFieldId',
-        'studentForms.formFieldType',
-        'studentForms.formFieldValue',
 
         'user.id',
         'user.phone',
@@ -379,8 +373,6 @@ export class StudentOnbService {
         'enrollCourse.courseId',
         'enrollCourse.institutionId',
 
-        // 'enrollCourse.registrationForm',
-
         'invoice.id',
         'invoice.paymentState',
         'invoice.proofToken',
@@ -389,10 +381,6 @@ export class StudentOnbService {
         'invoice.createdAt',
         'invoice.updatedAt',
         'invoice.usedBalance',
-        'invoice.createdBy',
-
-        'createdByUser.id',
-        'createdByUser.email',
 
         'course.id',
         'course.name',
@@ -400,11 +388,6 @@ export class StudentOnbService {
 
         'studentSchedule.id',
         'studentSchedule.invoiceId',
-
-        'studentLessons.id',
-        'studentLessons.attendance',
-        'studentLessons.changeEndTime',
-        'studentLessons.endTime',
 
         'class.id',
         'class.type',
@@ -417,163 +400,89 @@ export class StudentOnbService {
         'parentUser.id',
         'parentUser.phone',
       ])
-      // Add index hints for better performance
-      .useIndex('IDX_user_alias_institution_id')
-      .useIndex('IDX_user_alias_user_id')
-      .useIndex('IX_invoices_institution_id')
-      .useIndex('IX_enroll_courses_course_id')
 
     // Optional: Add caching if the data doesn't change frequently
     if (process.env.NODE_ENV === 'production') {
       query.cache(60000) // Cache for 1 minute
     }
 
-    return await query.getMany()
-  }
+    const userAliases = await query.getMany()
 
-  async getAllStudentsInInstitutionQueryBuilderWithStudentLessons(
-    // if there is userId inside the function, it means the user is only getting his own students
-    params: StudentOnbListDto
-  ): Promise<GetStudentDetailResponseDto[]> {
-    // First get eligible student user IDs
-    const userRoles = await this.userRoleRepository.find({
-      where: {
-        institutionId: params.institutionId,
-        siteId: params.siteId,
-        isStudent: true,
-      },
-      select: ['userId'], // Only select userId to minimize data transfer
+    if (userAliases.length === 0) return []
+
+    // 1. Fetch studentForms separately
+    const userAliasIds = userAliases.map((ua) => ua.id)
+    const studentForms = await this.studentFormRepository.find({
+      where: { userAliasId: In(userAliasIds) },
+      select: [
+        'id',
+        'userAliasId',
+        'formFieldId',
+        'formFieldType',
+        'formFieldValue',
+      ],
     })
 
-    const userRolesIds = userRoles.map((ur) => ur.userId)
-
-    if (userRolesIds.length === 0) return []
-
-    // Build the main query using QueryBuilder
-    const query = this.userAliasesRepository
-      .createQueryBuilder('userAlias')
-      .leftJoinAndSelect('userAlias.user', 'user')
-      .leftJoinAndSelect('user.enrollCourses', 'enrollCourses')
-      .leftJoinAndSelect('enrollCourses.course', 'course')
-      .leftJoinAndSelect('enrollCourses.studentSchedule', 'studentSchedules')
-      .leftJoinAndSelect('studentSchedules.class', 'class')
-      .leftJoinAndSelect('studentSchedules.invoice', 'invoice')
-      .leftJoinAndSelect('studentSchedules.studentLessons', 'studentLesson')
-      .where('userAlias.institutionId = :institutionId', { institutionId: params.institutionId })
-      .andWhere('userAlias.userId IN (:...userRolesIds)', { userRolesIds })
-      .andWhere(
-        new Brackets((qb) => {
-          qb.where('invoice.id IS NULL').orWhere('invoice.institutionId = :institutionId', {
-            institutionId: params.institutionId,
-          })
-        })
-      )
-      .andWhere(
-        new Brackets((qb) => {
-          if (params.userId) {
-            qb.where('class.instructorId = :userId', {
-              userId: params.userId,
-            })
-          } else {
-            // pass and allow all
-            qb.where('1=1')
-          }
-        })
-      )
-      .select([
-        'userAlias.id',
-        'userAlias.userId',
-        // 'userAlias.phone',
-        'userAlias.name',
-        'userAlias.email',
-        'userAlias.remarks',
-
-        'user.firstName',
-        'user.phone',
-        'user.status',
-        'user.createdAt',
-        'user.updatedAt',
-
-        'enrollCourses.id',
-        'enrollCourses.courseId',
-        'enrollCourses.institutionId',
-        'enrollCourses.registrationForm',
-
-        'invoice.id',
-        'invoice.paymentState',
-        'invoice.proofToken',
-        'invoice.payAmount',
-        'invoice.createdAt',
-        'invoice.updatedAt',
-        'invoice.usedBalance',
-
-        'course.id',
-        'course.name',
-        'course.path',
-
-        'studentSchedules.id',
-        'studentSchedules.invoiceId',
-
-        'studentLesson.id',
-        'studentLesson.attendance',
-
-        'class.id',
-        'class.type',
-        'class.name',
-
-        'recurringFormat.id',
-        'recurringFormat.every',
-        'recurringFormat.unit',
-        'recurringFormat.times',
-        'recurringFormat.startTime',
-        'recurringFormat.repeat',
-      ])
-      // Add index hints for better performance
-      .useIndex('IX_user_aliases_user_id')
-      .useIndex('IX_invoices_institution_id')
-      .useIndex('IX_enroll_courses_course_id')
-
-    // Optional: Add caching if the data doesn't change frequently
-    if (process.env.NODE_ENV === 'production') {
-      query.cache(60000) // Cache for 1 minute
+    const studentFormsMap = new Map<number, StudentForm[]>()
+    for (const form of studentForms) {
+      if (form.userAliasId) {
+        if (!studentFormsMap.has(form.userAliasId)) {
+          studentFormsMap.set(form.userAliasId, [])
+        }
+        studentFormsMap.get(form.userAliasId)!.push(form)
+      }
     }
 
-    const result = await query.getMany()
-
-    return result.map((o) => {
-      const enrollCourses = o.user.enrollCourses.filter((p) =>
-        p.studentSchedule.some((q) => q.class?.type === ClassTypeEnum.SUBSCRIPTION)
-      )
-
-      const newStudentLessons = enrollCourses.map((p) => {
-        const studentSchedule = p.studentSchedule.find(
-          (q) => q.class.type === ClassTypeEnum.SUBSCRIPTION
-        )
-        return {
-          id: `subscription.${p.id}`,
-          attendance: studentSchedule.invoice.paymentState,
-          course: p.course,
-          class: studentSchedule.class,
-          enrollCourse: { ...p, studentSchedule },
-          studentSchedule,
+    // 2. Fetch studentLessons separately
+    const studentScheduleIds: number[] = []
+    for (const ua of userAliases) {
+      if (ua.enrollCourses) {
+        for (const ec of ua.enrollCourses) {
+          if (ec.studentSchedule) {
+            for (const ss of ec.studentSchedule) {
+              studentScheduleIds.push(ss.id)
+            }
+          }
         }
+      }
+    }
+
+    const studentLessonsMap = new Map<number, StudentLesson[]>()
+    if (studentScheduleIds.length > 0) {
+      const studentLessons = await this.studentLessonRepository.find({
+        where: { studentScheduleId: In(studentScheduleIds) },
+        select: [
+          'id',
+          'studentScheduleId',
+          'attendance',
+          'changeEndTime',
+          'endTime',
+        ],
       })
 
-      delete o.user.enrollCourses
-
-      return {
-        ...o,
-        user: {
-          ...o.user,
-          studentLessons: [...o.user.studentLessons, ...newStudentLessons]?.sort((a, b) => {
-            if (a.studentSchedule && b.studentSchedule) {
-              return a.studentSchedule.id - b.studentSchedule.id
-            }
-            return 0
-          }),
-        },
+      for (const lesson of studentLessons) {
+        if (!studentLessonsMap.has(lesson.studentScheduleId)) {
+          studentLessonsMap.set(lesson.studentScheduleId, [])
+        }
+        studentLessonsMap.get(lesson.studentScheduleId)!.push(lesson)
       }
-    })
+    }
+
+    // Assembly
+    for (const ua of userAliases) {
+      ua.studentForms = studentFormsMap.get(ua.id) || []
+      if (ua.enrollCourses) {
+        for (const ec of ua.enrollCourses) {
+          if (ec.studentSchedule) {
+            for (const ss of ec.studentSchedule) {
+              ss.studentLessons = studentLessonsMap.get(ss.id) || []
+            }
+          }
+        }
+      }
+    }
+
+    return userAliases as unknown as GetStudentDetailResponseDto[]
   }
 
   async getStudentOnbByCustomFieldFilter(
@@ -763,8 +672,17 @@ export class StudentOnbService {
     institutionId: number,
     newUserCount: number
   ): Promise<boolean> {
+    const subscriptionPlanRecords =
+      await this.subscriptionPlanRecordsRepository.findOneWithExpiryDate(siteId)
+
     const users = await this.getActiveStudents(siteId, institutionId)
-    const maxActiveStudents = DEFAULT_BASE_USER_QUOTA
+
+    if (subscriptionPlanRecords) {
+      const maxActiveStudents = subscriptionPlanRecords?.baseUserQuantity
+      return users.length + newUserCount <= maxActiveStudents
+    }
+
+    const maxActiveStudents = FREE_SUBSCRIPTION_PLAN_RECORDS.baseUserQuantity
     return users.length + newUserCount <= maxActiveStudents
   }
 
@@ -871,15 +789,15 @@ export class StudentOnbService {
 
     if (!userAlias) throw new ApiError(ErrorCode.STUDENT_NOT_FOUND)
 
-    // studentInfo is now the userAlias itself (memo fields are on UserAlias)
-    const studentInfo: UserAlias | null = userAlias.institutionId === params.institutionId
-      ? userAlias
-      : await this.userAliasesRepository.findFirstByUserIdAndInstitution(
-          params.institutionId,
-          userAlias.userId
-        )
+    const studentInfo = await this.studentMemoRepository.findOne({
+      where: { userAliasId: userAlias.id, institutionId: params.institutionId },
+      relations: {
+        userAlias: true,
+      },
+    })
 
-    const { password, permissions, userRoles, enrollCourses, ...user } = userAlias.user
+
+    const { password, permissions, userRoles, enrollCourses, firebaseId, ...user } = userAlias.user
 
     const isOnlyUserAlias = await this.checkIfIsOnlyUserAlias(params.userId)
 
@@ -893,6 +811,11 @@ export class StudentOnbService {
         isOnlyUserAlias,
       }
     }
+
+    if (!studentInfo.userAlias) {
+      studentInfo.userAlias = userAlias
+      studentInfo.userAliasId = userAlias.id
+    }
     // eslint-disable-next-line unused-imports/no-unused-vars
 
     // We need to see if there are other user alias in the database.
@@ -902,22 +825,7 @@ export class StudentOnbService {
       ...instanceToInstance(user, {
         excludePrefixes: ['__'],
       }),
-      studentInfo: {
-        userAliasId: userAlias.id,
-        userAlias: {
-          id: userAlias.id,
-          name: userAlias.name,
-          email: userAlias.email,
-          userId: userAlias.userId,
-          secondaryEmail: userAlias.secondaryEmail ?? null,
-          // Surfaced so the student-detail UI can derive parent-ness. An alias
-          // with a non-null childOfUserAliasId is a *child* (a student); only
-          // aliases with no parent reference are the billing-account parent.
-          // This is the source of truth — the standalone isStudentParent flag
-          // can drift if it's set incorrectly during creation/import.
-          childOfUserAliasId: userAlias.childOfUserAliasId ?? null,
-        },
-      },
+      studentInfo,
       isOnlyUserAlias,
     }
   }
@@ -977,6 +885,17 @@ export class StudentOnbService {
         if (userRole) {
           await this.userRoleRepository.softRemove(userRole)
         }
+      }
+
+      const studentMemo = await this.studentMemoRepository.find({
+        where: {
+          userAliasId: singleUserAlias.id,
+          institutionId: params.institutionId,
+        },
+      })
+
+      if (studentMemo) {
+        await this.studentMemoRepository.softRemove(studentMemo)
       }
 
       const studentForm = await this.studentFormRepository.find({
@@ -1096,6 +1015,14 @@ export class StudentOnbService {
         .where('user_alias_id = :sourceId', { sourceId: params.sourceUserAliasId })
         .execute()
 
+      // 4. Reassign StudentMemo
+      await manager
+        .createQueryBuilder()
+        .update(StudentMemo)
+        .set({ userAliasId: params.targetUserAliasId })
+        .where('user_alias_id = :sourceId AND deleted_at IS NULL', { sourceId: params.sourceUserAliasId })
+        .execute()
+
       // 5. Reassign CreditTransactions
       await manager
         .createQueryBuilder()
@@ -1212,18 +1139,17 @@ export class StudentOnbService {
     return await this.userRepository.update({ id: user.id }, { status: params.status })
   }
 
-  async getTeachingService(params: GetTeachingServiceByInvoiceDto) {
-    // invoiceId already uniquely identifies the invoice — applying a userAliasId
-    // filter on top of it would exclude combined invoices whose enrollCourses
-    // belong to multiple aliases. Only fall back to userAliasId scoping when no
-    // invoiceId is supplied (e.g. the student-detail page).
+  async getTeachingService(params: StudentOnbDetailtByAliasIdDto) {
+    // Build where clause conditionally - only filter by invoiceId if provided
     const whereClause: any = {
       institutionId: params.institutionId,
+      // applicants: Raw((alias) => `${alias} @> to_jsonb(${params.userId})::jsonb`),
+      userAliasId: params.userAliasId,
     }
+    
+    // Only filter by invoiceId if it's provided
     if (params.invoiceId) {
       whereClause.id = params.invoiceId
-    } else if (params.userAliasId) {
-      whereClause.userAliasId = params.userAliasId
     }
 
     const getAllClasses = await this.invoiceRepository.find({
@@ -1246,65 +1172,35 @@ export class StudentOnbService {
     })
     const grouped = _.groupBy(lessonsByEnroll, 'enrollCourseId')
 
-    // Batch-load all classes referenced by the current lesson classId fields so
-    // we can resolve class names even when EnrollClassMapping drifted after a
-    // lesson change.
-    const allLessonClassIds = [...new Set(lessonsByEnroll.map((l) => l.classId).filter((id): id is number => !!id))]
-    const classesById = new Map<number, { id: number; name: string; type: string }>()
-    if (allLessonClassIds.length > 0) {
-      const classes = await this.classRepository.find({
-        where: { id: In(allLessonClassIds) },
-        select: ['id', 'name', 'type'],
-      })
-      classes.forEach((c) => classesById.set(c.id, c))
-    }
-
     const processedSubscriptionClasses = []
     getAllClasses.forEach((item) => {
       item.enrollCourses.forEach((enrollCourse) => {
-        // Collect all lessons for this enrollCourse. Prefer the directly-queried
-        // student_lesson rows (which carry classId). Fall back to the schedule
-        // relation but scope it to this enrollCourse so lessons don't bleed
-        // across students in combined invoices.
-        const enrollCourseItems = grouped[enrollCourse.id]?.length
-          ? grouped[enrollCourse.id]
-          : item.studentSchedules
-              .filter((s) => s.enrollCourseId === enrollCourse.id)
-              .flatMap((s) => s.studentLessons)
+        let selectedClass = null
+        if (enrollCourse.multipleClassMapping) {
+          selectedClass = enrollCourse.multipleClassMapping.at(0)?.class
+        }
 
-        if (!enrollCourseItems.length) return
+        if (!selectedClass) return
 
-        // Group by the lesson's CURRENT classId so stale EnrollClassMapping
-        // entries never produce empty rows, and lessons moved to a new class
-        // are always visible under the correct class name.
-        const rawClassIds: number[] = enrollCourseItems.map((l) => l.classId).filter((id): id is number => !!id)
-        const usedClassIds: number[] = [...new Set(rawClassIds)]
-
-        usedClassIds.forEach((classId: number) => {
-          const classInfo = classesById.get(classId)
-          if (!classInfo) return
-
-          const classLessons = enrollCourseItems.filter((l) => l.classId === classId)
-          if (!classLessons.length) return
-
-          processedSubscriptionClasses.push({
-            courseId: item.courseId,
-            courseName: item.course.name,
-            courseImg: item.course.previewImageUrl,
-            classId: classInfo.id,
-            className: classInfo.name,
-            enrollCourseId: enrollCourse.id,
-            paymentState: item.paymentState,
-            billingStartDate: enrollCourse.billingStartDate,
-            billingEndDate: enrollCourse.billingEndDate,
-            billingNextDate: enrollCourse.billingNextDate,
-            paymentAmount: enrollCourse.paymentAmount,
-            invoiceId: item.id,
-            confirmState: enrollCourse.confirmState,
-            registrationForm: enrollCourse.registrationForm,
-            lessons: classLessons,
-            classType: classInfo.type as ClassTypeEnum,
-          })
+        const lessons =
+          grouped[enrollCourse.id] ?? item.studentSchedules.flatMap((s) => s.studentLessons)
+        processedSubscriptionClasses.push({
+          courseId: item.courseId,
+          courseName: item.course.name,
+          courseImg: item.course.previewImageUrl,
+          classId: selectedClass.id,
+          className: selectedClass.name,
+          enrollCourseId: enrollCourse.id,
+          paymentState: item.paymentState,
+          billingStartDate: enrollCourse.billingStartDate,
+          billingEndDate: enrollCourse.billingEndDate,
+          billingNextDate: enrollCourse.billingNextDate,
+          paymentAmount: enrollCourse.paymentAmount,
+          invoiceId: item.id,
+          confirmState: enrollCourse.confirmState,
+          registrationForm: enrollCourse.registrationForm,
+          lessons,
+          classType: selectedClass.type,
         })
       })
     })
@@ -2033,15 +1929,38 @@ export class StudentOnbService {
     }
   }
 
-  async updateRemarks(
-    userAliasId: number,
-    remarks: string | null
-  ): Promise<{ id: number; remarks: string | null }> {
-    const userAlias = await this.userAliasesRepository.findOneBy({ id: userAliasId })
-    if (!userAlias) throw new ApiError(ErrorCode.USERID_NOT_FOUND)
-    userAlias.remarks = remarks ?? null
-    await this.userAliasesRepository.save(userAlias)
-    return { id: userAlias.id, remarks: userAlias.remarks }
+  async addStudentMemo(
+    createAndUpdateStudentMemoDto: CreateAndUpdateStudentMemoDto
+  ): Promise<StudentMemo> {
+    const memo = await this.studentMemoRepository.findOne({
+      where: {
+        userId: createAndUpdateStudentMemoDto.userId,
+        institutionId: createAndUpdateStudentMemoDto.institutionId,
+      },
+    })
+    if (!memo) {
+      const newMemo = this.studentMemoRepository.create({
+        userId: createAndUpdateStudentMemoDto.userId,
+        institutionId: createAndUpdateStudentMemoDto.institutionId,
+        memo: createAndUpdateStudentMemoDto.memo,
+      })
+      return await this.studentMemoRepository.save(newMemo)
+    } else {
+      await this.studentMemoRepository.update(
+        {
+          userId: createAndUpdateStudentMemoDto.userId,
+          institutionId: createAndUpdateStudentMemoDto.institutionId,
+        },
+        { memo: createAndUpdateStudentMemoDto.memo }
+      )
+
+      return await this.studentMemoRepository.findOne({
+        where: {
+          userId: createAndUpdateStudentMemoDto.userId,
+          institutionId: createAndUpdateStudentMemoDto.institutionId,
+        },
+      })
+    }
   }
 
   async editStudentContactInfo(params: CreateAndUpdateStudentContactInfoDto) {
@@ -2054,6 +1973,11 @@ export class StudentOnbService {
       throw new NotFoundException(UserErrorMessage.USER_NOT_FOUND)
     }
 
+    const existingStudentMemo = await this.studentMemoRepository.findOneBy({
+      userId: params.userId,
+      institutionId: params.institutionId,
+    })
+
     params.contactEmail = transformEmail(params.contactEmail)
     params.contactPhone = transformPhone(params.contactPhone)
 
@@ -2063,7 +1987,18 @@ export class StudentOnbService {
       alias: params.contactName,
       phone: params.contactPhone,
     })
-    return userAlias
+    if (!existingStudentMemo) {
+      const newStudentMemo = await this.studentMemoRepository.create({
+        userId: params.userId,
+        institutionId: params.institutionId,
+        userAliasId: userAlias.id,
+      })
+
+      return await this.studentMemoRepository.save(newStudentMemo)
+    } else {
+      existingStudentMemo.userAliasId = userAlias.id
+      return await this.studentMemoRepository.save(existingStudentMemo)
+    }
   }
 
   async updateContactInfoV2(params: CreateOrUpdateStudentContactInfoV2Dto) {
@@ -2095,7 +2030,6 @@ export class StudentOnbService {
         userAlias.email = params.email
         userAlias.refUserId = user.id
         await this.userAliasesRepository.save(userAlias)
-        await this.userRepository.save(user)
       }
     }
 
@@ -2123,7 +2057,28 @@ export class StudentOnbService {
       }
     }
 
-    return userAlias
+    let studentMemo = await this.studentMemoRepository.findOneBy({
+      userId: params.userId,
+      institutionId: params.institutionId,
+      userAliasId: userAlias.id,
+    })
+
+    if (!studentMemo) {
+      studentMemo = this.studentMemoRepository.create({
+        userId: params.userId,
+        institutionId: params.institutionId,
+        userAliasId: userAlias.id,
+      })
+      return await this.studentMemoRepository.save(studentMemo)
+    } else {
+      studentMemo.userAliasId = userAlias.id
+
+      if (studentMemo.userAliasId !== userAlias.id && studentMemo.userAliasId !== null) {
+        studentMemo.userAliasId = userAlias.id
+      }
+
+      return await this.studentMemoRepository.save(studentMemo)
+    }
   }
 
   async updateLesson(params: ChangeStudentLessonDto) {
@@ -2148,15 +2103,9 @@ export class StudentOnbService {
 
     return await this.studentLessonRepository.save({
       ...studentLesson,
-      // Preserve original reference on first change only
-      ...(studentLesson.changeClassLessonId ? {} : {
-        changeClassLessonId: studentLesson.classLessonId,
-        changeStartTime: studentLesson.startTime,
-        changeEndTime: studentLesson.endTime,
-      }),
-      classLessonId: classLesson.id,
-      startTime: classLesson.startTime,
-      endTime: classLesson.endTime,
+      changeClassLessonId: classLesson.id,
+      changeStartTime: classLesson.startTime,
+      changeEndTime: classLesson.endTime,
     })
   }
 
@@ -2468,8 +2417,8 @@ export class StudentOnbService {
     })
 
     const jwtOption = {
-      secret: process.env.JWT_SECRET,
-      expiresIn: '1d',
+      secret: process.env.JWT_TOKEN_ENROLL_COURSE_SECRET_KEY,
+      expiresIn: process.env.JWT_TOKEN_ENROLL_COURSE_EXPRIED,
     }
 
     const token = this.jwtService.sign(
@@ -2631,19 +2580,12 @@ export class StudentOnbService {
 
     if (customMessage) {
       const content = replaceContentVariables(customMessage.content, whatsappReminderDto)
-      await this.whatsappWebService.sendWhatsappMessage(
-        {
-          content,
-          institutionId: institution.id,
-          phone: enrollCourse.preferredPhone,
-        },
-        {
-          recipientUserId: user.id,
-          recipientUserPhone: enrollCourse.preferredPhone,
-          institutionId: institution.id,
-          siteId: institution.siteId,
-        }
-      )
+      if (enrollCourse.preferredPhone) {
+        await this.whatsappService.sendDirectWhatsappMessage({
+          toPhone: enrollCourse.preferredPhone,
+          body: content,
+        })
+      }
     } else {
       await this.notificationRecordService.saveNotificationLog({
         messageContent: JSON.stringify(whatsappReminderDto),
@@ -2761,18 +2703,41 @@ export class StudentOnbService {
         throw new ApiError(ErrorCode.INSTITUTION_NOT_FOUND)
       }
 
-      const resultStudentLesson = await this.handleSameCourseClassChangeWithTransaction({
-        studentLesson,
-        courseId,
-        classId,
-        siteId,
-        institutionId,
-        lessonDateTime,
-        isSendEmail,
-        institution,
-        user,
-        transactionalEntityManager,
-      })
+      // Check if course or class has changed
+      const isCourseChanged = studentLesson.courseId !== courseId
+      const isClassChanged = studentLesson.classId !== classId
+
+      let resultStudentLesson: StudentLesson
+
+      if (isCourseChanged || isClassChanged) {
+        // Handle course/class change - create new enroll_course and potentially new studentLesson
+        resultStudentLesson = await this.handleCourseOrClassChangeWithTransaction({
+          studentLesson,
+          courseId,
+          classId,
+          siteId,
+          institutionId,
+          lessonDateTime,
+          isSendEmail,
+          institution,
+          user,
+          transactionalEntityManager,
+        })
+      } else {
+        // Handle same course/class - use original logic
+        resultStudentLesson = await this.handleSameCourseClassChangeWithTransaction({
+          studentLesson,
+          courseId,
+          classId,
+          siteId,
+          institutionId,
+          lessonDateTime,
+          isSendEmail,
+          institution,
+          user,
+          transactionalEntityManager,
+        })
+      }
 
       return resultStudentLesson
     })
@@ -2935,14 +2900,18 @@ export class StudentOnbService {
     const startTime = classLesson.changeStartTime ?? classLesson.startTime
     const endTime = classLesson.changeEndTime ?? classLesson.endTime
 
-    // Check if the current slot (classLessonId) will be vacated — soft-delete if no other students
-    const currentClassLesson = await transactionalEntityManager.findOne(ClassLesson, {
+    // Original logic for same course/class
+    const oldClassLesson = await transactionalEntityManager.findOne(ClassLesson, {
       where: { id: studentLesson.classLessonId },
     })
 
-    if (currentClassLesson) {
+    const changeClassLesson = await transactionalEntityManager.findOne(ClassLesson, {
+      where: { id: studentLesson.changeClassLessonId },
+    })
+
+    if (oldClassLesson) {
       const studentLessons = await this.studentLessonRepository.findByEffectiveClassLessonId(
-        [currentClassLesson.id],
+        [oldClassLesson.id],
         {
           where: {
             id: Not(studentLesson.id),
@@ -2952,52 +2921,35 @@ export class StudentOnbService {
 
       // check if there is any other student in this class lesson
       if (!studentLessons?.length) {
-        currentClassLesson.deletedAt = getCurrentTimeStamp() as unknown as Date
-        await transactionalEntityManager.save(ClassLesson, currentClassLesson)
+        oldClassLesson.deletedAt = getCurrentTimeStamp() as unknown as Date
+        await transactionalEntityManager.save(ClassLesson, oldClassLesson)
       }
     }
-    // changeClassLessonId is the original reference — never clean it up
 
-    const originalClassId = studentLesson.classId
+    if (changeClassLesson) {
+      const studentLessons = await this.studentLessonRepository.findByEffectiveClassLessonId(
+        [changeClassLesson.id],
+        {
+          where: {
+            id: Not(studentLesson.id),
+          },
+        }
+      )
 
-    // Preserve original reference on first change only
-    if (!studentLesson.changeClassLessonId) {
-      studentLesson.changeClassLessonId = studentLesson.classLessonId
-      studentLesson.changeStartTime = studentLesson.startTime
-      studentLesson.changeEndTime = studentLesson.endTime
+      // check if there is any other student in this class lesson
+      if (!studentLessons?.length) {
+        changeClassLesson.deletedAt = getCurrentTimeStamp() as unknown as Date
+        await transactionalEntityManager.save(ClassLesson, changeClassLesson)
+      }
     }
-    // Update primary fields to the new/current lesson
-    studentLesson.classLessonId = classLesson.id
-    studentLesson.startTime = startTime
-    studentLesson.endTime = endTime
+
+    studentLesson.changeClassLessonId = classLesson.id
+    studentLesson.changeStartTime = startTime
+    studentLesson.changeEndTime = endTime
     studentLesson.classId = classLesson.classId
     studentLesson.courseId = classLesson.courseId
 
     const res = await transactionalEntityManager.save(StudentLesson, studentLesson)
-
-    // When the class changes, update the EnrollClassMapping so TeachingService
-    // always reflects the correct current class. Try to match by the old classId
-    // first; fall back to any existing mapping for this enrollment (handles cases
-    // where prior changes left the mapping out of sync).
-    if (originalClassId !== classLesson.classId) {
-      let enrollClassMapping = await transactionalEntityManager.findOne(EnrollClassMapping, {
-        where: {
-          enrollCourseId: studentLesson.enrollCourseId,
-          classId: originalClassId,
-        },
-      })
-      if (!enrollClassMapping) {
-        // Fallback: find any mapping for this enrollment
-        enrollClassMapping = await transactionalEntityManager.findOne(EnrollClassMapping, {
-          where: { enrollCourseId: studentLesson.enrollCourseId },
-          order: { id: 'DESC' },
-        })
-      }
-      if (enrollClassMapping) {
-        enrollClassMapping.classId = classLesson.classId
-        await transactionalEntityManager.save(EnrollClassMapping, enrollClassMapping)
-      }
-    }
 
     // Send email/WhatsApp notification if requested (outside transaction to avoid blocking)
     if (isSendEmail) {
@@ -3219,16 +3171,16 @@ export class StudentOnbService {
     const instructor = classItem.instructor?.firstName || ''
     const timeZoneId = classItem.site?.timeZone?.id || 'UTC'
 
-    const oldClassLessonStartDate = dayjs(studentLesson.changeStartTime)
+    const oldClassLessonStartDate = dayjs(studentLesson.startTime)
       .tz(timeZoneId)
       .format('DD/MM/YYYY HH:mm')
-    const oldClassLessonEndTime = dayjs(studentLesson.changeEndTime)
+    const oldClassLessonEndTime = dayjs(studentLesson.endTime)
       .tz(timeZoneId)
       .format('DD/MM/YYYY HH:mm')
-    const newClassLessonStartDate = dayjs(studentLesson.startTime)
+    const newClassLessonStartDate = dayjs(studentLesson.changeStartTime)
       .tz(timeZoneId)
       .format('DD/MM/YYYY HH:mm')
-    const newClassLessonEndDate = dayjs(studentLesson.endTime)
+    const newClassLessonEndDate = dayjs(studentLesson.changeEndTime)
       .tz(timeZoneId)
       .format('DD/MM/YYYY HH:mm')
 
@@ -3300,19 +3252,12 @@ export class StudentOnbService {
     if (customMessage) {
       const content = replaceContentVariables(customMessage.content, emailReminderVariables)
       try {
-        await this.whatsappWebService.sendWhatsappMessage(
-          {
-            content,
-            institutionId: institution.id,
-            phone: enrollCourse.preferredPhone,
-          },
-          {
-            recipientUserId: user.id,
-            recipientUserPhone: enrollCourse.preferredPhone,
-            institutionId: institution.id,
-            siteId: site.id,
-          }
-        )
+        if (enrollCourse.preferredPhone) {
+          await this.whatsappService.sendDirectWhatsappMessage({
+            toPhone: enrollCourse.preferredPhone,
+            body: content,
+          })
+        }
       } catch (e) {
         console.log(e)
       }
@@ -3321,14 +3266,151 @@ export class StudentOnbService {
 
   async updateLessonAttendance(
     updateLessonAttendanceDto: UpdateLessonAttendanceDto
-  ): Promise<{ id: number; attendance: AttendanceStatus }> {
-    const { studentLessonId, attendance } = updateLessonAttendanceDto
-    const { affected } = await this.studentLessonRepository.update(
-      { id: studentLessonId },
-      { attendance }
+  ): Promise<StudentLesson> {
+    const studentLesson = await this.studentLessonRepository.findOne({
+      where: {
+        id: updateLessonAttendanceDto.studentLessonId,
+      },
+      relations: {
+        studentSchedule: {
+          studentLessons: true,
+        },
+        class: {
+          recurringFormat: true,
+          site: true,
+          institution: true,
+        },
+        course: true,
+        user: true,
+      },
+    })
+    if (!studentLesson) throw new ApiError(ErrorCode.CLASS_LESSON_NOT_FOUND)
+
+    if (studentLesson.attendance === AttendanceStatus.POSTPONE) {
+      throw new ApiError(ErrorCode.LESSON_UPDATE_NOT_AVAILABLE)
+    }
+
+    let studentMemo = await this.studentMemoRepository.findOneBy({
+      userId: studentLesson.userId,
+      institutionId: studentLesson.institutionId,
+    })
+    if (
+      studentLesson.attendance !== AttendanceStatus.NOT_ATTENDED &&
+      updateLessonAttendanceDto.attendance === AttendanceStatus.NOT_ATTENDED
+    ) {
+      if (studentMemo) {
+        // Increment the assignableLessonCount
+        studentMemo.assignableLessonCount += 1
+
+        await this.studentMemoRepository.save(studentMemo)
+      } else {
+        studentMemo = await this.studentMemoRepository.create({
+          userId: studentLesson.userId,
+          institutionId: studentLesson.institutionId,
+          assignableLessonCount: 1,
+        })
+        await this.studentMemoRepository.save(studentMemo)
+      }
+    } else if (
+      studentLesson.attendance === AttendanceStatus.NOT_ATTENDED &&
+      updateLessonAttendanceDto.attendance !== AttendanceStatus.NOT_ATTENDED
+    ) {
+      if (studentMemo) {
+        // Increment the assignableLessonCount
+        studentMemo.assignableLessonCount -= 1
+
+        await this.studentMemoRepository.save(studentMemo)
+      }
+    } else if (updateLessonAttendanceDto.attendance === AttendanceStatus.POSTPONE) {
+      const { class: classEntity, course, user } = studentLesson
+      const { recurringFormat, site, institution: school } = classEntity
+
+      const originalDateTime = `${studentLesson.startTime.toISOString()} ${studentLesson.endTime.toISOString()}`
+
+      // Get the last lesson in the current studentScheule first
+      const lastLesson = await this.studentLessonRepository.find({
+        where: {
+          studentScheduleId: studentLesson.studentScheduleId,
+        },
+        order: {
+          startTime: 'DESC',
+        },
+      })
+
+      let lessonStartTime = studentLesson.startTime
+      let lessonEndTime = studentLesson.endTime
+
+      if (lastLesson.length > 0) {
+        lessonStartTime = lastLesson[0].startTime
+        lessonEndTime = lastLesson[0].endTime
+      }
+
+      const { startDate, endDate } = await this.recurringSchedulesService.generateNextPostponeDate(
+        school.id,
+        recurringFormat,
+        lessonStartTime,
+        lessonEndTime
+      )
+
+      let classLesson = await this.classLessonRepository.findOne({
+        where: {
+          classId: studentLesson.classId,
+          courseId: studentLesson.courseId,
+          institutionId: studentLesson.institutionId,
+          startTime: MoreThanOrEqual(startDate),
+          endTime: LessThanOrEqual(endDate),
+        },
+      })
+
+      if (!classLesson) {
+        const classLessonDto = this.classLessonRepository.create({
+          classId: studentLesson.classId,
+          courseId: studentLesson.courseId,
+          institutionId: studentLesson.institutionId,
+          startTime: startDate,
+          endTime: endDate,
+          recurringScheduleId: studentLesson.classLesson?.recurringScheduleId,
+          lessonId: studentLesson.classLesson?.lessonId,
+        })
+        classLesson = await this.classLessonRepository.save(classLessonDto)
+      }
+
+      const newStudentLesson = await this.studentLessonRepository.create({
+        institutionId: studentLesson.institutionId,
+        classLessonId: classLesson.id,
+        courseId: studentLesson.courseId,
+        enrollCourseId: studentLesson.enrollCourseId,
+        studentScheduleId: studentLesson.studentScheduleId,
+        classId: studentLesson.classId,
+        userId: studentLesson.userId,
+        startTime: startDate,
+        endTime: endDate,
+        attendance: AttendanceStatus.PENDING,
+      })
+
+      await this.studentLessonRepository.save(newStudentLesson)
+      const newDateTime = `${startDate.toISOString()} ${endDate.toISOString()}`
+      await this.emailService.sendStudentPostponeEmail({
+        recipientUserId: user.id,
+        institutionId: school.id,
+        siteId: site.id,
+        schoolEmail: school.email,
+        schoolPhone: school.phone,
+        studentName: user.firstName,
+        studentEmail: user.email,
+        courseName: course.name,
+        originalDateTime: lessonDateToString(originalDateTime, site.timeZone.id),
+        newDateTime: lessonDateToString(newDateTime, site.timeZone.id),
+      })
+    }
+    await this.studentLessonRepository.update(
+      { id: updateLessonAttendanceDto.studentLessonId },
+      { attendance: updateLessonAttendanceDto.attendance }
     )
-    if (!affected) throw new ApiError(ErrorCode.CLASS_LESSON_NOT_FOUND)
-    return { id: studentLessonId, attendance }
+    const res = await this.studentLessonRepository.findOneBy({
+      id: updateLessonAttendanceDto.studentLessonId,
+    })
+    return res
   }
 
   async recordLogRescheduleLesson({
@@ -3344,12 +3426,12 @@ export class StudentOnbService {
   }): Promise<RecordLog> {
     const dataLog = await this.studentLessonRepository
       .createQueryBuilder('stu')
-      .leftJoin('class_lessons', 'cll_new', 'cll_new.id = stu.class_lesson_id')
-      .leftJoin('classes', 'cl_new', 'cl_new.id = cll_new.class_id')
-      .leftJoin('courses', 'co_new', 'co_new.id = cll_new.course_id')
-      .leftJoin('class_lessons', 'cll_old', 'cll_old.id = stu.change_class_lesson_id')
+      .leftJoin('class_lessons', 'cll_old', 'cll_old.id = stu.class_lesson_id')
       .leftJoin('classes', 'cl_old', 'cl_old.id = cll_old.class_id')
       .leftJoin('courses', 'co_old', 'co_old.id = cll_old.course_id')
+      .leftJoin('class_lessons', 'cll_new', 'cll_new.id = stu.change_class_lesson_id')
+      .leftJoin('classes', 'cl_new', 'cl_new.id = cll_new.class_id')
+      .leftJoin('courses', 'co_new', 'co_new.id = cll_new.course_id')
       .leftJoin('users', 'u', 'u.id = stu.user_id')
       .where({
         id: studentLesson.id,
@@ -3378,11 +3460,15 @@ export class StudentOnbService {
           educatorId: user.id,
           studentFirstName: dataLog.studentFirstName,
           studentLastName: dataLog.studentLastName,
-          oldStartTime: studentLesson.changeStartTime,
-          oldEndTime: studentLesson.changeEndTime,
+          oldStartTime: studentLesson.changeStartTime
+            ? studentLesson.changeStartTime
+            : studentLesson.startTime,
+          oldEndTime: studentLesson.changeEndTime
+            ? studentLesson.changeEndTime
+            : studentLesson.endTime,
           classLessonId,
-          classLessonStartTime: studentLesson.startTime,
-          classLessonEndTime: studentLesson.endTime,
+          classLessonStartTime: studentLesson.changeStartTime,
+          classLessonEndTime: studentLesson.changeEndTime,
           modifiedDate: dayjs().toDate(),
         },
         userId: studentLesson.userId,
@@ -3405,12 +3491,12 @@ export class StudentOnbService {
   }): Promise<RecordLog> {
     const dataLog = await this.studentLessonRepository
       .createQueryBuilder('stu')
-      .leftJoin('class_lessons', 'cll_new', 'cll_new.id = stu.class_lesson_id')
-      .leftJoin('classes', 'cl_new', 'cl_new.id = cll_new.class_id')
-      .leftJoin('courses', 'co_new', 'co_new.id = cll_new.course_id')
-      .leftJoin('class_lessons', 'cll_old', 'cll_old.id = stu.change_class_lesson_id')
+      .leftJoin('class_lessons', 'cll_old', 'cll_old.id = stu.class_lesson_id')
       .leftJoin('classes', 'cl_old', 'cl_old.id = cll_old.class_id')
       .leftJoin('courses', 'co_old', 'co_old.id = cll_old.course_id')
+      .leftJoin('class_lessons', 'cll_new', 'cll_new.id = stu.change_class_lesson_id')
+      .leftJoin('classes', 'cl_new', 'cl_new.id = cll_new.class_id')
+      .leftJoin('courses', 'co_new', 'co_new.id = cll_new.course_id')
       .leftJoin('users', 'u', 'u.id = stu.user_id')
       .where({
         id: studentLesson.id,
@@ -3440,11 +3526,15 @@ export class StudentOnbService {
           educatorId: user.id,
           studentFirstName: dataLog?.studentFirstName,
           studentLastName: dataLog?.studentLastName,
-          oldStartTime: studentLesson.changeStartTime,
-          oldEndTime: studentLesson.changeEndTime,
+          oldStartTime: studentLesson.changeStartTime
+            ? studentLesson.changeStartTime
+            : studentLesson.startTime,
+          oldEndTime: studentLesson.changeEndTime
+            ? studentLesson.changeEndTime
+            : studentLesson.endTime,
           classLessonId,
-          classLessonStartTime: studentLesson.startTime,
-          classLessonEndTime: studentLesson.endTime,
+          classLessonStartTime: studentLesson.changeStartTime,
+          classLessonEndTime: studentLesson.changeEndTime,
           modifiedDate: dayjs().toDate(),
         },
         userId: studentLesson.userId,
@@ -3544,18 +3634,6 @@ export class StudentOnbService {
     }
 
     return await Promise.all(fieldValues)
-  }
-
-  async updateStudentLessonRemarks(
-    studentLessonId: number,
-    remarks: string | null
-  ): Promise<{ id: number; remarks: string | null }> {
-    const studentLesson = await this.studentLessonRepository.findOne({
-      where: { id: studentLessonId },
-    })
-    if (!studentLesson) throw new ApiError(ErrorCode.CLASS_LESSON_NOT_FOUND)
-    await this.studentLessonRepository.update(studentLessonId, { remarks })
-    return { id: studentLessonId, remarks }
   }
 
   async updateStudentForm(params: UpdateStudentFormDto) {
@@ -4100,7 +4178,7 @@ export class StudentOnbService {
       phone: user.phone,
     }
     res.userAlias = userAlias
-    res.studentMemo = userAlias
+    // res.studentMemo = userMemo
     const { StudentName, StudentEmail, StudentPhone, ...customFields } = item
 
     // This part is JUST for the default fields on the database
@@ -4322,7 +4400,7 @@ export class StudentOnbService {
 
     const s = path.join(dir, name)
     fs.writeFileSync(s, buffer)
-    return `${process.env.API_BASE_URL}${exportPath}/${name}`
+    return `${process.env.APP_HOSTNAME}${exportPath}/${name}`
   }
 
   async addFieldsToStudentRecord({
@@ -4423,10 +4501,7 @@ export class StudentOnbService {
     if (!user) {
       throw new ApiError(ErrorCode.USERID_NOT_FOUND)
     }
-    return (await this.studentNotifSettingService.getOrCreateNotification(
-      user,
-      data.institutionId
-    )) as unknown as StudentNotificationSettings[]
+    return await this.studentNotifSettingService.getOrCreateNotification(user, data.institutionId)
   }
 
   async setNotificationSetting(payload: {
@@ -4438,11 +4513,11 @@ export class StudentOnbService {
     if (!user) {
       throw new ApiError(ErrorCode.USERID_NOT_FOUND)
     }
-    return (await this.studentNotifSettingService.updateNotificationSettings(
+    return await this.studentNotifSettingService.updateNotificationSettings(
       user,
       payload.institutionId,
       payload.data
-    )) as unknown as StudentNotificationSettings[]
+    )
   }
 
   async checkIfIsOnlyUserAlias(userId: number): Promise<boolean> {

@@ -151,7 +151,7 @@ const StudentSelectionDialog: React.FC<Props> = ({
       label: t('teachingService:paymentStatus.submitted'),
     },
     {
-      value: PaymentState.PENDING,
+      value: PaymentState.UNPAID,
       label: t('teachingService:paymentStatus.unpaid'),
     },
   ]
@@ -185,7 +185,7 @@ const StudentSelectionDialog: React.FC<Props> = ({
         .map((student: StudentEnrolmentRecord) => {
           let currentEmail = student.email
           let currentPhone = student.phone
-          const currentName = student.name
+          let currentName = student.name
 
           if (student.user) {
             if (!currentEmail) {
@@ -196,11 +196,19 @@ const StudentSelectionDialog: React.FC<Props> = ({
             }
           }
 
+          if (student.studentMemo) {
+            if (student.studentMemo.userAlias?.name) {
+              currentName = student.studentMemo.userAlias.name
+            }
+          }
+
           return {
             ...student,
             name: currentName,
             email: currentEmail,
             phone: currentPhone,
+            updatedAt: student?.studentMemo?.updatedAt ?? new Date(),
+            createdAt: student?.studentMemo?.createdAt ?? new Date(),
           }
         })
         .filter(({ enrollCourses }) => {
@@ -388,7 +396,7 @@ const StudentSelectionDialog: React.FC<Props> = ({
             columns={tableColumns}
             handleReset={handleReset}
             hasFilterSelection
-            filterSelector={({ handleReset: reset }) => (
+            filterSelector={
               <>
                 <Box direction="col">
                   <Box className="box-row-full grid grid-cols-1 md:grid-cols-10 md:gap-2">
@@ -468,7 +476,7 @@ const StudentSelectionDialog: React.FC<Props> = ({
                       <Button
                         variant="outline"
                         className="w-full"
-                        onClick={reset}
+                        onClick={handleReset}
                       >
                         {t('recordLogs:notificationLogs.selectLabels.reset')}
                       </Button>
@@ -476,7 +484,7 @@ const StudentSelectionDialog: React.FC<Props> = ({
                   </Box>
                 </Box>
               </>
-            )}
+            }
           />
         </DialogBody>
       </DialogContent>

@@ -72,15 +72,10 @@ const EnrolledDialog: React.FC<Props> = ({
     setActiveStep(prev => prev + 1)
   }
 
-  // Sync into context only when the dialog opens, not on every Recoil change.
-  // Continuous syncing caused an infinite loop: Recoil allStudents changed →
-  // context updated → re-renders → InvoiceEditor effects fired → Recoil changed…
   useEffect(() => {
-    if (!open) return
     setAllStudentsToEnroll(allStudents)
     setStudentToEnroll(currentStudent)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open])
+  }, [allStudents, currentStudent, setAllStudentsToEnroll, setStudentToEnroll])
   return (
     <Dialog
       open={open}

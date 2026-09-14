@@ -1,36 +1,39 @@
 import { forwardRef } from 'react'
 
+import { CSS } from '@stitches/react'
+
 import Skeleton, { SkeletonProps, SkeletonTheme } from 'react-loading-skeleton'
 
-import { cn } from '@/utils/cn'
+import { theme } from '../../styles'
+import Box from '../Containers/Box'
 
 type SkeletonLoaderProps = {
   height?: string
-  boxCSS?: React.CSSProperties
-  boxClassName?: string
+  boxCSS?: CSS
 } & SkeletonProps
 
 const SkeletonLoader = forwardRef<HTMLDivElement, SkeletonLoaderProps>(
   (props, ref) => {
-    const { height, boxCSS, boxClassName, ...rest } = props
+    const { height, boxCSS, ...rest } = props
 
     return (
-      <div
-        ref={ref}
-        className={cn('w-full h-full', boxClassName)}
-        style={boxCSS}
+      <Box
+        css={{
+          all: 'unset',
+          width: '100% !important',
+          height: '100% !important',
+          ...boxCSS,
+        }}
       >
         <SkeletonTheme
-          baseColor="var(--color-background-layer-2)"
-          highlightColor="var(--color-background-layer-3)"
+          baseColor={theme.colors.backgroundLayer2.toString()}
+          highlightColor={theme.colors.backgroundLayer3.toString()}
         >
-          <Skeleton {...rest} height={height} />
+          <Skeleton {...rest} {...ref} height={height} />
         </SkeletonTheme>
-      </div>
+      </Box>
     )
   }
 )
-
-SkeletonLoader.displayName = 'SkeletonLoader'
 
 export default SkeletonLoader
