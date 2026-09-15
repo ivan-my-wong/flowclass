@@ -3636,8 +3636,8 @@ export class StudentOnbService {
     return await Promise.all(fieldValues)
   }
 
-  async updateStudentForm(params: UpdateStudentFormDto) {
-    let studentForms
+  async updateStudentForm(params: UpdateStudentFormDto): Promise<StudentForm[]> {
+    let studentForms: StudentForm[]
     if (params.userAliasId) {
       studentForms = await this.studentFormRepository.find({
         where: { userAliasId: params.userAliasId, institutionId: params.institutionId },
@@ -3647,9 +3647,17 @@ export class StudentOnbService {
         where: { userId: params.userId, institutionId: params.institutionId },
       })
     }
-    // Find forms with both userId and institutionId filter upfront
+    // If no existing form records exist, create them if metadata is provided
     if (studentForms.length === 0) {
-      throw new ApiError(ErrorCode.FORM_NOT_FOUND)
+      if (params.metadata && params.metadata.length > 0) {
+        return await this.addFieldsToStudentRecord({
+          userId: params.userId,
+          userAliasId: params.userAliasId,
+          institutionId: params.institutionId,
+          newFields: params.metadata,
+        })
+      }
+      return []
     }
 
     // Convert metadata array to Map for O(1) lookup

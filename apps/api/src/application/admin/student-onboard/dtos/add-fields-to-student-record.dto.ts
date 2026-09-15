@@ -1,10 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { IsNumber, IsOptional } from 'class-validator'
 
 import { StudentFormMetadata } from '@/models/student-form.entity'
 
 export class AddFieldsToStudentRecordDto {
   @ApiProperty({ description: 'User ID', example: 1 })
   userId: number
+
+  @ApiProperty({ description: 'User Alias ID', example: 1 })
+  @IsOptional()
+  @IsNumber()
+  userAliasId?: number
 
   @ApiProperty({ description: 'Institution ID', example: 1 })
   institutionId: number
