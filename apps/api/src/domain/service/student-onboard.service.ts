@@ -3575,16 +3575,25 @@ export class StudentOnbService {
               return +formFieldId === field.id
             })
 
+            const fieldId = fieldType?.id || getNumberIdFromFieldId(studentForm.formFieldId)
+            const question = fieldType?.question || studentForm.formFieldQuestion || studentForm.metadata?.question
+            const order = fieldType?.order ?? studentForm.formFieldOrder ?? studentForm.metadata?.order
+            const columnMapping = fieldType?.columnMapping || studentForm.formFieldColumnMapping || studentForm.metadata?.columnMapping
+            const isDefault = fieldType?.isDefault ?? studentForm.formFieldIsDefault ?? studentForm.metadata?.isDefault
+            const type = fieldType?.type || studentForm.formFieldType || studentForm.metadata?.type
+            const isRequire = fieldType?.isRequire ?? false
+            const option = fieldType?.option
+
             data[studentForm.formFieldId] = {
-              id: fieldType?.id,
-              question: fieldType?.question,
-              order: fieldType?.order,
-              columnMapping: fieldType?.columnMapping,
-              isDefault: fieldType?.isDefault,
-              type: fieldType?.type,
+              id: fieldId,
+              question,
+              order,
+              columnMapping,
+              isDefault,
+              type,
               value: studentForm.formFieldValue,
-              isRequire: fieldType?.isRequire,
-              option: fieldType?.option,
+              isRequire,
+              option,
             }
           }
           return data
@@ -3647,57 +3656,69 @@ export class StudentOnbService {
         where: { userId: params.userId, institutionId: params.institutionId },
       })
     }
-    // If no existing form records exist, create them if metadata is provided
-    if (studentForms.length === 0) {
-      if (params.metadata && params.metadata.length > 0) {
-        return await this.addFieldsToStudentRecord({
-          userId: params.userId,
-          userAliasId: params.userAliasId,
-          institutionId: params.institutionId,
-          newFields: params.metadata,
-        })
-      }
+
+    if (!params.metadata || params.metadata.length === 0) {
       return []
     }
 
-    // Convert metadata array to Map for O(1) lookup
-    const metadataMap = params.metadata.reduce((acc, item) => {
-      if (!item.id) return acc
-      acc[item.id] = item
-      return acc
-    }, {})
+    // Convert existing forms to Map by field ID (e.g. from applicant.0.123 -> '123' or '123')
+    const existingFormsMap = new Map<string, StudentForm>()
+    studentForms.forEach((form) => {
+      if (form.formFieldId) {
+        const parts = form.formFieldId.split('.')
+        const fieldKey = parts.length === 3 ? parts[2] : form.formFieldId
+        existingFormsMap.set(String(fieldKey), form)
+      }
+      if (form.fieldId) {
+        existingFormsMap.set(String(form.fieldId), form)
+      }
+    })
 
-    // Filter forms that need updating and prepare update data
-    const formsToUpdate = studentForms
-      .filter((form) => {
-        if (typeof form.formFieldId === 'string') {
-          const finalFormId = form.formFieldId.split('.')
-          if (finalFormId.length === 3) {
-            return metadataMap[finalFormId[2]]
-          }
-        }
-        return metadataMap[form.formFieldId]
-      })
-      .map((form) => {
-        if (typeof form.formFieldId === 'string') {
-          const finalFormId = form.formFieldId.split('.')
-          if (finalFormId.length === 3) {
-            return {
-              ...form,
-              metadata: metadataMap[finalFormId[2]],
-              formFieldValue: metadataMap[finalFormId[2]].value as string,
-            }
-          }
-        }
-        return {
-          ...form,
-          metadata: metadataMap[form.formFieldId],
-          formFieldValue: metadataMap[form.formFieldId].value as string,
-        }
-      })
+    const formsToSave: StudentForm[] = []
 
-    if (formsToUpdate.length === 0) {
-      return []
+    for (const item of params.metadata) {
+      if (item.id === undefined || item.id === null) continue
+      const fieldKey = String(item.id).includes('.')
+        ? item.id.split('.')[2]
+        : String(item.id)
+
+      const existingForm = existingFormsMap.get(fieldKey)
+      const fieldIdStr = `applicant.0.${fieldKey}`
+      const stringVal = typeof item.value === 'string' ? item.value : (item.value !== undefined && item.value !== null ? JSON.stringify(item.value) : '')
+
+      if (existingForm) {
+        existingForm.formFieldValue = stringVal
+        existingForm.formFieldQuestion = item.question || existingForm.formFieldQuestion
+        existingForm.formFieldType = item.type || existingForm.formFieldType
+        existingForm.formFieldIsDefault = item.isDefault ?? existingForm.formFieldIsDefault
+        existingForm.formFieldOrder = item.order ?? existingForm.formFieldOrder
+        existingForm.formFieldColumnMapping = item.columnMapping ?? existingForm.formFieldColumnMapping
+        existingForm.metadata = {
+          ...item,
+          id: fieldIdStr,
+          value: item.value,
+        }
+        formsToSave.push(existingForm)
+      } else {
+        const newForm = this.studentFormRepository.create({
+          userId: params.userId,
+          userAliasId: params.userAliasId,
+          institutionId: params.institutionId,
+          fieldId: fieldKey,
+          formFieldId: fieldIdStr,
+          formFieldQuestion: item.question,
+          formFieldType: item.type,
+          formFieldValue: stringVal,
+          formFieldIsDefault: item.isDefault,
+          formFieldOrder: item.order,
+          formFieldColumnMapping: item.columnMapping,
+          metadata: {
+            ...item,
+            id: fieldIdStr,
+          },
+        })
+        formsToSave.push(newForm)
+      }
     }
 
     if (params.invoiceId && params.metadata) {
@@ -3708,7 +3729,7 @@ export class StudentOnbService {
         })
         if (invoice && invoice.enrollCourses && invoice.enrollCourses.length > 0) {
           const enroll = invoice.enrollCourses[0]
-          if (enroll) {
+          if (enroll && enroll.registrationForm) {
             const registrationForm = enroll.registrationForm.map((o) => {
               if (!o.id?.toString()?.includes('.')) return o
               const id = o.id.split('.')[2]
@@ -3724,8 +3745,11 @@ export class StudentOnbService {
       }
     }
 
-    // Bulk save all updates in one query
-    return await this.studentFormRepository.save(formsToUpdate)
+    if (formsToSave.length === 0) {
+      return []
+    }
+
+    return await this.studentFormRepository.save(formsToSave)
   }
 
   async getColumnCSV(file: Express.Multer.File): Promise<{ clientColHeaders: string[] }> {
@@ -4422,17 +4446,61 @@ export class StudentOnbService {
     institutionId: number
     newFields: StudentFormMetadata[]
   }): Promise<StudentForm[]> {
-    const updatedForms = newFields.map((field) => {
-      const fieldId = `applicant.0.${field.id}`
+    let existingForms: StudentForm[] = []
+    if (userAliasId) {
+      existingForms = await this.studentFormRepository.find({
+        where: { userAliasId, institutionId },
+      })
+    } else {
+      existingForms = await this.studentFormRepository.find({
+        where: { userId, institutionId },
+      })
+    }
+
+    const existingMap = new Map<string, StudentForm>()
+    existingForms.forEach((form) => {
+      if (form.formFieldId) {
+        const parts = form.formFieldId.split('.')
+        const fieldKey = parts.length === 3 ? parts[2] : form.formFieldId
+        existingMap.set(String(fieldKey), form)
+      }
+      if (form.fieldId) {
+        existingMap.set(String(form.fieldId), form)
+      }
+    })
+
+    const updatedForms: StudentForm[] = newFields.map((field) => {
+      const fieldKey = String(field.id).includes('.')
+        ? field.id.split('.')[2]
+        : String(field.id)
+      const fieldId = `applicant.0.${fieldKey}`
+      const stringVal = typeof field.value === 'string' ? field.value : (field.value !== undefined && field.value !== null ? JSON.stringify(field.value) : '')
+
+      const existing = existingMap.get(fieldKey)
+      if (existing) {
+        existing.formFieldValue = stringVal
+        existing.formFieldQuestion = field.question || existing.formFieldQuestion
+        existing.formFieldType = field.type || existing.formFieldType
+        existing.formFieldIsDefault = field.isDefault ?? existing.formFieldIsDefault
+        existing.formFieldOrder = field.order ?? existing.formFieldOrder
+        existing.formFieldColumnMapping = field.columnMapping ?? existing.formFieldColumnMapping
+        existing.metadata = {
+          ...field,
+          id: fieldId,
+          value: field.value,
+        }
+        return existing
+      }
+
       return this.studentFormRepository.create({
         userId,
         userAliasId,
         institutionId,
-        fieldId: field.id,
+        fieldId: fieldKey,
         formFieldId: fieldId,
         formFieldQuestion: field.question,
         formFieldType: field.type,
-        formFieldValue: typeof field.value === 'string' ? field.value : JSON.stringify(field.value),
+        formFieldValue: stringVal,
         formFieldIsDefault: field.isDefault,
         formFieldOrder: field.order,
         formFieldColumnMapping: field.columnMapping,
