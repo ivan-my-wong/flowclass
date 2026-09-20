@@ -4,7 +4,6 @@ import { CloudWatchLoggerProvider } from '../config/loggers/cloudwatch-nestjs.pr
 
 import { AdminModule } from './admin.module'
 import { RedisModule } from './cache/cacheClient.module'
-import { DataMigrationModule } from './data-migration.module'
 import { MediaModule } from './media/media.module'
 import { StudentModule } from './student.module'
 
@@ -31,6 +30,8 @@ import { LoggerMiddleware } from '@/common/middlewares/logger.middleware'
         `.env.${process.env.APP_ENV}.local`,
         '.env',
         `.env.${process.env.APP_ENV}`,
+        '../../.env.local',
+        '../../.env',
       ],
       validationSchema: configValidationSchema,
       isGlobal: true,
@@ -39,8 +40,8 @@ import { LoggerMiddleware } from '@/common/middlewares/logger.middleware'
     BullModule.forRootAsync({
       useFactory: () => ({
         redis: {
-          host: process.env.REDIS_URL,
-          port: +process.env.REDIS_PORT,
+          host: process.env.REDIS_URL || 'localhost',
+          port: +process.env.REDIS_PORT || 6379,
         },
         limiter: {
           max: 10,
@@ -53,7 +54,6 @@ import { LoggerMiddleware } from '@/common/middlewares/logger.middleware'
       serveRoot: '/exports/',
     }),
     SSEModule,
-    DataMigrationModule,
     RedisModule,
     AdminModule,
     StudentModule,

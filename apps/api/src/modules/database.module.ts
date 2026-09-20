@@ -4,7 +4,7 @@ import { Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
 import * as fs from 'fs'
-import { Connection, createConnection, DataSource } from 'typeorm'
+import { DataSource } from 'typeorm'
 import { addTransactionalDataSource } from 'typeorm-transactional'
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions'
 
@@ -50,7 +50,7 @@ const getEnvironmentSpecificPoolConfig = (environment: string) => {
         console.log('Connected to database', databaseHost, databasePort, databaseName)
         console.log('Environment', environment)
 
-        const options: TypeOrmModuleOptions & { cli: Record<string, string> } = {
+        const options: TypeOrmModuleOptions = {
           type: 'postgres',
           host: databaseHost,
           port: databasePort,
@@ -59,7 +59,6 @@ const getEnvironmentSpecificPoolConfig = (environment: string) => {
           database: databaseName,
           synchronize: false,
           useUTC: true,
-          migrationsRun: false,
           poolErrorHandler: (err: Error) => {
             console.error('[Database Pool Error]', {
               error: err.message,
@@ -86,12 +85,6 @@ const getEnvironmentSpecificPoolConfig = (environment: string) => {
             : false,
           autoLoadEntities: true,
           logging: process.env.APP_ENV !== 'production' ? ['error', 'warn'] : ['error'],
-          // logger: new CloudWatchDatabaseLoggerProvider(),
-          migrations: [__dirname + 'migrations/*{.ts,.js}'],
-          cli: {
-            migrationsDir: 'migrations',
-          },
-
           poolSize: poolConfig.poolSize,
           connectTimeoutMS: 30000,
           extra: {
@@ -127,9 +120,6 @@ const getEnvironmentSpecificPoolConfig = (environment: string) => {
         if (process.env.APP_ENV === 'test') {
           return {
             ...options,
-            migrationsRun: false,
-            migrationsTransactionMode: 'each',
-            migrations: ['dist/migrations/*.{js,ts}'],
             synchronize: false,
           }
         }
@@ -145,61 +135,6 @@ const getEnvironmentSpecificPoolConfig = (environment: string) => {
         return addTransactionalDataSource(dataSource)
       },
     }),
-    // TypeOrmModule.forRootAsync({
-    //   imports: [],
-    //   inject: [ConfigService],
-    //   name: 'newConnection',
-    //   useFactory: (configService: ConfigService<TAppConfig>) => {
-    //     const options: TypeOrmModuleOptions & { cli: Record<string, string> } = {
-    //       type: 'postgres',
-    //       name: 'newConnection',
-    //       host: configService.get<string>('DATABASE_HOST'),
-    //       port: configService.get<number>('DATABASE_PORT'),
-    //       username: configService.get<string>('DATABASE_USER'),
-    //       password: configService.get<string>('DATABASE_PASSWORD'),
-    //       database: 'flowclass-new',
-    //       synchronize: false,
-    //       migrationsRun: false,
-    //       ssl: {
-    //         ca: fs.readFileSync('src/config/certs/ap-east-1-bundle.pem').toString(),
-    //         rejectUnauthorized: false,
-    //       },
-    //       autoLoadEntities: true,
-    //       logging: process.env.APP_ENV !== 'production' ? false : ['error', 'warn'],
-    //       logger: new CloudWatchDatabaseLoggerProvider(),
-    //       migrations: [__dirname + '/**/migrations/*{.ts,.js}'],
-    //       cli: {
-    //         migrationsDir: 'src/database/migrations',
-    //       },
-    //     };
-
-    //     if (process.env.APP_ENV === 'test') {
-    //       return {
-    //         ...options,
-    //         migrationsRun: false,
-    //         migrationsTransactionMode: 'each',
-    //         migrations: ['dist/migrations/*.{js,ts}'],
-    //         synchronize: false,
-    //       };
-    //     }
-
-    //     return options;
-    //   },
-    // }),
   ],
 })
-export class DatabaseModule {
-  public async runMigrations(configService: ConfigService<TAppConfig>) {
-    const connection: Connection = await createConnection({
-      type: 'postgres',
-      host: configService.get<string>('DATABASE_HOST'),
-      port: configService.get<number>('DATABASE_PORT'),
-      username: configService.get<string>('DATABASE_USER'),
-      password: configService.get<string>('DATABASE_PASSWORD'),
-      database: configService.get<string>('DATABASE_NAME'),
-    })
-
-    console.log('Run migration', connection.migrations)
-    return connection.runMigrations({ transaction: 'each' })
-  }
-}
+export class DatabaseModule {}

@@ -5,5 +5,5 @@ export type LinkConfig = {
 }
 
 export const linkConfigSchema = Joi.object<LinkConfig>({
-  LINK_FLOWCLASS_CMS: Joi.string().required(),
-}).required()
+  LINK_FLOWCLASS_CMS: Joi.string().default('http://localhost:3000'),
+})

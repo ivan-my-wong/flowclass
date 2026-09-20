@@ -7,7 +7,7 @@ export type AwsConfig = {
 }
 
 export const awsConfigSchema = Joi.object<AwsConfig>({
-  AWS_ACCESS_KEY_ID: Joi.string().optional(),
-  AWS_SECRET_ACCESS_KEY: Joi.string().optional(),
-  AWS_REGION: Joi.string().required(),
-}).required()
+  AWS_ACCESS_KEY_ID: Joi.string().allow('').optional(),
+  AWS_SECRET_ACCESS_KEY: Joi.string().allow('').optional(),
+  AWS_REGION: Joi.string().default('ap-southeast-1'),
+})

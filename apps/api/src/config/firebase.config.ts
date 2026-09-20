@@ -8,8 +8,8 @@ export type FirebaseConfig = {
 }
 
 export const firebaseConfigSchema = Joi.object<FirebaseConfig>({
-  FIREBASE_PROJECT_ID: Joi.string().required(),
-  FIREBASE_PRIVATE_KEY: Joi.string().required(),
-  FIREBASE_CLIENT_EMAIL: Joi.string().required(),
-  FIREBASE_CLIENT_ID: Joi.string().required(),
-}).required()
+  FIREBASE_PROJECT_ID: Joi.string().allow('').optional(),
+  FIREBASE_PRIVATE_KEY: Joi.string().allow('').optional(),
+  FIREBASE_CLIENT_EMAIL: Joi.string().allow('').optional(),
+  FIREBASE_CLIENT_ID: Joi.string().allow('').optional(),
+})

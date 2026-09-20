@@ -50,7 +50,7 @@ import {
   HttpStatus,
   Injectable,
 } from '@nestjs/common'
-import * as bcrypt from 'bcrypt'
+import * as bcrypt from 'bcryptjs'
 import { plainToInstance } from 'class-transformer'
 import * as dayjs from 'dayjs'
 import {

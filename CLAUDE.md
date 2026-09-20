@@ -1,23 +1,11 @@
 # Claude conventions for this repo
 
-## Smoke testing the admin app
-
-When the user asks for a UI test pass / smoke test / "click through every page" / regression check of the admin app, **follow [docs/testing/admin-smoke-test.md](docs/testing/admin-smoke-test.md)**. That file is the canonical playbook:
-
-- Section order
-- Per-page method (navigate → snapshot → console → network → interact → fix → log)
-- Fix policy (what to fix inline vs. log)
-- Logging format
-- Common bug patterns in this codebase
-
-After each run, append a dated file under `docs/testing/runs/<YYYY-MM-DD>.md` with what you tested, what you fixed, and what's still open.
-
 ## Repo layout
 
 - `apps/api/` — NestJS backend (port 5000)
 - `apps/admin/` — Vite + React admin (port 3000)
 - `apps/web/` — Next.js student-facing site
-- `docs/` — Operational docs, including `docs/testing/`
+- `docs/` — Operational and architecture docs
 
 ## House rules
 

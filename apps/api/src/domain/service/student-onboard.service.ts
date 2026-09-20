@@ -111,7 +111,7 @@ import {
   transformEmail,
   transformPhone,
 } from '@/utils/string.utils'
-import * as bcrypt from 'bcrypt'
+import * as bcrypt from 'bcryptjs'
 
 import { ClassLessonService } from './class-lesson.service'
 

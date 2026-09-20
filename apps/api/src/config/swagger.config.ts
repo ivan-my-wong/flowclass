@@ -5,5 +5,5 @@ export type SwaggerConfig = {
 }
 
 export const swaggerConfigSchema = Joi.object<SwaggerConfig>({
-  SWAGGER_ENABLED: Joi.boolean().required(),
+  SWAGGER_ENABLED: Joi.boolean().default(true),
 })

@@ -7,7 +7,7 @@ export type StripeConfig = {
 }
 
 export const stripeConfigSchema = Joi.object<StripeConfig>({
-  STRIPE_SECRET_KEY: Joi.string().required(),
-  STRIPE_ENDPOINT_SECRET: Joi.string().required(),
-  STRIPE_CONNECT_ENDPOINT_SECRET: Joi.string().required(),
-}).required()
+  STRIPE_SECRET_KEY: Joi.string().allow('').optional(),
+  STRIPE_ENDPOINT_SECRET: Joi.string().allow('').optional(),
+  STRIPE_CONNECT_ENDPOINT_SECRET: Joi.string().allow('').optional(),
+})

@@ -10,13 +10,15 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), visualizer({ filename: 'analyze.html', gzipSize: true })],
     assetsInclude: ['**/*.md', '**/*.csv'],
+    envDir: path.resolve(__dirname, '../../'),
     server: {
+      port: 3000,
       // dev proxy server
       proxy: {
         ...(mode === 'development'
           ? {
             '/api': {
-              target: 'https://flowclass.io',
+              target: 'http://localhost:5001',
               changeOrigin: true,
               rewrite: (path) => path.replace(/^\/api/, ""),
             },

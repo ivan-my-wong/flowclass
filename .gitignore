@@ -32,7 +32,14 @@ libs/*/node_modules/
 
 # Uploaded media (local dev and Docker bind mount)
 uploads/
-.playwright-mcp
+__uploads/
+.playwright-mcp/
+playwright-report/
+test-results/
+*.tsbuildinfo
+.wwebjs_auth/
+.wwebjs_cache/
+auth.json
 
 # SSH Automation
-*_run.exp
+*.exp

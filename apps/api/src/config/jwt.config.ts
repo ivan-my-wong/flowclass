@@ -13,13 +13,13 @@ export type JwtConfig = {
 }
 
 export const jwtConfigSchema = Joi.object<JwtConfig>({
-  JWT_SECRET: Joi.string().required(),
-  JWT_EXPIRES_IN: Joi.string().required(),
-  JWT_REFRESH_SECRET: Joi.string().required(),
-  JWT_REFRESH_EXPIRES_IN: Joi.string().required(),
-  JWT_SECRET_STUDENT: Joi.string().required(),
-  JWT_TOKEN_FORGOT_PASSWORD_SECRET_KEY: Joi.string().required(),
-  JWT_TOKEN_FORGOT_PASSWORD_EXPRIED: Joi.string().required(),
-  JWT_TOKEN_ENROLL_COURSE_SECRET_KEY: Joi.string().required(),
-  JWT_TOKEN_ENROLL_COURSE_EXPRIED: Joi.string().required(),
-}).required()
+  JWT_SECRET: Joi.string().empty('').default('flowclass-jwt-secret-dev'),
+  JWT_EXPIRES_IN: Joi.string().empty('').default('7d'),
+  JWT_REFRESH_SECRET: Joi.string().empty('').default('flowclass-jwt-refresh-secret-dev'),
+  JWT_REFRESH_EXPIRES_IN: Joi.string().empty('').default('30d'),
+  JWT_SECRET_STUDENT: Joi.string().empty('').default('flowclass-jwt-student-secret-dev'),
+  JWT_TOKEN_FORGOT_PASSWORD_SECRET_KEY: Joi.string().empty('').default('flowclass-jwt-forgot-password-secret-dev'),
+  JWT_TOKEN_FORGOT_PASSWORD_EXPRIED: Joi.string().empty('').default('1d'),
+  JWT_TOKEN_ENROLL_COURSE_SECRET_KEY: Joi.string().empty('').default('flowclass-jwt-enroll-course-secret-dev'),
+  JWT_TOKEN_ENROLL_COURSE_EXPRIED: Joi.string().empty('').default('7d'),
+})

@@ -10,7 +10,7 @@ export type BaseConfig = {
 }
 
 export const baseConfigSchema = Joi.object<BaseConfig>({
-  APP_ENV: Joi.string().valid(...envs),
-  APP_PORT: Joi.number().required(),
-  APP_HOSTNAME: Joi.string().required(),
-}).required()
+  APP_ENV: Joi.string().valid(...envs).default('local'),
+  APP_PORT: Joi.number().default(5000),
+  APP_HOSTNAME: Joi.string().default('localhost'),
+})

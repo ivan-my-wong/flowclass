@@ -22,17 +22,26 @@ import { initExtensions } from './exts'
 
 async function initFirebase(config: ConfigService<TAppConfig>) {
   const firebasePrivateKey = config.get('FIREBASE_PRIVATE_KEY')
+  const firebaseProjectId = config.get('FIREBASE_PROJECT_ID')
 
-  initializeApp({
-    // credential: applicationDefault(),
-    credential: admin.credential.cert({
-      projectId: config.get('FIREBASE_PROJECT_ID'),
-      privateKey: JSON.parse(firebasePrivateKey.replace(/\n/g, '\\n')).replace(/\\n/g, '\n'),
-      clientEmail: config.get('FIREBASE_CLIENT_EMAIL'),
-    } as admin.ServiceAccount),
+  if (!firebasePrivateKey || !firebaseProjectId) {
+    return
+  }
 
-    projectId: config.get('FIREBASE_PROJECT_ID'),
-  })
+  try {
+    initializeApp({
+      // credential: applicationDefault(),
+      credential: admin.credential.cert({
+        projectId: firebaseProjectId,
+        privateKey: JSON.parse(firebasePrivateKey.replace(/\n/g, '\\n')).replace(/\\n/g, '\n'),
+        clientEmail: config.get('FIREBASE_CLIENT_EMAIL'),
+      } as admin.ServiceAccount),
+
+      projectId: firebaseProjectId,
+    })
+  } catch (error) {
+    console.warn('Firebase initialization skipped or failed:', error?.message || error)
+  }
 }
 
 async function initSwagger(app: INestApplication) {
